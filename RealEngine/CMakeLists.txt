@@ -1,0 +1,37 @@
+add_library(RealEngine STATIC
+             Button.hpp	             Button.cpp
+             ClosedList.hpp	         ClosedList.cpp
+             CursorDrawer.hpp	     CursorDrawer.cpp
+             Error.hpp	             Error.cpp
+             Font.hpp	             Font.cpp
+             FontCache.hpp	         FontCache.cpp
+             Incrementer.hpp	     Incrementer.cpp
+             InputManager.hpp	     InputManager.cpp
+             key.hpp	             key.cpp
+             GeometryBatch.hpp	     GeometryBatch.cpp
+             MainProgram.hpp	     MainProgram.cpp
+             PlainText.hpp	         PlainText.cpp
+             RealEngine.hpp	         RealEngine.cpp
+             ResourceManager.hpp	 ResourceManager.cpp
+             lodepng.hpp	         lodepng.cpp
+             RoomVector.hpp	         RoomVector.cpp
+             ShaderProgram.hpp	     ShaderProgram.cpp
+             ShaderProgramCache.hpp	 ShaderProgramCache.cpp
+             Slider.hpp	             Slider.cpp
+             Sprite.hpp	             Sprite.cpp
+             SpriteBatch.hpp	     SpriteBatch.cpp
+             Surface.hpp	         Surface.cpp
+             Synchronizer.hpp	     Synchronizer.cpp
+             TextField.hpp	         TextField.cpp
+             Texture.hpp	         Texture.cpp
+             TextureCache.hpp	     TextureCache.cpp
+             TextureFlags.hpp	     TextureFlags.cpp
+             TextureGeometry.hpp	 TextureGeometry.cpp
+             TextureImage.hpp	     TextureImage.cpp
+             TextureParameters.hpp	 TextureParameters.cpp
+             TypingHandle.hpp	     TypingHandle.cpp
+             UniformManager.hpp	     UniformManager.cpp
+             utility.hpp	         utility.cpp
+             View.hpp	             View.cpp
+             Window.hpp	             Window.cpp
+             Room.hpp	             Room.cpp )

@@ -1,4 +1,4 @@
-#include "Room.h"
+#include <RealEngine/Room.hpp>
 
 namespace RE {
 
@@ -11,7 +11,7 @@ Room::~Room() {
 }
 
 int Room::getMyIndex() {
-	return m_roomIndex;
+	return p_roomIndex;
 }
 
 }
