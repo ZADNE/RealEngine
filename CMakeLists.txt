@@ -24,6 +24,13 @@ FetchContent_Declare(json
  )
 FetchContent_MakeAvailable(json)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC glm PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME}
+	PUBLIC
+		glm
+		nlohmann_json::nlohmann_json
+)
 
-target_include_directories(${PROJECT_NAME} PUBLIC .)
+target_include_directories(${PROJECT_NAME}
+	PUBLIC
+		.
+)
