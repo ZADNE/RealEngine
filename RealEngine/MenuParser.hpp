@@ -202,12 +202,13 @@ namespace RGUI {
 		};
 
 		//COMMON
+		using uchar = unsigned char;
 		ParameterInfo<ControllerType> type = std::make_pair(ControllerType::TEMPLATE, BY_DEF);
 		ParameterInfo<glm::vec2> pos = std::make_pair(glm::vec2(0.0f, 0.0f), UNDEF);
 		ParameterInfo<glm::vec2> dim = std::make_pair(glm::vec2(0.0f, 0.0f), UNDEF);
-		ParameterInfo<std::string> text = std::make_pair("", UNDEF);
-		ParameterInfo<std::string> textureName = std::make_pair("", UNDEF);
-		ParameterInfo<std::string> fontName = std::make_pair("", UNDEF);
+		ParameterInfo<std::string> text = std::make_pair(std::string{""}, UNDEF);
+		ParameterInfo<std::string> textureName = std::make_pair(std::string{""}, UNDEF);
+		ParameterInfo<std::string> fontName = std::make_pair(std::string{""}, UNDEF);
 		ParameterInfo<int> fontSize = std::make_pair(-1, UNDEF);
 		ParameterInfo<glm::uvec2> fontBounds = std::make_pair(glm::uvec2(FIRST_PRINTABLE_CHAR, LAST_PRINTABLE_CHAR), BY_DEF);
 		ParameterInfo<RE::Colour> fontColourNormal = std::make_pair(RE::Colour{}, UNDEF);
@@ -219,15 +220,15 @@ namespace RGUI {
 		ParameterInfo<int> onPress = std::make_pair(-1, BY_DEF);
 		ParameterInfo<int> onHover = std::make_pair(-1, BY_DEF);
 		ParameterInfo<int> onRelease = std::make_pair(-1, BY_DEF);
-		ParameterInfo<unsigned char> enabled = std::make_pair(true, BY_DEF);
+		ParameterInfo<unsigned char> enabled = std::make_pair(uchar{1}, BY_DEF);
 		//SLIDER
 		ParameterInfo<glm::vec2> slider_bounds = std::make_pair(glm::vec2{}, UNDEF);
 		ParameterInfo<float> slider_steps = std::make_pair(101.0f, BY_DEF);
-		ParameterInfo<unsigned char> slider_decimals = std::make_pair(2u, BY_DEF);
+		ParameterInfo<unsigned char> slider_decimals = std::make_pair(uchar{2}, BY_DEF);
 		ParameterInfo<float> slider_default_portion = std::make_pair(0.5f, BY_DEF);
 		//CLOSED LIST
 		ParameterInfo<std::vector<std::string>> closedList_list = std::make_pair(std::vector<std::string>{}, UNDEF);
-		ParameterInfo<size_t> closedList_chosen = std::make_pair(0, BY_DEF);
+		ParameterInfo<size_t> closedList_chosen = std::make_pair(size_t{0}, BY_DEF);
 	};
 
 	class MenuParser {

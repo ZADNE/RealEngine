@@ -85,25 +85,25 @@ Example usage
 
 #define SMARTENUM_STRING(typeName, value) STR(e##typeName##_##value),
 #define SMARTENUM_DEFINE_NAMES(typeName, values) const char* typeName##Array [] = { values(SMARTENUM_STRING) "ERROR_NAME", };
-#define enumToString(typeName, value) ((value < e##typeName##_Count && value >= 0) ? typeName##Array[##value] : "ERROR_NAME")
+#define enumToString(typeName, value) ((value < e##typeName##_Count && value >= 0) ? typeName##Array[value] : "ERROR_NAME")
 
 #define SMARTENUM_DEFINE_GET_VALUE_FROM_STRING(typeName, name)       \
 	typeName get##typeName##FromString(const std::string& str)     \
 	{                               \
 		for (int i = 0; i < e##typeName##_Count; ++i)    \
-			if (!strcmp(##typeName##Array[i], str.c_str()))     \
-				return (##typeName##)i;         \
+			if (!strcmp(typeName##Array[i], str.c_str()))     \
+				return (typeName)i;         \
 		return e##typeName##_Error;             \
 	}
-#define stringToEnum(typeName, name)  get##typeName##FromString(##name)
+#define stringToEnum(typeName, name)  get##typeName##FromString(name)
 
 #define SMARTENUM_CATEGORY(typeName, value) STR(typeName),
 #define SMARTENUM_DEFINE_CATEGORIES(typeName, values) const char* typeName##Cat [] = { values(SMARTENUM_CATEGORY) "ERROR_CAT", };
-#define enumToCat(typeName, value) ((value < e##typeName##_Count && value >= 0) ? typeName##Cat[##value] : "ERROR_CAT")
+#define enumToCat(typeName, value) ((value < e##typeName##_Count && value >= 0) ? typeName##Cat[value] : "ERROR_CAT")
 
 #define SMARTENUM_IDENTIFIER(typeName, value) STR(value),
 #define SMARTENUM_DEFINE_IDENTIFIERS(typeName, values) const char* typeName##Iden [] = { values(SMARTENUM_IDENTIFIER) "ERROR_IDEN", };
-#define enumToIden(typeName, value) ((value < e##typeName##_Count && value >= 0) ? typeName##Iden[##value] : "ERROR_IDEN")
+#define enumToIden(typeName, value) ((value < e##typeName##_Count && value >= 0) ? typeName##Iden[value] : "ERROR_IDEN")
 
 #define SMARTENUM_INIT_ALL(typeName, value) \
 	SMARTENUM_DEFINE_ENUM(typeName, value) \
@@ -111,3 +111,5 @@ Example usage
 	SMARTENUM_DEFINE_GET_VALUE_FROM_STRING(typeName, value) \
 	SMARTENUM_DEFINE_CATEGORIES(typeName, value) \
 	SMARTENUM_DEFINE_IDENTIFIERS(typeName, value)
+
+	

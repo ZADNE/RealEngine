@@ -11,7 +11,7 @@
 namespace RE {
 	class SpriteBatch;
 
-	using FontChar = char32_t;
+	using FontChar = char;
 	using FontString = std::basic_string<FontChar>;
 	using FontStringStream = std::basic_stringstream<FontChar>;
 
@@ -22,8 +22,8 @@ namespace RE {
 		glm::vec2 size;
 	};
 
-#define FIRST_PRINTABLE_CHAR ((FontChar)32)
-#define LAST_PRINTABLE_CHAR ((FontChar)126)
+#define FIRST_PRINTABLE_CHAR (32)
+#define LAST_PRINTABLE_CHAR (126)
 
 	//For text justification
 	enum class HAlign {
@@ -36,20 +36,20 @@ namespace RE {
 	class Font {
 	public:
 		Font() {}
-		Font(const char* font, int size, FontChar cs, FontChar ce);
+		Font(const char* font, int size, char32_t cs, char32_t ce);
 		Font(const char* font, int size) :
 			Font(font, size, FIRST_PRINTABLE_CHAR, LAST_PRINTABLE_CHAR) {
 		}
 
 		void init(const char* font, int size);
-		void init(const char* font, int size, FontChar cs, FontChar ce);
+		void init(const char* font, int size, char32_t cs, char32_t ce);
 
 		//Destroys the font resources
 		void dispose();
 
 		float getFontHeight() const { return m_fontHeight; }
-		FontChar getStartChar() const { return m_cs; }
-		FontChar getEndChar() const { return m_ce; }
+		char32_t getStartChar() const { return m_cs; }
+		char32_t getEndChar() const { return m_ce; }
 
 		//Measures the dimensions of the text
 		glm::vec2 measure(const FontString& s) const;
@@ -88,7 +88,7 @@ namespace RE {
 
 		unsigned int m_texID = 0u;
 
-		FontChar m_cs = FIRST_PRINTABLE_CHAR;
-		FontChar m_ce = LAST_PRINTABLE_CHAR;
+		char32_t m_cs = FIRST_PRINTABLE_CHAR;
+		char32_t m_ce = LAST_PRINTABLE_CHAR;
 	};
 }

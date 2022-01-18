@@ -38,7 +38,7 @@ namespace {
 	SMARTENUM_INIT_ALL(BL, KB_BINDING_LIST)
 }
 
-#define KB(enum) (RE::KeyBinder::std())[BL::e##enum##]
+#define KB(enum) (RE::KeyBinder::std())[BL::e##enum]
 
 namespace RE {
 
@@ -195,7 +195,7 @@ namespace RE {
 			}
 
 			MainProgram::std->checkForInput(true);
-			delete ptr;
+			delete info;
 			return 0;
 		}
 

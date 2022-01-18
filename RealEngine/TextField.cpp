@@ -115,10 +115,10 @@ namespace RGUI {
 		}
 		else if (p_writing && ((p_steps / 22u) % 2u) == 0u) {
 			//Text field
-			p_font->add(*p_spriteBatch,str + U'|', p_middlePos, p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
+			p_font->add(*p_spriteBatch, str + '|', p_middlePos, p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
 		}
 		else {
-			p_font->add(*p_spriteBatch, str + U' ', p_middlePos, p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
+			p_font->add(*p_spriteBatch, str + ' ', p_middlePos, p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
 		}
 	}
 

@@ -280,21 +280,21 @@ namespace RGUI {
 			size_t index;
 			switch (info.type()) {
 			case ControllerType::BUTTON: {
-				Button ctrl{ info.pos(), info.dim(), info.text(), RE::RM::getTexture(info.textureName()), m_spriteBatch, RE::RM::getFont(RE::FontSeed{ info.fontName(), info.fontSize(), (Uint16)info.fontBounds().x, (Uint16)info.fontBounds().y }), fontColours, info.drawDepth() };
+				Button ctrl{ info.pos(), info.dim(), info.text(), RE::RM::getTexture(info.textureName()), m_spriteBatch, RE::RM::getFont(RE::FontSeed{ info.fontName(), info.fontSize(), info.fontBounds().x, info.fontBounds().y }), fontColours, info.drawDepth() };
 				if (!info.enabled()) { ctrl.disable(); }
 				auto& vec = std::get<std::vector<MenuEntry<decltype(ctrl), Observer>>>(m_controllers);
 				index = vec.size();
 				vec.emplace_back(ctrl, info.activeState(), name, info.enabled(), onPress, onHover, onRelease);
 				break; }
 			case ControllerType::TEXT_FIELD: {
-				TextField ctrl{ info.pos(), info.dim(), info.text(), RE::RM::getTexture(info.textureName()), m_spriteBatch, RE::RM::getFont(RE::FontSeed{ info.fontName(), info.fontSize(), (Uint16)info.fontBounds().x, (Uint16)info.fontBounds().y }), fontColours, info.drawDepth(), m_typingHandle };
+				TextField ctrl{ info.pos(), info.dim(), info.text(), RE::RM::getTexture(info.textureName()), m_spriteBatch, RE::RM::getFont(RE::FontSeed{ info.fontName(), info.fontSize(), info.fontBounds().x, info.fontBounds().y }), fontColours, info.drawDepth(), m_typingHandle };
 				if (!info.enabled()) { ctrl.disable(); }
 				auto& vec = std::get<std::vector<MenuEntry<decltype(ctrl), Observer>>>(m_controllers);
 				index = vec.size();
 				vec.emplace_back(ctrl, info.activeState(), name, info.enabled(), onPress, onHover, onRelease);
 				break; }
 			case ControllerType::SLIDER: {
-				Slider ctrl{ info.pos(), info.dim(), info.text(), RE::RM::getTexture(info.textureName()), m_spriteBatch, RE::RM::getFont(RE::FontSeed{ info.fontName(), info.fontSize(), (Uint16)info.fontBounds().x, (Uint16)info.fontBounds().y }), fontColours, info.drawDepth(), info.slider_bounds().x, info.slider_bounds().y, info.slider_steps(), info.slider_decimals() };
+				Slider ctrl{ info.pos(), info.dim(), info.text(), RE::RM::getTexture(info.textureName()), m_spriteBatch, RE::RM::getFont(RE::FontSeed{ info.fontName(), info.fontSize(), info.fontBounds().x, info.fontBounds().y }), fontColours, info.drawDepth(), info.slider_bounds().x, info.slider_bounds().y, info.slider_steps(), info.slider_decimals() };
 				ctrl.setPortion(info.slider_default_portion());
 				if (!info.enabled()) { ctrl.disable(); }
 				auto& vec = std::get<std::vector<MenuEntry<decltype(ctrl), Observer>>>(m_controllers);
@@ -302,14 +302,14 @@ namespace RGUI {
 				vec.emplace_back(ctrl, info.activeState(), name, info.enabled(), onPress, onHover, onRelease);
 				break; }
 			case ControllerType::PLAIN_TEXT: {
-				PlainText ctrl{ info.pos(), info.dim(), info.text(), RE::RM::getTexture(info.textureName()), m_spriteBatch, RE::RM::getFont(RE::FontSeed{ info.fontName(), info.fontSize(), (Uint16)info.fontBounds().x, (Uint16)info.fontBounds().y }), fontColours, info.drawDepth() };
+				PlainText ctrl{ info.pos(), info.dim(), info.text(), RE::RM::getTexture(info.textureName()), m_spriteBatch, RE::RM::getFont(RE::FontSeed{ info.fontName(), info.fontSize(), info.fontBounds().x, info.fontBounds().y }), fontColours, info.drawDepth() };
 				if (!info.enabled()) { ctrl.disable(); }
 				auto& vec = std::get<std::vector<MenuEntry<decltype(ctrl), Observer>>>(m_controllers);
 				index = vec.size();
 				vec.emplace_back(ctrl, info.activeState(), name, info.enabled(), onPress, onHover, onRelease);
 				break; }
 			case ControllerType::CLOSED_LIST: {
-				ClosedList ctrl{ info.pos(), info.dim(), RE::RM::getTexture(info.textureName()), m_spriteBatch, RE::RM::getFont(RE::FontSeed{ info.fontName(), info.fontSize(), (Uint16)info.fontBounds().x, (Uint16)info.fontBounds().y }), fontColours, info.drawDepth(), info.closedList_list() };
+				ClosedList ctrl{ info.pos(), info.dim(), RE::RM::getTexture(info.textureName()), m_spriteBatch, RE::RM::getFont(RE::FontSeed{ info.fontName(), info.fontSize(), info.fontBounds().x, info.fontBounds().y }), fontColours, info.drawDepth(), info.closedList_list() };
 				ctrl.choose(info.closedList_chosen());
 				if (!info.enabled()) { ctrl.disable(); }
 				auto& vec = std::get<std::vector<MenuEntry<decltype(ctrl), Observer>>>(m_controllers);

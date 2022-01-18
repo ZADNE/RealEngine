@@ -20,7 +20,7 @@ int closestPow2(int i) {
 
 namespace RE {
 
-	Font::Font(const char* font, int size, FontChar cs, FontChar ce) {
+	Font::Font(const char* font, int size, char32_t cs, char32_t ce) {
 		init(font, size, cs, ce);
 	}
 
@@ -28,7 +28,7 @@ namespace RE {
 		init(font, size, FIRST_PRINTABLE_CHAR, LAST_PRINTABLE_CHAR);
 	}
 
-	void Font::init(const char* font, int size, FontChar cs, FontChar ce) {
+	void Font::init(const char* font, int size, char32_t cs, char32_t ce) {
 		// Initialize SDL_ttf
 		if (!TTF_WasInit()) {
 			TTF_Init();
@@ -308,11 +308,11 @@ namespace RE {
 			tp.x = trueOrigin.x;
 			break;
 		case HAlign::LEFT:
-			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			temp = s.substr(0u, s.find_first_of("\n", 0u));
 			tp.x = trueOrigin.x - measure(temp).x;
 			break;
 		case HAlign::MIDDLE:
-			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			temp = s.substr(0u, s.find_first_of("\n", 0u));
 			tp.x = trueOrigin.x - measure(temp).x / 2.0f;
 			break;
 		}
@@ -325,11 +325,11 @@ namespace RE {
 					tp.x = trueOrigin.x;
 					break;
 				case HAlign::LEFT:
-					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					temp = s.substr(si + 1u, s.find_first_of("\n", si + 1u) - 1u - si);
 					tp.x = trueOrigin.x - measure(temp).x;
 					break;
 				case HAlign::MIDDLE:
-					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					temp = s.substr(si + 1u, s.find_first_of("\n", si + 1u) - 1u - si);
 					tp.x = trueOrigin.x - measure(temp).x / 2.0f;
 					break;
 				}
@@ -380,11 +380,11 @@ namespace RE {
 			tp.x = trueOrigin.x;
 			break;
 		case HAlign::LEFT:
-			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			temp = s.substr(0u, s.find_first_of("\n", 0u));
 			tp.x = trueOrigin.x - measure(temp).x * scaling.x;
 			break;
 		case HAlign::MIDDLE:
-			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			temp = s.substr(0u, s.find_first_of("\n", 0u));
 			tp.x = trueOrigin.x - measure(temp).x / 2.0f * scaling.x;
 			break;
 		}
@@ -398,11 +398,11 @@ namespace RE {
 					tp.x = trueOrigin.x;
 					break;
 				case HAlign::LEFT:
-					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					temp = s.substr(si + 1u, s.find_first_of("\n", si + 1u) - 1u - si);
 					tp.x = trueOrigin.x - measure(temp).x * scaling.x;
 					break;
 				case HAlign::MIDDLE:
-					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					temp = s.substr(si + 1u, s.find_first_of("\n", si + 1u) - 1u - si);
 					tp.x = trueOrigin.x - measure(temp).x / 2.0f * scaling.x;
 					break;
 				}
@@ -456,11 +456,11 @@ namespace RE {
 			tp.x = trueOrigin.x;
 			break;
 		case HAlign::LEFT:
-			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			temp = s.substr(0u, s.find_first_of("\n", 0u));
 			tp.x = trueOrigin.x - measure(temp).x;
 			break;
 		case HAlign::MIDDLE:
-			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			temp = s.substr(0u, s.find_first_of("\n", 0u));
 			tp.x = trueOrigin.x - measure(temp).x / 2.0f;
 			break;
 		}
@@ -474,12 +474,12 @@ namespace RE {
 					tp.y = trueOrigin.y - m_fontHeight * lineIndex * cos(rots.x);
 					break;
 				case HAlign::LEFT:
-					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					temp = s.substr(si + 1u, s.find_first_of("\n", si + 1u) - 1u - si);
 					tp.x = trueOrigin.x - measure(temp).x * cos(rots.x) + (m_fontHeight * ++lineIndex) * sin(rots.x);
 					tp.y = trueOrigin.y - (m_fontHeight * lineIndex) * cos(rots.x) - measure(temp).x * sin(rots.x);
 					break;
 				case HAlign::MIDDLE:
-					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					temp = s.substr(si + 1u, s.find_first_of("\n", si + 1u) - 1u - si);
 					tp.x = trueOrigin.x - measure(temp).x / 2.0f;
 					break;
 				}
