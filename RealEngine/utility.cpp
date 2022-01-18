@@ -1,10 +1,13 @@
 #include <RealEngine/utility.hpp>
 
+#include <cmath>
 
 namespace rmath {
 
-	float rmath::distance(const glm::ivec2& p1, const glm::ivec2& p2) {
-		return (float)sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+	float distance(const glm::ivec2& p1, const glm::ivec2& p2) {
+		int xx = p1.x - p2.x;
+		int yy = p1.y - p2.y;
+		return std::sqrt(static_cast<float>(xx * xx + yy * yy));
 	}
 
 	bool isInsideCircle(const glm::ivec2& point, const glm::ivec2& center, float radius) {

@@ -1,9 +1,8 @@
 #pragma once
 #include <memory>
-#include <codecvt>
 
-#include <SDL\SDL_events.h>
-#include <glm\vec2.hpp>
+#include <SDL2/SDL_events.h>
+#include <glm/vec2.hpp>
 
 #include <RealEngine/RoomVector.hpp>
 #include <RealEngine/RealEngine.hpp>
@@ -11,6 +10,7 @@
 #include <RealEngine/Window.hpp>
 #include <RealEngine/Synchronizer.hpp>
 #include <RealEngine/ResourceManager.hpp>
+#include <RealEngine/Font.hpp>
 
 
 namespace RE {
@@ -71,9 +71,9 @@ namespace RE {
 
 		//The string will be edited as the player types
 		//Use nullptr to stop typing
-		void setTypeString(std::string* string, bool blockPressInput = false);
+		void setTypeString(FontString* string, bool blockPressInput = false);
 		//Returns the current target for typing = nullptr means there is not target
-		std::string const* getTypeString() const;
+		FontString const* getTypeString() const;
 
 		//Getters
 		InputManager* IM() {
@@ -109,12 +109,10 @@ namespace RE {
 		bool p_checkForInput = true;
 
 		//Typing
-		std::string* p_typeString = nullptr;
+		FontString* p_typeString = nullptr;
 		bool p_blockPressInput = false;
 
 	private:
-		static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> m_convert_utf8_utf16;
-
 		Window m_window;
 
 		Synchronizer m_synchronizer{ 50u, 50u };

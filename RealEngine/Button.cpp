@@ -8,7 +8,7 @@ namespace RGUI {
 
 	}
 
-	Button::Button(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth) :
+	Button::Button(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth) :
 		p_botleft(botLeft),
 		p_dims(dims),
 		p_text(text),
@@ -28,7 +28,7 @@ namespace RGUI {
 
 	}
 
-	void Button::init(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth) {
+	void Button::init(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth) {
 		p_botleft = botLeft;
 		p_dims = dims;
 		p_text = text;
@@ -141,7 +141,7 @@ namespace RGUI {
 
 	void Button::drawText() const {
 		//Text
-		p_font->add(*p_spriteBatch, p_text.c_str(), p_middlePos, p_depth, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
+		p_font->add(*p_spriteBatch, p_text, p_middlePos, p_depth, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
 	}
 
 }

@@ -1,8 +1,9 @@
 #pragma once
 #include <vector>
 
-#include <GL\glew.h>
-#include <glm\glm.hpp>
+#include <GL/glew.h>
+#include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
 
 #include <RealEngine/Surface.hpp>
 #include <RealEngine/Texture.hpp>

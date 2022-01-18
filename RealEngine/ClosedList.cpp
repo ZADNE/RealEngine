@@ -8,7 +8,7 @@ namespace RGUI {
 
 	}
 
-	ClosedList::ClosedList(const glm::vec2& botLeft, const glm::vec2& dims, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, const std::vector<std::string>& list) :
+	ClosedList::ClosedList(const glm::vec2& botLeft, const glm::vec2& dims, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, const std::vector<RE::FontString>& list) :
 		Button{ botLeft, dims, list[0], tex, spriteBatch, font, textTint, depth },
 		p_list(list),
 		p_optionHeight(p_dims.y - p_cornerDim.y){
@@ -19,7 +19,7 @@ namespace RGUI {
 
 	}
 
-	void ClosedList::init(const glm::vec2& botLeft, const glm::vec2& dims, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, const std::vector<std::string>& list) {
+	void ClosedList::init(const glm::vec2& botLeft, const glm::vec2& dims, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, const std::vector<RE::FontString>& list) {
 		Button::init(botLeft, dims, p_list[p_chosen], tex, spriteBatch, font, textTint, depth);
 		p_list = list;
 	}
@@ -54,7 +54,7 @@ namespace RGUI {
 		p_state = STATE_HIGHLIGHTED;
 	}
 
-	std::string ClosedList::getOption() const {
+	RE::FontString ClosedList::getOption() const {
 		return p_list[p_chosen];
 	}
 
@@ -64,7 +64,7 @@ namespace RGUI {
 		p_text = p_list[p_chosen];
 	}
 
-	void ClosedList::changelist(const std::vector<std::string>& newList) {
+	void ClosedList::changelist(const std::vector<RE::FontString>& newList) {
 		p_list = newList;
 		p_chosen = std::min(p_chosen, p_list.size() - 1);
 		p_text = p_list[p_chosen];
@@ -129,10 +129,10 @@ namespace RGUI {
 
 	void ClosedList::drawOptionText(size_t index) const {
 		if (index != 0u) {
-			p_font->add(*p_spriteBatch, p_list[index - 1u].c_str(), glm::vec2(p_middlePos.x, p_middlePos.y - (float)index * p_optionHeight), p_depth + 2, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
+			p_font->add(*p_spriteBatch, p_list[index - 1u], glm::vec2(p_middlePos.x, p_middlePos.y - (float)index * p_optionHeight), p_depth + 2, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
 		}
 		else {
-			p_font->add(*p_spriteBatch, p_list[p_chosen].c_str(), p_middlePos, p_depth + 2, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
+			p_font->add(*p_spriteBatch, p_list[p_chosen], p_middlePos, p_depth + 2, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
 		}
 	}
 

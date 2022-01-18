@@ -9,7 +9,7 @@ namespace RGUI {
 
 	}
 
-	TextField::TextField(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, RE::TypingHandle handle) :
+	TextField::TextField(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, RE::TypingHandle handle) :
 		Button{ botLeft, dims, text, tex, spriteBatch, font, textTint, depth } {
 		p_typingHandle = handle;
 	}
@@ -18,7 +18,7 @@ namespace RGUI {
 
 	}
 
-	void TextField::init(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, RE::TypingHandle handle) {
+	void TextField::init(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, RE::TypingHandle handle) {
 		Button::init(botLeft, dims, text, tex, spriteBatch, font, textTint, depth);
 		p_typingHandle = handle;
 	}
@@ -107,18 +107,18 @@ namespace RGUI {
 	}*/
 
 	void TextField::drawText() const {
-		std::string str = p_typingHandle.visit();
-		if (!p_writing && (str == "")) {
+		RE::FontString str = p_typingHandle.visit();
+		if (!p_writing && str.empty()) {
 			//Default text
-			p_font->add(*p_spriteBatch, p_text.c_str(), p_middlePos, p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
+			p_font->add(*p_spriteBatch, p_text, p_middlePos, p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
 
 		}
 		else if (p_writing && ((p_steps / 22u) % 2u) == 0u) {
 			//Text field
-			p_font->add(*p_spriteBatch, (str + "|").c_str(), p_middlePos, p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
+			p_font->add(*p_spriteBatch,str + U'|', p_middlePos, p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
 		}
 		else {
-			p_font->add(*p_spriteBatch, (str + " ").c_str(), p_middlePos, p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
+			p_font->add(*p_spriteBatch, str + U' ', p_middlePos, p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
 		}
 	}
 

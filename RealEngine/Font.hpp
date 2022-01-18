@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
-#include <codecvt>
+#include <string>
 
-#include <SDL/SDL_ttf.h>
+#include <SDL2/SDL_ttf.h>
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
@@ -11,15 +11,19 @@
 namespace RE {
 	class SpriteBatch;
 
+	using FontChar = char32_t;
+	using FontString = std::basic_string<FontChar>;
+	using FontStringStream = std::basic_stringstream<FontChar>;
+
 	struct CharGlyph {
 	public:
-		Uint16 character;
+		FontChar character;
 		glm::vec4 uvRect;
 		glm::vec2 size;
 	};
 
-#define FIRST_PRINTABLE_CHAR ((Uint16)32)
-#define LAST_PRINTABLE_CHAR ((Uint16)126)
+#define FIRST_PRINTABLE_CHAR ((FontChar)32)
+#define LAST_PRINTABLE_CHAR ((FontChar)126)
 
 	//For text justification
 	enum class HAlign {
@@ -32,55 +36,40 @@ namespace RE {
 	class Font {
 	public:
 		Font() {}
-		Font(const char* font, int size, Uint16 cs, Uint16 ce);
+		Font(const char* font, int size, FontChar cs, FontChar ce);
 		Font(const char* font, int size) :
 			Font(font, size, FIRST_PRINTABLE_CHAR, LAST_PRINTABLE_CHAR) {
 		}
 
 		void init(const char* font, int size);
-		void init(const char* font, int size, Uint16 cs, Uint16 ce);
+		void init(const char* font, int size, FontChar cs, FontChar ce);
 
 		//Destroys the font resources
 		void dispose();
 
 		float getFontHeight() const { return m_fontHeight; }
-		Uint16 getStartChar() const { return m_cs; }
-		Uint16 getEndChar() const { return m_ce; }
+		FontChar getStartChar() const { return m_cs; }
+		FontChar getEndChar() const { return m_ce; }
 
 		//Measures the dimensions of the text
-		glm::vec2 measure(const wchar_t* s) const;
-		glm::vec2 measure(const char* s) const;
-
-		glm::vec2 measure(const wchar_t* s, const glm::vec2& rots) const;
-		glm::vec2 measure(const char* s, const glm::vec2& rots) const;
+		glm::vec2 measure(const FontString& s) const;
+		glm::vec2 measure(const FontString& s, const glm::vec2& rots) const;
 
 
 		//UNSCALED, UNROTATED
-		void add(SpriteBatch& batch, const char* s, const glm::vec2& position,
-			int depth, Colour tint, HAlign halign = HAlign::RIGHT, VAlign valign = VAlign::FIRST_LINE_ABOVE) const;
-		//UNSCALED, UNROTATED
-		void add(SpriteBatch& batch, const wchar_t* s, const glm::vec2& position,
+		void add(SpriteBatch& batch, const FontString& s, const glm::vec2& position,
 			int depth, Colour tint, HAlign halign = HAlign::RIGHT, VAlign valign = VAlign::FIRST_LINE_ABOVE) const;
 
 		//SCALED, UNROTATED
-		void add(SpriteBatch& batch, const char* s, const glm::vec2& position, const glm::vec2& scaling,
-			int depth, Colour tint, HAlign halign = HAlign::RIGHT, VAlign valign = VAlign::FIRST_LINE_ABOVE) const;
-		//SCALED, UNROTATED
-		void add(SpriteBatch& batch, const wchar_t* s, const glm::vec2& position, const glm::vec2& scaling,
+		void add(SpriteBatch& batch, const FontString& s, const glm::vec2& position, const glm::vec2& scaling,
 			int depth, Colour tint, HAlign halign = HAlign::RIGHT, VAlign valign = VAlign::FIRST_LINE_ABOVE) const;
 
 		//UNSCALED, ROTATED
-		void add(SpriteBatch& batch, const char* s, const glm::vec2& position,
-			int depth, Colour tint, const glm::vec2& rots, HAlign halign = HAlign::RIGHT, VAlign valign = VAlign::FIRST_LINE_ABOVE) const;
-		//UNSCALED, ROTATED
-		void add(SpriteBatch& batch, const wchar_t* s, const glm::vec2& position,
+		void add(SpriteBatch& batch, const FontString& s, const glm::vec2& position,
 			int depth, Colour tint, const glm::vec2& rots, HAlign halign = HAlign::RIGHT, VAlign valign = VAlign::FIRST_LINE_ABOVE) const;
 
 		//SCALED, ROTATED
-		void add(SpriteBatch& batch, const char* s, const glm::vec2& position, const glm::vec2& scaling,
-			int depth, Colour tint, const glm::vec2& rots, HAlign halign = HAlign::RIGHT, VAlign valign = VAlign::FIRST_LINE_ABOVE) const;
-		//SCALED, ROTATED
-		void add(SpriteBatch& batch, const wchar_t* s, const glm::vec2& position, const glm::vec2& scaling,
+		void add(SpriteBatch& batch, const FontString& s, const glm::vec2& position, const glm::vec2& scaling,
 			int depth, Colour tint, const glm::vec2& rots, HAlign halign = HAlign::RIGHT, VAlign valign = VAlign::FIRST_LINE_ABOVE) const;
 
 
@@ -90,7 +79,6 @@ namespace RE {
 		}
 	private:
 		static std::vector<int>* createRows(glm::ivec4* rects, int rectsLength, int r, int padding, int& w);
-		static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> m_convert_utf8_utf16;
 
 		int m_regStart, m_regLength;
 		CharGlyph* m_glyphs = nullptr;
@@ -100,7 +88,7 @@ namespace RE {
 
 		unsigned int m_texID = 0u;
 
-		Uint16 m_cs = FIRST_PRINTABLE_CHAR;
-		Uint16 m_ce = LAST_PRINTABLE_CHAR;
+		FontChar m_cs = FIRST_PRINTABLE_CHAR;
+		FontChar m_ce = LAST_PRINTABLE_CHAR;
 	};
 }

@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <string>
 
-#include <GL\glew.h>
-#include <glm\vec2.hpp>
+#include <GL/glew.h>
+#include <glm/vec2.hpp>
 
 namespace rmath {
 

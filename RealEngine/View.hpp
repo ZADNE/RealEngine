@@ -1,8 +1,8 @@
 #pragma once
-#include <glm\vec2.hpp>
-#include <glm\mat4x4.hpp>
+#include <glm/vec2.hpp>
+#include <glm/mat4x4.hpp>
 
-#include <SDL\SDL_events.h>
+#include <SDL2/SDL_events.h>
 
 namespace RE {
 

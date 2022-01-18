@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <array>
+#include <climits>
 
 #if CHAR_BIT != 8
 #error 8 bits per byte required

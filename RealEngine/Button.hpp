@@ -16,10 +16,10 @@ namespace RGUI {
 		//Edge and filling are stretched to desired dimensions
 		//The subimages should not have odd dimensions and also should have origin of [0; 0]
 		Button();
-		Button(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth);
+		Button(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth);
 		~Button();
 
-		virtual void init(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth);
+		virtual void init(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth);
 
 		//Returns whether the cursor does point on the button
 		bool overlaps(const glm::vec2& cursorPos) const override;
@@ -46,11 +46,11 @@ namespace RGUI {
 		//Should be called each draw step
 		virtual void draw() const;
 
-		std::string getText() const {
+		RE::FontString getText() const {
 			return p_text;
 		};
 
-		std::string& getText() {
+		RE::FontString& getText() {
 			return p_text;
 		};
 
@@ -64,7 +64,7 @@ namespace RGUI {
 		RE::SpriteBatch* p_spriteBatch = nullptr;
 		const RE::Font* p_font = nullptr;
 		RE::TexturePtr p_tex = nullptr;
-		std::string p_text;
+		RE::FontString p_text;
 		glm::vec2 p_botleft;
 		glm::vec2 p_dims;
 		glm::vec2 p_cornerDim;

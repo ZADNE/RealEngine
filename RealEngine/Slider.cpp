@@ -13,7 +13,7 @@ namespace RGUI {
 
 	}
 
-	Slider::Slider(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, float minValue/* = 0.0f*/, float maxValue/* = 1.0f*/, float steps/* = 101.0f*/, unsigned char decimals/* = 2u*/) :
+	Slider::Slider(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, float minValue/* = 0.0f*/, float maxValue/* = 1.0f*/, float steps/* = 101.0f*/, unsigned char decimals/* = 2u*/) :
 		Button{ botLeft, dims, text, tex, spriteBatch, font, textTint, depth } {
 		p_minValue = minValue;
 		p_difference = maxValue - minValue;
@@ -28,7 +28,7 @@ namespace RGUI {
 
 	}
 
-	void Slider::init(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, float minValue/* = 0.0f*/, float maxValue/* = 1.0f*/, float steps/* = 101.0f*/, unsigned char decimals/* = 2u*/) {
+	void Slider::init(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, float minValue/* = 0.0f*/, float maxValue/* = 1.0f*/, float steps/* = 101.0f*/, unsigned char decimals/* = 2u*/) {
 		Button::init(botLeft, dims, text, tex, spriteBatch, font, textTint, depth);
 		p_minValue = minValue;
 		p_difference = maxValue - minValue;
@@ -150,7 +150,7 @@ namespace RGUI {
 			p_spriteBatch->addSubimage(p_tex.get(), p_botleft + glm::vec2(p_rightX - p_cornerDim.x, p_cornerDim.y), p_depth, p_white, 0.0f, glm::vec2(SUBIMAGE_SEPARATOR, p_state), glm::vec2(1.0f, p_edgeScale.y));
 		}
 		//Text
-		p_font->add(*p_spriteBatch, p_text.c_str(), glm::vec2(p_botleft.x + (p_proportion + 0.05f) * p_dims.x * 0.90909f, p_middlePos.y), p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
+		p_font->add(*p_spriteBatch, p_text, glm::vec2(p_botleft.x + (p_proportion + 0.05f) * p_dims.x * 0.90909f, p_middlePos.y), p_depth + 1, p_textTint[(size_t)p_state], RE::HAlign::MIDDLE, RE::VAlign::WHOLE_MIDDLE);
 	}
 
 	void Slider::update() {
@@ -159,7 +159,7 @@ namespace RGUI {
 	}
 
 	void Slider::updateText() {
-		std::stringstream stream;
+		RE::FontStringStream stream;
 		stream << std::fixed << std::setprecision(p_decimals) << (p_minValue + p_proportion * p_difference);
 		p_text = stream.str();
 	}

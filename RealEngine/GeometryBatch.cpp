@@ -115,7 +115,7 @@ namespace RE {
 			rad--; rad |= rad >> 1; rad |= rad >> 2; rad |= rad >> 4; rad |= rad >> 8; rad |= rad >> 16; rad++;
 			rad = (unsigned int)std::log2<unsigned int>(rad);
 			rad = (rad + 4u) / 2u;
-			float steps = std::powf(2.0f, (float)rad);
+			float steps = std::pow(2.0f, (float)rad);
 			for (float j = 0.0f; j < steps; ++j) {//For each edge
 				float d = j * rmath::PI_f * 2.0f / steps;
 				edge.position.x = mid.position.x + cos(d) * data[first + i].rad;

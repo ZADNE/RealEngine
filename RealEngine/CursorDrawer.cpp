@@ -1,6 +1,6 @@
 #include <RealEngine/CursorDrawer.hpp>
 
-#include <SDL/SDL_events.h>
+#include <SDL2/SDL_events.h>
 
 namespace RE {
 

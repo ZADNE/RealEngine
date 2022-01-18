@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 
-#include <glm\vec2.hpp>
-#include <glm\vec4.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
 
 #include <RealEngine/Vertex.hpp>
 #include <RealEngine/TextureParameters.hpp>

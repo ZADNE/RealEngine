@@ -1,7 +1,10 @@
 #include <RealEngine/SpriteBatch.hpp>
-#include <RealEngine/ResourceManager.hpp>
 
 #include <algorithm>
+
+#include <glm/common.hpp>
+
+#include <RealEngine/ResourceManager.hpp>
 
 
 namespace RE {

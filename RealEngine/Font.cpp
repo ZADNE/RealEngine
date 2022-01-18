@@ -20,9 +20,7 @@ int closestPow2(int i) {
 
 namespace RE {
 
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> Font::m_convert_utf8_utf16;
-
-	Font::Font(const char* font, int size, Uint16 cs, Uint16 ce) {
+	Font::Font(const char* font, int size, FontChar cs, FontChar ce) {
 		init(font, size, cs, ce);
 	}
 
@@ -30,7 +28,7 @@ namespace RE {
 		init(font, size, FIRST_PRINTABLE_CHAR, LAST_PRINTABLE_CHAR);
 	}
 
-	void Font::init(const char* font, int size, Uint16 cs, Uint16 ce) {
+	void Font::init(const char* font, int size, FontChar cs, FontChar ce) {
 		// Initialize SDL_ttf
 		if (!TTF_WasInit()) {
 			TTF_Init();
@@ -115,7 +113,7 @@ namespace RE {
 			for (size_t ci = 0; ci < bestPartition[ri].size(); ci++) {
 				int gi = bestPartition[ri][ci];
 
-				SDL_Surface* glyphSurface = TTF_RenderGlyph_Blended(f, (Uint16)(cs + gi), fg);
+				SDL_Surface* glyphSurface = TTF_RenderGlyph_Blended(f, (FontChar)(cs + gi), fg);
 
 
 				// Pre-multiplication occurs here
@@ -228,18 +226,16 @@ namespace RE {
 		return l;
 	}
 
-	glm::vec2 Font::measure(const wchar_t* s) const {
+	glm::vec2 Font::measure(const FontString& s) const {
 		glm::vec2 size(0, m_fontHeight);
 		float cw = 0;
-		for (int si = 0; s[si] != L'\0'; si++) {
-			wchar_t c = s[si];
-			if (s[si] == L'\n') {
+		for (const auto& c: s) {
+			if (c == '\n') {
 				size.y += m_fontHeight;
 				if (size.x < cw)
 					size.x = cw;
 				cw = 0;
-			}
-			else {
+			}else {
 				int gi = c - m_regStart;
 				if (gi < 0 || gi >= m_regLength)
 					gi = m_regLength;
@@ -251,16 +247,11 @@ namespace RE {
 		return size;
 	}
 
-	glm::vec2 Font::measure(const char* s) const {
-		return measure(m_convert_utf8_utf16.from_bytes(s).c_str());
-	}
-
-	glm::vec2 Font::measure(const wchar_t* s, const glm::vec2& rots) const {
+	glm::vec2 Font::measure(const FontString& s, const glm::vec2& rots) const {
 		glm::vec2 size(0, m_fontHeight);
 		float cw = 0;
-		for (int si = 0; s[si] != L'\0'; si++) {
-			wchar_t c = s[si];
-			if (s[si] == L'\n') {
+		for (const auto& c: s) {
+			if (c == '\n') {
 				size.y += m_fontHeight;
 				if (size.x < cw) {
 					size.x = cw;
@@ -279,17 +270,8 @@ namespace RE {
 		return size;
 	}
 
-	glm::vec2 Font::measure(const char* s, const glm::vec2& rots) const {
-		return measure(m_convert_utf8_utf16.from_bytes(s).c_str(), rots);
-	}
-
 	//UNSCALED, UNROTATED
-	void Font::add(SpriteBatch& batch, const char* s, const glm::vec2& position, int depth, Colour tint,
-		HAlign halign/* = HAlign::RIGHT*/, VAlign valign/* = VAlign::FIRST_LINE_ABOVE*/) const {
-		add(batch, m_convert_utf8_utf16.from_bytes(s).c_str(), position, depth, tint, halign, valign);
-	}
-	//UNSCALED, UNROTATED
-	void Font::add(SpriteBatch& batch, const wchar_t* s, const glm::vec2& position, int depth, Colour tint,
+	void Font::add(SpriteBatch& batch, const FontString& s, const glm::vec2& position, int depth, Colour tint,
 		HAlign halign/* = HAlign::RIGHT*/, VAlign valign/* = VAlign::FIRST_LINE_ABOVE*/) const {
 		glm::vec2 tp = position;
 		tp.y += m_fontDescent;
@@ -319,41 +301,39 @@ namespace RE {
 
 		glm::vec2 trueOrigin = tp;
 
-		std::wstring temp = s;
-		std::wstring text = s;
+		auto temp = s;
 
 		switch (halign) {
 		case HAlign::RIGHT:
 			tp.x = trueOrigin.x;
 			break;
 		case HAlign::LEFT:
-			temp = text.substr(0u, text.find_first_of(L"\n\0", 0u));
-			tp.x = trueOrigin.x - measure(temp.c_str()).x;
+			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			tp.x = trueOrigin.x - measure(temp).x;
 			break;
 		case HAlign::MIDDLE:
-			temp = text.substr(0u, text.find_first_of(L"\n\0", 0u));
-			tp.x = trueOrigin.x - measure(temp.c_str()).x / 2.0f;
+			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			tp.x = trueOrigin.x - measure(temp).x / 2.0f;
 			break;
 		}
 		for (int si = 0; s[si] != 0; si++) {
-			wchar_t c = s[si];
-			if (s[si] == L'\n') {
+			auto c = s[si];
+			if (s[si] == '\n') {
 				tp.y -= m_fontHeight;
 				switch (halign) {
 				case HAlign::RIGHT:
 					tp.x = trueOrigin.x;
 					break;
 				case HAlign::LEFT:
-					temp = text.substr(si + 1u, text.find_first_of(L"\n", si + 1u) - 1u - si);
-					tp.x = trueOrigin.x - measure(temp.c_str()).x;
+					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					tp.x = trueOrigin.x - measure(temp).x;
 					break;
 				case HAlign::MIDDLE:
-					temp = text.substr(si + 1u, text.find_first_of(L"\n", si + 1u) - 1u - si);
-					tp.x = trueOrigin.x - measure(temp.c_str()).x / 2.0f;
+					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					tp.x = trueOrigin.x - measure(temp).x / 2.0f;
 					break;
 				}
-			}
-			else {
+			} else {
 				int gi = c - m_regStart;
 				if (gi < 0 || gi >= m_regLength) gi = m_regLength;
 				glm::vec4 destRect(tp, m_glyphs[gi].size);
@@ -364,12 +344,7 @@ namespace RE {
 	}
 
 	//SCALED, UNROTATED
-	void Font::add(SpriteBatch& batch, const char* s, const glm::vec2& position, const glm::vec2& scaling,
-		int depth, Colour tint, HAlign halign/* = HAlign::RIGHT*/, VAlign valign/* = VAlign::FIRST_LINE_ABOVE*/) const {
-		add(batch, m_convert_utf8_utf16.from_bytes(s).c_str(), position, scaling, depth, tint, halign, valign);
-	}
-	//SCALED, UNROTATED
-	void Font::add(SpriteBatch& batch, const wchar_t* s, const glm::vec2& position, const glm::vec2& scaling,
+	void Font::add(SpriteBatch& batch, const FontString& s, const glm::vec2& position, const glm::vec2& scaling,
 		int depth, Colour tint, HAlign halign/* = HAlign::RIGHT*/, VAlign valign/* = VAlign::FIRST_LINE_ABOVE*/) const {
 		glm::vec2 tp = position;
 		tp.y += m_fontDescent * scaling.y;
@@ -398,25 +373,24 @@ namespace RE {
 
 		glm::vec2 trueOrigin = tp;
 
-		std::wstring temp = s;
-		std::wstring text = s;
+		auto temp = s;
 
 		switch (halign) {
 		case HAlign::RIGHT:
 			tp.x = trueOrigin.x;
 			break;
 		case HAlign::LEFT:
-			temp = text.substr(0u, text.find_first_of(L"\n\0", 0u));
-			tp.x = trueOrigin.x - measure(temp.c_str()).x * scaling.x;
+			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			tp.x = trueOrigin.x - measure(temp).x * scaling.x;
 			break;
 		case HAlign::MIDDLE:
-			temp = text.substr(0u, text.find_first_of(L"\n\0", 0u));
-			tp.x = trueOrigin.x - measure(temp.c_str()).x / 2.0f * scaling.x;
+			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			tp.x = trueOrigin.x - measure(temp).x / 2.0f * scaling.x;
 			break;
 		}
 
 		for (int si = 0; s[si] != 0; si++) {
-			wchar_t c = s[si];
+			auto c = s[si];
 			if (s[si] == L'\n') {
 				tp.y -= m_fontHeight * scaling.y;
 				switch (halign) {
@@ -424,12 +398,12 @@ namespace RE {
 					tp.x = trueOrigin.x;
 					break;
 				case HAlign::LEFT:
-					temp = text.substr(si + 1u, text.find_first_of(L"\n", si + 1u) - 1u - si);
-					tp.x = trueOrigin.x - measure(temp.c_str()).x * scaling.x;
+					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					tp.x = trueOrigin.x - measure(temp).x * scaling.x;
 					break;
 				case HAlign::MIDDLE:
-					temp = text.substr(si + 1u, text.find_first_of(L"\n", si + 1u) - 1u - si);
-					tp.x = trueOrigin.x - measure(temp.c_str()).x / 2.0f * scaling.x;
+					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					tp.x = trueOrigin.x - measure(temp).x / 2.0f * scaling.x;
 					break;
 				}
 			}
@@ -445,12 +419,7 @@ namespace RE {
 	}
 
 	//UNSCALED, ROTATED
-	void Font::add(SpriteBatch& batch, const char* s, const glm::vec2& position, int depth, Colour tint,
-		const glm::vec2& rots, HAlign halign/* = HAlign::RIGHT*/, VAlign valign/* = VAlign::FIRST_LINE_ABOVE*/) const {
-		add(batch, m_convert_utf8_utf16.from_bytes(s).c_str(), position, depth, tint, rots, halign, valign);
-	}
-	//UNSCALED, ROTATED
-	void Font::add(SpriteBatch& batch, const wchar_t* s, const glm::vec2& position, int depth, Colour tint,
+	void Font::add(SpriteBatch& batch, const FontString& s, const glm::vec2& position, int depth, Colour tint,
 		const glm::vec2& rots, HAlign halign/* = HAlign::RIGHT*/, VAlign valign/* = VAlign::FIRST_LINE_ABOVE*/) const {
 		glm::vec2 tp = position;
 		tp.y += m_fontDescent;
@@ -480,25 +449,24 @@ namespace RE {
 
 		glm::vec2 trueOrigin = tp;
 
-		std::wstring temp = s;
-		std::wstring text = s;
+		auto temp = s;
 
 		switch (halign) {
 		case HAlign::RIGHT:
 			tp.x = trueOrigin.x;
 			break;
 		case HAlign::LEFT:
-			temp = text.substr(0u, text.find_first_of(L"\n\0", 0u));
-			tp.x = trueOrigin.x - measure(temp.c_str()).x;
+			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			tp.x = trueOrigin.x - measure(temp).x;
 			break;
 		case HAlign::MIDDLE:
-			temp = text.substr(0u, text.find_first_of(L"\n\0", 0u));
-			tp.x = trueOrigin.x - measure(temp.c_str()).x / 2.0f;
+			temp = s.substr(0u, s.find_first_of(U"\n", 0u));
+			tp.x = trueOrigin.x - measure(temp).x / 2.0f;
 			break;
 		}
 		float lineIndex = 0.0f;
 		for (int si = 0; s[si] != 0; si++) {
-			wchar_t c = s[si];
+			auto c = s[si];
 			if (s[si] == L'\n') {
 				switch (halign) {
 				case HAlign::RIGHT:
@@ -506,17 +474,16 @@ namespace RE {
 					tp.y = trueOrigin.y - m_fontHeight * lineIndex * cos(rots.x);
 					break;
 				case HAlign::LEFT:
-					temp = text.substr(si + 1u, text.find_first_of(L"\n", si + 1u) - 1u - si);
-					tp.x = trueOrigin.x - measure(temp.c_str()).x * cos(rots.x) + (m_fontHeight * ++lineIndex) * sin(rots.x);
-					tp.y = trueOrigin.y - (m_fontHeight * lineIndex) * cos(rots.x) - measure(temp.c_str()).x * sin(rots.x);
+					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					tp.x = trueOrigin.x - measure(temp).x * cos(rots.x) + (m_fontHeight * ++lineIndex) * sin(rots.x);
+					tp.y = trueOrigin.y - (m_fontHeight * lineIndex) * cos(rots.x) - measure(temp).x * sin(rots.x);
 					break;
 				case HAlign::MIDDLE:
-					temp = text.substr(si + 1u, text.find_first_of(L"\n", si + 1u) - 1u - si);
-					tp.x = trueOrigin.x - measure(temp.c_str()).x / 2.0f;
+					temp = s.substr(si + 1u, s.find_first_of(U"\n", si + 1u) - 1u - si);
+					tp.x = trueOrigin.x - measure(temp).x / 2.0f;
 					break;
 				}
-			}
-			else {
+			} else {
 				int gi = c - m_regStart;
 				if (gi < 0 || gi >= m_regLength) { gi = m_regLength; }
 				glm::vec4 destRect(tp, m_glyphs[gi].size);
@@ -528,12 +495,7 @@ namespace RE {
 	}
 
 	//SCALED, ROTATED
-	void Font::add(SpriteBatch& batch, const char* s, const glm::vec2& position, const glm::vec2& scaling,
-		int depth, Colour tint, const glm::vec2& rots, HAlign halign/* = HAlign::RIGHT*/, VAlign valign/* = VAlign::FIRST_LINE_ABOVE*/) const {
-		add(batch, m_convert_utf8_utf16.from_bytes(s).c_str(), position, scaling, depth, tint, rots, halign, valign);
-	}
-	//SCALED, ROTATED
-	void Font::add(SpriteBatch& batch, const wchar_t* s, const glm::vec2& position, const glm::vec2& scaling,
+	void Font::add(SpriteBatch& batch, const FontString& s, const glm::vec2& position, const glm::vec2& scaling,
 		int depth, Colour tint, const glm::vec2& rots, HAlign halign/* = HAlign::RIGHT*/, VAlign valign/* = VAlign::FIRST_LINE_ABOVE*/) const {
 
 	}

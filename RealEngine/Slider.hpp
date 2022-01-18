@@ -6,10 +6,10 @@ namespace RGUI {
 	class Slider : public Button {
 	public:
 		Slider();
-		Slider(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, float minValue = 0.0f, float maxValue = 1.0f, float steps = 101.0f, unsigned char decimals = 2u);
+		Slider(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, float minValue = 0.0f, float maxValue = 1.0f, float steps = 101.0f, unsigned char decimals = 2u);
 		~Slider();
 
-		void init(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, float minValue = 0.0f, float maxValue = 1.0f, float steps = 101.0f, unsigned char decimals = 2u);
+		void init(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, float minValue = 0.0f, float maxValue = 1.0f, float steps = 101.0f, unsigned char decimals = 2u);
 
 		void interfere(const glm::vec2& cursorPos);
 

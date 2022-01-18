@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 
-#include <SDL\SDL_video.h>
-#include <glm\vec2.hpp>
+#include <SDL2/SDL_video.h>
+#include <glm/vec2.hpp>
 
 namespace RE {
 

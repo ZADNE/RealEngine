@@ -2,8 +2,6 @@
 #include <string>
 #include <vector>
 
-#include <SDL/SDL_events.h>
-
 #include <RealEngine/MainProgram.hpp>
 
 namespace RE {

@@ -7,7 +7,7 @@ namespace RGUI {
 
 	}
 
-	PlainText::PlainText(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth) :
+	PlainText::PlainText(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth) :
 		Button{ botLeft, dims, text, tex, spriteBatch, font, textTint, depth } {
 
 	}

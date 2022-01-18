@@ -1,14 +1,13 @@
-#pragma once
 #include <RealEngine/RealEngine.hpp>
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include <GL/glew.h>
 
 #include <RealEngine/Error.hpp>
 
 namespace RE {
 
-	int RE::initRE() {
+	int initRE() {
 		printf("RealEngine v%d.%d.%d\n", RE_VERSION_MAJOR, RE_VERSION_MINOR, RE_VERSION_PATCH);
 
 		SDL_Init(SDL_INIT_EVERYTHING);

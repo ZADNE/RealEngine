@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 
-#include <GL\glew.h>
+#include <GL/glew.h>
 #include <glm/vec4.hpp>
 
 #include <RealEngine/TextureFlagsToString.hpp>

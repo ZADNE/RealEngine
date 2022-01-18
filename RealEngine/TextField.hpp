@@ -12,12 +12,12 @@ namespace RGUI {
 		//Tex = texture containing 5 subimages - 0 = bottom-left corner of the button, 1 = bottom edge of the button, 2 = filling of the buttom, 3 = bottom 3-side corner used for joining separator and edge, 4 = vertical separator
 		//Edge and filling are stretched to desired dimensions
 		TextField();
-		TextField(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, RE::TypingHandle handle);
+		TextField(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, RE::TypingHandle handle);
 		~TextField();
 
-		void init(const glm::vec2& botLeft, const glm::vec2& dims, const std::string& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, RE::TypingHandle handle);
+		void init(const glm::vec2& botLeft, const glm::vec2& dims, const RE::FontString& text, RE::TexturePtr tex, RE::SpriteBatch* spriteBatch, const RE::Font* font, const RE::Colour* textTint, int depth, RE::TypingHandle handle);
 
-		std::string* getTextFieldString() {
+		RE::FontString* getTextFieldString() {
 			return &p_typingHandle.getString();
 		};
 

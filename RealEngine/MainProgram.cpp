@@ -19,8 +19,6 @@ using json = nlohmann::json;
 
 namespace RE {
 
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> MainProgram::m_convert_utf8_utf16;
-
 	MainProgram* MainProgram::std = nullptr;
 
 	const std::string SETTINGS_FILENAME = "settings.json";
@@ -188,10 +186,11 @@ namespace RE {
 			if ((key == RE::RKey::Backspace) && p_typeString) {
 				//Used backspace when typing - removing last character
 				if (p_typeString->size() >= 1) {
-					size_t size = m_convert_utf8_utf16.to_bytes(m_convert_utf8_utf16.from_bytes(*p_typeString).back()).size();
+					std::cerr << "TODO\n";
+					/*size_t size = m_convert_utf8_utf16.to_bytes(m_convert_utf8_utf16.from_bytes(*p_typeString).back()).size();
 					for (size_t i = 0u; i < size; ++i) {
 						p_typeString->pop_back();
-					}
+					}*/
 				}
 			}
 			break;
@@ -215,8 +214,7 @@ namespace RE {
 			}
 			break;
 		case SDL_MOUSEMOTION:
-			glm::uvec2 mouseAbs(evnt.motion.x, m_window.getDims().y - evnt.motion.y - 1);//Reversing Y coordinate to get standard math coordinates
-			p_inputManager.setCursorAbs(mouseAbs);
+			p_inputManager.setCursorAbs(glm::uvec2(evnt.motion.x, m_window.getDims().y - evnt.motion.y - 1));//Reversing Y coordinate to get standard math coordinates
 			break;
 		case SDL_MOUSEWHEEL:
 			key = (evnt.wheel.y > 0) ? (RKey::UMW) : (RKey::DMW);
@@ -226,7 +224,8 @@ namespace RE {
 			p_inputManager.press(key, std::abs(evnt.wheel.x));
 			break;
 		case SDL_TEXTINPUT:
-			*p_typeString += evnt.text.text;
+			std::cerr << "TODO";
+			//*p_typeString += evnt.text.text;
 			break;
 		case SDL_QUIT:
 			exitProgram();
@@ -307,7 +306,7 @@ namespace RE {
 		return m_window.getTitle();
 	}
 
-	void MainProgram::setTypeString(std::string* string, bool blockPressInput/* = false*/) {
+	void MainProgram::setTypeString(FontString* string, bool blockPressInput/* = false*/) {
 		p_typeString = string;
 		p_blockPressInput = blockPressInput;
 		if (p_typeString) {
@@ -318,7 +317,7 @@ namespace RE {
 		}
 	}
 
-	std::string const* MainProgram::getTypeString() const {
+	FontString const* MainProgram::getTypeString() const {
 		return p_typeString;
 	}
 

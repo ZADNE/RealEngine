@@ -10,7 +10,7 @@ namespace RE {
 	public:
 		FontSeed() {};
 
-		FontSeed(const std::string& name, int size, Uint16 cs = FIRST_PRINTABLE_CHAR, Uint16 ce = LAST_PRINTABLE_CHAR) : m_name(name), m_size(size), m_cs(cs), m_ce(ce) {
+		FontSeed(const std::string& name, int size, FontChar cs = FIRST_PRINTABLE_CHAR, FontChar ce = LAST_PRINTABLE_CHAR) : m_name(name), m_size(size), m_cs(cs), m_ce(ce) {
 
 		}
 
@@ -27,13 +27,13 @@ namespace RE {
 
 		std::string name() const { return m_name; }
 		int size() const { return m_size; }
-		Uint16 getStartChar() const { return m_cs; }
-		Uint16 getEndChar() const { return m_ce; }
+		FontChar getStartChar() const { return m_cs; }
+		FontChar getEndChar() const { return m_ce; }
 	private:
 		std::string m_name;
 		int m_size = 0;
-		Uint16 m_cs = 0;
-		Uint16 m_ce = 0;
+		FontChar m_cs = 0;
+		FontChar m_ce = 0;
 	};
 
 }

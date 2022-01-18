@@ -22,7 +22,7 @@ namespace RE {
 		}
 	}
 
-	std::string TypingHandle::visit(std::string* previousVisit) const {
+	FontString TypingHandle::visit(FontString* previousVisit) const {
 		if (previousVisit) {
 			*previousVisit = m_stringPrevious;
 		}

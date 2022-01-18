@@ -1,5 +1,6 @@
 #pragma once
 #include <RealEngine/MainProgram.hpp>
+#include <RealEngine/Font.hpp>
 
 namespace RE {
 
@@ -13,13 +14,13 @@ namespace RE {
 		void type(bool type, bool blockPressInput = false);
 
 		//Returns current string
-		std::string visit(std::string* previousVisit = nullptr) const;
+		FontString visit(FontString* previousVisit = nullptr) const;
 
-		std::string& getString() {
+		FontString& getString() {
 			return m_string;
 		}
 
-		const std::string& getString() const {
+		const FontString& getString() const {
 			return m_string;
 		}
 
@@ -27,8 +28,8 @@ namespace RE {
 		bool isBeingTypedInto() const;
 	private:
 		MainProgram* m_mainProgram = nullptr;
-		std::string m_string;
-		mutable std::string m_stringPrevious;
+		FontString m_string;
+		mutable FontString m_stringPrevious;
 	};
 
 }

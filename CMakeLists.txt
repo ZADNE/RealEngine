@@ -22,19 +22,23 @@ FetchContent_Declare(json
   GIT_TAG v3.10.5
 )
 
+FetchContent_MakeAvailable(glm json)
+
 #glew
-FetchContent_Declare(GLEW
-  GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
-  GIT_PROGRESS TRUE
-  GIT_SHALLOW TRUE
-)
-FetchContent_MakeAvailable(glm json GLEW)
+find_package(GLEW 2.0)
+
+#SDL2
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
+find_package(SDL2 REQUIRED)
+find_package(SDL2_ttf REQUIRED)
 
 target_link_libraries(${PROJECT_NAME}
 	PUBLIC
 		glm
 		nlohmann_json::nlohmann_json
-		libglew_static
+		GLEW::GLEW
+		SDL2::Main
+		SDL2::TTF
 )
 
 target_include_directories(${PROJECT_NAME}
