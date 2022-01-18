@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include <nlohmann/json.hpp>
-#include <SDL/SDL_timer.h>
+#include <SDL2/SDL_timer.h>
 
 #include <RealEngine/tupleUp.hpp>
 #include <RealEngine/CursorDrawer.hpp>

@@ -25,7 +25,7 @@ section name	binding name
 #include <array>
 #include <fstream>
 
-#include <SDL/SDL_thread.h>
+#include <SDL2/SDL_thread.h>
 #include <nlohmann/json.hpp>
 
 #include <RealEngine/utility.hpp>
