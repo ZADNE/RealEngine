@@ -5,6 +5,17 @@ add_subdirectory(${PROJECT_NAME})
 			 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
+# OpenGL
+find_package(OpenGL REQUIRED)
+
+# GLEW
+find_package(GLEW 2.0 REQUIRED)
+
+# SDL2 + SDL2_ttf
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
+find_package(SDL2 REQUIRED)
+find_package(SDL2_ttf REQUIRED)
+
 # GLM
 include(FetchContent)
 FetchContent_Declare(glm
@@ -24,21 +35,14 @@ FetchContent_Declare(json
 
 FetchContent_MakeAvailable(glm json)
 
-#glew
-find_package(GLEW 2.0)
-
-#SDL2
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
-find_package(SDL2 REQUIRED)
-find_package(SDL2_ttf REQUIRED)
-
 target_link_libraries(${PROJECT_NAME}
 	PUBLIC
-		glm
-		nlohmann_json::nlohmann_json
+		OpenGL::GL
 		GLEW::GLEW
 		SDL2::Main
 		SDL2::TTF
+		glm
+		nlohmann_json::nlohmann_json
 )
 
 target_include_directories(${PROJECT_NAME}

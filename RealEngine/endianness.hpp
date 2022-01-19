@@ -33,6 +33,7 @@ constexpr bool isSystemBigEndian() {
 */
 template <typename T>constexpr  T reverseByteOrder(const T& val) {
 	union U {
+		U(): raw(){}
 		T val;
 		std::array<std::byte, sizeof(T)> raw;
 	};

@@ -113,7 +113,7 @@ namespace RE {
 			for (size_t ci = 0; ci < bestPartition[ri].size(); ci++) {
 				int gi = bestPartition[ri][ci];
 
-				SDL_Surface* glyphSurface = TTF_RenderGlyph_Blended(f, (FontChar)(cs + gi), fg);
+				SDL_Surface* glyphSurface = TTF_RenderGlyph_Blended(f, cs + gi, fg);
 
 
 				// Pre-multiplication occurs here

@@ -40,7 +40,7 @@ namespace RE {
 			return;
 		}
 		p_running = true;
-		m_synchronizer.resumeSteps();
+		resumeSteps();
 
 		//MAIN PROGRAM LOOP
 		std::cout << "Entering main loop!" << std::endl;
@@ -137,14 +137,14 @@ namespace RE {
 				p_currentRoom->E_step();
 				break;
 			case (RoomState::CHANGE_TO_NEXT):
-				m_synchronizer.pauseSteps();
+				pauseSteps();
 				p_currentRoom = p_roomVector->gotoNextRoom();
-				m_synchronizer.resumeSteps();
+				resumeSteps();
 				break;
 			case (RoomState::CHANGE_TO_PREV):
-				m_synchronizer.pauseSteps();
+				pauseSteps();
 				p_currentRoom = p_currentRoom = p_roomVector->gotoPrevRoom();
-				m_synchronizer.resumeSteps();
+				resumeSteps();
 				break;
 			case (RoomState::EXIT_PROGRAM):
 				exitProgram();
@@ -224,8 +224,7 @@ namespace RE {
 			p_inputManager.press(key, std::abs(evnt.wheel.x));
 			break;
 		case SDL_TEXTINPUT:
-			std::cerr << "TODO";
-			//*p_typeString += evnt.text.text;
+			*p_typeString += evnt.text.text;
 			break;
 		case SDL_QUIT:
 			exitProgram();
@@ -234,9 +233,9 @@ namespace RE {
 	}
 
 	bool MainProgram::goToRoom(int index) {
-		m_synchronizer.pauseSteps();
+		pauseSteps();
 		p_currentRoom = p_roomVector->gotoRoom(index);
-		m_synchronizer.resumeSteps();
+		resumeSteps();
 		return false;
 	}
 
