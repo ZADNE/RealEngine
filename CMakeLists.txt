@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.14)
 project(RealEngine)
 
+add_library(${PROJECT_NAME} STATIC)
+
 add_subdirectory(${PROJECT_NAME})
-			 
+
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
 # OpenGL
