@@ -29,10 +29,6 @@ namespace RE {
 	}
 
 	void Font::init(const char* font, int size, char32_t cs, char32_t ce) {
-		// Initialize SDL_ttf
-		if (!TTF_WasInit()) {
-			TTF_Init();
-		}
 		TTF_Font* f = TTF_OpenFont(font, size);
 		if (f == nullptr) {
 			std::string error = "Failed to open TTF font: ";

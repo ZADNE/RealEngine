@@ -1,132 +1,176 @@
 #pragma once
-#include <memory>
+#include <SDL2/SDL_main.h>
 
-#include <SDL2/SDL_events.h>
 #include <glm/vec2.hpp>
 
-#include <RealEngine/main/RoomVector.hpp>
-#include <RealEngine/main/RealEngine.hpp>
-#include <RealEngine/user_input/InputManager.hpp>
+#include <RealEngine/main/RoomManager.hpp>
+#include <RealEngine/main/Error.hpp>
 #include <RealEngine/main/Window.hpp>
 #include <RealEngine/main/Synchronizer.hpp>
-#include <RealEngine/resources/ResourceManager.hpp>
+#include <RealEngine/main/details/RealEngine.hpp>
 #include <RealEngine/graphics/Font.hpp>
+#include <RealEngine/user_input/InputManager.hpp>
 
+union SDL_Event;
 
 namespace RE {
 
-	class RoomVector;
-	class Room;
-	struct DisplayInfo {
-		std::string name; //UTF-8
-		glm::ivec4 bounds; //In pixels; XYWH
-		glm::ivec4 boundsUsable; //In pixels; XYWH; system-reserved parts removed
-		glm::ivec2 dims; //In pixels
-		int refreshRate; //In Hz, 0 = unknown
-		Uint32 pixelFormat; //See SDL2's SDL_PixelFormatEnum
-		void* driverSpecific;
-	};
+class RoomVector;
+class Room;
 
-	/** @class MainProgram
-	* @brief This is the centre point of the whole application.
-	*
-	* This class encapsulates many functionalities.
-	* It creates main of window, keeps track of rooms and allows transitions among them,
-	* keeps physics steps running at constant frequency (and allows limiting of FPS),
-	* makes user input available (mouse, keyboard, OS), and much more...
+struct DisplayInfo {
+	std::string name; /**< @brief UTF-8 encoded 'name' */
+	glm::ivec4 bounds; /**< @brief Bounds in pixels; XYWH */
+	glm::ivec4 boundsUsable; /**< @brief Usable bounds in pixels; XYWH; system-reserved parts removed */
+	glm::ivec2 dims; /**< @brief Dimensions */
+	int refreshRate; /**< @brief Refresh rate */
+	Uint32 pixelFormat; /**< @brief Pixel format @see SDL2's SDL_PixelFormatEnum */
+	void* driverSpecific;
+};
+
+/**
+ * @brief Use this function to run a RealEngine program.
+ *
+ * Typical RealEngine main function should look like this:
+ *
+ * int main(int argc, char* argv[]) {
+ *     return RE::runProgram<MyDerivedFromREMainProgram>(argc, argv);
+ * }
+ *
+ * @tparam T Class derived from MainProgram
+ * @param argc Number of arguments passed to the program from the environment
+ * @param argv Pointer to the first element of an array of C-strings that represent program's arguments
+ * @return The exit code that should be returned from main.
+*/
+template<class T>
+int runProgram(int argc, char* argv[]) {
+	//Contruct command line arguments
+	CommandLineArguments args = std::span(argv, argc);
+
+	try {
+		//Construct program
+		static T program{args};
+
+		//And run it
+		return program.run();
+	}
+	catch (const std::exception& e) {
+		fatalError(std::string("Exception: ") + e.what() + " encountered!");
+	}
+	catch (...) {
+		fatalError("Uncaught exception encountered!");
+	}
+}
+
+
+/**
+ * @brief This is the centre point of the whole application.
+ *
+ * This class should not be instantiated directly (use runProgram() function
+ * to start a RealEngine program) but this class should be used as superclass
+ * for your own program class that will be instantiated by the above function.
+ *
+ * This class encapsulates many functionalities that are internally delegated to a number of subclasses.
+ *
+ * @see RealEngine
+ * @see RoomManager
+ * @see Window
+ * @see InputManager
+ * @see Synchronizer
+*/
+class MainProgram {
+private:
+	RealEngine m_realEngine;/**< Empty class that initializes and de-initializes systems */
+public:
+	MainProgram(const MainProgram& other) = delete;
+	void operator=(const MainProgram& other) = delete;
+
+	/**
+	 * @brief Runs the program
+	 *
+	 * The return value represent the exit code that this
+	 * RealEngine program should return to the enviroment.
+	 * The exit code can be altered by scheduleProgramExit().
+	 *
+	 * @return The exit code that should be returned to the enviroment.
 	*/
-	class MainProgram {
-	public:
-		//Automatically targets MainProgram::std to this
-		MainProgram();
-		virtual ~MainProgram();
+	int run();
 
-		void runProgram(int argc, char* argv[]);
+	/**
+	 * @brief Schedules the program to end.
+	 *
+	 * The program will end at the end of current frame.
+	 *
+	 * @param exitcode The exit code that should be returned from run()
+	*/
+	void scheduleProgramExit(int exitcode = EXIT_SUCCESS);
 
-		//Program ends at the end of the current step
-		void exitProgram();
-		void exitProgram(int exitcode);
+	/**
+	 * @brief Schedules change of current room.
+	 *
+	 * Actual switch of rooms happens at the end of current frame.
+	 *
+	 * @param index The index of next room, nothing happens if it is invalid.
+	*/
+	void scheduleNextRoom(size_t index);
 
-		virtual void E_Init(const std::vector<std::string>& cmdLnArg) = 0;
-		virtual void E_Exit() = 0;
+	//The string will be edited as the player types
+	//Use nullptr to stop typing
+	void setTypeString(FontString* string, bool blockPressInput = false);
+	//Returns the current target for typing = nullptr means there is not target
+	FontString const* getTypeString() const;
 
-		bool goToRoom(int index);
+	/**
+	 * @brief Pointer to main program
+	 * @deprecated Use program() within rooms instead.
+	*/
+	static MainProgram* std;
 
-		void setStepsPerSecond(unsigned int stepsPerSecond);/**< @copydoc Synchronizer::setStepsPerSecond */
-		void setFramesPerSecondLimit(unsigned int framesPerSecondLimit);/**< @copydoc Synchronizer::setFramesPerSecondLimit */
-		unsigned int getFramesPerSecond();/**< @copydoc Synchronizer::getFramesPerSecond */
-		Synchronizer::Duration getMaxFrameTime();/**< @copydoc Synchronizer::getMaxFrameTime */
-		void pauseSteps();/**< @copydoc Synchronizer::pauseSteps */
-		void resumeSteps();/**< @copydoc Synchronizer::resumeSteps */
+	void checkForInput(bool check);
 
-		//Window related
-		void resizeWindow(const glm::ivec2& newDims, bool isPermanent);
-		//Resizes window to fullscreen if true
-		void goFullscreen(bool fullscreen, bool isPermanent);
-		void goBorderless(bool borderless, bool isPermanent);
-		void setVSync(bool vSync, bool isPermanent);
-		void setWindowTitle(const std::string& title);
-		std::string getWindowTitle() const;
-		glm::vec2 getWindowDim() const;
+	/**
+	 * @brief Gets displays that can be drawn to
+	*/
+	std::vector<RE::DisplayInfo> getDisplays() const;
+protected:
+	/**
+	 * @brief Constructs main program.
+	 *
+	 * Do not forget to add rooms to room manager
+	 * and to enter a room inside your derived class
+	 * constructor or the program ends immediately!
+	*/
+	MainProgram();
 
-		//The string will be edited as the player types
-		//Use nullptr to stop typing
-		void setTypeString(FontString* string, bool blockPressInput = false);
-		//Returns the current target for typing = nullptr means there is not target
-		FontString const* getTypeString() const;
+	/**
+	 * @brief Destructs the main program
+	*/
+	virtual ~MainProgram();
 
-		//Getters
-		InputManager* IM() {
-			return &p_inputManager;
-		};
+	RoomManager p_roomManager; /**< Manages rooms - you have to add at least 1 room and enter it in the contructor of your derived class */
+	Window p_window{WindowSettings{}, RealEngine::getVersion()}; /**< window also creates and initializes OpenGL context */
+	InputManager p_inputManager; /**< Record key presses/releases, mouse movement etc. */
+	Synchronizer p_synchronizer{50u, 50u}; /**< Maintains constant speed of simulation, can also limit FPS */
+private:
+	void step();
+	void draw(double interpolationFactor);
 
+	void checkForSDLEvents();
+	void E_SDL(SDL_Event* evnt);
 
-		void checkForInput(bool check);
+	bool m_programShouldRun = false;
+	int m_programExitCode = EXIT_SUCCESS;
 
-		static MainProgram* std;
+	bool m_checkForInput = true;
 
-		//Gets Info about all displays
-		//Retuns true on success, false on failure
-		bool getDisplays(std::vector<RE::DisplayInfo>& infos) const;
-	protected:
-		void step();
-		void draw(double interpolationFactor);
-		void exitGameAction();
+	//Typing
+	FontString* m_typeString = nullptr;
+	bool m_blockPressInput = false;
 
-		bool init(int argc, char* argv[]);
-		bool initSystems();
+	void switchToNextRoomIfScheduled();
 
-
-		void checkForSDLEvents();
-		void E_SDL(SDL_Event& evnt);
-
-		std::unique_ptr<RoomVector> p_roomVector = nullptr;
-		Room* p_currentRoom = nullptr;
-		bool p_running = false;
-		int p_exitCode = 0;
-		InputManager p_inputManager;
-
-		bool p_checkForInput = true;
-
-		//Typing
-		FontString* p_typeString = nullptr;
-		bool p_blockPressInput = false;
-
-	private:
-		Window m_window;
-
-		Synchronizer m_synchronizer{ 50u, 50u };
-
-		glm::vec2 m_windowDims;
-		WindowFlags m_windowFlags;
-
-		//Settings related
-		void resetSettings();
-		//Saves current settings
-		void saveSettings();
-
-		ShaderProgramPtr m_stdSpriteShader;
-		ShaderProgramPtr m_stdGeometryShader;
-	};
+	static const size_t NO_NEXT_ROOM = std::numeric_limits<size_t>::max();
+	size_t m_nextRoomIndex = NO_NEXT_ROOM;
+};
 
 }

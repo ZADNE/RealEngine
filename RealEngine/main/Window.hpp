@@ -4,43 +4,97 @@
 #include <SDL2/SDL_video.h>
 #include <glm/vec2.hpp>
 
+#include <RealEngine/main/details/WindowSettings.hpp>
+#include <RealEngine/resources/ResourceManager.hpp>
+
 namespace RE {
 
-	struct WindowFlags {
-		WindowFlags(): invisible(false), fullscreen(false), borderless(false), vSync(false){}
+class MainProgram;
 
-		unsigned char invisible : 1, fullscreen : 1, borderless : 1, vSync : 1;
-	};
+/**
+ * @brief Window that displays the scene.
+ *
+ * Every window has its own OpenGL context.
+*/
+class Window : public WindowSettings {
+	friend class MainProgram;
+public:
+	Window(const Window& other) = delete;
+	void operator=(const Window& other) = delete;
 
-	class Window {
-	public:
-		Window();
-		~Window();
+	/**
+	 * @brief Resizes the window.
+	 * @param newDims New dimensions of the window
+	 * @param save Changed settings are saved to file if true.
+	*/
+	void resize(const glm::ivec2& newDims, bool save);
 
-		int createWindow(const std::string& windowTitle, const glm::ivec2& dims, WindowFlags flags);
+	/**
+	 * @brief Switches fullscreen on and off.
+	 * @param fullscreen True if the window should be fullscreen, false otherwise.
+	 * @param save Changed settings are saved to file if true.
+	*/
+	void goFullscreen(bool fullscreen, bool save);
 
-		//Editing functions
-		void resizeWindow(const glm::ivec2& newDims);
-		void goFullscreen(bool fullscreen);
-		void goBorderless(bool borderless);
-		void setVSync(bool vSync);
+	/**
+	 * @brief Disables and enables window decoration.
+	 * @param borderless True if the window should have no decoration, false otherwise.
+	 * @param save Changed settings are saved to file if true.
+	*/
+	void goBorderless(bool borderless, bool save);
 
-		//Title
-		void setTitle(const std::string& title);
-		std::string getTitle() const;
+	/**
+	 * @brief Sets usage of vertical synchronization.
+	 * @param vSync True if vertical synchronization should be used, false for immediate buffer swap.
+	 * @param save Changed settings are saved to file if true.
+	*/
+	void setVSync(bool vSync, bool save);
+
+	/**
+	 * @brief Sets new title for the window
+	 * @param title The new title
+	*/
+	void setTitle(const std::string& title);
+
+	/**
+	 * @brief Gets current title of the window
+	 * @return Current title
+	*/
+	const std::string& getTitle() const;
 
 
-		void swapBuffer();
+	/**
+	 * @brief Gets current dimensions of the window
+	 * @return Current dimensions
+	*/
+	glm::ivec2 getDims() const { return p_dims; }
+private:
+	/**
+	 * @brief Constructs window.
+	 * The window is constructed with its own OpenGL context and is dispalyed immediately.
+	 *
+	 * @param settings Settings to initialize the window with.
+	 * @param title Title for the window
+	*/
+	Window(const WindowSettings& settings, const std::string& title);
 
-		glm::ivec2 getDims() const { return m_dims; }
-		WindowFlags getFlags() const { return m_flags; }
-	private:
-		SDL_Window* m_SDLwindow = nullptr;
-		SDL_GLContext m_SDL_GLContext = nullptr;
-		WindowFlags m_flags;
-		std::string m_windowTitle;
+	/**
+	 * @brief Destroys the window and its OpenGL context.
+	*/
+	~Window();
 
-		glm::ivec2 m_dims = glm::ivec2(0, 0);
-	};
+	/**
+	 * @brief Swaps buffers if using double buffered context (should be).
+	 * This is called after each frame by the main program.
+	*/
+	void swapBuffer();
+
+	SDL_Window* m_SDLwindow = nullptr;	/**< handle to SDL window */
+	SDL_GLContext m_GLContext = nullptr;/**< handle to OpenGL context */
+	std::string m_windowTitle;			/**< Title of the window */
+
+	ShaderProgramPtr m_stdSpriteShader;	/**< window also own standard sprite shader */
+	ShaderProgramPtr m_stdGeometryShader;/**< window also own standard geometry shader */
+};
 
 }

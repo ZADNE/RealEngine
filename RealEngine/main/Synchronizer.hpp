@@ -3,6 +3,8 @@
 
 namespace RE {
 
+class MainProgram;
+
 /**
  * @brief Synchronizer ensures that steps happen at a constant rate per second.
  * Optionally, limits the number of frames per second.
@@ -10,6 +12,7 @@ namespace RE {
  * To be used in conjunction with MainProgram.
 */
 class Synchronizer {
+	friend class MainProgram;
 public:
 	using TimePoint = std::chrono::steady_clock::time_point;/**< Time point type alias */
 	using Duration = std::chrono::steady_clock::duration;/**< Time duration type alias */
@@ -44,16 +47,6 @@ public:
 	void setFramesPerSecondLimit(unsigned int framesPerSecondLimit);
 
 	/**
-	 * @brief This function has to be called at the beginning of each frame
-	*/
-	void beginFrame();
-
-	/**
-	 * @brief This function has to be called at the end of each frame
-	*/
-	void endFrame();
-
-	/**
 	 * @brief Temporarily pauses steps.
 	 * No steps will be reported to happen until resumeSteps() is called.
 	 * Use this if you need to perform a time sensitive operation that will greatly
@@ -67,14 +60,6 @@ public:
 	 * (that is without rushing to compensate for the time of the pause).
 	*/
 	void resumeSteps();
-
-	/**
-	 * @brief Tests whether next step should happen - that depends on the time that passed since the last step.
-	 *
-	 * If it should, it assumes it will happen immediately, and it updates internal counters.
-	 * @return True if step should happen immediately, false otherwise.
-	*/
-	bool shouldStepHappen();
 
 	/**
 	 * @brief Gets interpolation factor for drawing of the next frame.
@@ -100,6 +85,25 @@ public:
 	*/
 	Duration getMaxFrameTime() const;
 private:
+
+	/**
+	 * @brief This function has to be called at the beginning of each frame
+	*/
+	void beginFrame();
+
+	/**
+	 * @brief This function has to be called at the end of each frame
+	*/
+	void endFrame();
+
+	/**
+	 * @brief Tests whether next step should happen - that depends on the time that passed since the last step.
+	 *
+	 * If it should, it assumes it will happen immediately, and it updates internal counters.
+	 * @return True if step should happen immediately, false otherwise.
+	*/
+	bool shouldStepHappen();
+
 	/**
 	 * @brief Sleeps this thread until next frame should begin.
 	*/

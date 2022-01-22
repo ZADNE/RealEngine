@@ -2,39 +2,35 @@
 
 namespace RE {
 
-	TypingHandle::TypingHandle() : m_mainProgram(MainProgram::std) {
+TypingHandle::TypingHandle(MainProgram* mainProgram) : m_mainProgram(mainProgram) {
 
+}
+
+TypingHandle::~TypingHandle() {
+	if (m_mainProgram) {
+		m_mainProgram->setTypeString(nullptr);
 	}
+}
 
-	TypingHandle::TypingHandle(MainProgram* mainProgram) : m_mainProgram(mainProgram) {
-
+void TypingHandle::type(bool type, bool blockPressInput/* = false*/) {
+	if (m_mainProgram) {
+		m_mainProgram->setTypeString(type ? &m_string : nullptr, blockPressInput);
 	}
+}
 
-	TypingHandle::~TypingHandle() {
-		if (m_mainProgram) {
-			m_mainProgram->setTypeString(nullptr);
-		}
+FontString TypingHandle::visit(FontString* previousVisit) const {
+	if (previousVisit) {
+		*previousVisit = m_stringPrevious;
 	}
+	m_stringPrevious = m_string;
+	return m_string;
+}
 
-	void TypingHandle::type(bool type, bool blockPressInput/* = false*/) {
-		if (m_mainProgram) {
-			m_mainProgram->setTypeString(type ? &m_string : nullptr, blockPressInput);
-		}
+bool TypingHandle::isBeingTypedInto() const {
+	if (m_mainProgram && m_mainProgram->getTypeString() == &m_string) {
+		return true;
 	}
-
-	FontString TypingHandle::visit(FontString* previousVisit) const {
-		if (previousVisit) {
-			*previousVisit = m_stringPrevious;
-		}
-		m_stringPrevious = m_string;
-		return m_string;
-	}
-
-	bool TypingHandle::isBeingTypedInto() const {
-		if (m_mainProgram && m_mainProgram->getTypeString() == &m_string) {
-			return true;
-		}
-		return false;
-	}
+	return false;
+}
 
 }

@@ -1,9 +1,11 @@
+add_subdirectory(details)
+
 target_sources(${PROJECT_NAME} PUBLIC
+	CommandLineArguments.hpp
 	Error.hpp				Error.cpp
 	MainProgram.hpp			MainProgram.cpp
-	RealEngine.hpp			RealEngine.cpp
 	Room.hpp				Room.cpp
-	RoomVector.hpp			RoomVector.cpp
+	RoomManager.hpp			RoomManager.cpp
 	Synchronizer.hpp		Synchronizer.cpp
 	Window.hpp				Window.cpp
 )

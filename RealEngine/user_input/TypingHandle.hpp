@@ -4,32 +4,31 @@
 
 namespace RE {
 
-	class TypingHandle {
-	public:
-		//Standard main program is used
-		TypingHandle();
-		TypingHandle(MainProgram* mainProgram);
-		~TypingHandle();
+class TypingHandle {
+public:
 
-		void type(bool type, bool blockPressInput = false);
+	TypingHandle(MainProgram* mainProgram);
+	~TypingHandle();
 
-		//Returns current string
-		FontString visit(FontString* previousVisit = nullptr) const;
+	void type(bool type, bool blockPressInput = false);
 
-		FontString& getString() {
-			return m_string;
-		}
+	//Returns current string
+	FontString visit(FontString* previousVisit = nullptr) const;
 
-		const FontString& getString() const {
-			return m_string;
-		}
+	FontString& getString() {
+		return m_string;
+	}
 
-		//Returns whether the user is currently typing into this TypingHandle
-		bool isBeingTypedInto() const;
-	private:
-		MainProgram* m_mainProgram = nullptr;
-		FontString m_string;
-		mutable FontString m_stringPrevious;
-	};
+	const FontString& getString() const {
+		return m_string;
+	}
+
+	//Returns whether the user is currently typing into this TypingHandle
+	bool isBeingTypedInto() const;
+private:
+	MainProgram* m_mainProgram = nullptr;
+	FontString m_string;
+	mutable FontString m_stringPrevious;
+};
 
 }
