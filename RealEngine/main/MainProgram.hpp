@@ -1,3 +1,7 @@
+﻿/**
+ * @file
+ * @author Tomáš Dubský
+*/
 #pragma once
 #include <SDL2/SDL_main.h>
 
@@ -32,10 +36,11 @@ struct DisplayInfo {
  * @brief Use this function to run a RealEngine program.
  *
  * Typical RealEngine main function should look like this:
- *
+ * @code
  * int main(int argc, char* argv[]) {
  *     return RE::runProgram<MyDerivedFromREMainProgram>(argc, argv);
  * }
+ * @endcode
  *
  * @tparam T Class derived from MainProgram
  * @param argc Number of arguments passed to the program from the environment

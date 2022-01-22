@@ -1,4 +1,4 @@
-add_subdirectory(details)
+﻿add_subdirectory(details)
 
 target_sources(${PROJECT_NAME} PUBLIC
 	CommandLineArguments.hpp

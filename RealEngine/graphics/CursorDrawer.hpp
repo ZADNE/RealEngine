@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <SDL2/SDL_mouse.h>
 
 namespace RE {

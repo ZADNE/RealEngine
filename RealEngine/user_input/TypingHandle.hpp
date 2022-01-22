@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <RealEngine/main/MainProgram.hpp>
 #include <RealEngine/graphics/Font.hpp>
 

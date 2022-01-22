@@ -1,4 +1,4 @@
-#include <RealEngine/user_input/TypingHandle.hpp>
+﻿#include <RealEngine/user_input/TypingHandle.hpp>
 
 namespace RE {
 

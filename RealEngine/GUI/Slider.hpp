@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <RealEngine/GUI/Button.hpp>
 
 namespace RGUI {

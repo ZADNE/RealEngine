@@ -1,4 +1,4 @@
-#include <RealEngine/graphics/GeometryBatch.hpp>
+﻿#include <RealEngine/graphics/GeometryBatch.hpp>
 
 #include <cmath>
 

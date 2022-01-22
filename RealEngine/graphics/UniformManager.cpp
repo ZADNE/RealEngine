@@ -1,4 +1,4 @@
-#include <RealEngine/graphics/UniformManager.hpp>
+﻿#include <RealEngine/graphics/UniformManager.hpp>
 
 #include <RealEngine/resources/ResourceManager.hpp>
 

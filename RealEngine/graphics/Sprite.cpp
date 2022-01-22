@@ -1,4 +1,4 @@
-#include <RealEngine/graphics/Sprite.hpp>
+﻿#include <RealEngine/graphics/Sprite.hpp>
 
 #include <RealEngine/graphics/texture/Texture.hpp>
 

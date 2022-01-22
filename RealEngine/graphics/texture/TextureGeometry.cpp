@@ -1,4 +1,4 @@
-#include <RealEngine/graphics/texture/TextureGeometry.hpp>
+﻿#include <RealEngine/graphics/texture/TextureGeometry.hpp>
 
 namespace RE {
 

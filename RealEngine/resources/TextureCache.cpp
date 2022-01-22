@@ -1,4 +1,4 @@
-#include <RealEngine/resources/TextureCache.hpp>
+﻿#include <RealEngine/resources/TextureCache.hpp>
 
 namespace RE {
 

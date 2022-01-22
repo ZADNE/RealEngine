@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <RealEngine/resources/TextureCache.hpp>
 #include <RealEngine/resources/ShaderProgramCache.hpp>
 #include <RealEngine/resources/FontCache.hpp>

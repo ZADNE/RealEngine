@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <glm/vec2.hpp>
 
 #include <RealEngine/graphics/Vertex.hpp>

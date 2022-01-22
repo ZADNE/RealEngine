@@ -1,4 +1,4 @@
-#include <RealEngine/main/details/WindowSettings.hpp>
+﻿#include <RealEngine/main/details/WindowSettings.hpp>
 
 #include <fstream>
 #include <filesystem>

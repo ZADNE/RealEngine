@@ -1,4 +1,4 @@
-#include <RealEngine/main/Synchronizer.hpp>
+﻿#include <RealEngine/main/Synchronizer.hpp>
 
 #include <thread>
 #include <cassert>

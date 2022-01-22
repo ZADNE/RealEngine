@@ -1,4 +1,4 @@
-add_subdirectory(external)
+﻿add_subdirectory(external)
 add_subdirectory(graphics)
 add_subdirectory(GUI)
 add_subdirectory(main)

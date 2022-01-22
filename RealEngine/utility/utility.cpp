@@ -1,4 +1,4 @@
-#include <RealEngine/utility/utility.hpp>
+﻿#include <RealEngine/utility/utility.hpp>
 
 #include <cmath>
 

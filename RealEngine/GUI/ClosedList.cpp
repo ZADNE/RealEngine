@@ -1,4 +1,4 @@
-#include <RealEngine/GUI/ClosedList.hpp>
+﻿#include <RealEngine/GUI/ClosedList.hpp>
 
 #include <algorithm>
 

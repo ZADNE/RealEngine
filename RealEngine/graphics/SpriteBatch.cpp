@@ -1,4 +1,4 @@
-#include <RealEngine/graphics/SpriteBatch.hpp>
+﻿#include <RealEngine/graphics/SpriteBatch.hpp>
 
 #include <algorithm>
 

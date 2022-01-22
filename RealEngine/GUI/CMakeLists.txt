@@ -1,4 +1,4 @@
-target_sources(${PROJECT_NAME} PUBLIC
+﻿target_sources(${PROJECT_NAME} PUBLIC
 	Button.hpp				Button.cpp
 	ClosedList.hpp			ClosedList.cpp
 	Controller.hpp			

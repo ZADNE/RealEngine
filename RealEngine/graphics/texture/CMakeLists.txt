@@ -1,4 +1,4 @@
-target_sources(${PROJECT_NAME} PUBLIC
+﻿target_sources(${PROJECT_NAME} PUBLIC
 	Texture.hpp				Texture.cpp
 	TextureFlags.hpp		TextureFlags.cpp
 	TextureFlagsToString.hpp

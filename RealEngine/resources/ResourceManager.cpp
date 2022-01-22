@@ -1,4 +1,4 @@
-#include <RealEngine/resources/ResourceManager.hpp>
+﻿#include <RealEngine/resources/ResourceManager.hpp>
 
 namespace RE {
 

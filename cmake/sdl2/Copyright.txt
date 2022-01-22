@@ -1,4 +1,4 @@
-CMake - Cross Platform Makefile Generator
+﻿CMake - Cross Platform Makefile Generator
 Copyright 2000-2019 Kitware, Inc. and Contributors
 All rights reserved.
 

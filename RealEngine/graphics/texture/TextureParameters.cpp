@@ -1,4 +1,4 @@
-#include <RealEngine/graphics/texture/TextureParameters.hpp>
+﻿#include <RealEngine/graphics/texture/TextureParameters.hpp>
 
 #include <fstream>
 #include <cstring>

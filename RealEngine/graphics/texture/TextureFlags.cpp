@@ -1,4 +1,4 @@
-#include <RealEngine/graphics/texture/TextureFlags.hpp>
+﻿#include <RealEngine/graphics/texture/TextureFlags.hpp>
 
 namespace RE {
 

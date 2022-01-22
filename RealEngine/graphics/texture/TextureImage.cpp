@@ -1,4 +1,4 @@
-#include <RealEngine/graphics/texture/TextureImage.hpp>
+﻿#include <RealEngine/graphics/texture/TextureImage.hpp>
 
 #include <RealEngine/main/Error.hpp>
 #include <RealEngine/external/lodepng/lodepng.hpp>

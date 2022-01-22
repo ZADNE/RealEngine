@@ -1,3 +1,3 @@
-target_sources(${PROJECT_NAME} PUBLIC
+﻿target_sources(${PROJECT_NAME} PUBLIC
 	lodepng.hpp				lodepng.cpp
 )

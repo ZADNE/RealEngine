@@ -1,4 +1,4 @@
-add_subdirectory(texture)
+﻿add_subdirectory(texture)
 
 target_sources(${PROJECT_NAME} PUBLIC
 	CursorDrawer.hpp		CursorDrawer.cpp
