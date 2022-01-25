@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <string>
 #include <vector>
+#include <any>
 
 #include <RealEngine/main/CommandLineArguments.hpp>
 
@@ -11,36 +12,107 @@ class InputManager;
 class Synchronizer;
 class Window;
 
-using RoomTransitionParameters = std::vector<void*>;
+/**
+ * @brief Used for passing parameters to the next room when transitioning between them.
+*/
+using RoomTransitionParameters = std::vector<std::any>;
 
+/**
+ * @brief Separates program into logical units, only one unit is active at a time.
+ *
+ * Rooms allow separation of program into multiple units where only one unit
+ * is active at a time (= receives step and render calls, inactive rooms
+ * are resident in the memory but do not receive updates).
+ * Transitions between rooms are mamaged by RoomManager.
+ *
+ * @see RoomManager
+*/
 class Room {
 	friend class MainProgram;
 public:
 
+	/**
+	 * @brief Constructs a room.
+	 *
+	 * This happens when the room is added to the manager.
+	*/
 	Room();
+
+	/**
+	 * @brief Destructs a room.
+	 *
+	 * This happens when the program ends.
+	*/
 	virtual ~Room();
 
-	//Entry arguments are taken from previous room's leave arguments
-	virtual void E_entry(RoomTransitionParameters params) = 0;
+	/**
+	 * @brief Informs the room that a new session happens inside it.
+	 * @param params Parameters to initialize the session. These are
+	 *				 are obtained from previous room when it requests
+	 *				 transition to this room.
+	*/
+	virtual void sessionStart(const RoomTransitionParameters& params) = 0;
 
-	//It is supposed to return p_leavePointers
-	virtual RoomTransitionParameters E_exit() = 0;
+	/**
+	 * @brief Informs the room that its session ends.
+	 *
+	 * This happens after it was requested from the main program.
+	*/
+	virtual void sessionEnd() = 0;
 
-	virtual void E_step() = 0;
-	virtual void E_draw(double interpolationFactor) = 0;
+	/**
+	 * @brief The main update function of the room.
+	 *
+	 * This function is called at fixed rate per second.
+	 * The rate can be changed via Synchronizer.
+	*/
+	virtual void step() = 0;
 
+	/**
+	 * @brief This is the function where rendering should happen.
+	 *
+	 * This function is called at a variable rate, depending on
+	 * the speed of hardware. Upper limit can be set via Synchronizer.
+	 *
+	 * @param interpolationFactor Represents relative time between last
+	 *							  performed step and the upcoming step.
+	 *							  Use it to interpolate between discrete
+	 *							  simulation steps.
+	*/
+	virtual void render(double interpolationFactor) = 0;
+
+	/**
+	 * @brief Gets main program.
+	 * @return Main program, guaranteed to be valid.
+	*/
 	MainProgram* program() const;
 
+	/**
+	 * @brief Gets input manager which can be used to determine
+	 * user input (keyboard, mouse, etc.).
+	 *
+	 * @return Input manager, guaranteed to be valid.
+	*/
 	const InputManager* input() const;
 
+	/**
+	 * @brief Gets synchronizer which can be used to change rate
+	 * of steps or to limit render rates.
+	 *
+	 * @return Synchronizer, guaranteed to be valid.
+	*/
 	Synchronizer* synchronizer() const;
 
+	/**
+	 * @brief Gets window
+	 * @return Window , guaranteed to be valid.
+	*/
 	Window* window() const;
 private:
-	inline static MainProgram* m_mainProgram = nullptr;
-	inline static const InputManager* m_inputManager = nullptr;
-	inline static Synchronizer* m_synchronizer = nullptr;
-	inline static Window* m_window = nullptr;
+	inline static MainProgram* m_mainProgram = nullptr;			/**< Pointer set by main program */
+	inline static const InputManager* m_inputManager = nullptr;	/**< Pointer set by main program */
+	inline static Synchronizer* m_synchronizer = nullptr;		/**< Pointer set by main program */
+	inline static Window* m_window = nullptr;					/**< Pointer set by main program */
 };
 
 }

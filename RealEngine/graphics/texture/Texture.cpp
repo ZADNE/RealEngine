@@ -85,7 +85,7 @@ int minFilterToGLEnum(TextureMinFilter filter) {
 }
 
 glm::vec4 colourToFloatColour(Colour colour, TextureFormat type) {
-	glm::vec4 borderRGBA = glm::vec4{colour.R, colour.G, colour.B, colour.A};
+	glm::vec4 borderRGBA = glm::vec4{colour.r, colour.g, colour.b, colour.a};
 	switch (type) {
 	case TextureFormat::NORMALIZED_UNSIGNED: borderRGBA = borderRGBA / 255.0f; break;
 	case TextureFormat::NORMALIZED_SIGNED: borderRGBA = (borderRGBA / 255.0f) * 2.0f - 1.0f; break;
@@ -95,19 +95,24 @@ glm::vec4 colourToFloatColour(Colour colour, TextureFormat type) {
 	return borderRGBA;
 }
 
+TextureProxy::TextureProxy(const Texture& texture) :
+	m_ID(texture.m_ID) {
+
+}
+
 Texture::Texture(Texture&& other) noexcept :
-	m_textureID(other.m_textureID),
+	m_ID(other.m_ID),
 	m_flags(other.m_flags),
 	m_subimageDims(other.m_subimageDims),
 	m_pivot(other.m_pivot),
 	m_subimagesSpritesCount(other.m_subimagesSpritesCount),
 	m_trueDims(other.m_trueDims),
 	m_borderColour(other.m_borderColour) {
-	other.m_textureID = 0u;
+	other.m_ID = 0u;
 }
 
 Texture& Texture::operator=(Texture&& other) noexcept {
-	std::swap(m_textureID, other.m_textureID);
+	std::swap(m_ID, other.m_ID);
 #ifdef _DEBUG
 	//Swap flags and dims to correctly construct identificationString() in destructor
 	std::swap(m_flags, other.m_flags);
@@ -169,8 +174,8 @@ Texture::Texture(const TextureImage& image, const TextureParameters& params/* = 
 }
 
 Texture::~Texture() {
-	if (m_textureID != 0) {
-		glDeleteTextures(1, &m_textureID);
+	if (m_ID != 0) {
+		glDeleteTextures(1, &m_ID);
 	#if defined(_DEBUG) && defined(RE_LOG_TEXTURE_DESTROYED)
 		std::cout << "Destroyed " << identificationString() << '\n';
 	#endif // defined(_DEBUG) && defined(RE_LOG_TEXTURE_DESTROYED)
@@ -183,36 +188,36 @@ TextureParameters Texture::getParameters() const {
 
 void Texture::setMinFilter(TextureMinFilter minFilter) {
 	m_flags.setMinFilter(minFilter);
-	glTextureParameteri(m_textureID, GL_TEXTURE_MIN_FILTER, minFilterToGLEnum(minFilter));
+	glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, minFilterToGLEnum(minFilter));
 }
 
 void Texture::setMagFilter(TextureMagFilter magFilter) {
 	m_flags.setMagFilter(magFilter);
-	glTextureParameteri(m_textureID, GL_TEXTURE_MAG_FILTER, (magFilter == TextureMagFilter::LINEAR) ? GL_LINEAR : GL_NEAREST);
+	glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, (magFilter == TextureMagFilter::LINEAR) ? GL_LINEAR : GL_NEAREST);
 }
 
 void Texture::setWrapStyleX(TextureWrapStyle wrapStyleX) {
 	m_flags.setWrapStyleX(wrapStyleX);
-	glTextureParameteri(m_textureID, GL_TEXTURE_WRAP_S, wrapStyleToGLEnum(wrapStyleX));
+	glTextureParameteri(m_ID, GL_TEXTURE_WRAP_S, wrapStyleToGLEnum(wrapStyleX));
 }
 
 void Texture::setWrapStyleY(TextureWrapStyle wrapStyleY) {
 	m_flags.setWrapStyleY(wrapStyleY);
-	glTextureParameteri(m_textureID, GL_TEXTURE_WRAP_T, wrapStyleToGLEnum(wrapStyleY));
+	glTextureParameteri(m_ID, GL_TEXTURE_WRAP_T, wrapStyleToGLEnum(wrapStyleY));
 }
 
 void Texture::setBorderColour(RE::Colour col) {
 	m_borderColour = col;
 	glm::vec4 borderRGBA = colourToFloatColour(col, getFormat());
-	glTextureParameterfv(m_textureID, GL_TEXTURE_BORDER_COLOR, &borderRGBA.r);
+	glTextureParameterfv(m_ID, GL_TEXTURE_BORDER_COLOR, &borderRGBA.r);
 }
 
 void Texture::clear(const glm::vec4& colour) const {
-	glClearTexImage(m_textureID, 0, GL_RGBA, GL_FLOAT, &colour);
+	glClearTexImage(m_ID, 0, GL_RGBA, GL_FLOAT, &colour);
 }
 
 void Texture::clear(RE::Colour colour) const {
-	glClearTexImage(m_textureID, 0, GL_RGBA, GL_UNSIGNED_BYTE, &colour);
+	glClearTexImage(m_ID, 0, GL_RGBA, GL_UNSIGNED_BYTE, &colour);
 }
 
 bool Texture::saveToFile(const std::string& filePathPNG) {
@@ -224,7 +229,7 @@ bool Texture::saveToFile(const std::string& filePathPNG, const TextureParameters
 	//Download pixels
 	std::vector<unsigned char> pixels;
 	pixels.resize(TextureImage::requiredMemory(m_trueDims, channels));
-	glGetTextureImage(m_textureID, 0, toGLenum(channels), GL_UNSIGNED_BYTE, static_cast<GLsizei>(pixels.size()), pixels.data());
+	glGetTextureImage(m_ID, 0, toGLenum(channels), GL_UNSIGNED_BYTE, static_cast<GLsizei>(pixels.size()), pixels.data());
 
 	//Insert rti chunk
 	lodepng::State state{};
@@ -249,7 +254,7 @@ bool Texture::saveToFile(const std::string& filePathPNG, const TextureParameters
 
 std::string Texture::identificationString() const {
 	std::stringstream stream;
-	stream << "texture (ID: " << m_textureID << " - " << m_trueDims.x << "x" << m_trueDims.y << "x" << to_string(getChannels()) << ")";
+	stream << "texture (ID: " << m_ID << " - " << m_trueDims.x << "x" << m_trueDims.y << "x" << to_string(getChannels()) << ")";
 	return stream.str();
 }
 
@@ -268,16 +273,16 @@ void Texture::init(const TextureImage& image, const TextureParameters& params) {
 	m_borderColour = params.getBorderColour();
 
 	//Create texture
-	glCreateTextures(GL_TEXTURE_2D, 1, &m_textureID);
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
 
 	//Create storage for the texture
 	GLsizei levels = getMinFilterMipmapsUsage() == TextureMinFilterMipmapsUsage::YES ? uintlog2(std::max(m_trueDims.x, m_trueDims.y)) : 1;
 	auto internalFormat = textureInternalFormat(getChannels(), getFormat());
-	glTextureStorage2D(m_textureID, levels, internalFormat, m_trueDims.x, m_trueDims.y);
+	glTextureStorage2D(m_ID, levels, internalFormat, m_trueDims.x, m_trueDims.y);
 
 	//Upload pixels for the texture (if specified)
 	if (image.getPixels().size() > 0u) {
-		glTextureSubImage2D(m_textureID, 0, 0, 0, m_trueDims.x, m_trueDims.y, toGLenum(image.getChannels()), GL_UNSIGNED_BYTE, image.getPixels().data());
+		glTextureSubImage2D(m_ID, 0, 0, 0, m_trueDims.x, m_trueDims.y, toGLenum(image.getChannels()), GL_UNSIGNED_BYTE, image.getPixels().data());
 	}
 
 	//Set parameters of the texture
@@ -289,7 +294,7 @@ void Texture::init(const TextureImage& image, const TextureParameters& params) {
 
 	//Generate mipmaps for the texture
 	if (levels > 1) {
-		glGenerateTextureMipmap(m_textureID);
+		glGenerateTextureMipmap(m_ID);
 	}
 
 #if defined(_DEBUG) && defined(RE_LOG_TEXTURE_CREATED)

@@ -1,5 +1,8 @@
 ﻿#pragma once
 #include <string>
+#include <compare>
+
+#include <GL/glew.h>
 
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
@@ -12,11 +15,46 @@
 namespace RE {
 
 /**
+ * @brief Texture proxy is a small class that holds only
+ * non-owning handle to a texture.
+ *
+ * Once the texture that it represents is destroyed, the proxy
+ * becomed invalid and should not be used
+*/
+class TextureProxy {
+	friend class Texture;
+public:
+
+	/**
+	 * @brief TO BE REMOVED
+	*/
+	explicit TextureProxy(GLuint ID) : m_ID(ID) {}
+
+	/**
+	 * @brief Contructs proxy that represents the given texture
+	 * @param texture Texture to present
+	*/
+	TextureProxy(const Texture& texture);
+
+	/**
+	 * @brief Binds the texture that this proxy represents.
+	 *
+	 * Behaviour is undefined if the originating texture was destroyed.
+	*/
+	void bind() const { glBindTexture(GL_TEXTURE_2D, m_ID); }
+
+	auto operator<=>(const TextureProxy&) const = default;
+private:
+	GLuint m_ID; /**< OpenGL name of the texture */
+};
+
+/**
  * @brief Texture is image with associated parameters.
  * @see TextureImage
  * @see TextureParameters
 */
 class Texture {
+	friend class TextureProxy;
 public:
 	static inline const TextureFlags DEFAULT_FLAGS{TextureFlags::RGBA_NU_NEAR_NEAR_EDGE};
 	static inline const RE::Colour DEFAULT_BORDER_COLOUR{255, 20, 147, 255};
@@ -109,16 +147,20 @@ public:
 	void setBorderColour(RE::Colour col);
 
 	/**
-	 * @brief Gets internal ID of the texture.
-	 * Use with caution!
-	 * @return Internal ID of the texture
+	 * @brief Gets internal identifier of the texture.
+	 *
+	 * This breaches class encapsulation - use with caution!
+	 *
+	 * @return Internal ID of the texture.
 	*/
-	GLuint getID() const { return m_textureID; }
+	GLuint getID() const {
+		return m_ID;
+	}
 
 	/**
 	 * @brief Binds the texture to current texture unit.
 	*/
-	void bind() const { glBindTexture(GL_TEXTURE_2D, m_textureID); }
+	void bind() const { glBindTexture(GL_TEXTURE_2D, m_ID); }
 
 	/**
 	 * @brief Clears FIRST MIPMAP of the texture with given colour.
@@ -155,14 +197,14 @@ public:
 private:
 	void init(const TextureImage& image, const TextureParameters& params);
 
-	GLuint m_textureID = 0u;/**< OpenGL name of the texture */
-	TextureFlags m_flags{};/**< Flags associated with the texture */
+	GLuint m_ID = 0u;			/**< OpenGL name of the texture */
+	TextureFlags m_flags{};		/**< Flags associated with the texture */
 
-	glm::vec2 m_subimageDims{};/**< Dimensions of the texture */
-	glm::vec2 m_pivot{};/**< Pivot of the texture */
+	glm::vec2 m_subimageDims{};	/**< Dimensions of the texture */
+	glm::vec2 m_pivot{};		/**< Pivot of the texture */
 	glm::vec2 m_subimagesSpritesCount{};/**< Number of subimages and sprites of the texture */
 
-	glm::uvec2 m_trueDims{};/**< True dimensions of the OpenGL texture */
+	glm::uvec2 m_trueDims{};	/**< True dimensions of the OpenGL texture */
 
 	RE::Colour m_borderColour{};/**< Border colour of the texture */
 };

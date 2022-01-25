@@ -6,10 +6,6 @@
 
 #include <SDL2/SDL_events.h>
 
-#include <RealEngine/main/Window.hpp>
-#include <RealEngine/main/Room.hpp>
-#include <RealEngine/main/RoomManager.hpp>
-#include <RealEngine/main/details/RealEngine.hpp>
 #include <RealEngine/resources/ResourceManager.hpp>
 
 namespace RE {
@@ -17,7 +13,7 @@ namespace RE {
 MainProgram* MainProgram::std = nullptr;
 
 int MainProgram::run() {
-	switchToNextRoomIfScheduled();
+	doRoomTransitionIfScheduled();
 	if (!p_roomManager.getCurrentRoom()) {
 		throw std::runtime_error("Initial room was not set");
 	}
@@ -44,18 +40,18 @@ int MainProgram::run() {
 		}
 
 		//Draw frame
-		draw(p_synchronizer.getDrawInterpolationFactor());
+		render(p_synchronizer.getDrawInterpolationFactor());
 
 		p_window.swapBuffer();
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		switchToNextRoomIfScheduled();
+		doRoomTransitionIfScheduled();
 
 		p_synchronizer.endFrame();
 	}
 
 	//Exit the program
-	p_roomManager.getCurrentRoom()->E_exit();
+	p_roomManager.getCurrentRoom()->sessionEnd();
 
 	return m_programExitCode;
 }
@@ -102,11 +98,11 @@ std::vector<RE::DisplayInfo> MainProgram::getDisplays() const {
 }
 
 void MainProgram::step() {
-	p_roomManager.getCurrentRoom()->E_step();
+	p_roomManager.getCurrentRoom()->step();
 }
 
-void MainProgram::draw(double interpolationFactor) {
-	p_roomManager.getCurrentRoom()->E_draw(interpolationFactor);
+void MainProgram::render(double interpolationFactor) {
+	p_roomManager.getCurrentRoom()->render(interpolationFactor);
 }
 
 void MainProgram::E_SDL(SDL_Event* evnt) {
@@ -167,11 +163,11 @@ void MainProgram::E_SDL(SDL_Event* evnt) {
 	}
 }
 
-void MainProgram::switchToNextRoomIfScheduled() {
+void MainProgram::doRoomTransitionIfScheduled() {
 	if (m_nextRoomIndex == NO_NEXT_ROOM) return;
 	p_synchronizer.pauseSteps();
 	auto prev = p_roomManager.getCurrentRoom();
-	auto current = p_roomManager.gotoRoom(m_nextRoomIndex);
+	auto current = p_roomManager.gotoRoom(m_nextRoomIndex, m_roomTransitionParameters);
 	bool chaged = (prev != current);
 	if (chaged) {
 		step();
@@ -180,8 +176,9 @@ void MainProgram::switchToNextRoomIfScheduled() {
 	p_synchronizer.resumeSteps();
 }
 
-void MainProgram::scheduleNextRoom(size_t index) {
+void MainProgram::scheduleRoomTransition(size_t index, RoomTransitionParameters params) {
 	m_nextRoomIndex = index;
+	m_roomTransitionParameters = params;
 }
 
 void MainProgram::setTypeString(FontString* string, bool blockPressInput/* = false*/) {

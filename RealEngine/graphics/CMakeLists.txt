@@ -1,6 +1,7 @@
 ﻿add_subdirectory(texture)
 
 target_sources(${PROJECT_NAME} PUBLIC
+	Buffer.hpp				Buffer.cpp
 	CursorDrawer.hpp		CursorDrawer.cpp
 	default_shaders.hpp		
 	Font.hpp				Font.cpp
@@ -12,5 +13,6 @@ target_sources(${PROJECT_NAME} PUBLIC
 	Surface.hpp				Surface.cpp
 	UniformManager.hpp		UniformManager.cpp
 	Vertex.hpp				
+	VertexArray.hpp			VertexArray.cpp
 	View.hpp				View.cpp
 )

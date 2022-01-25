@@ -7,13 +7,12 @@
 
 #include <glm/vec2.hpp>
 
+#include <RealEngine/main/RealEngine.hpp>
 #include <RealEngine/main/RoomManager.hpp>
-#include <RealEngine/main/Error.hpp>
 #include <RealEngine/main/Window.hpp>
-#include <RealEngine/main/Synchronizer.hpp>
-#include <RealEngine/main/details/RealEngine.hpp>
-#include <RealEngine/graphics/Font.hpp>
 #include <RealEngine/user_input/InputManager.hpp>
+#include <RealEngine/main/Synchronizer.hpp>
+#include <RealEngine/graphics/Font.hpp>
 
 union SDL_Event;
 
@@ -53,17 +52,23 @@ int runProgram(int argc, char* argv[]) {
 	CommandLineArguments args = std::span(argv, argc);
 
 	try {
-		//Construct program
+		//Construct the program
 		static T program{args};
 
 		//And run it
 		return program.run();
 	}
 	catch (const std::exception& e) {
-		fatalError(std::string("Exception: ") + e.what() + " encountered!");
+		fatalError(std::string("Exception: ") + e.what());
+	}
+	catch (const char* str) {
+		fatalError(std::string("C-string exception: ") + str);
+	}
+	catch (int i) {
+		fatalError(std::string("int exception: ") + std::to_string(i));
 	}
 	catch (...) {
-		fatalError("Uncaught exception encountered!");
+		fatalError("Unknown exception!");
 	}
 }
 
@@ -111,13 +116,18 @@ public:
 	void scheduleProgramExit(int exitcode = EXIT_SUCCESS);
 
 	/**
-	 * @brief Schedules change of current room.
+	 * @brief Schedules transition to another ('next') room.
 	 *
-	 * Actual switch of rooms happens at the end of current frame.
+	 * The transition, which happens at the end of current frame,
+	 * does following:
+	 * - ends session of current room via sessionEnd()
+	 * - start session of next room via sessionStart(params)
+	 * - ensures that at least one step() happens in the next room before render()
 	 *
 	 * @param index The index of next room, nothing happens if it is invalid.
+	 * @param params Parameters to start the next room's session with.
 	*/
-	void scheduleNextRoom(size_t index);
+	void scheduleRoomTransition(size_t index, RoomTransitionParameters params);
 
 	//The string will be edited as the player types
 	//Use nullptr to stop typing
@@ -158,7 +168,7 @@ protected:
 	Synchronizer p_synchronizer{50u, 50u}; /**< Maintains constant speed of simulation, can also limit FPS */
 private:
 	void step();
-	void draw(double interpolationFactor);
+	void render(double interpolationFactor);
 
 	void checkForSDLEvents();
 	void E_SDL(SDL_Event* evnt);
@@ -172,10 +182,11 @@ private:
 	FontString* m_typeString = nullptr;
 	bool m_blockPressInput = false;
 
-	void switchToNextRoomIfScheduled();
+	void doRoomTransitionIfScheduled();
 
 	static const size_t NO_NEXT_ROOM = std::numeric_limits<size_t>::max();
 	size_t m_nextRoomIndex = NO_NEXT_ROOM;
+	RoomTransitionParameters m_roomTransitionParameters;
 };
 
 }

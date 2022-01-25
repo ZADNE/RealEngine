@@ -5,7 +5,7 @@
 
 #include <SDL2/SDL.h>
 
-#include <RealEngine/main/details/RealEngine.hpp>
+#include <RealEngine/main/RealEngine.hpp>
 
 namespace RE {
 

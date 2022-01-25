@@ -128,7 +128,7 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 
 	//Primitive restart index
 	glEnable(GL_PRIMITIVE_RESTART);
-	glPrimitiveRestartIndex(PRIMITIVE_RESTART_INDEX);
+	glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
 	//Initialize standard view
 	View::std.initView(p_dims);

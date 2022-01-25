@@ -4,7 +4,7 @@
 #include <SDL2/SDL_video.h>
 #include <glm/vec2.hpp>
 
-#include <RealEngine/main/details/WindowSettings.hpp>
+#include <RealEngine/main/WindowSettings.hpp>
 #include <RealEngine/resources/ResourceManager.hpp>
 
 namespace RE {

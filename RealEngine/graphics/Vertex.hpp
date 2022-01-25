@@ -1,145 +1,46 @@
 ﻿#pragma once
-#include <GL/glew.h>
+#include <limits>
+
 #include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
 
 namespace RE {
 
-	const GLuint PRIMITIVE_RESTART_INDEX = 4294967295u;
+using Colour = glm::vec<4, uint8_t, glm::qualifier::defaultp>;
 
-	const unsigned int ATTLOC_PO = 0u;
-	const unsigned int ATTLOC_CO = 1u;
-	const unsigned int ATTLOC_UV = 2u;
+const unsigned int ATTR_POSITION = 0u;
+const unsigned int ATTR_COLOUR = 1u;
+const unsigned int ATTR_UV = 2u;
 
-	struct Position {
-		Position() {}
-		Position(GLfloat X, GLfloat Y): x(X), y(Y) {}
-		Position(const glm::vec2& pos) : x(pos.x), y(pos.y) {}
+template<typename T>
+consteval T PRIMITIVE_RESTART_INDEX() {
+	static_assert(std::is_unsigned<T>::value, "primitive restart index in defined only for unsigned types");
+	return std::numeric_limits<T>::max();
+};
 
-		GLfloat x;
-		GLfloat y;
-	};
+struct VertexPO {
+	VertexPO() {}
+	VertexPO(const glm::vec2& pos) : position(pos) {}
 
-	struct Colour {
-		Colour() {}
-		Colour(GLubyte r, GLubyte g, GLubyte b, GLubyte a) : R(r), G(g), B(b), A(a) {}
-		
-		void setColour(GLubyte r, GLubyte g, GLubyte b, GLubyte a) {
-			R = r;
-			G = g;
-			B = b;
-			A = a;
-		}
+	glm::vec2 position;
+};
 
-		GLubyte R;
-		GLubyte G;
-		GLubyte B;
-		GLubyte A;
-	};
+struct VertexPOCO {
+	VertexPOCO() {}
+	VertexPOCO(const glm::vec2& pos, Colour col) : position(pos), colour(col) {}
 
-	struct UV {
-		UV() {}
-		UV(GLfloat U, GLfloat V): u(U), v(V) {}
-		UV(const glm::vec2& uv) : u(uv.x), v(uv.y) {}
-
-		GLfloat u;
-		GLfloat v;
-	};
-
-	struct VertexPOCOUV {
-		VertexPOCOUV() {}
-		VertexPOCOUV(Position pos, Colour col, UV uv) : position(pos), colour(col), uv(uv) {}
-
-		void setPosition(GLfloat x, GLfloat y) {
-			position.x = x;
-			position.y = y;
-		}
-
-		void setColour(GLubyte r, GLubyte g, GLubyte b, GLubyte a) {
-			colour.R = r;
-			colour.G = g;
-			colour.B = b;
-			colour.A = a;
-		}
-
-		void setUV(GLfloat u, GLfloat v) {
-			uv.u = u;
-			uv.v = v;
-		}
-
-		Position position;
-		Colour colour;
-		UV uv;
-	};
-
-	struct VertexPOCO {
-		VertexPOCO() {}
-		VertexPOCO(Position pos, Colour col) : position(pos), colour(col) {}
-
-		void setPosition(GLfloat x, GLfloat y) {
-			position.x = x;
-			position.y = y;
-		}
-
-		void setColour(GLubyte r, GLubyte g, GLubyte b, GLubyte a) {
-			colour.R = r;
-			colour.G = g;
-			colour.B = b;
-			colour.A = a;
-		}
-
-		Position position;
-		Colour colour;
-	};
-
-	struct VertexPOUV {
-		VertexPOUV() {}
-		VertexPOUV(GLfloat x, GLfloat y, GLfloat u, GLfloat v): position(x, y), uv(u, v){ };
-
-		Position position;
-		UV uv;
-
-		void setPosition(GLfloat x, GLfloat y) {
-			position.x = x;
-			position.y = y;
-		}
-
-		void setPosition(const glm::vec2& pos) {
-			position.x = pos.x;
-			position.y = pos.y;
-		};
-
-		void setUV(GLfloat u, GLfloat v) {
-			uv.u = u;
-			uv.v = v;
-		}
-
-		void setUV(const glm::vec2& uV) {
-			uv.u = uV.x;
-			uv.v = uV.y;
-		}
-	};
-
-	struct VertexPO {
-		VertexPO() {}
-		VertexPO(GLfloat x, GLfloat y) {
-			position.x = x;
-			position.y = y;
-		};
-
-		VertexPO(Position pos): position(pos) {}
+	glm::vec2 position;
+	Colour colour;
+};
 
 
-		void setPosition(GLfloat x, GLfloat y) {
-			position.x = x;
-			position.y = y;
-		}
+struct VertexPOCOUV {
+	VertexPOCOUV() {}
+	VertexPOCOUV(const glm::vec2& pos, Colour col, const glm::vec2& uv) : position(pos), colour(col), uv(uv) {}
 
-		void setPosition(const glm::vec2& pos) {
-			position.x = pos.x;
-			position.y = pos.y;
-		};
-
-		Position position;
-	};
+	glm::vec2 position;
+	Colour colour;
+	glm::vec2 uv;
+};
 
 }

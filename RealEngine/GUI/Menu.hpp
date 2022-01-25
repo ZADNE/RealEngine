@@ -267,7 +267,7 @@ public:
 
 	//Returns true if successfully added the controller (false = a controller with such name already exists etc.)
 	//No function index validation!
-#ifdef MENU_KEEP_INFOS
+#ifdef RE_MENU_KEEP_INFOS
 	bool addController(const std::string& name, const ControllerInfo& info) {
 		auto it = m_names.find(name);
 		if (it != m_names.end()) {
@@ -328,7 +328,7 @@ public:
 	};
 #endif
 
-#ifdef MENU_KEEP_INFOS
+#ifdef RE_MENU_KEEP_INFOS
 	//Throws if such info does not exist
 	const ControllerInfo& getInfo(const std::string& name) {
 		auto it = m_infoMap.find(name);
@@ -368,7 +368,7 @@ public:
 			//Parsing failed - throwing error
 			return error;
 		}
-	#ifdef MENU_KEEP_INFOS
+	#ifdef RE_MENU_KEEP_INFOS
 		//Saving objects
 		m_infoMap = infoMap;
 		m_functions = functions;
@@ -587,7 +587,7 @@ private:
 
 	float m_currentState = 1.0f;
 
-#ifdef MENU_KEEP_INFOS
+#ifdef RE_MENU_KEEP_INFOS
 	std::unordered_map<std::string, ControllerInfo> m_infoMap;
 	std::vector<void (Observer::*)(const std::string&)> m_functions;
 	RE::SpriteBatch* m_spriteBatch = nullptr;
