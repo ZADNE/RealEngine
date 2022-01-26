@@ -68,7 +68,7 @@ void ShaderProgram::unuse() const {
 		throw "Overbound shader programs";
 	}
 	m_currentlyUsedID = 0;
-	glBindVertexArray(0);
+	glUseProgram(0);
 #endif // _DEBUG
 }
 
