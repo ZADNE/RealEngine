@@ -1,55 +1,29 @@
 ﻿#pragma once
 #include <algorithm>
-#include <string>
+#include <string_view>
 
 #include <GL/glew.h>
 #include <glm/vec2.hpp>
 
 namespace rmath {
 
-	template <typename T> int sign(T val) {
-		return (T(0) < val) - (val < T(0));
-	}
+template <typename T> int sign(T val) {
+	return (T(0) < val) - (val < T(0));
+}
 
-	template <typename T>
-	T clamp(const T& n, const T& lower, const T& upper) {
-		return (std::max)(lower, (std::min)(n, upper));
-	}
+float distance(const glm::ivec2& p1, const glm::ivec2& p2);
+bool isInsideCircle(const glm::ivec2& point, const glm::ivec2& center, float radius);
 
-	float distance(const glm::ivec2& p1, const glm::ivec2& p2);
-	bool isInsideCircle(const glm::ivec2& point, const glm::ivec2& center, float radius);
-
-	const float PI_f = 3.14159265358979323846264338327950288f;
-	const double PI = 3.14159265358979323846264338327950288;
-	const long double PI_L = 3.14159265358979323846264338327950288L;
+const float PI_f = 3.14159265358979323846264338327950288f;
+const double PI = 3.14159265358979323846264338327950288;
+const long double PI_L = 3.14159265358979323846264338327950288L;
 }
 
 namespace RE {
 
-	std::string GLSLTypeToString(GLenum type);
+std::string_view GLSLTypeToString(GLenum type);
 
 }
-
-//WinAPI uses the same macro
-#ifdef RGB
-#undef RGB
-#endif // RGB
-
-
-
-#define STR(x) #x
-
-#define XY(vec) (vec).x, (vec).y
-#define XYZ(vec) (vec).x, (vec).y, (vec).z
-#define XYZW(vec) (vec).x, (vec).y, (vec).z, (vec).w
-
-#define RG(vec) (vec).r, (vec).g
-#define RGB(vec) (vec).r, (vec).g, (vec).b
-#define RGBA(vec) (vec).r, (vec).g, (vec).b, (vec).a
-
-#define ST(vec) (vec).s, (vec).t
-#define STP(vec) (vec).s, (vec).t, (vec).p
-#define STPQ(vec) (vec).s, (vec).t, (vec).p, (vec).q
 
 //SMART ENUMS @ David Saltares
 
@@ -79,6 +53,7 @@ Example usage
 
 */
 
+#define STR(x) #x
 
 #define SMARTENUM_VALUE(typeName, value) e##typeName##_##value,
 #define SMARTENUM_DEFINE_ENUM(typeName, values) enum typeName { values(SMARTENUM_VALUE) e##typeName##_Error, e##typeName##_Count, };
@@ -112,4 +87,3 @@ Example usage
 	SMARTENUM_DEFINE_CATEGORIES(typeName, value) \
 	SMARTENUM_DEFINE_IDENTIFIERS(typeName, value)
 
-	

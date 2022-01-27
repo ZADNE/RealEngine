@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <utility>
+#include <vector>
 
 #include <GL/glew.h>
 
@@ -60,12 +61,6 @@ class Buffer {
 	friend class VertexArray;
 public:
 
-	using enum BufferType;
-	using enum BufferStorage;
-	using enum BufferAccessFrequency;
-	using enum BufferAccessNature;
-	using enum BufferUsageFlags;
-
 	Buffer(GLsizeiptr sizeInBytes, BufferUsageFlags flags, const void* data = nullptr) :
 		m_sizeInBytes(sizeInBytes) {
 		static_assert(storage == IMMUTABLE);
@@ -73,6 +68,16 @@ public:
 		glCreateBuffers(1, &m_ID);
 
 		glNamedBufferStorage(m_ID, m_sizeInBytes, data, static_cast<GLbitfield>(flags));
+	}
+
+	template<typename T>
+	Buffer(BufferUsageFlags flags, const std::vector<T>& data) :
+		m_sizeInBytes(data.size() * sizeof(T)) {
+		static_assert(storage == IMMUTABLE);
+
+		glCreateBuffers(1, &m_ID);
+
+		glNamedBufferStorage(m_ID, m_sizeInBytes, data.data(), static_cast<GLbitfield>(flags));
 	}
 
 	Buffer(GLsizeiptr sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data = nullptr) :
@@ -83,6 +88,14 @@ public:
 		glCreateBuffers(1, &m_ID);
 
 		glNamedBufferData(m_ID, m_sizeInBytes, data, m_access);
+	}
+
+	Buffer(BufferAccessFrequency accessFreq, BufferAccessNature accessNature) :
+		m_sizeInBytes(0),
+		m_access(bufferAccesToGLEnum(accessFreq, accessNature)) {
+		static_assert(storage == MUTABLE);
+
+		glCreateBuffers(1, &m_ID);
 	}
 
 	~Buffer() {
@@ -123,21 +136,41 @@ public:
 	#endif // _DEBUG
 	}
 
-	void overwrite(GLsizeiptr countBytes, const void* data) {
-		glInvalidateBufferSubData(m_ID, 0, countBytes);
-		glNamedBufferSubData(m_ID, 0, countBytes, data);
+	void overwrite(GLintptr offset, GLsizeiptr countBytes, const void* data) {
+		glInvalidateBufferSubData(m_ID, offset, countBytes);
+		glNamedBufferSubData(m_ID, offset, countBytes, data);
+	}
+
+	template<typename T>
+	void overwrite(GLintptr offset, const std::vector<T>& data) {
+		overwrite(offset, data.size() * sizeof(T), reinterpret_cast<const void*>(data.data()));
 	}
 
 	void redefine(GLsizeiptr sizeInBytes, const void* data) {
 		static_assert(storage == MUTABLE);
 		if (sizeInBytes > m_sizeInBytes) {
 			m_sizeInBytes = sizeInBytes;
-			glInvalidateBufferData(m_ID);
+			invalidate();
 			glNamedBufferData(m_ID, sizeInBytes, data, m_access);
 		} else {
-			glInvalidateBufferSubData(m_ID, 0, sizeInBytes);
+			invalidate(sizeInBytes);
 			glNamedBufferSubData(m_ID, 0, sizeInBytes, data);
 		}
+	}
+
+	template<typename T>
+	void redefine(const std::vector<T>& data) {
+		redefine(data.size() * sizeof(T), reinterpret_cast<const void*>(data.data()));
+	}
+
+	void invalidate() {
+		static_assert(storage == MUTABLE);
+		glInvalidateBufferData(m_ID);
+	}
+
+	void invalidate(GLsizeiptr sizeInBytes) {
+		static_assert(storage == MUTABLE);
+		glInvalidateBufferSubData(m_ID, 0, sizeInBytes);
 	}
 
 	/*GLuint getID() {
@@ -145,6 +178,12 @@ public:
 	}*/
 
 private:
+	using enum BufferType;
+	using enum BufferStorage;
+	using enum BufferAccessFrequency;
+	using enum BufferAccessNature;
+	using enum BufferUsageFlags;
+
 	GLuint m_ID = 0;
 
 	GLsizeiptr m_sizeInBytes = 0;

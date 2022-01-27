@@ -4,22 +4,22 @@
 
 namespace rmath {
 
-	float distance(const glm::ivec2& p1, const glm::ivec2& p2) {
-		int xx = p1.x - p2.x;
-		int yy = p1.y - p2.y;
-		return std::sqrt(static_cast<float>(xx * xx + yy * yy));
-	}
+float distance(const glm::ivec2& p1, const glm::ivec2& p2) {
+	int xx = p1.x - p2.x;
+	int yy = p1.y - p2.y;
+	return std::sqrt(static_cast<float>(xx * xx + yy * yy));
+}
 
-	bool isInsideCircle(const glm::ivec2& point, const glm::ivec2& center, float radius) {
-		if (distance(point, center) <= radius) {
-			return true;
-		}
-		return false;
+bool isInsideCircle(const glm::ivec2& point, const glm::ivec2& center, float radius) {
+	if (distance(point, center) <= radius) {
+		return true;
 	}
+	return false;
+}
 
 }
 
-std::string RE::GLSLTypeToString(GLenum type) {
+std::string_view RE::GLSLTypeToString(GLenum type) {
 	switch (type) {
 		//SCALARS
 	case GL_FLOAT:

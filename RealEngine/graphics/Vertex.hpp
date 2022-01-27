@@ -18,6 +18,9 @@ consteval T PRIMITIVE_RESTART_INDEX() {
 	return std::numeric_limits<T>::max();
 };
 
+#pragma warning(push)
+#pragma warning(disable: 26495)
+
 struct VertexPO {
 	VertexPO() {}
 	VertexPO(const glm::vec2& pos) : position(pos) {}
@@ -42,5 +45,6 @@ struct VertexPOCOUV {
 	Colour colour;
 	glm::vec2 uv;
 };
+#pragma warning(pop)
 
 }

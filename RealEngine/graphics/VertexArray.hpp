@@ -96,11 +96,15 @@ public:
 	void unbind() const;
 
 	void renderArrays(Primitive prim, GLint first, GLsizei count);
+	void renderArrays(Primitive prim, GLint first, GLsizei count, GLsizei instancecount);
 
 	void renderElements(Primitive prim, GLsizei count, IndexType type, const void* offset);
+	void renderElements(Primitive prim, GLsizei count, IndexType type, const void* offset, GLsizei instancecount);
 
 private:
 	GLuint m_ID = 0;
+
+	void throwIfNotCurrentlyBound();
 
 #ifdef _DEBUG
 	static inline GLuint m_currentlyBoundID = 0;
