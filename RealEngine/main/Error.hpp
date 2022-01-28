@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include <stdlib.h>
+
 #include <string_view>
 
 #include <GL/glew.h>

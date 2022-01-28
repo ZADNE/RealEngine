@@ -21,6 +21,9 @@ namespace RE {
  * Once the texture that it represents is destroyed, the proxy
  * becomed invalid and should not be used
 */
+
+class Texture;
+
 class TextureProxy {
 	friend class Texture;
 public:
