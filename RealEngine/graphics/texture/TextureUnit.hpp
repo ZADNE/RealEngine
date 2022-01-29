@@ -3,11 +3,12 @@
 
 namespace RE {
 
-struct TextureUnit {
+class TextureUnit {
+	friend class ShaderProgram;
+public:
 	TextureUnit(GLuint index) : m_index(index) {}
 
 	void setActive() const { glActiveTexture(GL_TEXTURE0 + m_index); }
-	GLint index() const { return m_index; }
 private:
 	GLint m_index;
 };

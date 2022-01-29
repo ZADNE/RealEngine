@@ -200,7 +200,7 @@ void SpriteBatch::addSurface(const Surface& surface, const glm::vec2& position, 
 }
 
 void SpriteBatch::draw() {
-	draw(*m_shader);
+	draw(*m_shaderProgram);
 }
 
 void SpriteBatch::draw(const ShaderProgram& program) {
@@ -216,8 +216,8 @@ void SpriteBatch::draw(const ShaderProgram& program) {
 	program.unuse();
 }
 
-void SpriteBatch::changeShader(ShaderProgramSource source/* = ShaderProgramSource::stdSprite*/) {
-	m_shader = RM::getShaderProgram(source);
+void SpriteBatch::switchShaderProgram(ShaderProgramPtr shaderProgram) {
+	m_shaderProgram = shaderProgram;
 }
 
 void SpriteBatch::sortGlyphs() {

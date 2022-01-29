@@ -11,8 +11,9 @@ target_sources(${PROJECT_NAME} PUBLIC
 	Sprite.hpp				Sprite.cpp
 	SpriteBatch.hpp			SpriteBatch.cpp
 	Surface.hpp				Surface.cpp
-	UniformManager.hpp		UniformManager.cpp
+	UniformBuffer.hpp		UniformBuffer.cpp
 	Vertex.hpp				
 	VertexArray.hpp			VertexArray.cpp
 	View.hpp				View.cpp
+	Viewport.hpp			Viewport.cpp
 )

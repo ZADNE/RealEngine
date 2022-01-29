@@ -8,9 +8,8 @@
 #include <RealEngine/graphics/texture/Texture.hpp>
 #include <RealEngine/graphics/Vertex.hpp>
 #include <RealEngine/graphics/Sprite.hpp>
-#include <RealEngine/graphics/default_shaders.hpp>
 #include <RealEngine/graphics/VertexArray.hpp>
-#include <RealEngine/resources/ResourceManager.hpp>
+#include <RealEngine/resources/ShaderProgramCache.hpp>
 
 
 
@@ -113,11 +112,10 @@ public:
 	void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index, Colour colour, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
 
 	void draw();
-	//Draws once with different shader - the change is not saved (use changeShader() for that)
+	//Draws once with different shader program - the change is not saved (use switchShaderProgram() for that)
 	void draw(const ShaderProgram& program);
 
-	//Default parameter shader = standard shader
-	void changeShader(ShaderProgramSource source = ShaderProgramSource::stdSprite);
+	void switchShaderProgram(ShaderProgramPtr shaderProgram);
 
 	static SpriteBatch& std() {
 		static SpriteBatch std{};
@@ -141,8 +139,7 @@ private:
 	static bool comparePosToNeg(Glyph* a, Glyph* b);
 	static bool compareTexture(Glyph* a, Glyph* b);
 
-	//Draw defaults
-	ShaderProgramPtr m_shader = RE::RM::getShaderProgram(ShaderProgramSource::stdSprite);
+	ShaderProgramPtr m_shaderProgram;
 
 	const glm::vec4 m_UVRectangle = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 	const glm::vec4 m_SUVRectangle = glm::vec4(0.0f, 1.0f, 1.0f, -1.0f);//Used for drawing surfaces

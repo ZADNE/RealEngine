@@ -64,7 +64,7 @@ void GeometryBatch::end() {
 }
 
 void GeometryBatch::draw() {
-	m_shader->use();
+	m_shaderProgram->use();
 	glBindVertexArray(m_vao);
 
 	size_t offset = 0u;
@@ -78,7 +78,7 @@ void GeometryBatch::draw() {
 	}
 
 	glBindVertexArray(0);
-	m_shader->unuse();
+	m_shaderProgram->unuse();
 }
 
 void GeometryBatch::addPrimitives(PRIM prim, size_t first, size_t countVer, const RE::VertexPOCO* data, bool separate/* = true*/) {
@@ -130,8 +130,8 @@ void GeometryBatch::addCircles(size_t first, size_t count, const RE::CirclePOCO*
 	}
 }
 
-void GeometryBatch::changeShader(ShaderProgramSource source/* = ShaderProgramSource::stdGeometry*/) {
-	m_shader = RE::RM::getShaderProgram(source);
+void GeometryBatch::switchShaderProgram(ShaderProgramPtr shaderProgram) {
+	m_shaderProgram = shaderProgram;
 }
 
 GLenum GeometryBatch::prim_shapeToGLenum(size_t prim_shape) const {

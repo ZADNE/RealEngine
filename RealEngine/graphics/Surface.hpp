@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 
 #include <RealEngine/graphics/texture/Texture.hpp>
 #include <RealEngine/graphics/Vertex.hpp>
@@ -44,29 +45,29 @@ public:
 
 
 	/**
-	 * Destroys the surface and all its textures
+	 * @brief Destroys the surface and all its textures
 	 */
 	~Surface();
 
 	/**
-	 * Sets further drawing to be done to this surface
+	 * @brief Sets further drawing to be done to this surface
 	 */
 	void setTarget() const;
 
 	/**
-	 * Set further drawing to be done directly to window
+	 * @brief Set further drawing to be done directly to window
 	 */
 	void resetTarget() const;
 
 	/**
-	 * Allows disabling of drawing to some textures
+	 * @brief Allows disabling of drawing to some textures
 	 *
 	 * @param targetTextures Structure describing which texture should be drawn to
 	 */
 	void setTargetTextures(const SurfaceTargetTextures& targetTextures);
 
 	/**
-	 * Binds texture to current texture unit
+	 * @brief Binds texture to current texture unit
 	 *
 	 * @param index Index of the texture to be bound
 	 */
@@ -107,10 +108,12 @@ private:
 	std::vector<Texture> m_textures;
 	GLuint m_frameBuffer = 0;
 	bool m_disableBlend;
-	bool m_updateUniforms;
+	bool m_updateUniformBuffer;
 	TextureParameters m_params;
 
 	void attachTexturesToFBO();
+
+	glm::mat4 m_previousViewMatrix;
 };
 
 /**

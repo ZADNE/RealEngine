@@ -62,83 +62,90 @@ class Buffer {
 public:
 
 	Buffer(GLsizeiptr sizeInBytes, BufferUsageFlags flags, const void* data = nullptr) :
-		m_sizeInBytes(sizeInBytes) {
+		p_sizeInBytes(sizeInBytes) {
 		static_assert(storage == IMMUTABLE);
 
-		glCreateBuffers(1, &m_ID);
+		glCreateBuffers(1, &p_ID);
 
-		glNamedBufferStorage(m_ID, m_sizeInBytes, data, static_cast<GLbitfield>(flags));
+		glNamedBufferStorage(p_ID, p_sizeInBytes, data, static_cast<GLbitfield>(flags));
+	}
+
+	template<typename T>
+	Buffer(BufferUsageFlags flags, const T& data) :
+		Buffer(sizeof(T), flags, &data) {
+
 	}
 
 	template<typename T>
 	Buffer(BufferUsageFlags flags, const std::vector<T>& data) :
-		m_sizeInBytes(data.size() * sizeof(T)) {
-		static_assert(storage == IMMUTABLE);
+		Buffer(data.size() * sizeof(T), flags, data.data()) {
 
-		glCreateBuffers(1, &m_ID);
-
-		glNamedBufferStorage(m_ID, m_sizeInBytes, data.data(), static_cast<GLbitfield>(flags));
 	}
 
 	Buffer(GLsizeiptr sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data = nullptr) :
-		m_sizeInBytes(sizeInBytes),
-		m_access(bufferAccesToGLEnum(accessFreq, accessNature)) {
+		p_sizeInBytes(sizeInBytes),
+		p_access(bufferAccesToGLEnum(accessFreq, accessNature)) {
 		static_assert(storage == MUTABLE);
 
-		glCreateBuffers(1, &m_ID);
+		glCreateBuffers(1, &p_ID);
 
-		glNamedBufferData(m_ID, m_sizeInBytes, data, m_access);
+		glNamedBufferData(p_ID, p_sizeInBytes, data, p_access);
 	}
 
 	Buffer(BufferAccessFrequency accessFreq, BufferAccessNature accessNature) :
-		m_sizeInBytes(0),
-		m_access(bufferAccesToGLEnum(accessFreq, accessNature)) {
+		p_sizeInBytes(0),
+		p_access(bufferAccesToGLEnum(accessFreq, accessNature)) {
 		static_assert(storage == MUTABLE);
 
-		glCreateBuffers(1, &m_ID);
+		glCreateBuffers(1, &p_ID);
 	}
 
 	~Buffer() {
-		glDeleteBuffers(1, &m_ID);
+		glDeleteBuffers(1, &p_ID);
 	}
 
 	Buffer(const Buffer&) = delete;
 
 	Buffer(Buffer&& other) noexcept :
-		m_ID(other.m_ID) {
-		other.m_ID = 0;
+		p_ID(other.p_ID) {
+		other.p_ID = 0;
 	}
 
 	Buffer& operator=(const Buffer&) = delete;
 
 	Buffer& operator=(Buffer&& other) noexcept {
-		std::swap(m_ID, other.m_ID);
+		std::swap(p_ID, other.p_ID);
 		return *this;
 	}
 
 	void bind() {
 	#ifdef _DEBUG
-		if (m_currentlyBound.ID != 0) {
+		if (p_currentlyBound.ID != 0) {
 			throw "Overbound buffers";
 		}
-		m_currentlyBound.ID = m_ID;
+		p_currentlyBound.ID = p_ID;
 	#endif // _DEBUG
-		glBindBuffer(static_cast<GLenum>(type), m_ID);
+		glBindBuffer(static_cast<GLenum>(type), p_ID);
 	}
 
 	void unbind() {
 	#ifdef _DEBUG
-		if (m_currentlyBound.ID != m_ID) {
+		if (p_currentlyBound.ID != p_ID) {
 			throw "Overbound buffers";
 		}
-		m_currentlyBound.ID = 0;
+		p_currentlyBound.ID = 0;
 		glBindBuffer(static_cast<GLenum>(type), 0);
 	#endif // _DEBUG
 	}
 
 	void overwrite(GLintptr offset, GLsizeiptr countBytes, const void* data) {
-		glInvalidateBufferSubData(m_ID, offset, countBytes);
-		glNamedBufferSubData(m_ID, offset, countBytes, data);
+		glInvalidateBufferSubData(p_ID, offset, countBytes);
+		glNamedBufferSubData(p_ID, offset, countBytes, data);
+	}
+
+	template<typename T>
+	void overwrite(const T& data) {
+		overwrite(0, sizeof(T), reinterpret_cast<const void*>(&data));
 	}
 
 	template<typename T>
@@ -148,14 +155,19 @@ public:
 
 	void redefine(GLsizeiptr sizeInBytes, const void* data) {
 		static_assert(storage == MUTABLE);
-		if (sizeInBytes > m_sizeInBytes) {
-			m_sizeInBytes = sizeInBytes;
+		if (sizeInBytes > p_sizeInBytes) {
+			p_sizeInBytes = sizeInBytes;
 			invalidate();
-			glNamedBufferData(m_ID, sizeInBytes, data, m_access);
+			glNamedBufferData(p_ID, sizeInBytes, data, p_access);
 		} else {
 			invalidate(sizeInBytes);
-			glNamedBufferSubData(m_ID, 0, sizeInBytes, data);
+			glNamedBufferSubData(p_ID, 0, sizeInBytes, data);
 		}
+	}
+
+	template<typename T>
+	void redefine(const T& data) {
+		redefine(sizeof(T), reinterpret_cast<const void*>(&data));
 	}
 
 	template<typename T>
@@ -165,36 +177,32 @@ public:
 
 	void invalidate() {
 		static_assert(storage == MUTABLE);
-		glInvalidateBufferData(m_ID);
+		glInvalidateBufferData(p_ID);
 	}
 
 	void invalidate(GLsizeiptr sizeInBytes) {
 		static_assert(storage == MUTABLE);
-		glInvalidateBufferSubData(m_ID, 0, sizeInBytes);
+		glInvalidateBufferSubData(p_ID, 0, sizeInBytes);
 	}
 
-	/*GLuint getID() {
-		return m_ID;
-	}*/
-
-private:
+protected:
 	using enum BufferType;
 	using enum BufferStorage;
 	using enum BufferAccessFrequency;
 	using enum BufferAccessNature;
 	using enum BufferUsageFlags;
 
-	GLuint m_ID = 0;
+	GLuint p_ID = 0;
 
-	GLsizeiptr m_sizeInBytes = 0;
+	GLsizeiptr p_sizeInBytes = 0;
 
-	GLenum m_access = 0;
+	GLenum p_access = 0;
 
 #ifdef _DEBUG
 	template<BufferType> struct CurrentBinding {
 		GLuint ID = 0;
 	};
-	static inline CurrentBinding<type> m_currentlyBound{};
+	static inline CurrentBinding<type> p_currentlyBound{};
 #endif // _DEBUG
 };
 

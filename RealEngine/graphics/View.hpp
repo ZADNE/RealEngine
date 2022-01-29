@@ -2,18 +2,15 @@
 #include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
 
-#include <SDL2/SDL_events.h>
-
 namespace RE {
 
 class View {
 public:
-	View();
+	View(const glm::vec2& viewDimensions);
 	~View();
 
 	void update();
 
-	void initView(const glm::vec2& viewDimensions);
 	void resizeView(const glm::vec2& newDims);
 
 	bool isInsideView(const glm::vec2& position, const glm::vec2& dimension);
@@ -48,11 +45,6 @@ public:
 	void enableClipping(const glm::vec2& minXY, const glm::vec2& maxXY);
 	void disableClipping();
 
-	//SDL
-	void E_SDL(SDL_Event& evnt);
-
-	//Represents main window view (not affected by surfaces)
-	static View std;
 private:
 	bool m_needsUpdate = true;
 

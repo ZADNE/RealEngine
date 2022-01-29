@@ -2,10 +2,11 @@
 
 #include <GL/glew.h>
 
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <RealEngine/main/Error.hpp>
-#include <RealEngine/graphics/Vertex.hpp>
-#include <RealEngine/graphics/View.hpp>
-#include <RealEngine/graphics/UniformManager.hpp>
+#include <RealEngine/graphics/Viewport.hpp>
 
 namespace RE {
 
@@ -14,16 +15,10 @@ void Window::resize(const glm::ivec2& newDims, bool save) {
 	SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 	SDL_GetWindowSize(m_SDLwindow, &p_dims.x, &p_dims.y);
 
-	glViewport(0, 0, (GLsizei)p_dims.x, (GLsizei)p_dims.y);
-
-	//View
-	View::std.resizeView((glm::vec2)newDims);
-	View::std.setPosition((glm::vec2)newDims / 2.0f, glm::uvec2(0));
-	View::std.update();
-
-	//Uniforms
-	glm::mat4 matrix = View::std.getViewMatrix();
-	UniformManager::std.setUniformBuffer("GlobalMatrices", 0u, sizeof(glm::mat4), &matrix[0][0]);
+	Viewport::m_windowMatrix = glm::ortho(0.0f, static_cast<float>(p_dims.x), 0.0f, static_cast<float>(p_dims.y));
+	Viewport::m_windowSize = p_dims;
+	Viewport::setToWholeWindow();
+	Viewport::setWindowMatrixToMatchViewport();
 
 	if (save) this->save();
 }
@@ -98,7 +93,7 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 	std::printf("Vendor:       %s\n", glGetString(GL_VENDOR));
 
 	//Set vertical synchronisation
-	setVSync(p_flags.vSync, "");
+	setVSync(p_flags.vSync, false);
 
 #ifdef _DEBUG
 	//Enable OpenGL error callbacks
@@ -130,20 +125,11 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 	glEnable(GL_PRIMITIVE_RESTART);
 	glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
-	//Initialize standard view
-	View::std.initView(p_dims);
-	View::std.setPosition(p_dims / 2, glm::uvec2(0));
-	View::std.update();
-
-	m_stdSpriteShader = RM::getShaderProgram(ShaderProgramSource::stdSprite);
-	m_stdGeometryShader = RM::getShaderProgram(ShaderProgramSource::stdGeometry);
-
-	//Standard uniforms
-	UniformManager::std.addUniformBuffer("GlobalMatrices", sizeof(glm::mat4));
-	UniformManager::std.addShader("GlobalMatrices", m_stdSpriteShader.get());
-	UniformManager::std.addShader("GlobalMatrices", m_stdGeometryShader.get());
-	glm::mat4 matrix = View::std.getViewMatrix();
-	UniformManager::std.setUniformBuffer("GlobalMatrices", 0u, sizeof(glm::mat4), &matrix[0][0]);
+	//Create window matrix uniform buffer
+	Viewport::m_windowMatrix = glm::ortho(0.0f, static_cast<float>(p_dims.x), 0.0f, static_cast<float>(p_dims.y));
+	Viewport::m_windowSize = p_dims;
+	Viewport::m_windowMatrixUniformBuffer.emplace(
+		UNIF_BUF_VIEWPORT_MATRIX, true, RE::BufferUsageFlags::DYNAMIC_STORAGE, sizeof(Viewport::m_windowMatrix), &Viewport::m_windowMatrix);
 }
 
 Window::~Window() {

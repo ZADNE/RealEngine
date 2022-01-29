@@ -1,9 +1,7 @@
 ﻿#pragma once
 namespace RE {
 
-//SPRITE
-
-static const char* vert_sprite = {
+static const char* sprite_vert = {
 	"#version 460\n"
 
 	"layout(location = 0) in vec2 position;"
@@ -13,7 +11,7 @@ static const char* vert_sprite = {
 	"out vec4 fragColour;"
 	"out vec2 fragUV;"
 
-	"layout(std140) uniform GlobalMatrices{"
+	"layout(std140, binding = 0) uniform GlobalMatrices {"
 		"mat4 projectionMatrix;"
 	"};"
 
@@ -26,7 +24,7 @@ static const char* vert_sprite = {
 
 static int LOC_BASE_TEXTURE = 0;
 
-static const char* frag_sprite = {
+static const char* sprite_frag = {
 	"#version 460\n"
 
 	"in vec4 fragColour;"
@@ -41,9 +39,7 @@ static const char* frag_sprite = {
 	"}"
 };
 
-//GEOMETRY
-
-static const char* vert_geometry = {
+static const char* geometry_vetr = {
 	"#version 460\n"
 
 	"layout(location = 0) in vec2 position;"
@@ -51,7 +47,7 @@ static const char* vert_geometry = {
 
 	"out vec4 fragColour;"
 
-	"layout(std140) uniform GlobalMatrices{"
+	"layout(std140, binding = 0) uniform GlobalMatrices {"
 		"mat4 projectionMatrix;"
 	"};"
 
@@ -61,7 +57,7 @@ static const char* vert_geometry = {
 	"}"
 };
 
-static const char* frag_geometry = {
+static const char* geometry_frag = {
 	"#version 460\n"
 
 	"in vec4 fragColour;"

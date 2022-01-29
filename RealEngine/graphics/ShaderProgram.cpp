@@ -9,22 +9,17 @@
 
 #include <RealEngine/utility/utility.hpp>
 #include <RealEngine/main/Error.hpp>
-#include <RealEngine/graphics/default_shaders.hpp>
-
-const std::array STAGES = {
-	GL_VERTEX_SHADER,
-	GL_TESS_CONTROL_SHADER,
-	GL_TESS_EVALUATION_SHADER,
-	GL_GEOMETRY_SHADER,
-	GL_FRAGMENT_SHADER,
-	GL_COMPUTE_SHADER
-};
-
 
 namespace RE {
 
-const ShaderProgramSource ShaderProgramSource::stdSprite{.vert = vert_sprite, .frag = frag_sprite};
-const ShaderProgramSource ShaderProgramSource::stdGeometry{.vert = vert_geometry, .frag = frag_geometry};
+const std::array SHADER_STAGES = {
+	ShaderType::VERTEX,
+	ShaderType::TESS_CONTROL,
+	ShaderType::TESS_EVALUATION,
+	ShaderType::GEOMETRY,
+	ShaderType::FRAGMENT,
+	ShaderType::COMPUTE
+};
 
 ShaderProgram::ShaderProgram(const ShaderProgramSource& source) {
 	compileProgram(source);
@@ -104,55 +99,68 @@ void ShaderProgram::printInfo() const {
 }
 
 void ShaderProgram::setUniform(int location, float val) const { glProgramUniform1f(m_ID, location, val); }
-void ShaderProgram::setUniform(int location, glm::vec2 val) const { glProgramUniform2f(m_ID, location, val.x, val.y); }
-void ShaderProgram::setUniform(int location, glm::vec3 val) const { glProgramUniform3f(m_ID, location, val.x, val.y, val.z); }
-void ShaderProgram::setUniform(int location, glm::vec4 val) const { glProgramUniform4f(m_ID, location, val.x, val.y, val.z, val.w); }
+void ShaderProgram::setUniform(int location, float val0, float val1) const { glProgramUniform2f(m_ID, location, val0, val1); }
+void ShaderProgram::setUniform(int location, const glm::vec2& val) const { setUniform(location, val.x, val.y); }
+void ShaderProgram::setUniform(int location, float val0, float val1, float val2) const { glProgramUniform3f(m_ID, location, val0, val1, val2); }
+void ShaderProgram::setUniform(int location, const glm::vec3& val) const { setUniform(location, val.x, val.y, val.z); }
+void ShaderProgram::setUniform(int location, float val0, float val1, float val2, float val3) const { glProgramUniform4f(m_ID, location, val0, val1, val2, val3); }
+void ShaderProgram::setUniform(int location, const glm::vec4& val) const { setUniform(location, val.x, val.y, val.z, val.w); }
 void ShaderProgram::setUniform(int location, int count, const float* val) const { glProgramUniform1fv(m_ID, location, count, val); }
 void ShaderProgram::setUniform(int location, int count, const glm::vec2* val) const { glProgramUniform2fv(m_ID, location, count, glm::value_ptr(*val)); }
 void ShaderProgram::setUniform(int location, int count, const glm::vec3* val) const { glProgramUniform3fv(m_ID, location, count, glm::value_ptr(*val)); }
 void ShaderProgram::setUniform(int location, int count, const glm::vec4* val) const { glProgramUniform4fv(m_ID, location, count, glm::value_ptr(*val)); }
 
-void ShaderProgram::setUniform(int location, int val) const { glProgramUniform1i(m_ID, location, val); }
-void ShaderProgram::setUniform(int location, glm::ivec2 val) const { glProgramUniform2i(m_ID, location, val.x, val.y); }
-void ShaderProgram::setUniform(int location, glm::ivec3 val) const { glProgramUniform3i(m_ID, location, val.x, val.y, val.z); }
-void ShaderProgram::setUniform(int location, glm::ivec4 val) const { glProgramUniform4i(m_ID, location, val.x, val.y, val.z, val.w); }
-void ShaderProgram::setUniform(int location, int count, const int* val) const { glProgramUniform1iv(m_ID, location, count, val); }
+void ShaderProgram::setUniform(int location, GLint val) const { glProgramUniform1i(m_ID, location, val); }
+void ShaderProgram::setUniform(int location, GLint val0, GLint val1) const { glProgramUniform2i(m_ID, location, val0, val1); }
+void ShaderProgram::setUniform(int location, const glm::ivec2& val) const { setUniform(location, val.x, val.y); }
+void ShaderProgram::setUniform(int location, GLint val0, GLint val1, GLint val2) const { glProgramUniform3i(m_ID, location, val0, val1, val2); }
+void ShaderProgram::setUniform(int location, const glm::ivec3& val) const { setUniform(location, val.x, val.y, val.z); }
+void ShaderProgram::setUniform(int location, GLint val0, GLint val1, GLint val2, GLint val3) const { glProgramUniform4i(m_ID, location, val0, val1, val2, val3); }
+void ShaderProgram::setUniform(int location, const glm::ivec4& val) const { setUniform(location, val.x, val.y, val.z, val.w); }
+void ShaderProgram::setUniform(int location, int count, const GLint* val) const { glProgramUniform1iv(m_ID, location, count, val); }
 void ShaderProgram::setUniform(int location, int count, const glm::ivec2* val) const { glProgramUniform2iv(m_ID, location, count, glm::value_ptr(*val)); }
 void ShaderProgram::setUniform(int location, int count, const glm::ivec3* val) const { glProgramUniform3iv(m_ID, location, count, glm::value_ptr(*val)); }
 void ShaderProgram::setUniform(int location, int count, const glm::ivec4* val) const { glProgramUniform4iv(m_ID, location, count, glm::value_ptr(*val)); }
 
-void ShaderProgram::setUniform(int location, unsigned int val) const { glProgramUniform1ui(m_ID, location, val); }
-void ShaderProgram::setUniform(int location, glm::uvec2 val) const { glProgramUniform2ui(m_ID, location, val.x, val.y); }
-void ShaderProgram::setUniform(int location, glm::uvec3 val) const { glProgramUniform3ui(m_ID, location, val.x, val.y, val.z); }
-void ShaderProgram::setUniform(int location, glm::uvec4 val) const { glProgramUniform4ui(m_ID, location, val.x, val.y, val.z, val.w); }
-void ShaderProgram::setUniform(int location, int count, const unsigned int* val) const { glProgramUniform1uiv(m_ID, location, count, val); }
+void ShaderProgram::setUniform(int location, GLuint val) const { glProgramUniform1ui(m_ID, location, val); }
+void ShaderProgram::setUniform(int location, GLuint val0, GLuint val1) const { glProgramUniform2ui(m_ID, location, val0, val1); }
+void ShaderProgram::setUniform(int location, const glm::uvec2& val) const { setUniform(location, val.x, val.y); }
+void ShaderProgram::setUniform(int location, GLuint val0, GLuint val1, GLuint val2) const { glProgramUniform3ui(m_ID, location, val0, val1, val2); }
+void ShaderProgram::setUniform(int location, const glm::uvec3& val) const { setUniform(location, val.x, val.y, val.z); }
+void ShaderProgram::setUniform(int location, GLuint val0, GLuint val1, GLuint val2, GLuint val3) const { glProgramUniform4ui(m_ID, location, val0, val1, val2, val3); }
+void ShaderProgram::setUniform(int location, const glm::uvec4& val) const { setUniform(location, val.x, val.y, val.z, val.w); }
+void ShaderProgram::setUniform(int location, int count, const GLuint* val) const { glProgramUniform1uiv(m_ID, location, count, val); }
 void ShaderProgram::setUniform(int location, int count, const glm::uvec2* val) const { glProgramUniform2uiv(m_ID, location, count, glm::value_ptr(*val)); }
 void ShaderProgram::setUniform(int location, int count, const glm::uvec3* val) const { glProgramUniform3uiv(m_ID, location, count, glm::value_ptr(*val)); }
 void ShaderProgram::setUniform(int location, int count, const glm::uvec4* val) const { glProgramUniform4uiv(m_ID, location, count, glm::value_ptr(*val)); }
+
+void ShaderProgram::setUniform(int location, TextureUnit texUnit) const { glProgramUniform1i(m_ID, location, texUnit.m_index); }
 
 void ShaderProgram::compileProgram(const ShaderProgramSource& source) {
 	//Create program
 	m_ID = glCreateProgram();
 
 	//Create, compile and attach shaders
-	GLuint shaderID[STAGES.size()] = {0};
-	for (size_t i = 0; i < STAGES.size(); i++) {
-		if (source[static_cast<ShaderType>(i)] != nullptr) {
-			shaderID[i] = glCreateShader(STAGES[i]);
+	GLuint shaderID[SHADER_STAGES.size()] = {0};
+	size_t i = 0;
+	for (auto STAGE : SHADER_STAGES) {
+		if (source[STAGE] != nullptr) {
+			shaderID[i] = glCreateShader(static_cast<GLenum>(STAGE));
 		#ifdef _DEBUG
 			if (shaderID[i] == 0) {
 				fatalError("Failed to create shader!");
 			}
 		#endif // _DEBUG
-			compileShader(source[static_cast<ShaderType>(i)], shaderID[i]);
+			compileShader(source[STAGE], shaderID[i]);
 		}
+		i++;
 	}
 
 	//Link program
 	linkProgram();
 
 	//Detach and delete shaders
-	for (size_t i = 0; i < STAGES.size(); i++) {
+	for (size_t i = 0; i < 6; i++) {
 		if (shaderID[i] != 0) {
 			glDetachShader(m_ID, shaderID[i]);
 			glDeleteShader(shaderID[i]);

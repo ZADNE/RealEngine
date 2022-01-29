@@ -113,7 +113,7 @@ private:
 
 template<BufferType type, BufferStorage storage>
 inline void VertexArray::setBindingPoint(GLuint bindingPoint, const Buffer<type, storage>& buffer, GLintptr offset, GLsizei stride) {
-	glVertexArrayVertexBuffer(m_ID, bindingPoint, buffer.m_ID, offset, stride);
+	glVertexArrayVertexBuffer(m_ID, bindingPoint, buffer.p_ID, offset, stride);
 }
 
 }

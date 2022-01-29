@@ -8,19 +8,13 @@
 
 namespace RE {
 
-View View::std = View{};
-
-View::View() {
-
+View::View(const glm::vec2& viewDimensions) {
+	m_viewDimensions = viewDimensions;
+	m_orthoMatrix = glm::ortho(0.0f, m_viewDimensions.x, 0.0f, m_viewDimensions.y);
 }
 
 View::~View() {
 
-}
-
-void View::initView(const glm::vec2& viewDimensions) {
-	m_viewDimensions = viewDimensions;
-	m_orthoMatrix = glm::ortho(0.0f, m_viewDimensions.x, 0.0f, m_viewDimensions.y);
 }
 
 void View::resizeView(const glm::vec2& newDims) {
@@ -55,7 +49,7 @@ glm::vec2 View::convertAbsToRel(const glm::uvec2& abs) {
 	return (glm::vec2)floatAbs;
 }
 
-void View::update() {//Should be called once every step before drawing
+void View::update() {//Should be called once every beginStep before drawing
 	if (m_needsUpdate) {
 		//Translate
 		glm::vec3 translate(-m_position.x + m_viewDimensions.x / 2.0f, -m_position.y + m_viewDimensions.y / 2.0f, 0.0f);
@@ -84,14 +78,6 @@ void View::enableClipping(const glm::vec2& minXY, const glm::vec2& maxXY) {
 
 void View::disableClipping() {
 	m_clippingEnabled = false;
-}
-
-void View::E_SDL(SDL_Event& evnt) {
-	switch (evnt.type) {
-	case SDL_MOUSEMOTION:
-		updateCursorRel(glm::uvec2(evnt.motion.x, evnt.motion.y));
-		break;
-	}
 }
 
 void View::clip() {

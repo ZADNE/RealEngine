@@ -5,21 +5,21 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <RealEngine/main/Error.hpp>
-#include <RealEngine/graphics/View.hpp>
-#include <RealEngine/resources/ResourceManager.hpp>
+#include <RealEngine/graphics/Viewport.hpp>
 #include <RealEngine/graphics/default_shaders.hpp>
-#include <RealEngine/graphics/UniformManager.hpp>
 #include <RealEngine/graphics/texture/TextureFlagsToString.hpp>
+#include <RealEngine/resources/ResourceManager.hpp>
 
 
 namespace RE {
 
 Surface::Surface(const TextureImage& image, const TextureParameters& params, unsigned int numberOfTextures/* = 1*/, bool disableBlend/* = false*/, bool updateUniforms/* = true*/) :
 	m_disableBlend(disableBlend),
-	m_updateUniforms(updateUniforms),
+	m_updateUniformBuffer(updateUniforms),
 	m_params(params) {
 
 	if (m_params.getMinFilter() != TextureMinFilter::NEAREST) {
+		log("Surface cannot have mipmaps");
 		m_params.setMinFilter(TextureMinFilter::LINEAR);//Mipmaps are not allowed for surfaces
 	}
 
@@ -43,7 +43,7 @@ Surface::Surface(Surface&& other) noexcept :
 	m_frameBuffer(other.m_frameBuffer),
 	m_params(other.m_params),
 	m_disableBlend(other.m_disableBlend),
-	m_updateUniforms(other.m_updateUniforms) {
+	m_updateUniformBuffer(other.m_updateUniformBuffer) {
 	other.m_frameBuffer = 0;
 	std::swap(m_textures, other.m_textures);
 }
@@ -52,7 +52,7 @@ Surface& Surface::operator=(Surface&& other) noexcept {
 	std::swap(m_frameBuffer, other.m_frameBuffer);
 	std::swap(m_textures, other.m_textures);
 	m_disableBlend = other.m_disableBlend;
-	m_updateUniforms = other.m_updateUniforms;
+	m_updateUniformBuffer = other.m_updateUniformBuffer;
 	m_params = other.m_params;
 	return *this;
 }
@@ -73,42 +73,33 @@ Surface::~Surface() {
 #endif // defined(_DEBUG) && defined(RE_LOG_SURFACE_DESTROYED)
 }
 
-void Surface::setTarget() const {//Sets further drawing to be done into this surface
-	/*#ifdef _DEBUG
-		GLint framebuffer;
-		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &framebuffer);
-		if (framebuffer) {
-			fatalError("Tried to overbind surface!");
-		}
-	#endif // _DEBUG*/
-	//Framebuffer
+void Surface::setTarget() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
-	//Viewport
-	glViewport(0, 0, m_textures[0].getTrueDims().x, (GLsizei)m_textures[0].getTrueDims().y);
+
+	Viewport::set(glm::ivec2(0, 0), m_textures[0].getTrueDims());
 
 	if (m_disableBlend) {
 		glDisable(GL_BLEND);
 	}
 
-	if (m_updateUniforms) {
+	if (m_updateUniformBuffer) {
 		glm::vec2 trueDims = m_textures[0].getTrueDims();
 		glm::mat4 matrix = glm::ortho(0.0f, trueDims.x, 0.0f, trueDims.y);
-		UniformManager::std.setUniformBuffer("GlobalMatrices", 0u, sizeof(glm::mat4), &matrix[0][0]);
+		Viewport::getWindowMatrixUniformBuffer().overwrite(matrix);
 	}
 }
 
-void Surface::resetTarget() const {//Sets further drawing to be done directly to the screen
-	//Framebuffer
+void Surface::resetTarget() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//Viewport
-	glViewport(0, 0, (GLsizei)View::std.getUnscaledDims().x, (GLsizei)View::std.getUnscaledDims().y);
+
+	Viewport::setToWholeWindow();
 
 	if (m_disableBlend) {
 		glEnable(GL_BLEND);
 	}
-	if (m_updateUniforms) {
-		glm::mat4 matrix = View::std.getViewMatrix();
-		UniformManager::std.setUniformBuffer("GlobalMatrices", 0u, sizeof(glm::mat4), &matrix[0][0]);
+
+	if (m_updateUniformBuffer) {
+		Viewport::setWindowMatrixToMatchViewport();
 	}
 }
 
@@ -127,7 +118,9 @@ void Surface::resize(const TextureImage& image, unsigned int numberOfTextures) {
 	for (size_t i = 0; i < numberOfTextures; i++) {
 		m_textures.emplace_back(image, m_params);
 	}
-	attachTexturesToFBO();
+	if (numberOfTextures > 0) {
+		attachTexturesToFBO();
+	}
 #if defined(_DEBUG) && defined(RE_LOG_SURFACE_RESIZED)
 	std::cout << "Resized surface (ID: " << m_frameBuffer << ", ";
 	if (m_textures.size() > 0) {
@@ -168,7 +161,7 @@ void Surface::attachTexturesToFBO() {
 
 	glNamedFramebufferDrawBuffers(m_frameBuffer, (GLsizei)m_textures.size(), buffers);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+	if (glCheckNamedFramebufferStatus(m_frameBuffer, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		fatalError("Failed to create surface frame buffer!");
 	}
 }

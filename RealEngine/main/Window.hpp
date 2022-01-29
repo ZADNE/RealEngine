@@ -1,20 +1,22 @@
 ﻿#pragma once
 #include <string>
+#include <optional>
 
 #include <SDL2/SDL_video.h>
 #include <glm/vec2.hpp>
 
 #include <RealEngine/main/WindowSettings.hpp>
-#include <RealEngine/resources/ResourceManager.hpp>
+#include <RealEngine/graphics/UniformBuffer.hpp>
 
 namespace RE {
 
 class MainProgram;
 
 /**
- * @brief Window that displays the scene.
+ * @brief Displays the scene.
  *
- * Every window has its own OpenGL context.
+ * There can only be a single window within program
+ * and it is created by the main program.
 */
 class Window : public WindowSettings {
 	friend class MainProgram;
@@ -62,7 +64,6 @@ public:
 	*/
 	const std::string& getTitle() const;
 
-
 	/**
 	 * @brief Gets current dimensions of the window
 	 * @return Current dimensions
@@ -92,9 +93,6 @@ private:
 	SDL_Window* m_SDLwindow = nullptr;	/**< handle to SDL window */
 	SDL_GLContext m_GLContext = nullptr;/**< handle to OpenGL context */
 	std::string m_windowTitle;			/**< Title of the window */
-
-	ShaderProgramPtr m_stdSpriteShader;	/**< window also own standard sprite shader */
-	ShaderProgramPtr m_stdGeometryShader;/**< window also own standard geometry shader */
 };
 
 }

@@ -7,6 +7,10 @@
 #include <SDL2/SDL_events.h>
 
 #include <RealEngine/resources/ResourceManager.hpp>
+#include <RealEngine/graphics/SpriteBatch.hpp>
+#include <RealEngine/graphics/GeometryBatch.hpp>
+#include <RealEngine/graphics/default_shaders.hpp>
+#include <RealEngine/graphics/Viewport.hpp>
 
 namespace RE {
 
@@ -35,7 +39,7 @@ int MainProgram::run() {
 			} else {
 				SDL_PumpEvents();
 			}
-			//Do the step
+			//Do the simulation step
 			step();
 		}
 
@@ -209,6 +213,14 @@ MainProgram::MainProgram() {
 	Room::m_inputManager = &p_inputManager;
 	Room::m_synchronizer = &p_synchronizer;
 	Room::m_window = &p_window;
+
+	auto spriteShader = RE::RM::getShaderProgram({.vert = sprite_vert, .frag = sprite_frag});
+	Viewport::getWindowMatrixUniformBuffer().connectToShaderProgram(*spriteShader, 0u);
+	SpriteBatch::std().switchShaderProgram(spriteShader);
+
+	auto geometryShader = RE::RM::getShaderProgram({.vert = geometry_vetr, .frag = geometry_frag});
+	Viewport::getWindowMatrixUniformBuffer().connectToShaderProgram(*geometryShader, 0u);
+	GeometryBatch::std().switchShaderProgram(geometryShader);
 }
 
 MainProgram::~MainProgram() {
