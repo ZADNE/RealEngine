@@ -54,8 +54,8 @@ public:
 	SpriteBatch();
 	~SpriteBatch();
 
-	void begin(GlyphSortType sortType = GlyphSortType::TEXTURE);
-	void end();
+	void begin();
+	void end(GlyphSortType sortType);
 
 	//UNCOLORED
 	void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy texture, int depth);//Rotated to the right
@@ -122,10 +122,8 @@ public:
 		return std;
 	}
 private:
-	void sortGlyphs();
+	void sortGlyphs(GlyphSortType sortType);
 	void createDrawBatches();
-
-	GlyphSortType m_glyphSortType = GlyphSortType::NONE;
 
 	VertexArray m_vao;
 	Buffer<BufferType::ARRAY, BufferStorage::MUTABLE> m_vbo{0, STREAM, DRAW};

@@ -142,6 +142,8 @@ class TextureFlags {
 public:
 	static const TextureFlagsType RGBA_NU_NEAR_NEAR_EDGE;/**< RGBA, normalized - unsigned, near min&mag filter, clamping to edge */
 	static const TextureFlagsType RGBA_IU_NEAR_NEAR_EDGE;/**< RGBA, integral - unsigned, near min&mag filter, clamping to edge */
+	static const TextureFlagsType RGBA_NU_NEAR_LIN_EDGE;/**< RGBA, normalized - unsigned, near min, linear mag filter, clamping to edge */
+	static const TextureFlagsType RGBA_IU_NEAR_LIN_EDGE;/**< RGBA, integral - unsigned, near min, linear mag filter, clamping to edge */
 
 	/**
 	 * @brief Default constructs flags to all zeros

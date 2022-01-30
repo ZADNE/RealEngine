@@ -51,18 +51,17 @@ SpriteBatch::~SpriteBatch() {
 
 }
 
-void SpriteBatch::begin(GlyphSortType sortType) {
-	m_glyphSortType = sortType;
+void SpriteBatch::begin() {
 	m_drawBatches.clear();
 	m_glyphs.clear();
 }
 
-void SpriteBatch::end() {
+void SpriteBatch::end(GlyphSortType sortType) {
 	m_glyphPointers.resize(m_glyphs.size());
 	for (size_t i = 0; i < m_glyphs.size(); i++) {
 		m_glyphPointers[i] = &m_glyphs[i];
 	}
-	sortGlyphs();
+	sortGlyphs(sortType);
 	createDrawBatches();
 }
 
@@ -220,8 +219,8 @@ void SpriteBatch::switchShaderProgram(ShaderProgramPtr shaderProgram) {
 	m_shaderProgram = shaderProgram;
 }
 
-void SpriteBatch::sortGlyphs() {
-	switch (m_glyphSortType) {
+void SpriteBatch::sortGlyphs(GlyphSortType sortType) {
+	switch (sortType) {
 	case GlyphSortType::NEG_TOP:
 		std::stable_sort(m_glyphPointers.begin(), m_glyphPointers.end(), compareNegToPos);
 		break;
