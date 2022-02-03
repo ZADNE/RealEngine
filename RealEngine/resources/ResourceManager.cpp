@@ -11,8 +11,8 @@ TexturePtr ResourceManager::getTexture(const std::string& filePath) {
 	return m_textureCache.getTexture(filePath);
 }
 
-ShaderProgramPtr ResourceManager::getShaderProgram(const ShaderProgramSource& source) {
-	return m_shaderProgramCache.getShaderProgram(source);
+ShaderProgramPtr ResourceManager::getShaderProgram(const ShaderProgramSources& sources) {
+	return m_shaderProgramCache.getShaderProgram(sources);
 }
 
 const Font* ResourceManager::getFont(const FontSeed& fontSeed) {

@@ -4,6 +4,9 @@
 
 #include <RealEngine/graphics/ShaderProgram.hpp>
 
+/**
+ * @author The boost library
+*/
 inline void hash_combine(std::size_t& seed) { }
 template <typename T, typename... Rest>
 inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
@@ -13,8 +16,20 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
 }
 
 namespace std {
-template <> struct hash<RE::ShaderProgramSource> {
-	size_t operator()(const RE::ShaderProgramSource& source) const {
+template <> struct hash<RE::ShaderSources> {
+	size_t operator()(const RE::ShaderSources& sources) const {
+		std::size_t hash = sources.m_sources.size();
+		for (auto& i : sources.m_sources) {
+			hash ^= reinterpret_cast<intptr_t>(i) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+		}
+		return hash;
+	}
+};
+}
+
+namespace std {
+template <> struct hash<RE::ShaderProgramSources> {
+	size_t operator()(const RE::ShaderProgramSources& source) const {
 		std::size_t hash = 0;
 		hash_combine(hash,
 			source.vert, source.tesc, source.tese,
@@ -36,12 +51,12 @@ public:
 
 	/**
 	* @brief Gets shader program as a shared resource.
-	* @param source Source code of the shader program
+	* @param sources Source codes of the shader program
 	* @return Shader program as a shared resource
 	*/
-	ShaderProgramPtr getShaderProgram(const ShaderProgramSource& source);
+	ShaderProgramPtr getShaderProgram(const ShaderProgramSources& sources);
 private:
-	std::unordered_map<ShaderProgramSource, std::weak_ptr<ShaderProgram>> m_shaderMap;
+	std::unordered_map<ShaderProgramSources, std::weak_ptr<ShaderProgram>> m_shaderMap;
 };
 
 }

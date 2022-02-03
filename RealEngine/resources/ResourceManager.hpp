@@ -24,7 +24,7 @@ public:
 	/**
 	 * @copydoc ShaderProgramCache::getShaderProgram
 	*/
-	static ShaderProgramPtr getShaderProgram(const ShaderProgramSource& source);
+	static ShaderProgramPtr getShaderProgram(const ShaderProgramSources& sources);
 
 	//Font
 	static const Font* getFont(const FontSeed& fontSeed);

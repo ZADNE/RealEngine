@@ -21,8 +21,8 @@ const std::array SHADER_STAGES = {
 	ShaderType::COMPUTE
 };
 
-ShaderProgram::ShaderProgram(const ShaderProgramSource& source) {
-	compileProgram(source);
+ShaderProgram::ShaderProgram(const ShaderProgramSources& sources) {
+	compileProgram(sources);
 #if defined(_DEBUG) && defined(RE_LOG_SHADER_PROGRAM_CREATED)
 	std::cout << "Created shader (ID: " << m_programID << ")\n";
 #endif // defined(_DEBUG) && defined(RE_LOG_SHADER_PROGRAM_CREATED)
@@ -136,7 +136,7 @@ void ShaderProgram::setUniform(int location, int count, const glm::uvec4* val) c
 
 void ShaderProgram::setUniform(int location, TextureUnit texUnit) const { glProgramUniform1i(m_ID, location, texUnit.m_index); }
 
-void ShaderProgram::compileProgram(const ShaderProgramSource& source) {
+void ShaderProgram::compileProgram(const ShaderProgramSources& source) {
 	//Create program
 	m_ID = glCreateProgram();
 
@@ -144,7 +144,7 @@ void ShaderProgram::compileProgram(const ShaderProgramSource& source) {
 	GLuint shaderID[SHADER_STAGES.size()] = {0};
 	size_t i = 0;
 	for (auto STAGE : SHADER_STAGES) {
-		if (source[STAGE] != nullptr) {
+		if (!source[STAGE].m_sources.empty()) {
 			shaderID[i] = glCreateShader(static_cast<GLenum>(STAGE));
 		#ifdef _DEBUG
 			if (shaderID[i] == 0) {
@@ -211,8 +211,8 @@ void ShaderProgram::printProgramInfoLog() const {
 	}
 }
 
-void ShaderProgram::compileShader(const char* source, GLuint shaderID) {
-	glShaderSource(shaderID, 1, &source, nullptr);
+void ShaderProgram::compileShader(const ShaderSources& sources, GLuint shaderID) {
+	glShaderSource(shaderID, static_cast<GLsizei>(sources.m_sources.size()), sources.m_sources.data(), sources.m_lengths.data());
 
 	glCompileShader(shaderID);
 

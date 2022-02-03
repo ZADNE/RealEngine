@@ -1,9 +1,9 @@
 ﻿#pragma once
+#include <string_view>
+
 namespace RE {
 
-static const char* sprite_vert = {
-	"#version 460\n"
-
+static std::string_view sprite_vert = {
 	"layout(location = 0) in vec2 position;"
 	"layout(location = 1) in vec4 colour;"
 	"layout(location = 2) in vec2 UV;"
@@ -24,9 +24,7 @@ static const char* sprite_vert = {
 
 static int LOC_BASE_TEXTURE = 0;
 
-static const char* sprite_frag = {
-	"#version 460\n"
-
+static std::string_view sprite_frag = {
 	"in vec4 fragColour;"
 	"in vec2 fragUV;"
 
@@ -39,9 +37,7 @@ static const char* sprite_frag = {
 	"}"
 };
 
-static const char* geometry_vetr = {
-	"#version 460\n"
-
+static std::string_view geometry_vetr = {
 	"layout(location = 0) in vec2 position;"
 	"layout(location = 1) in vec4 colour;"
 
@@ -57,9 +53,7 @@ static const char* geometry_vetr = {
 	"}"
 };
 
-static const char* geometry_frag = {
-	"#version 460\n"
-
+static std::string_view geometry_frag = {
 	"in vec4 fragColour;"
 
 	"out vec4 colour;"
