@@ -107,8 +107,12 @@ void Surface::setTargetTextures(const SurfaceTargetTextures& targetTextures) {
 	glNamedFramebufferDrawBuffers(m_frameBuffer, (GLsizei)m_textures.size(), targetTextures.m_buffers);
 }
 
-void Surface::bindTexture(int index/* = 0*/) {//Binds texture of the surface to the current texture unit (unit is not set by this function)
+void Surface::bindTexture(int index/* = 0*/) {
 	m_textures[index].bind();
+}
+
+void Surface::bindTexture(TextureUnit unit, int index) {
+	m_textures[index].bind(unit);
 }
 
 void Surface::resize(const TextureImage& image, unsigned int numberOfTextures) {

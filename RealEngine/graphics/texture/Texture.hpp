@@ -10,6 +10,7 @@
 #include <RealEngine/graphics/Vertex.hpp>
 #include <RealEngine/graphics/texture/TextureParameters.hpp>
 #include <RealEngine/graphics/texture/TextureImage.hpp>
+#include <RealEngine/graphics/texture/TextureUnit.hpp>
 
 
 namespace RE {
@@ -45,6 +46,15 @@ public:
 	 * Behaviour is undefined if the originating texture was destroyed.
 	*/
 	void bind() const { glBindTexture(GL_TEXTURE_2D, m_ID); }
+
+	/**
+	 * @brief Binds the texture that this proxy represents to the given texture unit.
+	 *
+	 * Behaviour is undefined if the originating texture was destroyed.
+	 *
+	 * @param unit Texture unit to bind the texture to.
+	*/
+	void bind(TextureUnit unit) const { glBindTextureUnit(unit.m_index, m_ID); }
 
 	auto operator<=>(const TextureProxy&) const = default;
 private:
@@ -161,9 +171,16 @@ public:
 	}
 
 	/**
-	 * @brief Binds the texture to current texture unit.
+	 * @brief Binds the texture to the current texture unit.
 	*/
 	void bind() const { glBindTexture(GL_TEXTURE_2D, m_ID); }
+
+	/**
+	 * @brief Binds the texture to the given texture unit.
+	 *
+	 * @param unit Texture unit to bind the texture to.
+	*/
+	void bind(TextureUnit unit) const { glBindTextureUnit(unit.m_index, m_ID); }
 
 	/**
 	 * @brief Clears FIRST MIPMAP of the texture with given colour.

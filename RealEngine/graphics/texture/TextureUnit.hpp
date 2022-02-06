@@ -5,6 +5,8 @@ namespace RE {
 
 class TextureUnit {
 	friend class ShaderProgram;
+	friend class Texture;
+	friend class TextureProxy;
 public:
 	TextureUnit(GLuint index) : m_index(index) {}
 

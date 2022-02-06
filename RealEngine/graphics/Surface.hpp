@@ -67,11 +67,19 @@ public:
 	void setTargetTextures(const SurfaceTargetTextures& targetTextures);
 
 	/**
-	 * @brief Binds texture to current texture unit
+	 * @brief Binds texture to the current texture unit
 	 *
 	 * @param index Index of the texture to be bound
 	 */
 	void bindTexture(int index = 0);
+
+	/**
+	 * @brief Binds texture to the given texture unit
+	 *
+	 * @param unit Texture unit to bind the texture to
+	 * @param index Index of the texture to be bound
+	 */
+	void bindTexture(TextureUnit unit, int index = 0);
 
 	/**
 	 * @brief Resizes surface.
