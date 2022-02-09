@@ -18,7 +18,7 @@ namespace RE {
 		release(Key::DMW);
 		release(Key::LMW);
 		release(Key::RMW);
-		unsigned int longest = 0u;
+		int longest = 0;
 		for (auto& i : m_stateMap) {
 			if (i.first == Key::ANY_KEY) { continue; }
 			if (i.second > 0) {
@@ -34,15 +34,15 @@ namespace RE {
 		}
 
 		++m_noKeyHeld;
-		if (m_keysHeld > 0u) {
-			m_noKeyHeld = 0u;
+		if (m_keysHeld > 0) {
+			m_noKeyHeld = 0;
 		}
 
 		m_noKeyHeldPrevious = m_noKeyHeld;
 		m_keysHeldPrevious = m_keysHeld;
 	}
 
-	unsigned int InputManager::isDown(RE::Key keyID) const {
+	int InputManager::isDown(RE::Key keyID) const {
 		//First checking for special keys
 		if (keyID == RE::Key::ANY_KEY) {
 			return m_stateMap[m_longestHeld];
@@ -55,10 +55,10 @@ namespace RE {
 		if (it != m_stateMap.end()) {
 			return it->second;
 		}
-		return 0u;
+		return 0;
 	}
 
-	unsigned int InputManager::wasDown(RE::Key keyID) const {
+	int InputManager::wasDown(RE::Key keyID) const {
 		//First checking for special keys
 		if (keyID == RE::Key::ANY_KEY) {
 			return m_stateMapPrevious[m_longestHeld];
@@ -71,57 +71,57 @@ namespace RE {
 		if (it != m_stateMapPrevious.end()) {
 			return it->second;
 		}
-		return 0u;
+		return 0;
 	}
 
-	unsigned int InputManager::wasPressed(RE::Key keyID) const {
+	int InputManager::wasPressed(RE::Key keyID) const {
 		//First checking for special keys
 		if (keyID == RE::Key::ANY_KEY) {
 			if (m_keysHeld > m_keysHeldPrevious) {
 				return m_stateMap[m_longestHeld];
 			}
 			else {
-				return 0u;
+				return 0;
 			}
 		}
 		else if (keyID == RE::Key::NO_KEY) {
-			if (m_keysHeld < m_keysHeldPrevious && m_keysHeld == 0u) {
-				return 1u;
+			if (m_keysHeld < m_keysHeldPrevious && m_keysHeld == 0) {
+				return 1;
 			}
 			else {
-				return 0u;
+				return 0;
 			}
 		}
 
 		if (isDown(keyID) > wasDown(keyID)) {
 			return m_stateMap[keyID];
 		}
-		return 0u;
+		return 0;
 	}
 
-	unsigned int InputManager::wasReleased(RE::Key keyID) const {
+	int InputManager::wasReleased(RE::Key keyID) const {
 		//First checking for special keys
 		if (keyID == RE::Key::ANY_KEY) {
 			if (m_keysHeld < m_keysHeldPrevious) {
 				return m_stateMap[m_longestHeld];
 			}
 			else {
-				return 0u;
+				return 0;
 			}
 		}
 		else if (keyID == RE::Key::NO_KEY) {
-			if (m_keysHeld > m_keysHeldPrevious && m_keysHeldPrevious == 0u) {
+			if (m_keysHeld > m_keysHeldPrevious && m_keysHeldPrevious == 0) {
 				return m_noKeyHeld + 1;
 			}
 			else {
-				return 0u;
+				return 0;
 			}
 		}
 
 		if (wasDown(keyID) > isDown(keyID)) {
 			return m_stateMapPrevious[keyID];
 		}
-		return 0u;
+		return 0;
 	}
 
 	void InputManager::setCursorAbs(const glm::uvec2& abs) {
@@ -132,13 +132,12 @@ namespace RE {
 		return m_cursorAbs;
 	}
 
-	void InputManager::press(RE::Key keyID, int times/* = 1u*/) {
+	void InputManager::press(RE::Key keyID, int times/* = 1*/) {
 		auto& it = m_stateMap[keyID];
 		if (keyID == Key::ANY_KEY) {
 			m_keysHeld += times;
-		}
-		else {
-			if (m_keysHeld == 1u) {
+		} else {
+			if (m_keysHeld == 1) {
 				m_longestHeld = keyID;
 			}
 			it += times;
@@ -147,7 +146,7 @@ namespace RE {
 
 	void InputManager::release(RE::Key keyID) {
 		auto& it = m_stateMap[keyID];
-		it = 0u;
+		it = 0;
 	}
 
 }

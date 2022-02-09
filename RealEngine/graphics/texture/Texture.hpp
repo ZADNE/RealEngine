@@ -16,7 +16,7 @@
 namespace RE {
 
 /**
- * @brief Texture proxy is a small class that holds only
+ * @brief Is a small class that holds only
  * non-owning handle to a texture.
  *
  * Once the texture that it represents is destroyed, the proxy
@@ -62,7 +62,7 @@ private:
 };
 
 /**
- * @brief Texture is image with associated parameters.
+ * @brief Represents an image with associated parameters.
  * @see TextureImage
  * @see TextureParameters
 */

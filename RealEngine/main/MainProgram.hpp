@@ -124,7 +124,7 @@ public:
 	 * - start session of next room via sessionStart(params)
 	 * - ensures that at least one step() happens in the next room before render()
 	 *
-	 * @param index The index of next room, nothing happens if it is invalid.
+	 * @param index The index of next room, no transition will happen if the index is invalid.
 	 * @param params Parameters to start the next room's session with.
 	*/
 	void scheduleRoomTransition(size_t index, RoomTransitionParameters params);
