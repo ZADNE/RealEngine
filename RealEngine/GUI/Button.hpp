@@ -2,7 +2,7 @@
 #include <string>
 
 #include <RealEngine/GUI/Controller.hpp>
-#include <RealEngine/graphics/texture/Texture.hpp>
+#include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/graphics/SpriteBatch.hpp>
 #include <RealEngine/graphics/Font.hpp>
 

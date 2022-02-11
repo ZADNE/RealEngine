@@ -67,6 +67,22 @@ void ShaderProgram::unuse() const {
 #endif // _DEBUG
 }
 
+void ShaderProgram::dispatchCompute(const glm::uvec3& groupCount, bool use) const {
+	if (use) {
+		this->use();
+	} else {
+	#ifdef _DEBUG
+		if (m_currentlyUsedID != m_ID) {
+			throw "Tried to dispatch a compute without having the program bound for usage!";
+		}
+	#endif // _DEBUG
+	}
+	glDispatchCompute(groupCount.x, groupCount.y, groupCount.z);
+	if (use) {
+		unuse();
+	}
+}
+
 void ShaderProgram::printInfo() const {
 	std::cout << "|SHADER: " << m_ID << '\n';
 	//ATTRIBUTE INFO
@@ -134,7 +150,9 @@ void ShaderProgram::setUniform(int location, int count, const glm::uvec2* val) c
 void ShaderProgram::setUniform(int location, int count, const glm::uvec3* val) const { glProgramUniform3uiv(m_ID, location, count, glm::value_ptr(*val)); }
 void ShaderProgram::setUniform(int location, int count, const glm::uvec4* val) const { glProgramUniform4uiv(m_ID, location, count, glm::value_ptr(*val)); }
 
-void ShaderProgram::setUniform(int location, TextureUnit texUnit) const { glProgramUniform1i(m_ID, location, texUnit.m_index); }
+void ShaderProgram::setUniform(int location, TextureUnit unit) const { glProgramUniform1i(m_ID, location, unit.m_unit); }
+
+void ShaderProgram::setUniform(int location, ImageUnit unit) const { glProgramUniform1i(m_ID, location, unit.m_unit); }
 
 void ShaderProgram::compileProgram(const ShaderProgramSources& source) {
 	//Create program

@@ -1,4 +1,4 @@
-﻿#include <RealEngine/graphics/texture/Texture.hpp>
+﻿#include <RealEngine/graphics/textures/Texture.hpp>
 
 #include <cmath>
 #include <iostream>
@@ -7,7 +7,7 @@
 #include <GL/glew.h>
 #include <glm/vec4.hpp>
 
-#include <RealEngine/graphics/texture/TextureFlagsToString.hpp>
+#include <RealEngine/graphics/textures/TextureFlagsToString.hpp>
 #include <RealEngine/main/Error.hpp>
 #include <RealEngine/external/lodepng/lodepng.hpp>
 
@@ -166,11 +166,11 @@ Texture::Texture(const std::string& filePathPNG) {
 
 paramsLoaded:
 	//Initialize texture
-	init(TextureImage{dims, toTextureChannels(state.info_raw.colortype), pixels}, params);
+	init(Raster{dims, toTextureChannels(state.info_raw.colortype), pixels}, params);
 }
 
-Texture::Texture(const TextureImage& image, const TextureParameters& params/* = DEFAULT_PARAMETERS*/) {
-	init(image, params);
+Texture::Texture(const Raster& raster, const TextureParameters& params/* = DEFAULT_PARAMETERS*/) {
+	init(raster, params);
 }
 
 Texture::~Texture() {
@@ -212,6 +212,20 @@ void Texture::setBorderColour(RE::Colour col) {
 	glTextureParameterfv(m_ID, GL_TEXTURE_BORDER_COLOR, &borderRGBA.r);
 }
 
+void Texture::bindImage(ImageUnit unit, GLint level, ImageAccess access) const {
+	glBindImageTexture(unit.m_unit, m_ID, level, GL_FALSE, 0, static_cast<GLenum>(access), textureInternalFormat(getChannels(), getFormat()));
+}
+
+void Texture::setTexelsWithinImage(GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
+	glTextureSubImage2D(m_ID, level, offset.x, offset.y,
+		size.x, size.y, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, raster);
+}
+
+void Texture::copyTexelsBetweenImages(GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
+	glCopyImageSubData(m_ID, GL_TEXTURE_2D, srcLevel, srcPos.x, srcPos.y, 0,
+		destination.m_ID, GL_TEXTURE_2D, dstLevel, dstPos.x, dstPos.y, 0, size.x, size.y, 1);
+}
+
 void Texture::clear(const glm::vec4& colour) const {
 	glClearTexImage(m_ID, 0, GL_RGBA, GL_FLOAT, &colour);
 }
@@ -228,7 +242,7 @@ bool Texture::saveToFile(const std::string& filePathPNG, const TextureParameters
 	auto channels = params.getChannels();
 	//Download pixels
 	std::vector<unsigned char> pixels;
-	pixels.resize(TextureImage::requiredMemory(m_trueDims, channels));
+	pixels.resize(Raster::requiredMemory(m_trueDims, channels));
 	glGetTextureImage(m_ID, 0, toGLenum(channels), GL_UNSIGNED_BYTE, static_cast<GLsizei>(pixels.size()), pixels.data());
 
 	//Insert rti chunk
@@ -258,9 +272,9 @@ std::string Texture::identificationString() const {
 	return stream.str();
 }
 
-void Texture::init(const TextureImage& image, const TextureParameters& params) {
+void Texture::init(const Raster& raster, const TextureParameters& params) {
 	if (params.isGeometryDefinedByImage()) {//Geometry defined by image
-		m_subimageDims = image.getDims();
+		m_subimageDims = raster.getDims();
 		m_pivot = glm::vec2{0.0f, 0.0f};
 		m_subimagesSpritesCount = glm::vec2{1.0f, 1.0f};
 	} else {//Geometry defined by parameters
@@ -269,7 +283,7 @@ void Texture::init(const TextureImage& image, const TextureParameters& params) {
 		m_subimagesSpritesCount = params.getSubimagesSpritesCount();
 	}
 	m_flags = TextureFlags{params};
-	m_trueDims = image.getDims();
+	m_trueDims = raster.getDims();
 	m_borderColour = params.getBorderColour();
 
 	//Create texture
@@ -281,8 +295,8 @@ void Texture::init(const TextureImage& image, const TextureParameters& params) {
 	glTextureStorage2D(m_ID, levels, internalFormat, m_trueDims.x, m_trueDims.y);
 
 	//Upload pixels for the texture (if specified)
-	if (image.getPixels().size() > 0u) {
-		glTextureSubImage2D(m_ID, 0, 0, 0, m_trueDims.x, m_trueDims.y, toGLenum(image.getChannels()), GL_UNSIGNED_BYTE, image.getPixels().data());
+	if (raster.getTexels().size() > 0u) {
+		glTextureSubImage2D(m_ID, 0, 0, 0, m_trueDims.x, m_trueDims.y, toGLenum(raster.getChannels()), GL_UNSIGNED_BYTE, raster.getTexels().data());
 	}
 
 	//Set parameters of the texture

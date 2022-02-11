@@ -12,7 +12,8 @@
 #include <glm/vec4.hpp>
 
 #include <RealEngine/main/Error.hpp>
-#include <RealEngine/graphics/texture/TextureUnit.hpp>
+#include <RealEngine/graphics/textures/TextureUnit.hpp>
+#include <RealEngine/graphics/textures/ImageUnit.hpp>
 
 
 namespace RE {
@@ -165,6 +166,16 @@ public:
 	void unuse() const;
 
 	/**
+	 * @brief Dispatches compute groups of this shader program.
+	 * 
+	 * Can be used only if the program was compiled with compute shader stage.
+	 * 
+	 * @param groupCount The number of work groups to be launched in each.
+	 * @param use If true, the program is bound and unbound for usage. If false it is expected to be already bound.
+	*/
+	void dispatchCompute(const glm::uvec3& groupCount, bool use) const;
+
+	/**
 	* @brief Prints diagnostic information about the shader program
 	*/
 	void printInfo() const;
@@ -219,7 +230,8 @@ public:
 	void setUniform(int location, int count, const glm::uvec3* val) const;				/**< Sets uvec4 array uniform at given location */
 	void setUniform(int location, int count, const glm::uvec4* val) const;				/**< Sets uvec4 array uniform at given location */
 
-	void setUniform(int location, TextureUnit texUnit) const;							/**< Sets sampler uniform at given location */
+	void setUniform(int location, TextureUnit unit) const;							/**< Sets sampler uniform at given location */
+	void setUniform(int location, ImageUnit unit) const;								/**< Sets image uniform at given location */
 
 private:
 	//Used to compile from scratch

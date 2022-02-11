@@ -1,4 +1,4 @@
-﻿#include <RealEngine/graphics/texture/TextureParameters.hpp>
+﻿#include <RealEngine/graphics/textures/TextureParameters.hpp>
 
 #include <fstream>
 #include <cstring>
@@ -54,7 +54,7 @@ namespace RE {
 		p_subimageDims = glm::dvec2{ rti.subimageDims } + 1.0;
 		p_pivot = glm::dvec2{ rti.pivot } / 2.0;
 		p_subimagesSpritesCount = glm::dvec2{ rti.subimagesSpritesCount } + 1.0;
-		p_definedByImage = false;
+		p_definedByRaster = false;
 		m_borderColour = rti.borderColour;
 	}
 

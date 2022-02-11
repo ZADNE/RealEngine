@@ -5,7 +5,7 @@
 #include <glm/vec4.hpp>
 
 #include <RealEngine/graphics/Surface.hpp>
-#include <RealEngine/graphics/texture/Texture.hpp>
+#include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/graphics/Vertex.hpp>
 #include <RealEngine/graphics/Sprite.hpp>
 #include <RealEngine/graphics/VertexArray.hpp>

@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <memory>
 
-#include <RealEngine/graphics/texture/Texture.hpp>
+#include <RealEngine/graphics/textures/Texture.hpp>
 
 namespace RE {
 

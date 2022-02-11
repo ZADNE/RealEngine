@@ -7,13 +7,13 @@
 #include <RealEngine/main/Error.hpp>
 #include <RealEngine/graphics/Viewport.hpp>
 #include <RealEngine/graphics/default_shaders.hpp>
-#include <RealEngine/graphics/texture/TextureFlagsToString.hpp>
+#include <RealEngine/graphics/textures/TextureFlagsToString.hpp>
 #include <RealEngine/resources/ResourceManager.hpp>
 
 
 namespace RE {
 
-Surface::Surface(const TextureImage& image, const TextureParameters& params, unsigned int numberOfTextures/* = 1*/, bool disableBlend/* = false*/, bool updateUniforms/* = true*/) :
+Surface::Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures/* = 1*/, bool disableBlend/* = false*/, bool updateUniforms/* = true*/) :
 	m_disableBlend(disableBlend),
 	m_updateUniformBuffer(updateUniforms),
 	m_params(params) {
@@ -107,15 +107,7 @@ void Surface::setTargetTextures(const SurfaceTargetTextures& targetTextures) {
 	glNamedFramebufferDrawBuffers(m_frameBuffer, (GLsizei)m_textures.size(), targetTextures.m_buffers);
 }
 
-void Surface::bindTexture(int index/* = 0*/) {
-	m_textures[index].bind();
-}
-
-void Surface::bindTexture(TextureUnit unit, int index) {
-	m_textures[index].bind(unit);
-}
-
-void Surface::resize(const TextureImage& image, unsigned int numberOfTextures) {
+void Surface::resize(const Raster& image, unsigned int numberOfTextures) {
 	//Delete framebuffe
 	m_textures.clear();
 	m_textures.reserve(numberOfTextures);
@@ -143,6 +135,10 @@ void Surface::clear(const glm::vec4& colour, int index) {
 
 void Surface::clear(RE::Colour colour, int index) {
 	m_textures[index].clear(colour);
+}
+
+const Texture& Surface::getTexture(int index) const {
+	return m_textures[index];
 }
 
 void Surface::setPivot(const glm::vec2& pivot, int index) {

@@ -20,7 +20,6 @@ View::~View() {
 void View::resizeView(const glm::vec2& newDims) {
 	m_viewDimensions = newDims;
 	m_orthoMatrix = glm::ortho(0.0f, newDims.x, 0.0f, newDims.y);
-	m_needsUpdate = true;
 	update();
 }
 
@@ -38,6 +37,11 @@ bool View::isInsideView(const glm::vec2& position, const glm::vec2& dimension) {
 	return false;
 }
 
+void View::setCursorAbs(const glm::vec2& cursorAbs) {
+	m_cursorAbs = cursorAbs;
+	m_cursorRel = convertAbsToRel(cursorAbs);
+}
+
 glm::vec2 View::convertAbsToRel(const glm::uvec2& abs) {
 	//Center [0;0]
 	glm::vec2 floatAbs = glm::vec2(abs);
@@ -49,31 +53,27 @@ glm::vec2 View::convertAbsToRel(const glm::uvec2& abs) {
 	return (glm::vec2)floatAbs;
 }
 
-void View::update() {//Should be called once every beginStep before drawing
-	if (m_needsUpdate) {
-		//Translate
-		glm::vec3 translate(-m_position.x + m_viewDimensions.x / 2.0f, -m_position.y + m_viewDimensions.y / 2.0f, 0.0f);
-		m_viewMatrix = glm::translate(m_orthoMatrix, translate);
-		//Scale
-		glm::vec3 scale(m_scale.x, m_scale.y, 0.0f);
-		m_viewMatrix = glm::scale(glm::mat4(1.0f), scale) * m_viewMatrix;
-		m_needsUpdate = false;
-	}
+void View::update() {
+	//Clip
+	clip();
+	//Translate
+	glm::vec3 translate(-m_position.x + m_viewDimensions.x / 2.0f, -m_position.y + m_viewDimensions.y / 2.0f, 0.0f);
+	m_viewMatrix = glm::translate(m_orthoMatrix, translate);
+	//Scale
+	glm::vec3 scale(m_scale.x, m_scale.y, 0.0f);
+	m_viewMatrix = glm::scale(glm::mat4(1.0f), scale) * m_viewMatrix;
+	//Update relative cursor position
+	m_cursorRel = convertAbsToRel(m_cursorAbs);
 }
 
 glm::vec2 View::getCursorRel() {
 	return m_cursorRel;
 }
 
-void View::updateCursorRel(const glm::uvec2& absCoord) {
-	m_cursorRel = convertAbsToRel(absCoord);
-}
-
 void View::enableClipping(const glm::vec2& minXY, const glm::vec2& maxXY) {
 	m_minXY = minXY;
 	m_maxXY = maxXY;
 	m_clippingEnabled = true;
-	m_needsUpdate = true;
 }
 
 void View::disableClipping() {

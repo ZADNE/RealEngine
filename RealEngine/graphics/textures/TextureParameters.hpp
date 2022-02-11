@@ -4,13 +4,13 @@
 
 #include <glm/vec2.hpp>
 
-#include <RealEngine/graphics/texture/TextureGeometry.hpp>
-#include <RealEngine/graphics/texture/TextureFlags.hpp>
+#include <RealEngine/graphics/textures/TextureGeometry.hpp>
+#include <RealEngine/graphics/textures/TextureFlags.hpp>
 #include <RealEngine/graphics/Vertex.hpp>
 
 namespace RE {
 	/**
-	 * @brief Texture parameters specify all auxiliary information (except the pixels)
+	 * @brief Texture parameters specify all auxiliary information (except the rasters)
 	 * that is required to draw a texture.
 	*/
 	class TextureParameters : public TextureGeometry, public TextureFlags {
@@ -49,7 +49,7 @@ namespace RE {
 		/**
 		 * @brief Constructs parameters with flags only.
 		 *
-		 * Geometry is set to be defined by image.
+		 * Geometry is set to be defined by raster.
 		 * Colour is set to (0, 0, 0, 255).
 		 *
 		 * @param flags Flags of the parameters

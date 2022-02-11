@@ -1,4 +1,4 @@
-﻿add_subdirectory(texture)
+﻿add_subdirectory(textures)
 
 target_sources(${PROJECT_NAME} PUBLIC
 	Buffer.hpp				Buffer.cpp

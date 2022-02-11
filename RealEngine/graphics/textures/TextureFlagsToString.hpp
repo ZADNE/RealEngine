@@ -3,7 +3,7 @@
  * @author Tomáš Dubský
 */
 #pragma once
-#include <RealEngine/graphics/texture/TextureFlags.hpp>
+#include <RealEngine/graphics/textures/TextureFlags.hpp>
 
 namespace RE {
 

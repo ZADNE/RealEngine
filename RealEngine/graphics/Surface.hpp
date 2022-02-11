@@ -6,7 +6,7 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
-#include <RealEngine/graphics/texture/Texture.hpp>
+#include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/graphics/Vertex.hpp>
 
 namespace RE {
@@ -24,7 +24,7 @@ public:
 	 * @brief Constructs surface without any textures (these can be later added via resize())
 	*/
 	Surface(const TextureParameters& params, bool disableBlend = false, bool updateUniforms = true) :
-		Surface(TextureImage{{1, 1}}, params, 0, disableBlend, updateUniforms) {};
+		Surface(Raster{{1, 1}}, params, 0, disableBlend, updateUniforms) {};
 
 	/**
 	 * @brief Constructs surface
@@ -35,7 +35,7 @@ public:
 	 * @param disableBlend If true, blending will be disabled when drawing to the surface.
 	 * @param updateUniforms If true, standard GlobalMatrices uniform will be updated when drawing to the surface.
 	*/
-	Surface(const TextureImage& image, const TextureParameters& params, unsigned int numberOfTextures = 1, bool disableBlend = false, bool updateUniforms = true);
+	Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures = 1, bool disableBlend = false, bool updateUniforms = true);
 
 	Surface(const Surface& other) = delete;
 	Surface(Surface&& other) noexcept;
@@ -67,21 +67,6 @@ public:
 	void setTargetTextures(const SurfaceTargetTextures& targetTextures);
 
 	/**
-	 * @brief Binds texture to the current texture unit
-	 *
-	 * @param index Index of the texture to be bound
-	 */
-	void bindTexture(int index = 0);
-
-	/**
-	 * @brief Binds texture to the given texture unit
-	 *
-	 * @param unit Texture unit to bind the texture to
-	 * @param index Index of the texture to be bound
-	 */
-	void bindTexture(TextureUnit unit, int index = 0);
-
-	/**
 	 * @brief Resizes surface.
 	 *
 	 * That is: deletes all previous textures and then creates new textures
@@ -90,7 +75,7 @@ public:
 	 * @param image Image to construct new textures with
 	 * @param numberOfTextures Number of textures of the surface
 	*/
-	void resize(const TextureImage& image, unsigned int numberOfTextures);
+	void resize(const Raster& image, unsigned int numberOfTextures);
 
 	//colour = normalized RGBA [0.0f; 1.0f]
 	//index = which texture of the surface should be cleared
@@ -100,8 +85,7 @@ public:
 	//Getters
 	TextureProxy getTextureProxy(int index = 0) const { return TextureProxy{m_textures[index]}; }
 
-	GLuint getTextureID(int index = 0) const { return m_textures[index].getID(); }
-	//GLuint getFramebuffer() { return m_frameBuffer; }
+	const Texture& getTexture(int index = 0) const;
 
 	//All textures in the surface have same dimensions
 	glm::uvec2 getDims() const { return m_textures[0].getTrueDims(); }

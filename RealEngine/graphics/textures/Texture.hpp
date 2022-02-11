@@ -8,9 +8,10 @@
 #include <glm/vec4.hpp>
 
 #include <RealEngine/graphics/Vertex.hpp>
-#include <RealEngine/graphics/texture/TextureParameters.hpp>
-#include <RealEngine/graphics/texture/TextureImage.hpp>
-#include <RealEngine/graphics/texture/TextureUnit.hpp>
+#include <RealEngine/graphics/textures/TextureParameters.hpp>
+#include <RealEngine/graphics/textures/Raster.hpp>
+#include <RealEngine/graphics/textures/TextureUnit.hpp>
+#include <RealEngine/graphics/textures/ImageUnit.hpp>
 
 
 namespace RE {
@@ -54,7 +55,7 @@ public:
 	 *
 	 * @param unit Texture unit to bind the texture to.
 	*/
-	void bind(TextureUnit unit) const { glBindTextureUnit(unit.m_index, m_ID); }
+	void bind(TextureUnit unit) const { glBindTextureUnit(unit.m_unit, m_ID); }
 
 	auto operator<=>(const TextureProxy&) const = default;
 private:
@@ -62,8 +63,8 @@ private:
 };
 
 /**
- * @brief Represents an image with associated parameters.
- * @see TextureImage
+ * @brief Represents one (or more) images with associated parameters.
+ * @see Raster
  * @see TextureParameters
 */
 class Texture {
@@ -73,7 +74,7 @@ public:
 	static inline const RE::Colour DEFAULT_BORDER_COLOUR{255, 20, 147, 255};
 
 	/**
-	 * @brief Default parameters for texture use RGBA_NU_NEAR_NEAR_EDGE flags and geometry defined by image
+	 * @brief Default parameters for texture use RGBA_NU_NEAR_NEAR_EDGE flags and geometry defined by raster
 	 * @see TextureFlags::RGBA_NU_NEAR_NEAR_EDGE
 	*/
 	static inline const TextureParameters DEFAULT_PARAMETERS{{}, DEFAULT_FLAGS, DEFAULT_BORDER_COLOUR};
@@ -93,15 +94,15 @@ public:
 	Texture(const std::string& filePathPNG);
 
 	/**
-	 * @brief Contructs texture from image and parameters
+	 * @brief Contructs texture from raster and parameters
 	 *
 	 * Default parameters are used if not specified.
 	 * @see DEFAULT_PARAMETERS
 	 *
-	 * @param image Specifies true dimensions of the texture and initial contents of the texture if pixels are provided
+	 * @param raster Specifies true dimensions of the texture and initial contents of the texture if pixels are provided
 	 * @param params Specifies how the texture will be drawn.
 	*/
-	Texture(const TextureImage& image, const TextureParameters& params = DEFAULT_PARAMETERS);
+	Texture(const Raster& raster, const TextureParameters& params = DEFAULT_PARAMETERS);
 
 	Texture(const Texture&) = delete;
 
@@ -171,7 +172,7 @@ public:
 	}
 
 	/**
-	 * @brief Binds the texture to the current texture unit.
+	 * @brief Binds the texture to the active texture unit.
 	*/
 	void bind() const { glBindTexture(GL_TEXTURE_2D, m_ID); }
 
@@ -180,7 +181,35 @@ public:
 	 *
 	 * @param unit Texture unit to bind the texture to.
 	*/
-	void bind(TextureUnit unit) const { glBindTextureUnit(unit.m_index, m_ID); }
+	void bind(TextureUnit unit) const { glBindTextureUnit(unit.m_unit, m_ID); }
+
+	/**
+	 * @brief Binds an image of the texture to the image unit
+	 * @param unit Unit to bind the image to
+	 * @param level Mipmap level of the texture to bind
+	 * @param access Access to the image
+	*/
+	void bindImage(ImageUnit unit, GLint level, ImageAccess access) const;
+
+	/**
+	 * @brief Replaces a portion of an image within the texture with given raster
+	 * @param level Level of the texture to replace
+	 * @param offset Offset within the target image to place the raster to
+	 * @param size Size of the rectangle that is to be replaced
+	 * @param raster The texels that will be copied int othe image. The format must be RGBA 8-bits per channel
+	*/
+	void setTexelsWithinImage(GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const;
+
+	/**
+	 * @brief Copies texels between two images
+	 * @param srcLevel Level (image) of this texture to be used as source
+	 * @param srcPos Position within the source level (image) to copy from
+	 * @param destination Destination texture that will receive the texels
+	 * @param dstLevel Level (image) of the destination texture that will receive the texels
+	 * @param dstPos Position within the destination the destination level (image) to copy to
+	 * @param size Size of the area that is to be copied
+	*/
+	void copyTexelsBetweenImages(GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const;
 
 	/**
 	 * @brief Clears FIRST MIPMAP of the texture with given colour.
@@ -215,7 +244,7 @@ public:
 	*/
 	std::string identificationString() const;
 private:
-	void init(const TextureImage& image, const TextureParameters& params);
+	void init(const Raster& raster, const TextureParameters& params);
 
 	GLuint m_ID = 0u;			/**< OpenGL name of the texture */
 	TextureFlags m_flags{};		/**< Flags associated with the texture */

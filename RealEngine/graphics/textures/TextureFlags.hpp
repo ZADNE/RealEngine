@@ -98,12 +98,12 @@ enum class TextureMinFilterBetweenMipmaps : TextureFlagsType {
 
 /**
  * @brief Minifying filter specifies usage of mipmaps and nearest/linear interpolation.
- * Mipmaps are auto-generated minified version of original image.
+ * Mipmaps are auto-generated minified versions of original raster.
  * Linear & mipmaps look better but they are slower.
 */
 enum class TextureMinFilter : TextureFlagsType {
-	NEAREST,								/**< Nearest in the single image, no mipmaps*/
-	LINEAR = TEX_MIN_FILTER_IN_MIPMAP_BITS,	/**< Linear in the single image, no mipmaps*/
+	NEAREST,								/**< Nearest in the single raster, no mipmaps*/
+	LINEAR = TEX_MIN_FILTER_IN_MIPMAP_BITS,	/**< Linear in the single raster, no mipmaps*/
 	NEAREST_MIPMAP_NEAREST = TEX_MIN_FILTER_MIPMAPS_USAGE_BITS,/**< Nearest in mipmap, nearest between mipmaps*/
 	NEAREST_MIPMAP_LINEAR = TEX_MIN_FILTER_MIPMAPS_USAGE_BITS | TEX_MIN_FILTER_BETWEEN_MIPMAPS_BITS,/**< Nearest in mipmap, linear between mipmaps*/
 	LINEAR_MIPMAP_NEAREST = TEX_MIN_FILTER_MIPMAPS_USAGE_BITS | TEX_MIN_FILTER_IN_MIPMAP_BITS,/**< Linear in mipmap, nearest between mipmaps*/

@@ -1,6 +1,6 @@
 ﻿#include <RealEngine/graphics/Sprite.hpp>
 
-#include <RealEngine/graphics/texture/Texture.hpp>
+#include <RealEngine/graphics/textures/Texture.hpp>
 
 namespace RE {
 

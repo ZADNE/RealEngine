@@ -7,25 +7,25 @@ namespace RE {
 /**
  * @brief Texture geometry defines logical size and layout of texture.
  *
- * Texture geometry is typically independent of actual size of texture defined by its image.
+ * Texture geometry is typically independent of actual size of texture defined by its raster.
  *
- * If not defined by image, texture geometry is a grid of subimages
- * where each image has same width and height. Paddings between subimages are not allowed.
+ * If not defined by raster, texture geometry is a grid of subimages
+ * where each raster has same width and height. Paddings between subimages are not allowed.
  * All subimages also have same pivot. Pivot is a point which defines the center of the subimage
  * for transformations (such as rotation or scale).
  * Subimages placed along X axis form together a sprite.
  * There can also be multiple sprites in single geometry so these are placed under each other.
  *
- * @see TextureImage
+ * @see Raster
 */
 class TextureGeometry {
 public:
 	/**
-	 * @brief Constructs geometry that is to be defined by image.
+	 * @brief Constructs geometry that is to be defined by raster.
 	 *
 	 * All getters will return zeros for this as they lose relevance.
 	*/
-	TextureGeometry() : p_definedByImage(true) {}
+	TextureGeometry() : p_definedByRaster(true) {}
 
 	/**
 	 * @brief Constructs geometry that has single subimage of given dimensions and pivot
@@ -46,7 +46,7 @@ public:
 	 * @brief Gets whether geometry is to be defined by image (only default-constructed is)
 	 * @return True if geometry is to be defined by image, false otherwise.
 	*/
-	bool isGeometryDefinedByImage() const { return p_definedByImage; }
+	bool isGeometryDefinedByImage() const { return p_definedByRaster; }
 
 	/**
 	 * @brief Gets dimensions of a subimage (all subimages have same dimensions)
@@ -74,7 +74,7 @@ protected:
 	glm::vec2 p_subimageDims{};			/**< Dimensions of subimages*/
 	glm::vec2 p_pivot{};				/**< Pivot of subimages*/
 	glm::vec2 p_subimagesSpritesCount{};/**< Count of subimages in sprite and count of sprites*/
-	bool p_definedByImage = false;		/**< Flag that defines whether geometry is to be defined by image*/
+	bool p_definedByRaster = false;		/**< Flag that defines whether geometry is to be defined by raster*/
 };
 
 }
