@@ -29,6 +29,7 @@ int MainProgram::run() {
 	std::cout << "Entering main loop!" << std::endl;
 	while (m_programShouldRun) {
 		p_synchronizer.beginFrame();
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Perform simulation steps to catch up the time
 		while (p_synchronizer.shouldStepHappen()) {
@@ -47,7 +48,6 @@ int MainProgram::run() {
 		render(p_synchronizer.getDrawInterpolationFactor());
 
 		p_window.swapBuffer();
-		glClear(GL_COLOR_BUFFER_BIT);
 
 		doRoomTransitionIfScheduled();
 
