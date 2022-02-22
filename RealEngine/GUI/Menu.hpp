@@ -23,7 +23,7 @@
 #ifdef LM_EXPRESSION_LIST
 #define MENU_LM_DEC , RE::LanguageManager LM
 #define MENU_LM_PASS , LM
-#include <RealEngine/LanguageManager.hpp>
+#include <RealEngine/utility/LanguageManager.hpp>
 #else
 #define MENU_LM_DEC
 #define MENU_LM_PASS
@@ -77,8 +77,12 @@ public:
 	}
 
 	Menu(RE::MainProgram* mainProgram, Observer* observer) :
-		m_observer(observer),
-		m_typingHandle(mainProgram) {
+		m_observer(observer)
+	#ifdef RE_MENU_KEEP_INFOS
+		,
+		m_typingHandle(mainProgram)
+	#endif
+	{
 
 	}
 
