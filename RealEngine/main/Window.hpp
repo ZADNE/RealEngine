@@ -6,7 +6,7 @@
 #include <glm/vec2.hpp>
 
 #include <RealEngine/main/WindowSettings.hpp>
-#include <RealEngine/graphics/UniformBuffer.hpp>
+#include <RealEngine/graphics/buffers/UniformBuffer.hpp>
 
 namespace RE {
 

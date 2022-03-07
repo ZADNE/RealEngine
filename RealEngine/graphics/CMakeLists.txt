@@ -1,7 +1,7 @@
-﻿add_subdirectory(textures)
+﻿add_subdirectory(buffers)
+add_subdirectory(textures)
 
 target_sources(${PROJECT_NAME} PUBLIC
-	Buffer.hpp				Buffer.cpp
 	CursorDrawer.hpp		CursorDrawer.cpp
 	default_shaders.hpp		
 	Font.hpp				Font.cpp
@@ -11,7 +11,6 @@ target_sources(${PROJECT_NAME} PUBLIC
 	Sprite.hpp				Sprite.cpp
 	SpriteBatch.hpp			SpriteBatch.cpp
 	Surface.hpp				Surface.cpp
-	UniformBuffer.hpp		UniformBuffer.cpp
 	Vertex.hpp				
 	VertexArray.hpp			VertexArray.cpp
 	View.hpp				View.cpp

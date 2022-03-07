@@ -3,7 +3,7 @@
 
 #include <glm/vec2.hpp>
 
-#include <RealEngine/graphics/Buffer.hpp>
+#include <RealEngine/graphics/buffers/Buffer.hpp>
 
 namespace RE {
 

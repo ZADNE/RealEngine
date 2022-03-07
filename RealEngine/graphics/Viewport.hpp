@@ -3,7 +3,7 @@
 
 #include <glm/mat4x4.hpp>
 
-#include <RealEngine/graphics/UniformBuffer.hpp>
+#include <RealEngine/graphics/buffers/UniformBuffer.hpp>
 
 namespace RE {
 

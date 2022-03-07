@@ -5,13 +5,12 @@
 #include <string_view>
 #include <initializer_list>
 
-#include <GL/glew.h>
-
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
 #include <RealEngine/main/Error.hpp>
+#include <RealEngine/graphics/buffers/BufferType.hpp>
 #include <RealEngine/graphics/textures/TextureUnit.hpp>
 #include <RealEngine/graphics/textures/ImageUnit.hpp>
 
@@ -44,7 +43,7 @@ public:
 
 	/**
 	 * @brief Constructs empty shader source
-	 * 
+	 *
 	 * This shader stage will not be used.
 	*/
 	ShaderSources() {
@@ -70,7 +69,7 @@ public:
 		m_lengths(list.size() + 1u) {
 		m_sources.emplace_back(preamble.data());
 		m_lengths.emplace_back(static_cast<GLint>(preamble.size()));
-		for (auto& sw: list) {
+		for (auto& sw : list) {
 			m_sources.emplace_back(sw.data());
 			m_lengths.emplace_back(static_cast<GLint>(sw.size()));
 		}
@@ -111,7 +110,7 @@ struct ShaderProgramSources {
 
 	/**
 	 * @brief Performs shallow equality test.
-	 * 
+	 *
 	 * Sources are considered equal when all their shaders point
 	 * to same memory location. The contents of strings are NOT compared.
 	*/
@@ -136,7 +135,7 @@ struct ShaderProgramSources {
 * @brief Controls how vertices are rendered to screen.
 */
 class ShaderProgram {
-	friend class UniformBuffer;
+	template<BufferType>friend class InterfaceBlockBuffer;
 public:
 	/**
 	 * @brief Constructs shader program from given source codes
@@ -167,9 +166,9 @@ public:
 
 	/**
 	 * @brief Dispatches compute groups of this shader program.
-	 * 
+	 *
 	 * Can be used only if the program was compiled with compute shader stage.
-	 * 
+	 *
 	 * @param groupCount The number of work groups to be launched in each.
 	 * @param use If true, the program is bound and unbound for usage. If false it is expected to be already bound.
 	*/
@@ -230,7 +229,7 @@ public:
 	void setUniform(int location, int count, const glm::uvec3* val) const;				/**< Sets uvec4 array uniform at given location */
 	void setUniform(int location, int count, const glm::uvec4* val) const;				/**< Sets uvec4 array uniform at given location */
 
-	void setUniform(int location, TextureUnit unit) const;							/**< Sets sampler uniform at given location */
+	void setUniform(int location, TextureUnit unit) const;								/**< Sets sampler uniform at given location */
 	void setUniform(int location, ImageUnit unit) const;								/**< Sets image uniform at given location */
 
 private:
