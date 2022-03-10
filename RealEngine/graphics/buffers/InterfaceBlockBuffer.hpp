@@ -6,7 +6,7 @@
 namespace RE {
 
 /**
- * @brief Provides backing storage for interface blocks.
+ * @brief Provides the backing storage for an interface block.
  *
  * Interface block buffers are a type of indexed target buffers.
  * @tparam BufferType There are two types interface block buffers: UNIFORM and SHADER_STORAGE.
@@ -17,16 +17,26 @@ public:
 
 	/**
 	 * @brief Constructs an interface block buffer of given size
-	 * @see IndexedTargetBuffer::IndexedTargetBuffer(GLuint,bool,BufferUsageFlags,GLsizeiptr,const void*)
+	 * @see IndexedTargetBuffer::IndexedTargetBuffer
 	*/
-	InterfaceBlockBuffer(GLuint bindingPoint, bool bindNow, BufferUsageFlags flags, GLsizeiptr sizeInBytes, const void* data = nullptr) :
-		IndexedTargetBuffer<type>(bindingPoint, bindNow, flags, sizeInBytes, data) {
+	InterfaceBlockBuffer(GLuint bindingPoint, bool bindNow, GLsizeiptr sizeInBytes, BufferUsageFlags flags, const void* data = nullptr) :
+		IndexedTargetBuffer<type>(bindingPoint, bindNow, sizeInBytes, flags, data) {
 		static_assert(type == BufferType::UNIFORM || type == BufferType::SHADER_STORAGE);
 	}
 
 	/**
+	 * @brief Contructs an interface block buffer as a storage for given type
+	 * @see IndexedTargetBuffer::IndexedTargetBuffer
+	*/
+	template<typename T>
+	InterfaceBlockBuffer(GLuint bindingPoint, bool bindNow, BufferUsageFlags flags, const T& data) :
+		InterfaceBlockBuffer(bindingPoint, bindNow, sizeof(T), flags, &data) {
+
+	}
+
+	/**
 	 * @brief Constructs an interface block buffer of given size
-	 * @see IndexedTargetBuffer::IndexedTargetBuffer(GLuint,bool,BufferUsageFlags,GLsizeiptr,const std::vector<T>&)
+	 * @see IndexedTargetBuffer::IndexedTargetBuffer
 	*/
 	template<typename T>
 	InterfaceBlockBuffer(GLuint bindingPoint, bool bindNow, BufferUsageFlags flags, const std::vector<T>& data) :

@@ -9,7 +9,7 @@ glm::ivec2 Viewport::m_windowSize{};
 glm::mat4 Viewport::m_windowMatrix{};
 
 void Viewport::setWindowMatrixToMatchViewport() {
-	m_windowMatrixUniformBuffer->overwrite(m_windowMatrix);
+	m_windowMatrixUniformBuffer->overwrite(0u, m_windowMatrix);
 }
 
 void Viewport::set(const glm::ivec2& pos, const glm::ivec2& size) {

@@ -85,7 +85,7 @@ void Surface::setTarget() const {
 	if (m_updateUniformBuffer) {
 		glm::vec2 trueDims = m_textures[0].getTrueDims();
 		glm::mat4 matrix = glm::ortho(0.0f, trueDims.x, 0.0f, trueDims.y);
-		Viewport::getWindowMatrixUniformBuffer().overwrite(matrix);
+		Viewport::getWindowMatrixUniformBuffer().overwrite(0u, matrix);
 	}
 }
 

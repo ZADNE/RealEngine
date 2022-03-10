@@ -22,7 +22,7 @@ public:
 	 * @param bindNow If true, the constructed buffer is bound to its binding point upon creation
 	 * @see Buffer::Buffer
 	*/
-	IndexedTargetBuffer(GLuint bindingPoint, bool bindNow, BufferUsageFlags flags, GLsizeiptr sizeInBytes, const void* data = nullptr) :
+	IndexedTargetBuffer(GLuint bindingPoint, bool bindNow, GLsizeiptr sizeInBytes, BufferUsageFlags flags, const void* data = nullptr) :
 		Buffer<type>(sizeInBytes, flags, data),
 		p_bindingPoint(bindingPoint) {
 		static_assert(
@@ -35,8 +35,19 @@ public:
 	}
 
 	/**
+	 * @brief Contructs an indexed buffer as a storage for given type
+	 * @param bindingPoint The indexed target that this buffer binds to
+	 * @param bindNow If true, the constructed buffer is bound to its binding point upon creation
+	 * @see Buffer::Buffer
+	*/
+	template<typename T>
+	IndexedTargetBuffer(GLuint bindingPoint, bool bindNow, BufferUsageFlags flags, const T& data) :
+		IndexedTargetBuffer(bindingPoint, bindNow, sizeof(T), flags, &data) {
+
+	}
+
+	/**
 	 * @brief Constructs an indexed target buffer with given vector of data
-	 * @tparam T Data type of the buffer (used to determine the size of the buffer)
 	 * @param bindingPoint The indexed target that this buffer binds to
 	 * @param bindNow If true, the constructed buffer is bound to its binding point upon creation
 	 * @see Buffer::Buffer
