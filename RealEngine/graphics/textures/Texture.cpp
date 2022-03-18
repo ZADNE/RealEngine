@@ -18,7 +18,7 @@ GLenum toGLenum(TextureChannels channels) {
 	static const GLenum enums[] = {
 		GL_RED, GL_RG, GL_RGB, GL_RGBA
 	};
-	return enums[static_cast<int>(channels)];
+	return enums[ft_cast(channels)];
 }
 
 LodePNGColorType toLodePNGColorType(TextureChannels channels) {
@@ -26,7 +26,7 @@ LodePNGColorType toLodePNGColorType(TextureChannels channels) {
 	static const LodePNGColorType colorTypes[] = {
 		LodePNGColorType::LCT_GREY, LodePNGColorType::LCT_GREY_ALPHA, LodePNGColorType::LCT_RGB, LodePNGColorType::LCT_RGBA
 	};
-	return colorTypes[static_cast<int>(channels)];
+	return colorTypes[ft_cast(channels)];
 }
 
 TextureChannels toTextureChannels(LodePNGColorType colorType) {
@@ -39,15 +39,25 @@ TextureChannels toTextureChannels(LodePNGColorType colorType) {
 	}
 }
 
-GLenum textureInternalFormat(TextureChannels channels, TextureFormat type) {
+GLenum textureInternalFormat(TextureChannels channels, TextureFormat type, TextureBitdepthPerChannel bitdepth) {
 	static_assert((TEX_CHANNELS_BITS | TEX_FORMAT_BITS) == 0b0000'0000'0000'1111, "TextureFlags - channel or format bits reaaranged");
-	static const GLenum internalFormats[] = {
+	static const GLenum internalFormats[3][16] = {{
 		GL_R8,		GL_RG8,			GL_RGB8,		GL_RGBA8,
 		GL_R8_SNORM,GL_RG8_SNORM,	GL_RGB8_SNORM,	GL_RGBA8_SNORM,
 		GL_R8UI,	GL_RG8UI,		GL_RGB8UI,		GL_RGBA8UI,
 		GL_R8I,		GL_RG8I,		GL_RGB8I,		GL_RGBA8I
-	};
-	return internalFormats[static_cast<int>(channels) | static_cast<int>(type)];
+	},{
+		GL_R16,		GL_RG16,		GL_RGB16,		GL_RGBA16,
+		GL_R16_SNORM,GL_RG16_SNORM,	GL_RGB16_SNORM,	GL_RGBA16_SNORM,
+		GL_R16UI,	GL_RG16UI,		GL_RGB16UI,		GL_RGBA16UI,
+		GL_R16I,	GL_RG16I,		GL_RGB16I,		GL_RGBA16I
+	},{
+		GL_R32F,	GL_RG32F,		GL_RGB32F,		GL_RGBA32F,
+		GL_R32F,	GL_RG32F,		GL_RGB32F,		GL_RGBA32F,
+		GL_R32UI,	GL_RG32UI,		GL_RGB32UI,		GL_RGBA32UI,
+		GL_R32I,	GL_RG32I,		GL_RGB32I,		GL_RGBA32I
+	}};
+	return internalFormats[ft_cast(bitdepth) >> TEX_BITDEPTH_TO_VAL_RIGHTSHIFT][ft_cast(channels) | ft_cast(type)];
 }
 
 int uintlog2(unsigned int arg) {
@@ -73,8 +83,8 @@ int wrapStyleToGLEnum(TextureWrapStyle style) {
 
 int minFilterToGLEnum(TextureMinFilter filter) {
 	switch (filter) {
-	case RE::TextureMinFilter::NEAREST: return GL_NEAREST;
-	case RE::TextureMinFilter::LINEAR: return GL_LINEAR;
+	case RE::TextureMinFilter::NEAREST_NO_MIPMAPS: return GL_NEAREST;
+	case RE::TextureMinFilter::LINEAR_NO_MIPMAPS: return GL_LINEAR;
 	case RE::TextureMinFilter::NEAREST_MIPMAP_NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
 	case RE::TextureMinFilter::NEAREST_MIPMAP_LINEAR: return GL_NEAREST_MIPMAP_LINEAR;
 	case RE::TextureMinFilter::LINEAR_MIPMAP_NEAREST: return GL_LINEAR_MIPMAP_NEAREST;
@@ -213,7 +223,7 @@ void Texture::setBorderColour(RE::Colour col) {
 }
 
 void Texture::bindImage(ImageUnit unit, GLint level, ImageAccess access) const {
-	glBindImageTexture(unit.m_unit, m_ID, level, GL_FALSE, 0, static_cast<GLenum>(access), textureInternalFormat(getChannels(), getFormat()));
+	glBindImageTexture(unit.m_unit, m_ID, level, GL_FALSE, 0, static_cast<GLenum>(access), textureInternalFormat(getChannels(), getFormat(), getBitdepthPerChannel()));
 }
 
 void Texture::setTexelsWithinImage(GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
@@ -230,8 +240,16 @@ void Texture::clear(const glm::vec4& colour) const {
 	glClearTexImage(m_ID, 0, GL_RGBA, GL_FLOAT, &colour);
 }
 
+void Texture::clear(const glm::ivec4& colour) const {
+	glClearTexImage(m_ID, 0, GL_RGBA_INTEGER, GL_INT, &colour);
+}
+
+void Texture::clear(const glm::uvec4& colour) const {
+	glClearTexImage(m_ID, 0, GL_RGBA_INTEGER, GL_UNSIGNED_INT, &colour);
+}
+
 void Texture::clear(RE::Colour colour) const {
-	glClearTexImage(m_ID, 0, GL_RGBA, GL_UNSIGNED_BYTE, &colour);
+	glClearTexImage(m_ID, 0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, &colour);
 }
 
 bool Texture::saveToFile(const std::string& filePathPNG) {
@@ -291,7 +309,7 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
 
 	//Create storage for the texture
 	GLsizei levels = getMinFilterMipmapsUsage() == TextureMinFilterMipmapsUsage::YES ? uintlog2(std::max(m_trueDims.x, m_trueDims.y)) : 1;
-	auto internalFormat = textureInternalFormat(getChannels(), getFormat());
+	auto internalFormat = textureInternalFormat(getChannels(), getFormat(), getBitdepthPerChannel());
 	glTextureStorage2D(m_ID, levels, internalFormat, m_trueDims.x, m_trueDims.y);
 
 	//Upload pixels for the texture (if specified)

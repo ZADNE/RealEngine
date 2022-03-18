@@ -70,7 +70,7 @@ private:
 class Texture {
 	friend class TextureProxy;
 public:
-	static inline const TextureFlags DEFAULT_FLAGS{TextureFlags::RGBA_NU_NEAR_NEAR_EDGE};
+	static inline const TextureFlags DEFAULT_FLAGS{TextureFlags::RGBA8_NU_NEAR_NEAR_EDGE};
 	static inline const RE::Colour DEFAULT_BORDER_COLOUR{255, 20, 147, 255};
 
 	/**
@@ -137,6 +137,7 @@ public:
 	TextureMagFilter getMagFilter() const { return m_flags.getMagFilter(); }
 	TextureWrapStyle getWrapStyleX() const { return m_flags.getWrapStyleX(); }
 	TextureWrapStyle getWrapStyleY() const { return m_flags.getWrapStyleY(); }
+	TextureBitdepthPerChannel getBitdepthPerChannel() const { return m_flags.getBitdepthPerChannel(); }
 
 	TextureParameters getParameters() const;
 	glm::vec2 getSubimageDims() const { return m_subimageDims; }
@@ -147,7 +148,7 @@ public:
 	glm::uvec2 getTrueDims() const { return m_trueDims; }
 
 	/**
-	 * @note Switching to mipmap using filter is not possible if the texture was constructed without mipmaps.
+	 * @note Switching to a filter that uses mipmaps is not possible if the texture was constructed without mipmaps.
 	*/
 	void setMinFilter(TextureMinFilter minFilter);
 	void setMagFilter(TextureMagFilter magFilter);
@@ -212,15 +213,12 @@ public:
 	void copyTexelsBetweenImages(GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const;
 
 	/**
-	 * @brief Clears FIRST MIPMAP of the texture with given colour.
+	 * @brief Clears first level of the texture with given colour.
 	 * @param colour Colour to clear the texture with.
 	*/
 	void clear(const glm::vec4& colour) const;
-
-	/**
-	 * @brief Clears FIRST MIPMAP of the texture with given colour.
-	 * @param colour Colour to clear the texture with.
-	*/
+	void clear(const glm::ivec4& colour) const;
+	void clear(const glm::uvec4& colour) const;
 	void clear(RE::Colour colour) const;
 
 	/**

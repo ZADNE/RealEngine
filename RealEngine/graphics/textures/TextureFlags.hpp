@@ -3,6 +3,7 @@
  * @file TextureFlags.hpp
  */
 #include <cstdint>
+#include <bit>
 
 namespace RE {
 
@@ -27,6 +28,9 @@ const TextureFlagsType TEX_CLAMP_STYLE_Y_BITS = TEX_REPEAT_STYLE_Y_BITS;
 const TextureFlagsType TEX_WRAP_Y_BITS = TEX_WRAP_STYLE_Y_BITS | TEX_REPEAT_STYLE_Y_BITS;
 const TextureFlagsType TEX_WRAP_Y_TO_X_RIGHTSHIFT = 2;
 const TextureFlagsType TEX_WRAP_X_TO_Y_LEFTSHIFT = 2;
+const TextureFlagsType TEX_BITDEPTH_PER_CHANNEL_BITS = 0b0011'0000'0000'0000;
+const TextureFlagsType TEX_VAL_TO_BITDEPTH_LEFTSHIFT = 12;
+const TextureFlagsType TEX_BITDEPTH_TO_VAL_RIGHTSHIFT = 12;
 
 static_assert(
 	TEX_WRAP_X_BITS == (TEX_WRAP_Y_BITS >> TEX_WRAP_Y_TO_X_RIGHTSHIFT)
@@ -102,17 +106,17 @@ enum class TextureMinFilterBetweenMipmaps : TextureFlagsType {
  * Linear & mipmaps look better but they are slower.
 */
 enum class TextureMinFilter : TextureFlagsType {
-	NEAREST,								/**< Nearest in the single raster, no mipmaps*/
-	LINEAR = TEX_MIN_FILTER_IN_MIPMAP_BITS,	/**< Linear in the single raster, no mipmaps*/
-	NEAREST_MIPMAP_NEAREST = TEX_MIN_FILTER_MIPMAPS_USAGE_BITS,/**< Nearest in mipmap, nearest between mipmaps*/
+	NEAREST_NO_MIPMAPS,											/**< Nearest in the single raster, no mipmaps*/
+	LINEAR_NO_MIPMAPS = TEX_MIN_FILTER_IN_MIPMAP_BITS,			/**< Linear in the single raster, no mipmaps*/
+	NEAREST_MIPMAP_NEAREST = TEX_MIN_FILTER_MIPMAPS_USAGE_BITS,	/**< Nearest in mipmap, nearest between mipmaps*/
 	NEAREST_MIPMAP_LINEAR = TEX_MIN_FILTER_MIPMAPS_USAGE_BITS | TEX_MIN_FILTER_BETWEEN_MIPMAPS_BITS,/**< Nearest in mipmap, linear between mipmaps*/
 	LINEAR_MIPMAP_NEAREST = TEX_MIN_FILTER_MIPMAPS_USAGE_BITS | TEX_MIN_FILTER_IN_MIPMAP_BITS,/**< Linear in mipmap, nearest between mipmaps*/
 	LINEAR_MIPMAP_LINEAR = TEX_MIN_FILTER_MIPMAPS_USAGE_BITS | TEX_MIN_FILTER_IN_MIPMAP_BITS | TEX_MIN_FILTER_BETWEEN_MIPMAPS_BITS/**< Linear in mipmap, linear between mipmaps*/
 };
 
 /**
- * @brief Magnifying filter specifies interpolation.
- * Linear produces smoother results but it is slower.
+ * @brief Magnifying filter specifies how is the texture enlarged.
+ * Linear filter produces smoother results but it is slower.
 */
 enum class TextureMagFilter : TextureFlagsType {
 	NEAREST,					/**< Nearest pixel - sharp */
@@ -132,6 +136,32 @@ enum class TextureWrapStyle : TextureFlagsType {
 	REPEAT_MIRRORED = TEX_WRAP_STYLE_X_BITS | TEX_REPEAT_STYLE_X_BITS /**< Texture is repeated infinitely, mirrored */
 };
 
+static_assert(TEX_BITDEPTH_PER_CHANNEL_BITS == (3 << TEX_VAL_TO_BITDEPTH_LEFTSHIFT), "TextureFlags - bitdepth bits rearranged");
+
+/**
+ * @brief Bitdepth specifies precision of each channel
+*/
+enum class TextureBitdepthPerChannel : TextureFlagsType {
+	BITS_8 = 0 << TEX_VAL_TO_BITDEPTH_LEFTSHIFT,	/**< 8 bits per channel  */
+	BITS_16 = 1 << TEX_VAL_TO_BITDEPTH_LEFTSHIFT,	/**< 16 bits per channel */
+	BITS_32 = 2 << TEX_VAL_TO_BITDEPTH_LEFTSHIFT,	/**< 32 bits per channel; normalized formats are sotred as floats instead! */
+};
+
+/**
+ * @brief Casts a texture flag enum to its underlying type
+ * 
+ * Avoids type checks, use with caution.
+ * @tparam T A texture flag enum type
+ * @param val The enum to cast
+ * @return Same bits type casted to the underlying type
+*/
+template<typename T>
+TextureFlagsType ft_cast(T val) {
+	static_assert(std::is_enum_v<T>);
+	static_assert(std::is_same_v<std::underlying_type_t<T>, TextureFlagsType>);
+	return std::bit_cast<TextureFlagsType>(val);
+}
+
 /**
  * @brief Flags control how the texture gets drawn.
  *
@@ -139,11 +169,32 @@ enum class TextureWrapStyle : TextureFlagsType {
  * minifying filter, magnifying filter, wrapping style.
 */
 class TextureFlags {
+private:
+	using enum TextureChannels;
+	using enum TextureFormatSign;
+	using enum TextureFormatType;
+	using enum TextureFormat;
+	using enum TextureMinFilterMipmapsUsage;
+	using enum TextureMinFilter;
+	using enum TextureMagFilter;
+	using enum TextureWrapStyle;
+	using enum TextureBitdepthPerChannel;
+
+	static inline const TextureFlagsType NEAR_NEAR_EDGE8 =
+		ft_cast(NEAREST_NO_MIPMAPS) | ft_cast(NEAREST) | ft_cast(CLAMP_TO_EDGE) | (ft_cast(CLAMP_TO_EDGE) << TEX_WRAP_X_TO_Y_LEFTSHIFT) | ft_cast(BITS_8);
+	static inline const TextureFlagsType NEAR_LIN_EDGE8 =
+		ft_cast(NEAREST_NO_MIPMAPS) | ft_cast(LINEAR) | ft_cast(CLAMP_TO_EDGE) | (ft_cast(CLAMP_TO_EDGE) << TEX_WRAP_X_TO_Y_LEFTSHIFT) | ft_cast(BITS_8);
+
 public:
-	static const TextureFlagsType RGBA_NU_NEAR_NEAR_EDGE;/**< RGBA, normalized - unsigned, near min&mag filter, clamping to edge */
-	static const TextureFlagsType RGBA_IU_NEAR_NEAR_EDGE;/**< RGBA, integral - unsigned, near min&mag filter, clamping to edge */
-	static const TextureFlagsType RGBA_NU_NEAR_LIN_EDGE;/**< RGBA, normalized - unsigned, near min, linear mag filter, clamping to edge */
-	static const TextureFlagsType RGBA_IU_NEAR_LIN_EDGE;/**< RGBA, integral - unsigned, near min, linear mag filter, clamping to edge */
+
+	/** RGBA, 8 bits per channel, normalized - unsigned, near min&mag filter, clamping to edge */
+	static inline const TextureFlagsType RGBA8_NU_NEAR_NEAR_EDGE = ft_cast(RGBA) | ft_cast(NORMALIZED_UNSIGNED) | NEAR_NEAR_EDGE8;
+	/** RGBA, 8 bits per channel, integral - unsigned, near min&mag filter, clamping to edge */
+	static inline const TextureFlagsType RGBA8_IU_NEAR_NEAR_EDGE = ft_cast(RGBA) | ft_cast(INTEGRAL_UNSIGNED) | NEAR_NEAR_EDGE8;
+	/** RGBA, 8 bits per channel, normalized - unsigned, near min, linear mag filter, clamping to edge */
+	static inline const TextureFlagsType RGBA8_NU_NEAR_LIN_EDGE = ft_cast(RGBA) | ft_cast(NORMALIZED_UNSIGNED) | NEAR_LIN_EDGE8;
+	/** RGBA, 8 bits per channel, integral - unsigned, near min, linear mag filter, clamping to edge */
+	static inline const TextureFlagsType RGBA8_IU_NEAR_LIN_EDGE = ft_cast(RGBA) | ft_cast(INTEGRAL_UNSIGNED) | NEAR_LIN_EDGE8;
 
 	/**
 	 * @brief Default constructs flags to all zeros
@@ -160,7 +211,8 @@ public:
 	*/
 	TextureFlags(TextureChannels channels, TextureFormat format,
 		TextureMinFilter minFilter, TextureMagFilter magFilter,
-		TextureWrapStyle wrapStyleX, TextureWrapStyle wrapStyleY);
+		TextureWrapStyle wrapStyleX, TextureWrapStyle wrapStyleY,
+		TextureBitdepthPerChannel bitdepth);
 
 	/**
 	 * @brief Conversion to raw type
@@ -178,6 +230,7 @@ public:
 	TextureMagFilter getMagFilter() const;
 	TextureWrapStyle getWrapStyleX() const;
 	TextureWrapStyle getWrapStyleY() const;
+	TextureBitdepthPerChannel getBitdepthPerChannel() const;
 
 	void setChannels(TextureChannels channels);
 	void setFormat(TextureFormat format);
@@ -186,6 +239,7 @@ public:
 	void setMagFilter(TextureMagFilter magFilter);
 	void setWrapStyleX(TextureWrapStyle wrapStyle);
 	void setWrapStyleY(TextureWrapStyle wrapStyle);
+	void setBitdepthPerChannel(TextureBitdepthPerChannel bitdepth);
 protected:
 	TextureFlagsType p_flags;/**< Raw integer type storing the flags */
 };

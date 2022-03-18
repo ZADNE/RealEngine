@@ -10,7 +10,7 @@ namespace RE {
 /**
  * @brief Converts TextureChannels to string representation
 */
-inline const char* to_string(TextureChannels channels) {
+inline std::string_view to_string(TextureChannels channels) {
 	switch (channels) {
 	case RE::TextureChannels::R: return "R";
 	case RE::TextureChannels::RG: return "RG";
@@ -23,7 +23,7 @@ inline const char* to_string(TextureChannels channels) {
 /**
  * @brief Converts TextureFormat to string representation
 */
-inline const char* to_string(TextureFormat format) {
+inline std::string_view to_string(TextureFormat format) {
 	switch (format) {
 	case RE::TextureFormat::NORMALIZED_UNSIGNED: return "NORMALIZED_UNSIGNED";
 	case RE::TextureFormat::NORMALIZED_SIGNED: return "NORMALIZED_SIGNED";
@@ -36,10 +36,10 @@ inline const char* to_string(TextureFormat format) {
 /**
  * @brief Converts TextureMinFilter to string representation
 */
-inline const char* to_string(TextureMinFilter minFilter) {
+inline std::string_view to_string(TextureMinFilter minFilter) {
 	switch (minFilter) {
-	case RE::TextureMinFilter::NEAREST: return "NEAREST";
-	case RE::TextureMinFilter::LINEAR: return "LINEAR";
+	case RE::TextureMinFilter::NEAREST_NO_MIPMAPS: return "NEAREST_NO_MIPMAPS";
+	case RE::TextureMinFilter::LINEAR_NO_MIPMAPS: return "LINEAR_NO_MIPMAPS";
 	case RE::TextureMinFilter::NEAREST_MIPMAP_NEAREST: return "NEAREST_MIPMAP_NEAREST";
 	case RE::TextureMinFilter::NEAREST_MIPMAP_LINEAR: return "NEAREST_MIPMAP_LINEAR";
 	case RE::TextureMinFilter::LINEAR_MIPMAP_NEAREST: return "LINEAR_MIPMAP_NEAREST";
@@ -51,7 +51,7 @@ inline const char* to_string(TextureMinFilter minFilter) {
 /**
  * @brief Converts TextureMagFilter to string representation
 */
-inline const char* to_string(TextureMagFilter magFilter) {
+inline std::string_view to_string(TextureMagFilter magFilter) {
 	switch (magFilter) {
 	case RE::TextureMagFilter::NEAREST: return "NEAREST";
 	case RE::TextureMagFilter::LINEAR: return "LINEAR";
@@ -62,7 +62,7 @@ inline const char* to_string(TextureMagFilter magFilter) {
 /**
  * @brief Converts TextureWrapStyle to string representation
 */
-inline const char* to_string(TextureWrapStyle wrapStyle) {
+inline std::string_view to_string(TextureWrapStyle wrapStyle) {
 	switch (wrapStyle) {
 	case RE::TextureWrapStyle::CLAMP_TO_EDGE: return "CLAMP_TO_EDGE";
 	case RE::TextureWrapStyle::CLAMP_TO_BORDER: return "CLAMP_TO_BORDER";

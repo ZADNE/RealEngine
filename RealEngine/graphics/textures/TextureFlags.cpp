@@ -2,33 +2,12 @@
 
 namespace RE {
 
-const TextureFlagsType TextureFlags::RGBA_NU_NEAR_NEAR_EDGE =
-static_cast<TextureFlagsType>(RE::TextureChannels::RGBA) | static_cast<TextureFlagsType>(RE::TextureFormat::NORMALIZED_UNSIGNED) |
-static_cast<TextureFlagsType>(RE::TextureMinFilter::NEAREST) | static_cast<TextureFlagsType>(RE::TextureMagFilter::NEAREST) |
-static_cast<TextureFlagsType>(RE::TextureWrapStyle::CLAMP_TO_EDGE) | (static_cast<TextureFlagsType>(RE::TextureWrapStyle::CLAMP_TO_EDGE) << TEX_WRAP_X_TO_Y_LEFTSHIFT);
-
-const TextureFlagsType TextureFlags::RGBA_IU_NEAR_NEAR_EDGE =
-static_cast<TextureFlagsType>(RE::TextureChannels::RGBA) | static_cast<TextureFlagsType>(RE::TextureFormat::INTEGRAL_UNSIGNED) |
-static_cast<TextureFlagsType>(RE::TextureMinFilter::NEAREST) | static_cast<TextureFlagsType>(RE::TextureMagFilter::NEAREST) |
-static_cast<TextureFlagsType>(RE::TextureWrapStyle::CLAMP_TO_EDGE) | (static_cast<TextureFlagsType>(RE::TextureWrapStyle::CLAMP_TO_EDGE) << TEX_WRAP_X_TO_Y_LEFTSHIFT);
-
-const TextureFlagsType TextureFlags::RGBA_NU_NEAR_LIN_EDGE =
-static_cast<TextureFlagsType>(RE::TextureChannels::RGBA) | static_cast<TextureFlagsType>(RE::TextureFormat::NORMALIZED_UNSIGNED) |
-static_cast<TextureFlagsType>(RE::TextureMinFilter::NEAREST) | static_cast<TextureFlagsType>(RE::TextureMagFilter::LINEAR) |
-static_cast<TextureFlagsType>(RE::TextureWrapStyle::CLAMP_TO_EDGE) | (static_cast<TextureFlagsType>(RE::TextureWrapStyle::CLAMP_TO_EDGE) << TEX_WRAP_X_TO_Y_LEFTSHIFT);
-
-const TextureFlagsType TextureFlags::RGBA_IU_NEAR_LIN_EDGE =
-static_cast<TextureFlagsType>(RE::TextureChannels::RGBA) | static_cast<TextureFlagsType>(RE::TextureFormat::INTEGRAL_UNSIGNED) |
-static_cast<TextureFlagsType>(RE::TextureMinFilter::NEAREST) | static_cast<TextureFlagsType>(RE::TextureMagFilter::LINEAR) |
-static_cast<TextureFlagsType>(RE::TextureWrapStyle::CLAMP_TO_EDGE) | (static_cast<TextureFlagsType>(RE::TextureWrapStyle::CLAMP_TO_EDGE) << TEX_WRAP_X_TO_Y_LEFTSHIFT);
-
 TextureFlags::TextureFlags(TextureChannels channels, TextureFormat format,
 	TextureMinFilter minFilter, TextureMagFilter magFilter,
-	TextureWrapStyle wrapStyleX, TextureWrapStyle wrapStyleY) :
-	p_flags(static_cast<TextureFlagsType>(channels) | static_cast<TextureFlagsType>(format) |
-		static_cast<TextureFlagsType>(minFilter) | static_cast<TextureFlagsType>(magFilter) |
-		static_cast<TextureFlagsType>(wrapStyleX) | (static_cast<TextureFlagsType>(wrapStyleY) << TEX_WRAP_X_TO_Y_LEFTSHIFT)) {
-
+	TextureWrapStyle wrapStyleX, TextureWrapStyle wrapStyleY,
+	TextureBitdepthPerChannel bitdepth) :
+	p_flags(ft_cast(channels) | ft_cast(format) | ft_cast(minFilter) | ft_cast(magFilter)
+		| ft_cast(wrapStyleX) | (ft_cast(wrapStyleY) << TEX_WRAP_X_TO_Y_LEFTSHIFT) | ft_cast(bitdepth)) {
 }
 
 TextureChannels TextureFlags::getChannels() const {
@@ -75,32 +54,40 @@ TextureWrapStyle TextureFlags::getWrapStyleY() const {
 	return static_cast<TextureWrapStyle>((p_flags >> TEX_WRAP_Y_TO_X_RIGHTSHIFT) & TEX_WRAP_X_BITS);
 }
 
+TextureBitdepthPerChannel TextureFlags::getBitdepthPerChannel() const {
+	return static_cast<TextureBitdepthPerChannel>(p_flags & TEX_BITDEPTH_PER_CHANNEL_BITS);
+}
+
 void TextureFlags::setChannels(TextureChannels channels) {
-	p_flags = (p_flags & ~TEX_CHANNELS_BITS) | static_cast<TextureFlagsType>(channels);
+	p_flags = (p_flags & ~TEX_CHANNELS_BITS) | ft_cast(channels);
 }
 
 void TextureFlags::setFormat(TextureFormat format) {
-	p_flags = (p_flags & ~TEX_FORMAT_BITS) | static_cast<TextureFlagsType>(format);
+	p_flags = (p_flags & ~TEX_FORMAT_BITS) | ft_cast(format);
 }
 
 void TextureFlags::setFormat(TextureFormatType type, TextureFormatSign sign) {
-	p_flags = (p_flags & ~TEX_FORMAT_BITS) | static_cast<TextureFlagsType>(type) | static_cast<TextureFlagsType>(sign);
+	p_flags = (p_flags & ~TEX_FORMAT_BITS) | ft_cast(type) | ft_cast(sign);
 }
 
 void TextureFlags::setMagFilter(TextureMagFilter magFilter) {
-	p_flags = (p_flags & ~TEX_MAG_FILTER_BITS) | static_cast<TextureFlagsType>(magFilter);
+	p_flags = (p_flags & ~TEX_MAG_FILTER_BITS) | ft_cast(magFilter);
 }
 
 void TextureFlags::setMinFilter(TextureMinFilter minFilter) {
-	p_flags = (p_flags & ~TEX_MIN_FILTER_BITS) | static_cast<TextureFlagsType>(minFilter);
+	p_flags = (p_flags & ~TEX_MIN_FILTER_BITS) | ft_cast(minFilter);
 }
 
 void TextureFlags::setWrapStyleX(TextureWrapStyle wrapStyle) {
-	p_flags = (p_flags & ~TEX_WRAP_X_BITS) | static_cast<TextureFlagsType>(wrapStyle);
+	p_flags = (p_flags & ~TEX_WRAP_X_BITS) | ft_cast(wrapStyle);
 }
 
 void TextureFlags::setWrapStyleY(TextureWrapStyle wrapStyle) {
-	p_flags = (p_flags & ~TEX_WRAP_Y_BITS) | (static_cast<TextureFlagsType>(wrapStyle) << TEX_WRAP_X_TO_Y_LEFTSHIFT);
+	p_flags = (p_flags & ~TEX_WRAP_Y_BITS) | (ft_cast(wrapStyle) << TEX_WRAP_X_TO_Y_LEFTSHIFT);
+}
+
+void TextureFlags::setBitdepthPerChannel(TextureBitdepthPerChannel bitdepth) {
+	p_flags = (p_flags & ~TEX_BITDEPTH_PER_CHANNEL_BITS) | ft_cast(bitdepth);
 }
 
 }

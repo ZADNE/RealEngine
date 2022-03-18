@@ -38,7 +38,7 @@ namespace RE {
 		/**
 		 * @brief Constructs parameters from given geometry and flags.
 		 *
-		 * Colour is set to (0, 0, 0, 255).
+		 * Border colour is set to (0, 0, 0, 255).
 		 *
 		 * @param geometry Geometry of the parameters
 		 * @param flags Flags of the parameters

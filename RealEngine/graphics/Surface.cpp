@@ -18,9 +18,9 @@ Surface::Surface(const Raster& image, const TextureParameters& params, unsigned 
 	m_updateUniformBuffer(updateUniforms),
 	m_params(params) {
 
-	if (m_params.getMinFilter() != TextureMinFilter::NEAREST) {
+	if (m_params.getMinFilterMipmapsUsage() == TextureMinFilterMipmapsUsage::YES) {
 		log("Surface cannot have mipmaps");
-		m_params.setMinFilter(TextureMinFilter::LINEAR);//Mipmaps are not allowed for surfaces
+		m_params.setMinFilter(TextureMinFilter::LINEAR_NO_MIPMAPS);//Mipmaps are not allowed for surfaces
 	}
 
 	assert(numberOfTextures <= 16);

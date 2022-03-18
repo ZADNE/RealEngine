@@ -1,56 +1,41 @@
 ﻿#pragma once
-/*
-Example of binding list
-
-#define KB_BINDING_LIST(m)   \
-	m(VIEW, MOVE_LEFT)  \
-	m(VIEW, MOVE_RIGHT)  \
-	m(VIEW, MOVE_UP)  \
-	m(VIEW, MOVE_DOWN)  \
-	m(VIEW, ZOOM_IN)  \
-	m(VIEW, ZOOM_OUT)  \
-	m(BUILDMENU, OPEN)  \
-	m(BUILDMENU, CHOOSE)  \
-	m(DEBUG, ENDGAME)  \
-	m(DEBUG, WORLDDRAW)
-	  /|\		/|\
-section name	binding name
-
-*/
-
-
-#ifdef KB_BINDING_LIST
 #include <iostream>
 #include <string>
-#include <array>
 #include <fstream>
+#include <array>
 
 #include <SDL2/SDL_thread.h>
 #include <nlohmann/json.hpp>
 
-#include <RealEngine/utility/utility.hpp>
-#include <RealEngine/main/Error.hpp>
+#include <RealEngine/external/magic_enum/magic_enum.hpp>
 #include <RealEngine/user_input/Key.hpp>
+#include <RealEngine/main/Error.hpp>
 #include <RealEngine/main/MainProgram.hpp>
-
-//Deliberately outside of RE namespace
-namespace {
-SMARTENUM_INIT_ALL(BL, KB_BINDING_LIST)
-}
-
-#define KB(enum) (RE::KeyBinder::std())[BL::e##enum]
 
 namespace RE {
 
+template<typename KeyBindings>
+using KeyBindingValueList = std::array<Key, magic_enum::enum_count<KeyBindings>()>;
+
+/**
+ * @brief Provides a mechanism for user-changeable key bindings
+ * 
+ * Keybinder holds compile-time list of key bindings. Upon creation, the key bindings
+ * are assigned previously saved values (= bound keys). If the saved bindings cannot be loaded,
+ * default bindings are assigned.
+ * 
+ * @tparam KeyBindings Enum class that contains the binding points. The values must be continous sequence 0..N-1
+ * @tparam defaultValuesList List with default values of the bindings. These are used when saved bindings cannot be loaded.
+*/
+template<typename KeyBindings, const KeyBindingValueList<const KeyBindings>& defaultValuesList>
 class KeyBinder {
 	friend class MainProgram;
 public:
 
-	KeyBinder() : KeyBinder(std::array<RE::Key, (size_t)BL::eBL_Count>{}) {
-
-	}
-
-	KeyBinder(std::array<RE::Key, (size_t)BL::eBL_Count> defBindings) : m_bindingsDefault(defBindings) {
+	/**
+	 * @brief Assignes bindings the previously saved values or the default ones.
+	*/
+	KeyBinder() {
 		try {
 			if (loadBindings()) {
 				saveCurrentBindings();//Bindings are not latest-version, saving current one
@@ -65,71 +50,84 @@ public:
 		}
 	}
 
-	RE::Key operator[](BL binding) const {
-		return m_bindings[binding];
+	/**
+	 * @brief Gets the currently bound key for the given key binding
+	 * @param binding The binding to get the bound key of
+	 * @return Currently bound key of the binding
+	*/
+	Key operator[](KeyBindings binding) const {
+		return m_bindings[static_cast<size_t>(binding)];
 	};
 
-	//Immediately changes the binding to the given key 
-	void changeBinding(BL binding, Key key) {
-		m_bindings[binding] = key;
+	/**
+	 * @brief Immediately changes the binding to the given key and saves the change
+	 * @param binding The binding to change
+	 * @param key The key to assign
+	*/
+	void changeBinding(KeyBindings binding, Key key) {
+		m_bindings[static_cast<size_t>(binding)] = key;
 		saveCurrentBindings();
 	};
 
-	//Returns whether the binding were up-to-date
+	/**
+	 * @brief Loads bindings from previously saved file
+	 * 
+	 * If a binding cannot be loaded, its default value is assigned instead.
+	 * 
+	 * @return True if all bindings could be loaded, false otherwise
+	*/
 	bool loadBindings() {
 		nlohmann::json j;
 		std::ifstream i(m_bindingFileName);
 		i >> j;
 
-		for (auto outer = j.begin(); outer != j.end(); outer++) {
-			for (auto inner = outer.value().begin(); inner != outer.value().end(); inner++) {
-				m_bindings[(size_t)(stringToEnum(BL, 'e' + outer.key() + '_' + inner.key()))] = RE::stringToKey(inner.value().get<std::string>());
+		for (auto item = j.begin(); item != j.end(); item++) {
+			auto binding = magic_enum::enum_cast<KeyBindings>(item.key());
+			if (binding.has_value()) {
+				m_bindings[static_cast<size_t>(*binding)] = stringToKey(item.value().get<std::string>());
 			}
 		}
 
 		bool returnVal = false;
-		for (int i = 0; i < (int)BL::eBL_Count; i++) {
-			if (m_bindings[i] == RE::Key::NO_KEY && i != (int)BL::eBL_Error) {
-				m_bindings[i] = m_bindingsDefault[i];
+		for (size_t i = 0; i < magic_enum::enum_count<KeyBindings>(); i++) {
+			if (m_bindings[i] == Key::NO_KEY) {
+				m_bindings[i] = defaultValuesList[i];
 				returnVal = true;
 			}
 		}
 		return returnVal;//Indicates whether bindings have been up-to-date
 	}
 
+	/**
+	 * @brief Resets all bindings to their default values
+	 * @param permanently If true, the reset bindings are saved
+	*/
 	void resetBindings(bool permanently) {
-		std::copy(m_bindingsDefault.begin(), m_bindingsDefault.end(), m_bindings.begin());
+		std::copy(defaultValuesList.begin(), defaultValuesList.end(), m_bindings.begin());
 		if (permanently) { saveCurrentBindings(); }
 	}
 
+	/**
+	 * @brief Saves current bindings
+	*/
 	void saveCurrentBindings() {
 		nlohmann::ordered_json j;
 
-		std::string cat;
-
-		for (size_t i = 0u; i < (size_t)BL::eBL_Error; ++i) {
-			j[enumToCat(BL, i)][enumToIden(BL, i)] = RE::keyToString(m_bindings[i]);
+		for (auto& enum_entry: magic_enum::enum_entries<KeyBindings>()) {
+			j[std::string(enum_entry.second)] = keyToString(m_bindings[static_cast<size_t>(enum_entry.first)]);
 		}
+
 		std::ofstream o(m_bindingFileName, std::ofstream::trunc);
 		o << j.dump(2);
 		o.close();
 	}
-
-	static KeyBinder& std() {
-	#ifdef KB_DEFAULT_LIST
-		static KeyBinder std{KB_DEFAULT_LIST};
-	#else
-		static KeyBinder std{};
-	#endif // KB_DEFAULT_LIST
-		return std;
-	};
 
 	//Changes the binding to the first key that the user presses
 	//The key is saved into newKey
 	//Blocks normal key input until new key is pressed
 	//Pressing the stopKey will stop the listening and either: unbind the binding or leave without any changes to the bindings (depedning on 'unbindKeyAfterStop')
 	//All is done in side thread, main thread keeps going
-	void listenChangeBinding(BL binding, Key* newKey, Key stopKey = Key::Escape, bool unbindKeyAfterStop = false) {
+	void listenChangeBinding(KeyBindings binding, Key* newKey, Key stopKey = Key::Escape, bool unbindKeyAfterStop = false) {
 		m_listenBinding = binding;
 		auto info = new ListeningInfo();
 		info->KB = this;
@@ -137,7 +135,7 @@ public:
 		info->stopKey = stopKey;
 		info->unbindKeyAfterStop = unbindKeyAfterStop;
 
-		auto thread = SDL_CreateThread(listenFoKey, "temp_keybind_listener", info);
+		auto thread = SDL_CreateThread(listenFoKey, "keybind_listener", info);
 		SDL_DetachThread(thread);
 	};
 private:
@@ -210,17 +208,15 @@ private:
 	}
 
 
-	void finishedListening(const RE::Key& newKey) {
-		m_bindings[m_listenBinding] = newKey;
+	void finishedListening(const Key& newKey) {
+		m_bindings[static_cast<size_t>(m_listenBinding)] = newKey;
 		saveCurrentBindings();
 	};
 
-	BL m_listenBinding = BL::eBL_Error;
+	KeyBindings m_listenBinding;
 	std::string m_bindingFileName = "bindings.json";
 
-	std::array<Key, (size_t)BL::eBL_Count> m_bindings;
-	std::array<Key, (size_t)BL::eBL_Count> m_bindingsDefault;
+	KeyBindingValueList<KeyBindings> m_bindings;
 };
 
 }
-#endif // KB_BINDING_LIST
