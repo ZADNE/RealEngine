@@ -172,6 +172,7 @@ public:
 	 *
 	 * Each type of buffer has its own generic binding point.
 	*/
+	template<BufferType bindType = type>
 	void bind() {
 	#ifdef _DEBUG
 		if (p_currentlyBound.ID != 0) {
@@ -179,7 +180,7 @@ public:
 		}
 		p_currentlyBound.ID = p_ID;
 	#endif // _DEBUG
-		glBindBuffer(static_cast<GLenum>(type), p_ID);
+		glBindBuffer(static_cast<GLenum>(bindType), p_ID);
 	}
 
 	/**
@@ -187,13 +188,14 @@ public:
 	 *
 	 * A bound buffer has to be unbound before another buffer can be bound.
 	*/
+	template<BufferType bindType = type>
 	void unbind() {
 	#ifdef _DEBUG
 		if (p_currentlyBound.ID != p_ID) {
 			throw "Overbound buffers";
 		}
 		p_currentlyBound.ID = 0;
-		glBindBuffer(static_cast<GLenum>(type), 0);
+		glBindBuffer(static_cast<GLenum>(bindType), 0);
 	#endif // _DEBUG
 	}
 

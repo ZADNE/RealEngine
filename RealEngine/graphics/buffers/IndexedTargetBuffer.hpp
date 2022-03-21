@@ -31,7 +31,7 @@ public:
 			type == BufferType::TRANSFORM_FEEDBACK ||
 			type == BufferType::UNIFORM
 		);
-		if (bindNow) bind();
+		if (bindNow) bindIndexed();
 	}
 
 	/**
@@ -60,7 +60,7 @@ public:
 	/**
 	 * @brief Binds the buffer to its indexed binding point
 	*/
-	void bind() {
+	void bindIndexed() {
 		glBindBufferBase(static_cast<GLenum>(type), p_bindingPoint, this->p_ID);
 	}
 

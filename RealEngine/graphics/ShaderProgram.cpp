@@ -73,11 +73,28 @@ void ShaderProgram::dispatchCompute(const glm::uvec3& groupCount, bool use) cons
 	} else {
 	#ifdef _DEBUG
 		if (m_currentlyUsedID != m_ID) {
-			throw "Tried to dispatch a compute without having the program bound for usage!";
+			throw "Tried to dispatch compute groups without having the program bound for usage!";
 		}
 	#endif // _DEBUG
 	}
 	glDispatchCompute(groupCount.x, groupCount.y, groupCount.z);
+	if (use) {
+		unuse();
+	}
+}
+
+void ShaderProgram::dispatchCompute(GLintptr indirect, bool use) const {
+	if (use) {
+		this->use();
+	}
+	else {
+#ifdef _DEBUG
+		if (m_currentlyUsedID != m_ID) {
+			throw "Tried to dispatch compute groups without having the program bound for usage!";
+		}
+#endif // _DEBUG
+	}
+	glDispatchComputeIndirect(indirect);
 	if (use) {
 		unuse();
 	}

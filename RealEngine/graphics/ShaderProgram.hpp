@@ -175,6 +175,13 @@ public:
 	void dispatchCompute(const glm::uvec3& groupCount, bool use) const;
 
 	/**
+	 * @brief Dispatches indirectly compute groups of this shader program.
+	 * @param indirect The offset into the buffer object currently bound as the DISPATCH_INDIRECT buffer
+	 * @param use If true, the program is bound and unbound for usage. If false it is expected to be already bound.
+	*/
+	void dispatchCompute(GLintptr indirect, bool use) const;
+
+	/**
 	* @brief Prints diagnostic information about the shader program
 	*/
 	void printInfo() const;
