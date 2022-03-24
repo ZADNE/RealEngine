@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <string>
-#include <optional>
 
 #include <SDL2/SDL_video.h>
 #include <glm/vec2.hpp>
@@ -17,19 +16,14 @@ class MainProgram;
  *
  * There can only be a single window within program
  * and it is created by the main program.
+ * 
+ * The window creates GL context, initializes GLEW and ImGui.
 */
 class Window : public WindowSettings {
 	friend class MainProgram;
 public:
 	Window(const Window& other) = delete;
 	void operator=(const Window& other) = delete;
-
-	/**
-	 * @brief Resizes the window.
-	 * @param newDims New dimensions of the window
-	 * @param save Changed settings are saved to file if true.
-	*/
-	void resize(const glm::ivec2& newDims, bool save);
 
 	/**
 	 * @brief Switches fullscreen on and off.
@@ -83,6 +77,13 @@ private:
 	 * @brief Destroys the window and its OpenGL context.
 	*/
 	~Window();
+
+	/**
+	 * @brief Resizes the window.
+	 * @param newDims New dimensions of the window
+	 * @param save Changed settings are saved to file if true.
+	*/
+	void resize(const glm::ivec2& newDims, bool save);
 
 	/**
 	 * @brief Swaps buffers if using double buffered context (should be).

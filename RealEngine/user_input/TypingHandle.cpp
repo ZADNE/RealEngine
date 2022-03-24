@@ -8,13 +8,13 @@ TypingHandle::TypingHandle(MainProgram* mainProgram) : m_mainProgram(mainProgram
 
 TypingHandle::~TypingHandle() {
 	if (m_mainProgram) {
-		m_mainProgram->setTypeString(nullptr);
+		//m_mainProgram->setTypeString(nullptr);
 	}
 }
 
 void TypingHandle::type(bool type, bool blockPressInput/* = false*/) {
 	if (m_mainProgram) {
-		m_mainProgram->setTypeString(type ? &m_string : nullptr, blockPressInput);
+		//m_mainProgram->setTypeString(type ? &m_string : nullptr, blockPressInput);
 	}
 }
 
@@ -27,9 +27,9 @@ FontString TypingHandle::visit(FontString* previousVisit) const {
 }
 
 bool TypingHandle::isBeingTypedInto() const {
-	if (m_mainProgram && m_mainProgram->getTypeString() == &m_string) {
+	/*if (m_mainProgram && m_mainProgram->getTypeString() == &m_string) {
 		return true;
-	}
+	}*/
 	return false;
 }
 

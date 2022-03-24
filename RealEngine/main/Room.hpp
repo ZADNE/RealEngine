@@ -3,6 +3,9 @@
 #include <vector>
 #include <any>
 
+#include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
+
 #include <RealEngine/main/CommandLineArguments.hpp>
 
 namespace RE {
@@ -30,6 +33,16 @@ using RoomTransitionParameters = std::vector<std::any>;
 class Room {
 	friend class MainProgram;
 public:
+
+	/**
+	 * @brief Specifies some parameters related to how the room is drawn
+	*/
+	struct DisplaySettings {
+		glm::vec4 clearColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);	/**< The color that is used to clear the window framebuffer */
+		unsigned int stepsPerSecond = 50;							/**< The number of steps per second that this romm runs at */
+		unsigned int framesPerSecondLimit = 100;					/**< The limit of frames per second that this room will be rendered in */
+		bool usingImGui = false;									/**< Tells whether this room uses ImGui. ImGui cannot be used if it is false */
+	};
 
 	/**
 	 * @brief Constructs a room.
@@ -80,6 +93,21 @@ public:
 	 *							  simulation steps.
 	*/
 	virtual void render(double interpolationFactor) = 0;
+
+	/**
+	 * @brief Gets the settings that will be used for this room
+	 * 
+	 * The settings are adopted every time the room is entered
+	*/
+	virtual const DisplaySettings& getDisplaySettings();
+
+	/**
+	 * @brief Callback used to notify that the window's size has changed
+	 * 
+	 * This callback is called for all rooms, even those that are not active.
+	 * @param newSize The new size fo the window
+	*/
+	virtual void windowResized(const glm::ivec2& newSize);
 
 	/**
 	 * @brief Gets main program.

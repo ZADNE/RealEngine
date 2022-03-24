@@ -39,7 +39,6 @@ RealEngine::RealEngine() {
 		goto fail;
 	}
 	printSDLVersion();
-	SDL_StopTextInput();
 
 	//SDL2 TTF
 	if (err = TTF_Init()) {
@@ -75,7 +74,6 @@ fail:
 RealEngine::~RealEngine() {
 	TTF_Quit();
 	SDL_Quit();
-	log("RealEngine quit");
 }
 
 }

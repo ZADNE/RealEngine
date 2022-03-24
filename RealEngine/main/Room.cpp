@@ -10,6 +10,15 @@ Room::~Room() {
 
 }
 
+const Room::DisplaySettings& Room::getDisplaySettings() {
+	static DisplaySettings settings{};
+	return settings;
+}
+
+void Room::windowResized(const glm::ivec2& newSize) {
+
+}
+
 MainProgram* Room::program() const {
 	return m_mainProgram;
 }

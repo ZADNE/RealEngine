@@ -12,7 +12,6 @@
 #include <RealEngine/main/Window.hpp>
 #include <RealEngine/user_input/InputManager.hpp>
 #include <RealEngine/main/Synchronizer.hpp>
-#include <RealEngine/graphics/Font.hpp>
 
 union SDL_Event;
 
@@ -129,12 +128,6 @@ public:
 	*/
 	void scheduleRoomTransition(size_t index, RoomTransitionParameters params);
 
-	//The string will be edited as the player types
-	//Use nullptr to stop typing
-	void setTypeString(FontString* string, bool blockPressInput = false);
-	//Returns the current target for typing = nullptr means there is not target
-	FontString const* getTypeString() const;
-
 	/**
 	 * @brief Pointer to main program
 	 * @deprecated Use program() within rooms instead.
@@ -147,6 +140,13 @@ public:
 	 * @brief Gets displays that can be drawn to
 	*/
 	std::vector<RE::DisplayInfo> getDisplays() const;
+
+	/**
+	 * @brief Resizes the window and notifies all room of the change.
+	 * @param newDims New dimensions of the window
+	 * @param save Changed settings are saved to file if true.
+	*/
+	void resizeWindow(const glm::ivec2& newDims, bool save);
 protected:
 	/**
 	 * @brief Constructs main program.
@@ -170,17 +170,16 @@ private:
 	void step();
 	void render(double interpolationFactor);
 
-	void checkForSDLEvents();
-	void E_SDL(SDL_Event* evnt);
+	void pollEvents();
+	void processEvent(SDL_Event* evnt);
+
+	void adoptRoomSettings(const Room::DisplaySettings& s);
 
 	bool m_programShouldRun = false;
 	int m_programExitCode = EXIT_SUCCESS;
 
 	bool m_checkForInput = true;
-
-	//Typing
-	FontString* m_typeString = nullptr;
-	bool m_blockPressInput = false;
+	bool m_usingImGui = false;
 
 	void doRoomTransitionIfScheduled();
 

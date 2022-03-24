@@ -6,6 +6,9 @@
 
 #include <SDL2/SDL_events.h>
 
+#include <RealEngine/external/ImGui/imgui_impl_sdl.h>
+#include <RealEngine/external/ImGui/imgui_impl_opengl3.h>
+
 #include <RealEngine/resources/ResourceManager.hpp>
 #include <RealEngine/graphics/SpriteBatch.hpp>
 #include <RealEngine/graphics/GeometryBatch.hpp>
@@ -22,6 +25,9 @@ int MainProgram::run() {
 		throw std::runtime_error("Initial room was not set");
 	}
 
+	//Adopt display settings of the first room
+	adoptRoomSettings(p_roomManager.getCurrentRoom()->getDisplaySettings());
+
 	m_programShouldRun = true;
 	p_synchronizer.resumeSteps();
 
@@ -36,7 +42,7 @@ int MainProgram::run() {
 			//Check for user input
 			if (m_checkForInput) {
 				p_inputManager.update();
-				checkForSDLEvents();
+				pollEvents();
 			} else {
 				SDL_PumpEvents();
 			}
@@ -101,32 +107,38 @@ std::vector<RE::DisplayInfo> MainProgram::getDisplays() const {
 	return infos;
 }
 
+void MainProgram::resizeWindow(const glm::ivec2& newDims, bool save) {
+	p_window.resize(newDims, save);
+	p_roomManager.notifyWindowResized(newDims);
+}
+
 void MainProgram::step() {
 	p_roomManager.getCurrentRoom()->step();
 }
 
 void MainProgram::render(double interpolationFactor) {
+	if (m_usingImGui) {//ImGui frame start
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+	}
+
 	p_roomManager.getCurrentRoom()->render(interpolationFactor);
+
+	if (m_usingImGui) {//ImGui frame end
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
 }
 
-void MainProgram::E_SDL(SDL_Event* evnt) {
+void MainProgram::processEvent(SDL_Event* evnt) {
 	RE::Key key = RE::Key::UNKNOWN;
 	switch (evnt->type) {
 	case SDL_KEYDOWN:
 		key = SDLKToREKey(evnt->key.keysym.sym);
-		if (evnt->key.repeat == 0 && !(m_typeString && m_blockPressInput)) {
+		if (evnt->key.repeat == 0) {
 			p_inputManager.press(RE::Key::ANY_KEY);
 			p_inputManager.press(key);
-		}
-		if ((key == RE::Key::Backspace) && m_typeString) {
-			//Used backspace when typing - removing last character
-			if (m_typeString->size() >= 1) {
-				std::cerr << "TODO\n";
-				/*size_t size = m_convert_utf8_utf16.to_bytes(m_convert_utf8_utf16.from_bytes(*p_typeString).back()).size();
-				for (size_t i = 0u; i < size; ++i) {
-					p_typeString->pop_back();
-				}*/
-			}
 		}
 		break;
 	case SDL_KEYUP:
@@ -149,7 +161,8 @@ void MainProgram::E_SDL(SDL_Event* evnt) {
 		}
 		break;
 	case SDL_MOUSEMOTION:
-		p_inputManager.setCursorAbs(glm::uvec2(evnt->motion.x, p_window.getDims().y - evnt->motion.y - 1));//Reversing Y coordinate to get standard math coordinates
+		//Invert the Y coordinate to get standard math coordinates
+		p_inputManager.setCursorAbs(glm::uvec2(evnt->motion.x, p_window.getDims().y - evnt->motion.y - 1));
 		break;
 	case SDL_MOUSEWHEEL:
 		key = (evnt->wheel.y > 0) ? (Key::UMW) : (Key::DMW);
@@ -158,25 +171,34 @@ void MainProgram::E_SDL(SDL_Event* evnt) {
 		key = (evnt->wheel.x > 0) ? (Key::RMW) : (Key::LMW);
 		p_inputManager.press(key, std::abs(evnt->wheel.x));
 		break;
-	case SDL_TEXTINPUT:
-		*m_typeString += evnt->text.text;
-		break;
 	case SDL_QUIT:
 		scheduleProgramExit();
 		break;
 	}
 }
 
+void MainProgram::adoptRoomSettings(const Room::DisplaySettings& s) {
+	glClearColor(s.clearColor.r, s.clearColor.g, s.clearColor.b, s.clearColor.a);
+	p_synchronizer.setStepsPerSecond(s.stepsPerSecond);
+	p_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
+	m_usingImGui = s.usingImGui;
+}
+
 void MainProgram::doRoomTransitionIfScheduled() {
 	if (m_nextRoomIndex == NO_NEXT_ROOM) return;
+
 	p_synchronizer.pauseSteps();
 	auto prev = p_roomManager.getCurrentRoom();
 	auto current = p_roomManager.gotoRoom(m_nextRoomIndex, m_roomTransitionParameters);
-	bool chaged = (prev != current);
-	if (chaged) {
+	if (prev != current) {//If successfully changed the room
+		//Adopt the display settings of the entered room
+		adoptRoomSettings(current->getDisplaySettings());
+		
+		//Ensure at least one step before the first frame is rendered
 		step();
 	}
 	m_nextRoomIndex = NO_NEXT_ROOM;
+
 	p_synchronizer.resumeSteps();
 }
 
@@ -185,24 +207,17 @@ void MainProgram::scheduleRoomTransition(size_t index, RoomTransitionParameters 
 	m_roomTransitionParameters = params;
 }
 
-void MainProgram::setTypeString(FontString* string, bool blockPressInput/* = false*/) {
-	m_typeString = string;
-	m_blockPressInput = blockPressInput;
-	if (m_typeString) {
-		SDL_StartTextInput();
-	} else {
-		SDL_StopTextInput();
-	}
-}
-
-FontString const* MainProgram::getTypeString() const {
-	return m_typeString;
-}
-
-void MainProgram::checkForSDLEvents() {
+void MainProgram::pollEvents() {
 	SDL_Event evnt;
-	while (SDL_PollEvent(&evnt)) {
-		E_SDL(&evnt);
+	if (m_usingImGui) {
+		while (SDL_PollEvent(&evnt)) {
+			ImGui_ImplSDL2_ProcessEvent(&evnt);
+			processEvent(&evnt);
+		}
+	} else {
+		while (SDL_PollEvent(&evnt)) {
+			processEvent(&evnt);
+		}
 	}
 }
 

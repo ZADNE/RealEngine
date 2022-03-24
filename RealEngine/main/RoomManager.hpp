@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <vector>
+#include <functional>
 
 #include <RealEngine/main/CommandLineArguments.hpp>
 #include <RealEngine/main/Room.hpp>
@@ -47,8 +48,8 @@ public:
 	 * and it is your responsibility that the point is valid through
 	 * lifetime of the room manger.
 	 *
-	 * This is typically called from the constructor of your
-	 * class derived from MainProgram.
+	 * This is typically called from the constructor of the
+	 * class derived from the MainProgram.
 	 * @param room Room to manage
 	 * @return Index of the room, can be used to enter the room via gotoRoom()
 	*/
@@ -57,9 +58,19 @@ public:
 		return p_rooms.size() - 1;
 	}
 
+	/**
+	 * @brief Notifies all rooms that the window has been resized
+	 * @param newSize The new size of the window
+	*/
+	void notifyWindowResized(const glm::ivec2& newSize) {
+		for (auto& room: p_rooms) {
+			room->windowResized(newSize);
+		}
+	}
+
 protected:
-	std::vector<Room*> p_rooms;		/**< Non-owning vector of all managed rooms */
-	Room* p_currentRoom = nullptr;	/**< Pointer to current room */
+	std::vector<Room*> p_rooms;								/**< Non-owning vector of all managed rooms */
+	Room* p_currentRoom = nullptr;							/**< Pointer to current room */
 };
 
 }

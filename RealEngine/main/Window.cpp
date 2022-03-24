@@ -5,23 +5,14 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <RealEngine/external/ImGui/imgui.h>
+#include <RealEngine/external/ImGui/imgui_impl_sdl.h>
+#include <RealEngine/external/ImGui/imgui_impl_opengl3.h>
+
 #include <RealEngine/main/Error.hpp>
 #include <RealEngine/graphics/Viewport.hpp>
 
 namespace RE {
-
-void Window::resize(const glm::ivec2& newDims, bool save) {
-	SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
-	SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-	SDL_GetWindowSize(m_SDLwindow, &p_dims.x, &p_dims.y);
-
-	Viewport::m_windowMatrix = glm::ortho(0.0f, static_cast<float>(p_dims.x), 0.0f, static_cast<float>(p_dims.y));
-	Viewport::m_windowSize = p_dims;
-	Viewport::setToWholeWindow();
-	Viewport::setWindowMatrixToMatchViewport();
-
-	if (save) this->save();
-}
 
 void Window::goFullscreen(bool fullscreen, bool save) {
 	p_flags.fullscreen = fullscreen;
@@ -32,7 +23,7 @@ void Window::goFullscreen(bool fullscreen, bool save) {
 
 void Window::goBorderless(bool borderless, bool save) {
 	p_flags.borderless = borderless;
-	SDL_SetWindowBordered(m_SDLwindow, (borderless) ? SDL_TRUE : SDL_FALSE);
+	SDL_SetWindowBordered(m_SDLwindow, (borderless) ? SDL_FALSE : SDL_TRUE);
 	if (save) this->save();
 }
 
@@ -63,9 +54,12 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 	WindowSettings(settings), m_windowTitle(title) {
 	//Prepare flags
 	Uint32 SDL_flags = SDL_WINDOW_OPENGL;
-	SDL_flags |= SDL_WINDOW_HIDDEN & p_flags.invisible;
-	SDL_flags |= SDL_WINDOW_FULLSCREEN & p_flags.fullscreen;
-	SDL_flags |= SDL_WINDOW_BORDERLESS & p_flags.borderless;
+	if (p_flags.invisible)
+		SDL_flags |= SDL_WINDOW_HIDDEN;
+	if (p_flags.fullscreen)
+		SDL_flags |= SDL_WINDOW_FULLSCREEN;
+	if (p_flags.borderless)
+		SDL_flags |= SDL_WINDOW_BORDERLESS;
 
 	//Create window
 	m_SDLwindow = SDL_CreateWindow(m_windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, p_dims.x, p_dims.y, SDL_flags);
@@ -130,15 +124,39 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 	Viewport::m_windowSize = p_dims;
 	Viewport::m_windowMatrixUniformBuffer.emplace(
 		UNIF_BUF_VIEWPORT_MATRIX, true, sizeof(Viewport::m_windowMatrix), RE::BufferUsageFlags::DYNAMIC_STORAGE, &Viewport::m_windowMatrix);
+
+	//Initialize ImGui
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplSDL2_InitForOpenGL(m_SDLwindow, m_GLContext);
+	ImGui_ImplOpenGL3_Init("#version 460 core");
 }
 
 Window::~Window() {
-	if (m_GLContext) {//Delete OpenGL context
-		SDL_GL_DeleteContext(m_GLContext);
-	}
-	if (m_SDLwindow) {//And destroy the SDL window
-		SDL_DestroyWindow(m_SDLwindow);
-	}
+	//Shutdown ImGui
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
+	//Delete OpenGL context
+	SDL_GL_DeleteContext(m_GLContext);
+
+	//Destroy the SDL window
+	SDL_DestroyWindow(m_SDLwindow);
+}
+
+void Window::resize(const glm::ivec2& newDims, bool save) {
+	SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
+	SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+	SDL_GetWindowSize(m_SDLwindow, &p_dims.x, &p_dims.y);
+
+	Viewport::m_windowMatrix = glm::ortho(0.0f, static_cast<float>(p_dims.x), 0.0f, static_cast<float>(p_dims.y));
+	Viewport::m_windowSize = p_dims;
+	Viewport::setToWholeWindow();
+	Viewport::setWindowMatrixToMatchViewport();
+
+	if (save) this->save();
 }
 
 void Window::swapBuffer() {
