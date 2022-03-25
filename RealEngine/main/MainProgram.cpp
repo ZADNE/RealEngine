@@ -193,7 +193,8 @@ void MainProgram::doRoomTransitionIfScheduled() {
 	if (prev != current) {//If successfully changed the room
 		//Adopt the display settings of the entered room
 		adoptRoomSettings(current->getDisplaySettings());
-		
+		//Pressed/released events belong to the previous room
+		p_inputManager.update();
 		//Ensure at least one step before the first frame is rendered
 		step();
 	}

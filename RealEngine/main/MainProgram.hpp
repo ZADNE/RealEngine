@@ -106,9 +106,9 @@ public:
 	int run();
 
 	/**
-	 * @brief Schedules the program to end.
+	 * @brief Schedules the program to exit.
 	 *
-	 * The program will end at the end of current frame.
+	 * The program will end at the end of the current frame.
 	 *
 	 * @param exitcode The exit code that should be returned from run()
 	*/
