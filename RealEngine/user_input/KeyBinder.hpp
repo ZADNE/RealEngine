@@ -131,48 +131,54 @@ public:
 		o.close();
 	}
 
-	//Changes the binding to the first key that the user presses
-	//Blocks normal key input until new key is pressed
-	//Pressing the stopKey will stop the listening and either: unbind the binding or leave without any changes to the bindings (depedning on 'unbindKeyAfterStop')
-	//All is done in side thread, main thread keeps going
-	void listenChangeBinding(KeyBindings binding, Key stopKey = Key::Delete, bool unbindKeyAfterStop = true) {
-		m_listenBinding = binding;
-		auto info = new ListeningInfo();
-		info->KB = this;
-		info->stopKey = stopKey;
-		info->unbindKeyAfterStop = unbindKeyAfterStop;
+	/**
+	 * @brief Asynchronously changes a keybinding
+	 * @param binding The binding to change
+	 * @param stopKey The key that stops the listening without changing the keybind
+	*/
+	template<typename CallbackReceiver, void(CallbackReceiver::* callback)(Key)>
+	void listenChangeBinding(KeyBindings binding, CallbackReceiver& callbackReceiver, Key stopKey = Key::Delete) {
+		auto info = new ListeningInfo<CallbackReceiver>{
+			.binding = binding,
+			.keyBinder = (*this),
+			.stopKey = stopKey,
+			.callbackReceiver = callbackReceiver
+		};
 
-		auto thread = SDL_CreateThread(listenForKey, "keybind_listener", info);
+		auto thread = SDL_CreateThread((listenForKey<CallbackReceiver, callback>), "keybind_listener", info);
 		SDL_DetachThread(thread);
 	};
 private:
+	template<typename CallbackReceiver>
 	struct ListeningInfo {
-		KeyBinder* KB;
+		KeyBindings binding;
+		KeyBinder& keyBinder;
 		Key stopKey;
-		bool unbindKeyAfterStop;
+		CallbackReceiver& callbackReceiver;
 	};
 
+	template<typename CallbackReceiver, void (CallbackReceiver::* func)(Key)>
 	static int listenForKey(void* ptr) {
 		SDL_Event evnt;
-		Key key = Key::UNKNOWN;
+		Key newKey = Key::UNKNOWN;
 		MainProgram::std->checkForInput(false);
-		ListeningInfo* info = reinterpret_cast<ListeningInfo*>(ptr);
+		ListeningInfo<CallbackReceiver>* info = reinterpret_cast<ListeningInfo<CallbackReceiver>*>(ptr);
 		int rval = 0;
 
-		while (key == Key::UNKNOWN) {//Until a key is pressed
+		while (newKey == Key::UNKNOWN) {//Until a key is pressed
 			while (SDL_WaitEventTimeout(&evnt, 10)) {//Wait for events
 				switch (evnt.type) {//Extract the pressed key (if it is one)
 				case SDL_KEYDOWN:
-					key = SDLKToREKey(evnt.key.keysym.sym);
+					newKey = SDLKToREKey(evnt.key.keysym.sym);
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-					key = SDLKToREKey(evnt.button.button);
+					newKey = SDLKToREKey(evnt.button.button);
 					break;
 				case SDL_MOUSEWHEEL:
 					if (evnt.wheel.y != 0) {
-						key = (evnt.wheel.y > 0) ? Key::UMW : Key::DMW;
+						newKey = (evnt.wheel.y > 0) ? Key::UMW : Key::DMW;
 					} else {
-						key = (evnt.wheel.x > 0) ? Key::RMW : Key::LMW;
+						newKey = (evnt.wheel.x > 0) ? Key::RMW : Key::LMW;
 					}
 					break;
 				}
@@ -180,21 +186,20 @@ private:
 		}
 
 		//If the pressed key is the one that stops the listening
-		if (key == info->stopKey) {
-			if (info->unbindKeyAfterStop) {//If it should be unbound
-				info->KB->changeBinding(info->KB->m_listenBinding, Key::KEY_UNBOUND);
-			}
+		if (newKey == info->stopKey) {
 			rval = 1;
 		} else {//Successfully changed the binding
-			info->KB->changeBinding(info->KB->m_listenBinding, key);
+			info->keyBinder.changeBinding(info->binding, newKey);
 		}
+
+		//Callback
+		(info->callbackReceiver.*func)(newKey);
 
 		MainProgram::std->checkForInput(true);
 		delete info;
 		return rval;
 	}
 
-	KeyBindings m_listenBinding;
 	std::string m_bindingFileName = "bindings.json";
 
 	KeyBindingValueList<KeyBindings> m_bindings;
