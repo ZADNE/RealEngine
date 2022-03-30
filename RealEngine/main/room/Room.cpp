@@ -1,4 +1,4 @@
-﻿#include <RealEngine/main/Room.hpp>
+﻿#include <RealEngine/main/room/Room.hpp>
 
 namespace RE {
 
@@ -10,8 +10,8 @@ Room::~Room() {
 
 }
 
-const Room::DisplaySettings& Room::getDisplaySettings() {
-	static DisplaySettings settings{};
+const RoomDisplaySettings& Room::getDisplaySettings() {
+	static RoomDisplaySettings settings{};
 	return settings;
 }
 

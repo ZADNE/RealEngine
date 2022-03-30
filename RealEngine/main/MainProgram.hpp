@@ -8,10 +8,12 @@
 #include <glm/vec2.hpp>
 
 #include <RealEngine/main/RealEngine.hpp>
-#include <RealEngine/main/RoomManager.hpp>
+#include <RealEngine/main/room/RoomManager.hpp>
+#include <RealEngine/main/room/RoomDisplaySettings.hpp>
+#include <RealEngine/main/room/RoomTransitionParameters.hpp>
 #include <RealEngine/main/Window.hpp>
-#include <RealEngine/user_input/InputManager.hpp>
 #include <RealEngine/main/Synchronizer.hpp>
+#include <RealEngine/user_input/InputManager.hpp>
 
 union SDL_Event;
 
@@ -173,7 +175,7 @@ private:
 	void pollEvents();
 	void processEvent(SDL_Event* evnt);
 
-	void adoptRoomSettings(const Room::DisplaySettings& s);
+	void adoptRoomSettings(const RoomDisplaySettings& s);
 
 	bool m_programShouldRun = false;
 	int m_programExitCode = EXIT_SUCCESS;

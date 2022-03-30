@@ -222,6 +222,11 @@ void Texture::setBorderColour(RE::Colour col) {
 	glTextureParameterfv(m_ID, GL_TEXTURE_BORDER_COLOR, &borderRGBA.r);
 }
 
+void Texture::setBorderColour(const glm::vec4& col) {
+	m_borderColour = RE::Colour{col * 255.0f};
+	glTextureParameterfv(m_ID, GL_TEXTURE_BORDER_COLOR, &col.r);
+}
+
 void Texture::bindImage(ImageUnit unit, GLint level, ImageAccess access) const {
 	glBindImageTexture(unit.m_unit, m_ID, level, GL_FALSE, 0, static_cast<GLenum>(access), textureInternalFormat(getChannels(), getFormat(), getBitdepthPerChannel()));
 }

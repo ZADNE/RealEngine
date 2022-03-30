@@ -11,6 +11,7 @@ namespace RE {
 View::View(const glm::vec2& viewDimensions) {
 	m_viewDimensions = viewDimensions;
 	m_orthoMatrix = glm::ortho(0.0f, m_viewDimensions.x, 0.0f, m_viewDimensions.y);
+	update();
 }
 
 View::~View() {

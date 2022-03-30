@@ -9,6 +9,7 @@
 #include <RealEngine/external/ImGui/imgui_impl_sdl.h>
 #include <RealEngine/external/ImGui/imgui_impl_opengl3.h>
 
+#include <RealEngine/main/room/Room.hpp>
 #include <RealEngine/resources/ResourceManager.hpp>
 #include <RealEngine/graphics/SpriteBatch.hpp>
 #include <RealEngine/graphics/GeometryBatch.hpp>
@@ -177,7 +178,7 @@ void MainProgram::processEvent(SDL_Event* evnt) {
 	}
 }
 
-void MainProgram::adoptRoomSettings(const Room::DisplaySettings& s) {
+void MainProgram::adoptRoomSettings(const RoomDisplaySettings& s) {
 	glClearColor(s.clearColor.r, s.clearColor.g, s.clearColor.b, s.clearColor.a);
 	p_synchronizer.setStepsPerSecond(s.stepsPerSecond);
 	p_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);

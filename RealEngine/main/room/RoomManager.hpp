@@ -1,11 +1,14 @@
 ﻿#pragma once
 #include <vector>
-#include <functional>
+
+#include <glm/vec2.hpp>
 
 #include <RealEngine/main/CommandLineArguments.hpp>
-#include <RealEngine/main/Room.hpp>
+#include <RealEngine/main/room/RoomTransitionParameters.hpp>
 
 namespace RE {
+
+class Room;
 
 /**
  * @brief Manages rooms and transitions among them.
@@ -53,20 +56,13 @@ public:
 	 * @param room Room to manage
 	 * @return Index of the room, can be used to enter the room via gotoRoom()
 	*/
-	size_t addRoom(Room* room) {
-		p_rooms.emplace_back(room);
-		return p_rooms.size() - 1;
-	}
+	size_t addRoom(Room* room);
 
 	/**
 	 * @brief Notifies all rooms that the window has been resized
 	 * @param newSize The new size of the window
 	*/
-	void notifyWindowResized(const glm::ivec2& newSize) {
-		for (auto& room: p_rooms) {
-			room->windowResized(newSize);
-		}
-	}
+	void notifyWindowResized(const glm::ivec2& newSize);
 
 protected:
 	std::vector<Room*> p_rooms;								/**< Non-owning vector of all managed rooms */

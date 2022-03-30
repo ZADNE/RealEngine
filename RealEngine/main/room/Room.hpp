@@ -6,19 +6,11 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
-#include <RealEngine/main/CommandLineArguments.hpp>
+#include <RealEngine/main/MainProgram.hpp>
 
 namespace RE {
 
 class MainProgram;
-class InputManager;
-class Synchronizer;
-class Window;
-
-/**
- * @brief Used for passing parameters to the next room when transitioning between them.
-*/
-using RoomTransitionParameters = std::vector<std::any>;
 
 /**
  * @brief Separates program into logical units, only one unit is active at a time.
@@ -33,16 +25,6 @@ using RoomTransitionParameters = std::vector<std::any>;
 class Room {
 	friend class MainProgram;
 public:
-
-	/**
-	 * @brief Specifies some parameters related to how the room is drawn
-	*/
-	struct DisplaySettings {
-		glm::vec4 clearColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);	/**< The color that is used to clear the window framebuffer */
-		unsigned int stepsPerSecond = 50;							/**< The number of steps per second that this romm runs at */
-		unsigned int framesPerSecondLimit = 100;					/**< The limit of frames per second that this room will be rendered in */
-		bool usingImGui = false;									/**< Tells whether this room uses ImGui. ImGui cannot be used if it is false */
-	};
 
 	/**
 	 * @brief Constructs a room.
@@ -99,7 +81,7 @@ public:
 	 * 
 	 * The settings are adopted every time the room is entered
 	*/
-	virtual const DisplaySettings& getDisplaySettings();
+	virtual const RoomDisplaySettings& getDisplaySettings();
 
 	/**
 	 * @brief Callback used to notify that the window's size has changed

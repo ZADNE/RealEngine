@@ -160,6 +160,7 @@ public:
 	void setPivot(const glm::vec2& pivot) { m_pivot = pivot; }
 	void setSubimagesSpritesCount(const glm::vec2& subimagesSpritesCount) { m_subimagesSpritesCount = subimagesSpritesCount; }
 	void setBorderColour(RE::Colour col);
+	void setBorderColour(const glm::vec4& col);
 
 	/**
 	 * @brief Gets internal identifier of the texture.
