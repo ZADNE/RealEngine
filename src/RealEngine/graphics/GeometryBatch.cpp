@@ -1,10 +1,8 @@
 ﻿#include <RealEngine/graphics/GeometryBatch.hpp>
 
-#include <cmath>
+#include <glm/gtc/constants.hpp>
 
 #include <RealEngine/resources/ResourceManager.hpp>
-
-#include <RealEngine/utility/utility.hpp>
 
 namespace RE {
 
@@ -117,7 +115,7 @@ void GeometryBatch::addCircles(size_t first, size_t count, const RE::CirclePOCO*
 		rad = (rad + 4u) / 2u;
 		float steps = std::pow(2.0f, (float)rad);
 		for (float j = 0.0f; j < steps; ++j) {//For each edge
-			float d = j * rmath::PI_f * 2.0f / steps;
+			float d = j * glm::pi<float>() * 2.0f / steps;
 			edge.position.x = mid.position.x + cos(d) * data[first + i].rad;
 			edge.position.y = mid.position.y + sin(d) * data[first + i].rad;
 			m_vertices[index].push_back(edge);

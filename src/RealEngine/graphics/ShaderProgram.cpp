@@ -7,7 +7,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include <RealEngine/utility/utility.hpp>
+#include <RealEngine/utility/GLTypeToString.hpp>
 #include <RealEngine/main/Error.hpp>
 
 namespace RE {
@@ -113,7 +113,7 @@ void ShaderProgram::printInfo() const {
 		GLchar name[32];
 		glGetActiveAttrib(m_ID, i, 32, &length, &size, &type, &name[0]);
 		GLint loc = glGetAttribLocation(m_ID, &name[0]);
-		std::cout << "|  layout (location = " << std::to_string(loc) << ") in " << GLSLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
+		std::cout << "|  layout (location = " << std::to_string(loc) << ") in " << GLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
 	}
 
 	//UNIFORM INFO
@@ -127,7 +127,7 @@ void ShaderProgram::printInfo() const {
 		GLchar name[32];
 		glGetActiveUniform(m_ID, i, 32, &length, &size, &type, &name[0]);
 		GLint loc = glGetUniformLocation(m_ID, &name[0]);
-		std::cout << "|  layout (location = " << std::to_string(loc) << ") uniform " << GLSLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
+		std::cout << "|  layout (location = " << std::to_string(loc) << ") uniform " << GLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
 	}
 }
 

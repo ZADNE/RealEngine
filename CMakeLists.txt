@@ -1,12 +1,18 @@
 ﻿cmake_minimum_required(VERSION 3.14)
 project(RealEngine)
 
-add_library(${PROJECT_NAME} STATIC)
+add_library(RealEngine STATIC)
+
+add_executable(RTICreator)
+target_include_directories(CSVToDAT PRIVATE src )
 
 add_subdirectory(src)
 add_subdirectory(external)
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
+set_target_properties(RealEngine RTICreator PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build"
+	CXX_STANDARD 20
+)
 
 # OpenGL
 find_package(OpenGL REQUIRED)
@@ -48,8 +54,13 @@ target_link_libraries(${PROJECT_NAME}
 		nlohmann_json::nlohmann_json
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(RealEngine
 	PUBLIC
 		src
 		external
+)
+
+target_link_libraries(RTICreator
+	PUBLIC
+		RealEngine
 )

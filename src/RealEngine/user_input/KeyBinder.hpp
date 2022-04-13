@@ -8,7 +8,7 @@
 #include <SDL2/SDL_thread.h>
 #include <nlohmann/json.hpp>
 
-#include <RealEngine/external/magic_enum/magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <RealEngine/user_input/Key.hpp>
 #include <RealEngine/main/Error.hpp>
 #include <RealEngine/main/MainProgram.hpp>
