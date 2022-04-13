@@ -10,7 +10,6 @@ add_subdirectory(src)
 add_subdirectory(external)
 
 set_target_properties(RealEngine RTICreator PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build"
 	CXX_STANDARD 20
 )
 
