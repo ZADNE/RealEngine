@@ -1,5 +1,4 @@
-﻿add_subdirectory(external)
-add_subdirectory(graphics)
+﻿add_subdirectory(graphics)
 add_subdirectory(main)
 add_subdirectory(resources)
 add_subdirectory(user_input)

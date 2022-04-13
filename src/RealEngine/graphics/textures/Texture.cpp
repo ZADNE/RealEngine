@@ -6,10 +6,10 @@
 
 #include <GL/glew.h>
 #include <glm/vec4.hpp>
+#include <lodepng/lodepng.hpp>
 
 #include <RealEngine/graphics/textures/TextureFlagsToString.hpp>
 #include <RealEngine/main/Error.hpp>
-#include <RealEngine/external/lodepng/lodepng.hpp>
 
 namespace RE {
 

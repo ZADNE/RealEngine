@@ -1,7 +1,8 @@
 ﻿#include <RealEngine/graphics/textures/Raster.hpp>
 
+#include <lodepng/lodepng.hpp>
+
 #include <RealEngine/main/Error.hpp>
-#include <RealEngine/external/lodepng/lodepng.hpp>
 
 namespace RE {
 

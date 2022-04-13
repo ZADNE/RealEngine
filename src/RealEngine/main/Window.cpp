@@ -5,9 +5,9 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <RealEngine/external/ImGui/imgui.h>
-#include <RealEngine/external/ImGui/imgui_impl_sdl.h>
-#include <RealEngine/external/ImGui/imgui_impl_opengl3.h>
+#include <ImGui/imgui.h>
+#include <ImGui/imgui_impl_sdl.h>
+#include <ImGui/imgui_impl_opengl3.h>
 
 #include <RealEngine/main/Error.hpp>
 #include <RealEngine/graphics/Viewport.hpp>

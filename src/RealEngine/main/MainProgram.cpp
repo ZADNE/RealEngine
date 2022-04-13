@@ -6,8 +6,8 @@
 
 #include <SDL2/SDL_events.h>
 
-#include <RealEngine/external/ImGui/imgui_impl_sdl.h>
-#include <RealEngine/external/ImGui/imgui_impl_opengl3.h>
+#include <ImGui/imgui_impl_sdl.h>
+#include <ImGui/imgui_impl_opengl3.h>
 
 #include <RealEngine/main/room/Room.hpp>
 #include <RealEngine/resources/ResourceManager.hpp>
