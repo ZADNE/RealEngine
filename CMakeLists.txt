@@ -45,6 +45,7 @@ FetchContent_MakeAvailable(glm json)
 
 target_link_libraries(${PROJECT_NAME}
 	PUBLIC
+		${CMAKE_DL_LIBS}
 		OpenGL::GL
 		GLEW::GLEW
 		SDL2::Main

@@ -2,7 +2,7 @@
 
 namespace RE {
 
-std::string_view RE::GLTypeToString(GLenum type) {
+std::string_view GLTypeToString(GLenum type) {
 	switch (type) {
 		//SCALARS
 	case GL_FLOAT:
