@@ -4,7 +4,7 @@ project(RealEngine)
 add_library(RealEngine STATIC)
 
 add_executable(RTICreator)
-target_include_directories(CSVToDAT PRIVATE src )
+target_include_directories(RTICreator PRIVATE src )
 
 add_subdirectory(src)
 add_subdirectory(external)
