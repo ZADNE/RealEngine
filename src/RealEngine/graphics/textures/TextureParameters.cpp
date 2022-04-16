@@ -20,7 +20,7 @@ namespace RE {
 		glm::ivec2_32 pivot;
 		glm::uvec2_32 subimagesSpritesCount;
 		glm::uvec2_32 subimageDims;
-		RE::Colour borderColour;
+		RE::Color borderColor;
 
 		void toHost() {
 			ntohBulk(version, flags,
@@ -55,7 +55,7 @@ namespace RE {
 		p_pivot = glm::dvec2{ rti.pivot } / 2.0;
 		p_subimagesSpritesCount = glm::dvec2{ rti.subimagesSpritesCount } + 1.0;
 		p_definedByRaster = false;
-		m_borderColour = rti.borderColour;
+		m_borderColor = rti.borderColor;
 	}
 
 	std::vector<unsigned char> TextureParameters::convertToRTI() const {
@@ -66,7 +66,7 @@ namespace RE {
 		rti.subimageDims = glm::ivec2_32{ p_subimageDims } - 1;
 		rti.pivot = glm::ivec2_32{ p_pivot } *2;
 		rti.subimagesSpritesCount = glm::ivec2_32{ p_subimagesSpritesCount } - 1;
-		rti.borderColour = m_borderColour;
+		rti.borderColor = m_borderColor;
 
 		//Convert RTI to network endianness
 		rti.toNetwork();

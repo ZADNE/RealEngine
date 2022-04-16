@@ -27,18 +27,18 @@ namespace RE {
 		TextureParameters(const unsigned char* rtiBytes, size_t size);
 
 		/**
-		 * @brief Constructs parameters from given geometry, flags and border colour
+		 * @brief Constructs parameters from given geometry, flags and border color
 		 * @param geometry Geometry of the parameters
 		 * @param flags Flags of the parameters
-		 * @param borderColour Border colour of the parameters
+		 * @param borderColor Border color of the parameters
 		*/
-		TextureParameters(const TextureGeometry& geometry, TextureFlags flags, RE::Colour borderColour) :
-			TextureGeometry(geometry), TextureFlags(flags), m_borderColour(borderColour) {}
+		TextureParameters(const TextureGeometry& geometry, TextureFlags flags, RE::Color borderColor) :
+			TextureGeometry(geometry), TextureFlags(flags), m_borderColor(borderColor) {}
 
 		/**
 		 * @brief Constructs parameters from given geometry and flags.
 		 *
-		 * Border colour is set to (0, 0, 0, 255).
+		 * Border color is set to (0, 0, 0, 255).
 		 *
 		 * @param geometry Geometry of the parameters
 		 * @param flags Flags of the parameters
@@ -50,7 +50,7 @@ namespace RE {
 		 * @brief Constructs parameters with flags only.
 		 *
 		 * Geometry is set to be defined by raster.
-		 * Colour is set to (0, 0, 0, 255).
+		 * Color is set to (0, 0, 0, 255).
 		 *
 		 * @param flags Flags of the parameters
 		*/
@@ -58,14 +58,14 @@ namespace RE {
 			TextureParameters(TextureGeometry{}, flags) {}
 
 		/**
-		 * @brief Gets the border colour.
+		 * @brief Gets the border color.
 		 *
-		 * Border colour is the colour that will be sampled outside texture's texels
+		 * Border color is the color that will be sampled outside texture's texels
 		 * if clamping to border is used. It has no effect if clamping to border
 		 * is not used.
-		 * @return Border colour of the texture
+		 * @return Border color of the texture
 		*/
-		RE::Colour getBorderColour() const { return m_borderColour; }
+		RE::Color getBorderColor() const { return m_borderColor; }
 
 		/**
 		 * @brief Converts parameters to raw bytes, encoded as Real Texture Infromation (RTI)
@@ -73,7 +73,7 @@ namespace RE {
 		*/
 		std::vector<unsigned char> convertToRTI() const;
 	private:
-		RE::Colour m_borderColour;/**< Border colour of the texture*/
+		RE::Color m_borderColor;/**< Border color of the texture*/
 	};
 
 }

@@ -32,7 +32,7 @@ static constexpr std::array WRAP_STYLES = {
 };
 
 static constexpr std::array WRAP_STYLES_LABELS = {
-	"Clamp to edge", "Clamp to border colour",
+	"Clamp to edge", "Clamp to border color",
 	"Repeat normally", "Repeat mirrored"
 };
 

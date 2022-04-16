@@ -40,16 +40,16 @@ void MainMenuRoom::step() {
 	auto cursorPos = (glm::vec2)input()->getCursorAbs();
 
 	if (input()->isDown(RE::Key::MMB) && m_texture) {
-		m_texView.shiftPosition((glm::vec2{m_cursorPosPrev - cursorPos} / m_drawScale));
+		m_texView.shiftPosition((glm::vec2{ m_cursorPosPrev - cursorPos } / m_drawScale));
 	}
 
 	if (m_texture) {
 		if (input()->wasPressed(RE::Key::UMW)) {
-			m_texView.zoom({1.5f, 1.5f});
+			m_texView.zoom({ 1.5f, 1.5f });
 			m_drawScale *= 1.5f;
 		}
 		if (input()->wasPressed(RE::Key::DMW)) {
-			m_texView.zoom({0.66666666f, 0.66666666f});
+			m_texView.zoom({ 0.66666666f, 0.66666666f });
 			m_drawScale *= 0.66666666f;
 		}
 	}
@@ -89,8 +89,8 @@ void MainMenuRoom::render(double interpolationFactor) {
 					ImGui::SliderFloat2("Overlap (to see wrapping)", &m_overlap.x, 0.0f, 1.0f);
 					if (ImGui::Button("Reset view"))
 						resetView();
-					if (ImGui::ColorPicker3("Background colour", &m_backgroundColour.x))
-						glClearColor(m_backgroundColour.r, m_backgroundColour.g, m_backgroundColour.b, 1.0f);
+					if (ImGui::ColorPicker3("Background color", &m_backgroundColor.x))
+						glClearColor(m_backgroundColor.r, m_backgroundColor.g, m_backgroundColor.b, 1.0f);
 					ImGui::EndTabItem();
 				}
 			}
@@ -138,8 +138,8 @@ void MainMenuRoom::parametersGUI() {
 
 	if ((WRAP_STYLES[m_wrapStyleY] == RE::TextureWrapStyle::CLAMP_TO_BORDER ||
 		WRAP_STYLES[m_wrapStyleX] == RE::TextureWrapStyle::CLAMP_TO_BORDER)
-		&& ImGui::ColorPicker4("Border colour", &m_borderColour.x)) {
-		m_texture->setBorderColour(m_borderColour);
+		&& ImGui::ColorPicker4("Border color", &m_borderColor.x)) {
+		m_texture->setBorderColor(m_borderColor);
 	}
 }
 
@@ -171,7 +171,7 @@ void MainMenuRoom::save(const std::string& loc) {
 void MainMenuRoom::load(const std::string& loc) {
 	if (loc.empty()) { return; }
 	try {
-		m_texture = RE::Texture{loc};
+		m_texture = RE::Texture{ loc };
 	}
 	catch (...) {
 		return;
@@ -188,7 +188,7 @@ void MainMenuRoom::load(const std::string& loc) {
 	m_subimagesSprites = m_texture->getSubimagesSpritesCount();
 	m_subimageDims = m_texture->getSubimageDims();
 	m_pivot = m_texture->getPivot();
-	m_borderColour = glm::vec4(m_texture->getBorderColour()) / 255.0f;
+	m_borderColor = glm::vec4(m_texture->getBorderColor()) / 255.0f;
 }
 
 void MainMenuRoom::drawTexture() {
@@ -215,45 +215,45 @@ void MainMenuRoom::drawTexture() {
 	std::vector<RE::VertexPOCO> vertices;
 	glm::vec2 subimageSprite = m_texture->getSubimagesSpritesCount();
 	vertices.reserve((size_t)(subimageSprite.x * subimageSprite.y) * 4u);
-	RE::Colour colour{0, 255u, 0u, 255u};
+	RE::Color color{ 0, 255u, 0u, 255u };
 	auto subimageDims = m_texture->getSubimageDims();
 	//Subimages
 	for (float x = 1.0f; x < subimageSprite.x; ++x) {
 		glm::vec2 coord = botLeft + glm::vec2(x, 0.0f) * subimageDims;
-		vertices.emplace_back(coord, colour);
-		vertices.emplace_back(coord + glm::vec2(0.0f, texDims.y), colour);
+		vertices.emplace_back(coord, color);
+		vertices.emplace_back(coord + glm::vec2(0.0f, texDims.y), color);
 	}
 	for (float y = 1.0f; y < subimageSprite.y; ++y) {
 		glm::vec2 coord = botLeft + glm::vec2(0.0f, y) * subimageDims;
-		vertices.emplace_back(coord, colour);
-		vertices.emplace_back(coord + glm::vec2(texDims.x, 0.0f), colour);
+		vertices.emplace_back(coord, color);
+		vertices.emplace_back(coord + glm::vec2(texDims.x, 0.0f), color);
 	}
 	if (vertices.size() > 0u) {
 		gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
 		vertices.clear();
 	}
 	//Pivots
-	colour = {0u, 0u, 255u, 255u};
+	color = { 0u, 0u, 255u, 255u };
 	glm::vec2 pivotOffset = m_texture->getPivot();
 	float pivotMarkRadius = glm::min(subimageDims.x, subimageDims.y) * 0.5f;
 	for (float x = 0.0f; x < m_texture->getSubimagesSpritesCount().x; ++x) {
 		for (float y = 0.0f; y < m_texture->getSubimagesSpritesCount().y; ++y) {
 			glm::vec2 pivotPos = botLeft + glm::vec2(x, y) * subimageDims + pivotOffset;
-			vertices.emplace_back(pivotPos + glm::vec2(pivotMarkRadius, pivotMarkRadius), colour);
-			vertices.emplace_back(pivotPos + glm::vec2(-pivotMarkRadius, -pivotMarkRadius), colour);
-			vertices.emplace_back(pivotPos + glm::vec2(pivotMarkRadius, -pivotMarkRadius), colour);
-			vertices.emplace_back(pivotPos + glm::vec2(-pivotMarkRadius, pivotMarkRadius), colour);
+			vertices.emplace_back(pivotPos + glm::vec2(pivotMarkRadius, pivotMarkRadius), color);
+			vertices.emplace_back(pivotPos + glm::vec2(-pivotMarkRadius, -pivotMarkRadius), color);
+			vertices.emplace_back(pivotPos + glm::vec2(pivotMarkRadius, -pivotMarkRadius), color);
+			vertices.emplace_back(pivotPos + glm::vec2(-pivotMarkRadius, pivotMarkRadius), color);
 		}
 	}
 
 	gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
 	vertices.clear();
 	//Whole image
-	colour = {255u, 0u, 0u, 255u};
-	vertices.emplace_back(botLeft, colour);
-	vertices.emplace_back(botLeft + glm::vec2(texDims.x, 0.0f), colour);
-	vertices.emplace_back(botLeft + glm::vec2(texDims.x, texDims.y), colour);
-	vertices.emplace_back(botLeft + glm::vec2(0.0f, texDims.y), colour);
+	color = { 255u, 0u, 0u, 255u };
+	vertices.emplace_back(botLeft, color);
+	vertices.emplace_back(botLeft + glm::vec2(texDims.x, 0.0f), color);
+	vertices.emplace_back(botLeft + glm::vec2(texDims.x, texDims.y), color);
+	vertices.emplace_back(botLeft + glm::vec2(0.0f, texDims.y), color);
 	gb.addPrimitives(RE::PRIM::LINE_LOOP, 0u, vertices.size(), vertices.data());
 
 	gb.end();
@@ -263,7 +263,7 @@ void MainMenuRoom::drawTexture() {
 }
 
 void MainMenuRoom::resetView() {
-	m_texView.setScale({1.0f, 1.0f});
-	m_texView.setPosition(glm::vec2{0.0f, 0.0f});
+	m_texView.setScale({ 1.0f, 1.0f });
+	m_texView.setPosition(glm::vec2{ 0.0f, 0.0f });
 	m_drawScale = 1.0f;
 }

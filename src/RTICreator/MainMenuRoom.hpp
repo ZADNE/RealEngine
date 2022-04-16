@@ -45,9 +45,9 @@ private:
 
 	//View
 	RE::View m_texView;
-	RE::UniformBuffer m_texViewUBO{RE::UNIF_BUF_VIEWPORT_MATRIX, false, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE};
+	RE::UniformBuffer m_texViewUBO{ RE::UNIF_BUF_VIEWPORT_MATRIX, false, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE };
 	glm::vec2 m_overlap = glm::vec2(0.2f, 0.2f);
-	glm::vec3 m_backgroundColour = glm::vec3(0.1f, 0.1f, 0.1f);
+	glm::vec3 m_backgroundColor = glm::vec3(0.1f, 0.1f, 0.1f);
 
 	//Texture parameters
 	size_t m_minFilter = 0u;
@@ -55,9 +55,9 @@ private:
 	size_t m_wrapStyleX = 0u;
 	size_t m_wrapStyleY = 0u;
 	glm::ivec2 m_subimagesSprites{};
-	glm::vec2 m_subimageDims{1.0f};
+	glm::vec2 m_subimageDims{ 1.0f };
 	glm::vec2 m_pivot{};
-	glm::vec4 m_borderColour{0.0f, 0.0f, 0.0f, 1.0f};
+	glm::vec4 m_borderColor{ 0.0f, 0.0f, 0.0f, 1.0f };
 
 
 	glm::vec2 m_offset = glm::vec2(0.0f, 0.0f);
