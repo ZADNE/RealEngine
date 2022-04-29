@@ -4,7 +4,6 @@ namespace RE {
 
 TextureCache ResourceManager::m_textureCache{};
 ShaderProgramCache ResourceManager::m_shaderProgramCache{};
-FontCache ResourceManager::m_fontCache{};
 
 
 TexturePtr ResourceManager::getTexture(const std::string& filePath) {
@@ -13,14 +12,6 @@ TexturePtr ResourceManager::getTexture(const std::string& filePath) {
 
 ShaderProgramPtr ResourceManager::getShaderProgram(const ShaderProgramSources& sources) {
 	return m_shaderProgramCache.getShaderProgram(sources);
-}
-
-const Font* ResourceManager::getFont(const FontSeed& fontSeed) {
-	return m_fontCache.getFont(fontSeed);
-}
-
-void ResourceManager::removeFont(const FontSeed& fontSeed) {
-	m_fontCache.removeFont(fontSeed);
 }
 
 }

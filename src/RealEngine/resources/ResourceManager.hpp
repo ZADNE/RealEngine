@@ -1,16 +1,14 @@
 ﻿#pragma once
 #include <RealEngine/resources/TextureCache.hpp>
 #include <RealEngine/resources/ShaderProgramCache.hpp>
-#include <RealEngine/resources/FontCache.hpp>
 
 
 namespace RE {
 
 /**
- * @brief Resource Manager (also as accessible through shortcut RM) is
- * pure static class that manages shared resources.
+ * @brief Resource Manager (also RM) ensures there is only one copy of shared resources.
  *
- * Resources managed by resource meneger: textures, shader programs, fonts.
+ * Resources managed by resource manager: textures, shader programs.
  * Resources are released once there are no references to them.
 */
 class ResourceManager {
@@ -26,13 +24,9 @@ public:
 	*/
 	static ShaderProgramPtr getShaderProgram(const ShaderProgramSources& sources);
 
-	//Font
-	static const Font* getFont(const FontSeed& fontSeed);
-	static void removeFont(const FontSeed& fontSeed);
 private:
 	static TextureCache m_textureCache;
 	static ShaderProgramCache m_shaderProgramCache;
-	static FontCache m_fontCache;
 };
 
 using RM = class ResourceManager;
