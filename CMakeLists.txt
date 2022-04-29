@@ -19,10 +19,9 @@ find_package(OpenGL REQUIRED)
 # GLEW
 find_package(GLEW 2.0 REQUIRED)
 
-# SDL2 + SDL2_ttf
+# SDL2
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 find_package(SDL2 REQUIRED)
-find_package(SDL2_ttf REQUIRED)
 
 # GLM
 include(FetchContent)
@@ -49,7 +48,6 @@ target_link_libraries(${PROJECT_NAME}
 		OpenGL::GL
 		GLEW::GLEW
 		SDL2::Main
-		SDL2::TTF
 		glm
 		nlohmann_json::nlohmann_json
 )

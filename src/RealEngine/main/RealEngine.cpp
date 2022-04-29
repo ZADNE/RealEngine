@@ -1,7 +1,6 @@
 ﻿#include <RealEngine/main/RealEngine.hpp>
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include <GL/glew.h>
 
 #include <RealEngine/main/Error.hpp>
@@ -19,16 +18,6 @@ void printSDLVersion() {
 	std::printf("SDL linked:   %u.%u.%u\n", linked.major, linked.minor, linked.patch);
 }
 
-void printTTFVersion() {
-#ifdef _DEBUG
-	SDL_version compiled;
-	TTF_VERSION(&compiled);
-	std::printf("TTF compiled: %u.%u.%u\n", compiled.major, compiled.minor, compiled.patch);
-#endif // _DEBUG
-	auto linked = TTF_Linked_Version();
-	std::printf("TTF linked:   %u.%u.%u\n", linked->major, linked->minor, linked->patch);
-}
-
 RealEngine::RealEngine() {
 	log(getVersion());
 	int err;
@@ -39,13 +28,6 @@ RealEngine::RealEngine() {
 		goto fail;
 	}
 	printSDLVersion();
-
-	//SDL2 TTF
-	if (err = TTF_Init()) {
-		error(TTF_GetError());
-		goto quitSDL_fail;
-	}
-	printTTFVersion();
 
 	if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)) {
 		error("Cannot use doublebuffer!");
@@ -63,16 +45,13 @@ RealEngine::RealEngine() {
 
 	return;//Successfully initialized
 
-//quitTTF_quitSDL_fail:
-	TTF_Quit();
-quitSDL_fail:
+//quitSDL_fail:
 	SDL_Quit();
 fail:
 	throw err;
 }
 
 RealEngine::~RealEngine() {
-	TTF_Quit();
 	SDL_Quit();
 }
 

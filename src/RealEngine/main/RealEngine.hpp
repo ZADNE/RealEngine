@@ -3,8 +3,8 @@
 #include <string>
 
 static const int RE_VERSION_MAJOR = 1;
-static const int RE_VERSION_MINOR = 7;
-static const int RE_VERSION_PATCH = 1;
+static const int RE_VERSION_MINOR = 8;
+static const int RE_VERSION_PATCH = 0;
 
 
 namespace RE {
@@ -17,7 +17,7 @@ public:
 	/**
 	 * @brief Initializes all RealEngine's subsystems
 	 *
-	 * The internal subsystem initialized are SDL2, SDL2_TTF,
+	 * The internal subsystem initialized are SDL2,
 	 * and some OpenGL context flags.
 	 *
 	 * @throws int when a system failed to initialize
