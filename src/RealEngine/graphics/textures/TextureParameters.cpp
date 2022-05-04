@@ -64,7 +64,7 @@ namespace RE {
 		rti.version = 400;
 		rti.flags = p_flags;
 		rti.subimageDims = glm::ivec2_32{ p_subimageDims } - 1;
-		rti.pivot = glm::ivec2_32{ p_pivot } *2;
+		rti.pivot = glm::ivec2_32{ p_pivot * 2.0f};
 		rti.subimagesSpritesCount = glm::ivec2_32{ p_subimagesSpritesCount } - 1;
 		rti.borderColor = m_borderColor;
 

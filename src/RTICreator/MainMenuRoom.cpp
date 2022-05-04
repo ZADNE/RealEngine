@@ -2,6 +2,10 @@
 
 #include <iostream>
 
+#if not defined(WIN32) && not defined(_WIN32) && not defined(__WIN32__)
+#error "Since this tool requires file selection dialog window and I did not want another library dependency, it is a Windows-only tool. Sorry!"
+#endif
+
 #define NOMINMAX 1
 #include <Windows.h>
 
