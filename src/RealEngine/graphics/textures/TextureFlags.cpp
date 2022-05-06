@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #include <RealEngine/graphics/textures/TextureFlags.hpp>
 

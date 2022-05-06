@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <glm/vec2.hpp>
@@ -8,7 +8,7 @@
 namespace RE {
 
 /**
- * @brief Texture geometry defines logical size and layout of texture.
+ * @brief Defines logical size and layout of a texture.
  *
  * Texture geometry is typically independent of actual size of texture defined by its raster.
  *

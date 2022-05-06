@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <glm/vec2.hpp>

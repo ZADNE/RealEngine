@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <vector>
@@ -17,8 +17,9 @@ namespace RE {
 class SurfaceTargetTextures;
 
 /**
-* Class representing a canvas that can be drawn into.
-* Single canvas can have several layers (= textures).
+* @brief Represents a canvas that can be drawn into.
+* 
+* A single surface can have several layers (= textures).
 */
 class Surface {
 public:

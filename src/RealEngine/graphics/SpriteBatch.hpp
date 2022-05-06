@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <vector>
@@ -47,6 +47,9 @@ namespace RE {
 		TextureProxy texture;
 	};
 
+	/**
+	 * @brief Draws sprites, surfaces and other textures.
+	*/
 	class SpriteBatch {
 	public:
 		using enum BufferType;
@@ -144,7 +147,7 @@ namespace RE {
 
 		const glm::vec4 m_UVRectangle = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		const glm::vec4 m_SUVRectangle = glm::vec4(0.0f, 1.0f, 1.0f, -1.0f);//Used for drawing surfaces
-		const Color WHITE{ 255, 255, 255, 255 };
+		static inline const Color WHITE{ 255, 255, 255, 255 };
 	};
 
 }

@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <chrono>
@@ -9,10 +9,9 @@ namespace RE {
 class MainProgram;
 
 /**
- * @brief Synchronizer ensures that steps happen at a constant rate per second.
+ * @brief Ensures that steps happen at a constant rate per second.
+ * 
  * Optionally, limits the number of frames per second.
- *
- * To be used in conjunction with MainProgram.
 */
 class Synchronizer {
 	friend class MainProgram;

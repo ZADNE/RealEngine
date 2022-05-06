@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 
@@ -10,7 +10,7 @@
 namespace RE {
 
 /**
- * @brief Window flags specify ancillary parameters of a window
+ * @brief Specify ancillary parameters of a window
 */
 struct WindowFlags {
 	WindowFlags() : invisible(false), fullscreen(false), borderless(false), vSync(false) {}
@@ -19,7 +19,7 @@ struct WindowFlags {
 };
 
 /**
- * @brief Windows settings specify dimensions and flags of a window.
+ * @brief Specify dimensions and flags of a window.
  * These settings are typically saved so that the settings can be restored
  * on the next startup of the program.
 */
@@ -27,6 +27,7 @@ class WindowSettings {
 public:
 	/**
 	 * @brief Constructs settings from file that was saved before.
+	 * 
 	 * If the file cannot be loaded, settings are constructed with most basic options.
 	*/
 	WindowSettings();

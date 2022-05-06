@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <glm/vec2.hpp>
@@ -7,6 +7,9 @@
 
 namespace RE {
 
+/**
+ * @brief Represents an orthographic projection.
+*/
 class View {
 public:
 	View(const glm::vec2& viewDimensions);

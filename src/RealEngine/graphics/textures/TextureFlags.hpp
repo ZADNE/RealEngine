@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 /**
@@ -166,7 +166,7 @@ namespace RE {
 	}
 
 	/**
-	 * @brief Flags control how the texture gets drawn.
+	 * @brief Controls how a texture is drawn.
 	 *
 	 * What flags control: number of channels, internal format,
 	 * minifying filter, magnifying filter, wrapping style.

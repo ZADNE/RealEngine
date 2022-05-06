@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <string>
@@ -20,11 +20,10 @@
 namespace RE {
 
 	/**
-	 * @brief Is a small class that holds only
-	 * non-owning handle to a texture.
+	 * @brief Holds a non-owning handle to a texture.
 	 *
 	 * Once the texture that it represents is destroyed, the proxy
-	 * becomed invalid and should not be used
+	 * becomes invalid and should not be used!
 	*/
 
 	class Texture;
@@ -66,7 +65,10 @@ namespace RE {
 	};
 
 	/**
-	 * @brief Represents one (or more) images with associated parameters.
+	 * @brief Represents one (or more) images.
+	 * 
+	 * Textures are always stored in GPU memory.
+	 * 
 	 * @see Raster
 	 * @see TextureParameters
 	*/

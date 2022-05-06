@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <vector>
@@ -11,7 +11,7 @@
 namespace RE {
 
 	/**
-	 * @brief Is a rectangular grid of texels 8-bit per channel, 1-4 channels
+	 * @brief Is a rectangular grid of texels 8-bit per channel, 1 to 4 channels
 	*/
 	class Raster {
 	public:

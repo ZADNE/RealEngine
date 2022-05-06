@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <string>
@@ -8,6 +8,9 @@
 
 namespace RE {
 
+/**
+ * @brief Every input (mouse/keyboard) key that can used.
+*/
 enum class Key {
 	NO_KEY,
 	ANY_KEY,

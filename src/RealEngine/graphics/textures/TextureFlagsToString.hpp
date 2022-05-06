@@ -1,10 +1,7 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
+ *	@file
  */
-/**
- * @file
- * @author Tomáš Dubský
-*/
 #pragma once
 #include <RealEngine/graphics/textures/TextureFlags.hpp>
 

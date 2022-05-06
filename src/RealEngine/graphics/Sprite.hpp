@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <glm/vec2.hpp>
@@ -11,7 +11,9 @@ namespace RE {
 
 	class Texture;
 
-	//SPRITE (static)
+	/**
+	 * @brief Represents a static subimage within a texture.
+	*/
 	class Sprite {
 	public:
 		Sprite(TexturePtr texture, float sprite, float subimage = 0.0f);
@@ -29,7 +31,9 @@ namespace RE {
 		TexturePtr p_texture;
 	};
 
-	//SPEED SPRITE (images animate, user can specify image speed)
+	/**
+	 * @brief Represents an animated subimage within a texture.
+	*/
 	class SpeedSprite : public Sprite {
 	public:
 		SpeedSprite(TexturePtr texture, float sprite, float subimage = 0.0f, float imageSpeed = 1.0f);
@@ -43,7 +47,9 @@ namespace RE {
 		float p_imageSpeed;//Speed is added each beginStep to the current image position
 	};
 
-	//FULL SPRITE (user can specify default color and draw scale)
+	/**
+	 * @brief Represents an animated subimage within a texture that can be tinted or scaled.
+	*/
 	class FullSprite : public SpeedSprite {
 	public:
 		FullSprite(TexturePtr texture, float sprite, float subimage, float imageSpeed, RE::Color color, const glm::vec2& scale);

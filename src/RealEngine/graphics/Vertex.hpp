@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <limits>
@@ -24,6 +24,9 @@ namespace RE {
 #pragma warning(push)
 #pragma warning(disable: 26495)
 
+	/**
+	 * @brief Vertex with position
+	*/
 	struct VertexPO {
 		VertexPO() {}
 		VertexPO(const glm::vec2& pos) : position(pos) {}
@@ -31,6 +34,9 @@ namespace RE {
 		glm::vec2 position;
 	};
 
+	/**
+	 * @brief Vertex with position and color
+	*/
 	struct VertexPOCO {
 		VertexPOCO() {}
 		VertexPOCO(const glm::vec2& pos, Color col) : position(pos), color(col) {}
@@ -39,7 +45,9 @@ namespace RE {
 		Color color;
 	};
 
-
+	/**
+	 * @brief Vertex with position, color and UVs
+	*/
 	struct VertexPOCOUV {
 		VertexPOCOUV() {}
 		VertexPOCOUV(const glm::vec2& pos, Color col, const glm::vec2& uv) : position(pos), color(col), uv(uv) {}

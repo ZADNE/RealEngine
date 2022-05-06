@@ -1,10 +1,7 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
+ *	@file
  */
-/**
- * @file
- * @author Tomáš Dubský
-*/
 #pragma once
 #include <SDL2/SDL_main.h>
 
@@ -135,7 +132,8 @@ public:
 
 	/**
 	 * @brief Pointer to main program
-	 * @deprecated Use program() within rooms instead.
+	 * 
+	 * Use program() within rooms instead.
 	*/
 	static MainProgram* std;
 

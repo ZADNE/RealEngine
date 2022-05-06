@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 #include <array>
@@ -32,6 +32,9 @@ const size_t PRIMITIVES_COUNT = 7u;
 
 const size_t SHAPES_COUNT = 2u;
 
+/**
+ * @brief Draws lines and circles.
+*/
 class GeometryBatch {
 public:
 	GeometryBatch();

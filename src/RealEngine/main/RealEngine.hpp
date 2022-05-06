@@ -1,5 +1,5 @@
 ﻿/*! 
- *  \author    Dubsky Tomas
+ *  @author    Dubsky Tomas
  */
 #pragma once
 
@@ -9,11 +9,23 @@ static const int RE_VERSION_MAJOR = 1;
 static const int RE_VERSION_MINOR = 8;
 static const int RE_VERSION_PATCH = 0;
 
+/*! \mainpage RealEngine
+ *
+ * \section overview Overview
+ * 
+ * To get a minimal working RealEngine application, two of its classes have to be inherited.
+ *	*	At least one room which inherits from RE::Room has to be created.
+ *  *	A custom program class which inherits from RE::MainProgram also has to be created.
+ *		MainProgram initializes all subsystems and maintains the simulation. The room should be entered in its constructor.
+ * 
+ * The whole application then should be started by RE::runProgram() function.
+ */
+
 
 namespace RE {
 
 /**
- * @brief Class that logically represents RealEngine's subsystems
+ * @brief Represents RealEngine's subsystems
 */
 class RealEngine {
 public:
