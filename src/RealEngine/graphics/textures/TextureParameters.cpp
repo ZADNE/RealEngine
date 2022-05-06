@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/textures/TextureParameters.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/textures/TextureParameters.hpp>
 
 #include <fstream>
 #include <cstring>

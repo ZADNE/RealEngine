@@ -1,4 +1,7 @@
-﻿#include "MainMenuRoom.hpp"
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include "MainMenuRoom.hpp"
 
 #include <iostream>
 

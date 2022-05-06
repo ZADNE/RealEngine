@@ -1,4 +1,7 @@
-﻿/**
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+/**
  * @file
  * @author Tomáš Dubský
 */

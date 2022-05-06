@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#pragma once
 #include <unordered_map>
 
 #include <glm/vec2.hpp>

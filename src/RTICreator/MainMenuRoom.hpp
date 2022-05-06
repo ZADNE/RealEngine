@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#pragma once
 #include <optional>
 
 #include <RealEngine/main/room/Room.hpp>

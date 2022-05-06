@@ -1,4 +1,7 @@
-﻿#include <RealEngine/utility/GLTypeToString.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/utility/GLTypeToString.hpp>
 
 namespace RE {
 

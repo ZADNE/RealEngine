@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/textures/TextureGeometry.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/textures/TextureGeometry.hpp>
 
 namespace RE {
 

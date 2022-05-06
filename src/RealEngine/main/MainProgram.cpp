@@ -1,4 +1,7 @@
-﻿#include <RealEngine/main/MainProgram.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/main/MainProgram.hpp>
 
 #include <filesystem>
 #include <fstream>

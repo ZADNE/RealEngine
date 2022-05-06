@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/Sprite.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/Sprite.hpp>
 
 #include <RealEngine/graphics/textures/Texture.hpp>
 

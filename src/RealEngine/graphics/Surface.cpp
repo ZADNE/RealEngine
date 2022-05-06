@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/Surface.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/Surface.hpp>
 
 #include <iostream>
 

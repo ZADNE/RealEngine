@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/textures/Texture.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/textures/Texture.hpp>
 
 #include <cmath>
 #include <iostream>

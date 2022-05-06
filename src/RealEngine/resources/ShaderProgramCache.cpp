@@ -1,4 +1,7 @@
-﻿#include <RealEngine/resources/ShaderProgramCache.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/resources/ShaderProgramCache.hpp>
 
 namespace RE {
 

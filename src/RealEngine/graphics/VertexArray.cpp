@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/VertexArray.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/VertexArray.hpp>
 
 namespace RE {
 

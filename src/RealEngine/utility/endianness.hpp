@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#pragma once
 #include <cstdint>
 #include <algorithm>
 #include <array>

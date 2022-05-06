@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#pragma once
 #include <stdlib.h>
 
 #include <string_view>

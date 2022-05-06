@@ -1,4 +1,7 @@
-﻿#include <RealEngine/main/RealEngine.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/main/RealEngine.hpp>
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>

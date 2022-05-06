@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#pragma once
 #include <RealEngine/resources/TextureCache.hpp>
 #include <RealEngine/resources/ShaderProgramCache.hpp>
 

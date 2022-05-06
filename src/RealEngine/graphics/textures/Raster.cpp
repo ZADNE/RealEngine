@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/textures/Raster.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/textures/Raster.hpp>
 
 #include <lodepng/lodepng.hpp>
 

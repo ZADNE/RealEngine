@@ -1,4 +1,7 @@
-﻿#include <RealEngine/resources/ResourceManager.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/resources/ResourceManager.hpp>
 
 namespace RE {
 

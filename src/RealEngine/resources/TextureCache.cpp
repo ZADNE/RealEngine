@@ -1,4 +1,7 @@
-﻿#include <RealEngine/resources/TextureCache.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/resources/TextureCache.hpp>
 
 namespace RE {
 

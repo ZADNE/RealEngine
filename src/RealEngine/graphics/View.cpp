@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/View.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/View.hpp>
 
 #include <algorithm>
 

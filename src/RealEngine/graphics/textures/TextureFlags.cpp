@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/textures/TextureFlags.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/textures/TextureFlags.hpp>
 
 namespace RE {
 

@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#pragma once
 #include <RealEngine/main/MainProgram.hpp>
 
 #include <RTICreator/MainMenuRoom.hpp>

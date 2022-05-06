@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#pragma once
 #include <glm/vec2.hpp>
 
 #include <RealEngine/graphics/Vertex.hpp>

@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/SpriteBatch.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/SpriteBatch.hpp>
 
 #include <algorithm>
 

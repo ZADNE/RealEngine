@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/GeometryBatch.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/GeometryBatch.hpp>
 
 #include <glm/gtc/constants.hpp>
 

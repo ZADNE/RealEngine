@@ -1,4 +1,7 @@
-﻿#include <RealEngine/main/room/RoomManager.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/main/room/RoomManager.hpp>
 
 #include <RealEngine/main/room/Room.hpp>
 

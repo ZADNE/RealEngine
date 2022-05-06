@@ -1,4 +1,7 @@
-﻿#include <RealEngine/graphics/ShaderProgram.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/graphics/ShaderProgram.hpp>
 
 #include <fstream>
 #include <vector>

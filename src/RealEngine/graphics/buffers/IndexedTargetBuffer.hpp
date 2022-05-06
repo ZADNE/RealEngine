@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#pragma once
 
 #include <RealEngine/graphics/buffers/Buffer.hpp>
 

@@ -1,4 +1,7 @@
-﻿#include <RealEngine/main/room/Room.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/main/room/Room.hpp>
 
 namespace RE {
 

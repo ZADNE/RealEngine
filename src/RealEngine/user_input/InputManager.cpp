@@ -1,4 +1,7 @@
-﻿#include <RealEngine/user_input/InputManager.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/user_input/InputManager.hpp>
 
 #include <iostream>
 #include <algorithm>

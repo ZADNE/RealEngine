@@ -1,4 +1,7 @@
-﻿#include "Viewport.hpp"
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include "Viewport.hpp"
 
 #include <GL/glew.h>
 

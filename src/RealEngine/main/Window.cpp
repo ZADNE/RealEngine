@@ -1,4 +1,7 @@
-﻿#include <RealEngine/main/Window.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/main/Window.hpp>
 
 #include <GL/glew.h>
 

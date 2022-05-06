@@ -1,4 +1,7 @@
-﻿#include <RealEngine/user_input/Key.hpp>
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include <RealEngine/user_input/Key.hpp>
 
 #include <SDL2/SDL_mouse.h>
 

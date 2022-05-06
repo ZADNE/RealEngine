@@ -1,4 +1,7 @@
-﻿#include "Program.hpp"
+﻿/*! 
+ *  \author    Dubsky Tomas
+ */
+#include "Program.hpp"
 
 
 Program::Program(RE::CommandLineArguments args) :
