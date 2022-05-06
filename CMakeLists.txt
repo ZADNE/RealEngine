@@ -1,15 +1,13 @@
 ﻿cmake_minimum_required(VERSION 3.14)
 project(RealEngine)
 
+# RealEngine library
 add_library(RealEngine STATIC)
 
-add_executable(RTICreator)
-target_include_directories(RTICreator PRIVATE src )
-
-add_subdirectory(src)
+add_subdirectory(RealEngine)
 add_subdirectory(external)
 
-set_target_properties(RealEngine RTICreator PROPERTIES
+set_target_properties(RealEngine PROPERTIES
 	CXX_STANDARD 20
 )
 
@@ -42,7 +40,7 @@ FetchContent_Declare(json
 
 FetchContent_MakeAvailable(glm json)
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(RealEngine
 	PUBLIC
 		${CMAKE_DL_LIBS}
 		OpenGL::GL
@@ -54,11 +52,23 @@ target_link_libraries(${PROJECT_NAME}
 
 target_include_directories(RealEngine
 	PUBLIC
-		src
+		.
 		external
 )
 
-target_link_libraries(RTICreator
-	PUBLIC
-		RealEngine
-)
+# RTICreator  (Windows only)
+if(WIN32)
+	add_executable(RTICreator)
+	target_include_directories(RTICreator PRIVATE .)
+
+	set_target_properties(RTICreator PROPERTIES
+		CXX_STANDARD 20
+	)
+
+	target_link_libraries(RTICreator
+		PUBLIC
+			RealEngine
+	)
+	
+	add_subdirectory(RTICreator)
+endif()
