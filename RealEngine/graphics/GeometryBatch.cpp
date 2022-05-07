@@ -3,6 +3,8 @@
  */
 #include <RealEngine/graphics/GeometryBatch.hpp>
 
+#include <cmath>
+
 #include <glm/gtc/constants.hpp>
 
 #include <RealEngine/resources/ResourceManager.hpp>
