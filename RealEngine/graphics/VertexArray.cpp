@@ -46,6 +46,10 @@ void VertexArray::unsetAttribute(GLuint attribute) {
 	glDisableVertexArrayAttrib(m_ID, attribute);
 }
 
+void VertexArray::setBindingPoint(GLuint bindingPoint, const Buffer& buffer, GLintptr offset, GLsizei stride) {
+	glVertexArrayVertexBuffer(m_ID, bindingPoint, buffer.p_ID, offset, stride);
+}
+
 void VertexArray::unsetBindingPoint(GLuint bindingPoint) {
 	glVertexArrayVertexBuffer(m_ID, bindingPoint, 0, 0, 0);
 }

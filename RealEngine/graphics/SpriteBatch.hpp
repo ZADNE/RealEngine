@@ -132,7 +132,7 @@ namespace RE {
 		void createDrawBatches();
 
 		VertexArray m_vao;
-		Buffer<BufferType::ARRAY, BufferStorage::MUTABLE> m_vbo{ 0, STREAM, DRAW };
+		Buffer m_vbo{ 0, STREAM, DRAW };
 
 		std::vector<Glyph*> m_glyphPointers;
 		std::vector<Glyph> m_glyphs;

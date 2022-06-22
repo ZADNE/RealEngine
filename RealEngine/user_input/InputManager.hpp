@@ -28,10 +28,18 @@ public:
 	//Returns usually 0 (was not released) or 1 (was released)
 	int wasReleased(RE::Key keyID) const;
 
+	/**
+	 * @brief Gets absolute position of the cursor.
+	*/
+	glm::ivec2 getCursorAbs() const;
+
+	/**
+	 * @brief Gets position of the cursor relative to previous step.
+	*/
+	glm::ivec2 getCursorRel() const;
+
 	//Setters
-	void setCursorAbs(const glm::uvec2& abs);
-	//Getters
-	glm::uvec2 getCursorAbs() const;
+	void setCursor(const glm::ivec2& abs, const glm::ivec2& rel);
 private:
 	void press(RE::Key keyID, int times = 1);
 	void release(RE::Key keyID);
@@ -39,7 +47,8 @@ private:
 	int wasDown(RE::Key keyID) const;
 	mutable std::unordered_map<RE::Key, int> m_stateMap;
 	mutable std::unordered_map<RE::Key, int> m_stateMapPrevious;
-	glm::uvec2 m_cursorAbs = glm::uvec2(0u, 0u);
+	glm::ivec2 m_cursorAbs = glm::ivec2(0u, 0u);
+	glm::ivec2 m_cursorRel = glm::ivec2(0u, 0u);
 
 	int m_keysHeld = 0u;
 	int m_keysHeldPrevious = 0u;

@@ -6,7 +6,7 @@
 
 #include <glm/mat4x4.hpp>
 
-#include <RealEngine/graphics/buffers/UniformBuffer.hpp>
+#include <RealEngine/graphics/buffers/TypedBuffer.hpp>
 
 namespace RE {
 
@@ -26,7 +26,7 @@ public:
 	 *
 	 * @return Uniform buffer with view matrix of this window
 	*/
-	static UniformBuffer& getWindowMatrixUniformBuffer() { return *m_windowMatrixUniformBuffer; }
+	static TypedBuffer& getWindowMatrixUniformBuffer() { return *m_windowMatrixUniformBuffer; }
 
 	/**
 	 * @brief Overwrites view matrix uniform buffer to match viewport
@@ -45,7 +45,7 @@ public:
 	*/
 	static void setToWholeWindow();
 private:
-	static std::optional<UniformBuffer> m_windowMatrixUniformBuffer;/**< Uniform buffer that contains view matrix of the window */
+	static std::optional<TypedBuffer> m_windowMatrixUniformBuffer;/**< Uniform buffer that contains view matrix of the window */
 	static glm::ivec2 m_windowSize;
 	static glm::mat4 m_windowMatrix;
 };

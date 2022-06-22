@@ -1,4 +1,5 @@
 ﻿add_subdirectory(buffers)
+add_subdirectory(cameras)
 add_subdirectory(textures)
 
 target_sources(${PROJECT_NAME} PUBLIC
@@ -11,6 +12,5 @@ target_sources(${PROJECT_NAME} PUBLIC
 	Surface.hpp				Surface.cpp
 	Vertex.hpp				
 	VertexArray.hpp			VertexArray.cpp
-	View.hpp				View.cpp
 	Viewport.hpp			Viewport.cpp
 )

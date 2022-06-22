@@ -1,8 +1,5 @@
 ﻿target_sources(${PROJECT_NAME} PUBLIC
-	Buffer.hpp				
+	Buffer.hpp				Buffer.cpp
 	BufferType.hpp			
-	IndexedTargetBuffer.hpp		
-	InterfaceBlockBuffer.hpp
-	ShaderStorageBuffer.hpp	
-	UniformBuffer.hpp		
+	TypedBuffer.hpp			TypedBuffer.cpp
 )

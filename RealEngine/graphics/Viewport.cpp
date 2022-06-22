@@ -7,7 +7,7 @@
 
 namespace RE {
 
-std::optional<UniformBuffer> Viewport::m_windowMatrixUniformBuffer;
+std::optional<TypedBuffer> Viewport::m_windowMatrixUniformBuffer;
 glm::ivec2 Viewport::m_windowSize{};
 glm::mat4 Viewport::m_windowMatrix{};
 

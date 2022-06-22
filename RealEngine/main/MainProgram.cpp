@@ -116,6 +116,10 @@ void MainProgram::resizeWindow(const glm::ivec2& newDims, bool save) {
 	p_roomManager.notifyWindowResized(newDims);
 }
 
+void MainProgram::setRelativeCursorMode(bool relative) {
+	SDL_SetRelativeMouseMode(relative ? SDL_TRUE : SDL_FALSE);
+}
+
 void MainProgram::step() {
 	p_roomManager.getCurrentRoom()->step();
 }
@@ -165,8 +169,11 @@ void MainProgram::processEvent(SDL_Event* evnt) {
 		}
 		break;
 	case SDL_MOUSEMOTION:
-		//Invert the Y coordinate to get standard math coordinates
-		p_inputManager.setCursorAbs(glm::uvec2(evnt->motion.x, p_window.getDims().y - evnt->motion.y - 1));
+		//Y coordinates are inverted to get standard math coordinates
+		p_inputManager.setCursor(
+			{evnt->motion.x, p_window.getDims().y - evnt->motion.y - 1},
+			{evnt->motion.xrel, -evnt->motion.yrel}
+		);
 		break;
 	case SDL_MOUSEWHEEL:
 		key = (evnt->wheel.y > 0) ? (Key::UMW) : (Key::DMW);
@@ -235,11 +242,11 @@ MainProgram::MainProgram() {
 	Room::m_window = &p_window;
 
 	auto spriteShader = RE::RM::getShaderProgram({.vert = sprite_vert, .frag = sprite_frag});
-	Viewport::getWindowMatrixUniformBuffer().connectToShaderProgram(*spriteShader, 0u);
+	Viewport::getWindowMatrixUniformBuffer().connectToInterfaceBlock(*spriteShader, 0u);
 	SpriteBatch::std().switchShaderProgram(spriteShader);
 
 	auto geometryShader = RE::RM::getShaderProgram({.vert = geometry_vetr, .frag = geometry_frag});
-	Viewport::getWindowMatrixUniformBuffer().connectToShaderProgram(*geometryShader, 0u);
+	Viewport::getWindowMatrixUniformBuffer().connectToInterfaceBlock(*geometryShader, 0u);
 	GeometryBatch::std().switchShaderProgram(geometryShader);
 }
 

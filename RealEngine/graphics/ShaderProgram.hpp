@@ -11,6 +11,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 
 #include <RealEngine/main/Error.hpp>
 #include <RealEngine/graphics/buffers/BufferType.hpp>
@@ -138,7 +139,7 @@ struct ShaderProgramSources {
 * @brief Controls how vertices are rendered to screen.
 */
 class ShaderProgram {
-	template<BufferType>friend class InterfaceBlockBuffer;
+	friend class Buffer;
 public:
 	/**
 	 * @brief Constructs shader program from given source codes
@@ -238,6 +239,9 @@ public:
 	void setUniform(int location, int count, const glm::uvec2* val) const;				/**< Sets uvec4 array uniform at given location */
 	void setUniform(int location, int count, const glm::uvec3* val) const;				/**< Sets uvec4 array uniform at given location */
 	void setUniform(int location, int count, const glm::uvec4* val) const;				/**< Sets uvec4 array uniform at given location */
+
+
+	void setUniform(int location, int count, const glm::mat4* val) const;				/**< Sets mat4x4 uniform at given location */
 
 	void setUniform(int location, TextureUnit unit) const;								/**< Sets sampler uniform at given location */
 	void setUniform(int location, ImageUnit unit) const;								/**< Sets image uniform at given location */

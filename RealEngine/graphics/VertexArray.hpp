@@ -87,8 +87,7 @@ public:
 
 	void unsetAttribute(GLuint attribute);
 
-	template<BufferType type, BufferStorage storage>
-	void setBindingPoint(GLuint bindingPoint, const Buffer<type, storage>& buffer, GLintptr offset, GLsizei stride);
+	void setBindingPoint(GLuint bindingPoint, const Buffer& buffer, GLintptr offset, GLsizei stride);
 
 	void unsetBindingPoint(GLuint bindingPoint);
 
@@ -113,10 +112,5 @@ private:
 	static inline GLuint m_currentlyBoundID = 0;
 #endif // _DEBUG
 };
-
-template<BufferType type, BufferStorage storage>
-inline void VertexArray::setBindingPoint(GLuint bindingPoint, const Buffer<type, storage>& buffer, GLintptr offset, GLsizei stride) {
-	glVertexArrayVertexBuffer(m_ID, bindingPoint, buffer.p_ID, offset, stride);
-}
 
 }

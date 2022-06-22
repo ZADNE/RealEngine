@@ -17,6 +17,7 @@ namespace RE {
 	}
 
 	void InputManager::update() {
+		m_cursorRel = glm::ivec2(0, 0);
 		release(Key::UMW);
 		release(Key::DMW);
 		release(Key::LMW);
@@ -127,12 +128,17 @@ namespace RE {
 		return 0;
 	}
 
-	void InputManager::setCursorAbs(const glm::uvec2& abs) {
-		m_cursorAbs = abs;
+	glm::ivec2 InputManager::getCursorAbs() const {
+		return m_cursorAbs;
 	}
 
-	glm::uvec2 InputManager::getCursorAbs() const {
-		return m_cursorAbs;
+	glm::ivec2 InputManager::getCursorRel() const {
+		return m_cursorRel;
+	}
+
+	void InputManager::setCursor(const glm::ivec2& abs, const glm::ivec2& rel) {
+		m_cursorAbs = abs;
+		m_cursorRel = rel;
 	}
 
 	void InputManager::press(RE::Key keyID, int times/* = 1*/) {

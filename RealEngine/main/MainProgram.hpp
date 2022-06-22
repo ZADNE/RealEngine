@@ -150,6 +150,8 @@ public:
 	 * @param save Changed settings are saved to file if true.
 	*/
 	void resizeWindow(const glm::ivec2& newDims, bool save);
+
+	void setRelativeCursorMode(bool relative);
 protected:
 	/**
 	 * @brief Constructs main program.

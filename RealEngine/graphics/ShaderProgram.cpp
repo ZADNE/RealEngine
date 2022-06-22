@@ -170,8 +170,9 @@ void ShaderProgram::setUniform(int location, int count, const glm::uvec2* val) c
 void ShaderProgram::setUniform(int location, int count, const glm::uvec3* val) const { glProgramUniform3uiv(m_ID, location, count, glm::value_ptr(*val)); }
 void ShaderProgram::setUniform(int location, int count, const glm::uvec4* val) const { glProgramUniform4uiv(m_ID, location, count, glm::value_ptr(*val)); }
 
-void ShaderProgram::setUniform(int location, TextureUnit unit) const { glProgramUniform1i(m_ID, location, unit.m_unit); }
+void ShaderProgram::setUniform(int location, int count, const glm::mat4* val) const { glProgramUniformMatrix4fv(m_ID, location, count, false, glm::value_ptr(*val)); }
 
+void ShaderProgram::setUniform(int location, TextureUnit unit) const { glProgramUniform1i(m_ID, location, unit.m_unit); }
 void ShaderProgram::setUniform(int location, ImageUnit unit) const { glProgramUniform1i(m_ID, location, unit.m_unit); }
 
 void ShaderProgram::compileProgram(const ShaderProgramSources& source) {

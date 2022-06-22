@@ -8,7 +8,7 @@
 #include <glm/vec2.hpp>
 
 #include <RealEngine/main/WindowSettings.hpp>
-#include <RealEngine/graphics/buffers/UniformBuffer.hpp>
+#include <RealEngine/graphics/buffers/Buffer.hpp>
 
 namespace RE {
 

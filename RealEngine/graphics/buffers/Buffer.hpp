@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <RealEngine/graphics/buffers/BufferType.hpp>
+#include <RealEngine/graphics/ShaderProgram.hpp>
 
 namespace RE {
 
@@ -70,10 +71,10 @@ inline GLenum bufferAccesToGLEnum(BufferAccessFrequency accessFreq, BufferAccess
 /**
  * @brief Is a continuous block of memory stored in the GPU's memory.
  *
- * @tparam storage	A buffer can be either mutable or immutable. Mutable buffer can be resized,
- *					while immutable buffer cannot change its size upon construction.
+ * A buffer can be either mutable or immutable. Mutable buffer can be resized,
+ * while immutable buffer cannot change its size upon construction.
+ * The mutability is chosen with the constructor that is used to construct the buffer.
 */
-template<BufferType type, BufferStorage storage = BufferStorage::IMMUTABLE>
 class Buffer {
 	friend class VertexArray;
 public:
@@ -85,14 +86,7 @@ public:
 	 * @param data	If a valid pointer is provided, it is used to initialize the contents of the buffer.
 	 *				If the nullptr is provided, the contents of the buffer are undefined.
 	*/
-	Buffer(GLsizeiptr sizeInBytes, BufferUsageFlags flags, const void* data = nullptr) :
-		p_sizeInBytes(sizeInBytes) {
-		static_assert(storage == IMMUTABLE);
-
-		glCreateBuffers(1, &p_ID);
-
-		glNamedBufferStorage(p_ID, p_sizeInBytes, data, static_cast<GLbitfield>(flags));
-	}
+	Buffer(GLsizeiptr sizeInBytes, BufferUsageFlags flags, const void* data = nullptr);
 
 	/**
 	 * @brief Contructs an immutable buffer as a storage for given type
@@ -102,9 +96,7 @@ public:
 	*/
 	template<typename T>
 	Buffer(BufferUsageFlags flags, const T& data) :
-		Buffer(sizeof(T), flags, &data) {
-
-	}
+		Buffer(sizeof(T), flags, &data) {}
 
 	/**
 	 * @brief Contructs an immutable buffer as an array
@@ -114,9 +106,7 @@ public:
 	*/
 	template<typename T>
 	Buffer(BufferUsageFlags flags, const std::vector<T>& data) :
-		Buffer(data.size() * sizeof(T), flags, data.data()) {
-
-	}
+		Buffer(data.size() * sizeof(T), flags, data.data()) {}
 
 	/**
 	 * @brief Constructs a mutable buffer of given initial size, access hints and initial data
@@ -126,81 +116,65 @@ public:
 	 * @param data	If a valid pointer is provided, it is used to initialize the contents of the buffer.
 	 *				If the nullptr is provided, the contents of the buffer are undefined.
 	*/
-	Buffer(GLsizeiptr sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data = nullptr) :
-		p_sizeInBytes(sizeInBytes),
-		p_access(bufferAccesToGLEnum(accessFreq, accessNature)) {
-		static_assert(storage == MUTABLE);
-
-		glCreateBuffers(1, &p_ID);
-
-		glNamedBufferData(p_ID, p_sizeInBytes, data, p_access);
-	}
+	Buffer(GLsizeiptr sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data = nullptr);
 
 	/**
 	 * @brief Contructs a mutable buffer of given access hints
+	 * 
+	 * Initial size of the buffer is zero bytes.
 	 * @param accessFreq Hints how often the buffer will be access by the GPU
 	 * @param accessNature Hints how the buffer will be used
 	*/
 	Buffer(BufferAccessFrequency accessFreq, BufferAccessNature accessNature) :
-		p_sizeInBytes(0),
-		p_access(bufferAccesToGLEnum(accessFreq, accessNature)) {
-		static_assert(storage == MUTABLE);
-
-		glCreateBuffers(1, &p_ID);
-	}
+		Buffer(0u, accessFreq, accessNature, nullptr) {}
 
 	/**
-	 * @brief Frees the backing memory block on the GPU and destructs the buffer
+	 * @brief Frees the backing memory block on the GPU and destructs the buffer.
 	*/
-	~Buffer() {
-		glDeleteBuffers(1, &p_ID);
-	}
+	~Buffer();
 
 	Buffer(const Buffer&) = delete;
 
-	Buffer(Buffer&& other) noexcept :
-		p_ID(other.p_ID) {
-		other.p_ID = 0;
-	}
+	Buffer(Buffer&& other) noexcept;
 
 	Buffer& operator=(const Buffer&) = delete;
 
-	Buffer& operator=(Buffer&& other) noexcept {
-		std::swap(p_ID, other.p_ID);
-		return *this;
-	}
+	Buffer& operator=(Buffer&& other) noexcept;
 
 	/**
-	 * @brief Binds the buffer to its generic binding point.
+	 * @brief Binds the buffer to a generic binding point.
 	 *
 	 * Each type of buffer has its own generic binding point.
+	 * @param bindType The type of binding point to bind this buffer to.
 	*/
-	template<BufferType bindType = type>
-	void bind() {
-	#ifdef _DEBUG
-		if (p_currentlyBound.ID != 0) {
-			throw "Overbound buffers";
-		}
-		p_currentlyBound.ID = p_ID;
-	#endif // _DEBUG
-		glBindBuffer(static_cast<GLenum>(bindType), p_ID);
-	}
+	void bind(BufferType bindType);
 
 	/**
-	 * @brief Unbinds the buffer from its binding point.
+	 * @brief Unbinds the buffer from a generic binding point.
 	 *
 	 * A bound buffer has to be unbound before another buffer can be bound.
+	 * @param bindType The type of binding point to unbind this buffer from.
 	*/
-	template<BufferType bindType = type>
-	void unbind() {
-	#ifdef _DEBUG
-		if (p_currentlyBound.ID != p_ID) {
-			throw "Overbound buffers";
-		}
-		p_currentlyBound.ID = 0;
-		glBindBuffer(static_cast<GLenum>(bindType), 0);
-	#endif // _DEBUG
-	}
+	void unbind(BufferType bindType);
+
+	/**
+	 * @brief Binds the buffer to an indexed binding point (as well as generic binding point)
+	 * 
+	 * Indexed binding is only available for these types:
+	 * ATOMIC_COUNTER, TRANSFORM_FEEDBACK, UNIFORM, and SHADER_STORAGE.
+	 * @param bindType The type of binding point to bind this buffer to.
+	 * @param index The index within the type to bind this buffer to.
+	*/
+	void bindIndexed(BufferType bindType, GLuint index);
+
+	/**
+	 * @brief Connects the buffer with an interface block within given shader program
+	 * @param shaderProgram Program that contains the interface block
+	 * @param interfaceBlockIndex Index of the interface block within the program
+	 * @param bufferType The type of interface block/buffer to connect to. UNIFORM and SHADER_STORAGE are useable.
+	 * @param bindingIndex Index of the interface block within the program
+	*/
+	void connectToInterfaceBlock(const ShaderProgram& shaderProgram, GLuint interfaceBlockIndex, BufferType bufferType, GLuint bindingIndex) const;
 
 	/**
 	 * @brief Overwrites a portion of or whole buffer
@@ -208,10 +182,7 @@ public:
 	 * @param countBytes Number of bytes to overwrite
 	 * @param data The data to overwrite with
 	*/
-	void overwrite(GLintptr offsetInBytes, GLsizeiptr countBytes, const void* data) {
-		glInvalidateBufferSubData(p_ID, offsetInBytes, countBytes);
-		glNamedBufferSubData(p_ID, offsetInBytes, countBytes, data);
-	}
+	void overwrite(GLintptr offsetInBytes, GLsizeiptr countBytes, const void* data);
 
 	/**
 	 * @brief Overwrites the buffer with instance of a type
@@ -239,24 +210,17 @@ public:
 	 * @brief Ensures that the buffer is big enough to store the data and writes it
 	 *
 	 * Since this operation may cause resize of the buffer,
-	 * it can only be used for mutable buffers.
+	 * it can only be applied to mutable buffers.
 	 * @param sizeInBytes Size of the data required to write
 	 * @param data The data to write
 	*/
-	void redefine(GLsizeiptr sizeInBytes, const void* data) {
-		static_assert(storage == MUTABLE);
-		if (sizeInBytes > p_sizeInBytes) {
-			p_sizeInBytes = sizeInBytes;
-			invalidate();
-			glNamedBufferData(p_ID, sizeInBytes, data, p_access);
-		} else {
-			invalidate(sizeInBytes);
-			glNamedBufferSubData(p_ID, 0, sizeInBytes, data);
-		}
-	}
+	void redefine(GLsizeiptr sizeInBytes, const void* data);
 
 	/**
 	 * @brief Ensures that the buffer is big enough to store the data and writes it
+	 *
+	 * Since this operation may cause resize of the buffer,
+	 * it can only be applied to mutable buffers.
 	 * @tparam T Type to write
 	 * @param data Instance to write
 	*/
@@ -267,6 +231,9 @@ public:
 
 	/**
 	 * @brief Ensures that the buffer is big enough to store the data and writes it
+	 *
+	 * Since this operation may cause resize of the buffer,
+	 * it can only be applied to mutable buffers.
 	 * @tparam T Element type of the array
 	 * @param data Array (provided as a vector) to redefine the buffer as
 	*/
@@ -280,19 +247,13 @@ public:
 	 *
 	 * This effectively frees the backing block of memory of the buffer.
 	*/
-	void invalidate() {
-		static_assert(storage == MUTABLE);
-		glInvalidateBufferData(p_ID);
-	}
+	void invalidate();
 
 	/**
 	 * @brief Makes a range of the buffer undefined
 	 * @param lengthInBytes Length of the range at the beginning of the buffer to invalidate
 	*/
-	void invalidate(GLsizeiptr lengthInBytes) {
-		static_assert(storage == MUTABLE);
-		glInvalidateBufferSubData(p_ID, 0, lengthInBytes);
-	}
+	void invalidate(GLsizeiptr lengthInBytes);
 
 	/**
 	 * @brief Maps a range of the buffer to the client's memory
@@ -306,17 +267,13 @@ public:
 	/**
 	 * @brief Indicates modifications to a mapped range of the buffer
 	*/
-	void flushMapped(GLintptr offsetInBytes, GLsizeiptr lengthInBytes) {
-		glFlushMappedNamedBufferRange(p_ID, offsetInBytes, lengthInBytes);
-	}
+	void flushMapped(GLintptr offsetInBytes, GLsizeiptr lengthInBytes);
 
 	/**
 	 * @brief Releases the mapping of the buffer
 	 * @return True if success. Buffer's contents are undefined if false is returned.
 	*/
-	bool unmap() {
-		return glUnmapNamedBuffer(p_ID);
-	}
+	bool unmap();
 
 protected:
 	using enum BufferType;
@@ -330,10 +287,8 @@ protected:
 	GLenum p_access = 0;			/**< Access hints of the buffer; relevant only for mutable buffers */
 
 #ifdef _DEBUG
-	template<BufferType> struct CurrentBinding {
-		GLuint ID = 0;
-	};
-	static inline CurrentBinding<type> p_currentlyBound{};
+	static inline GLuint p_currentlyBound[14] = {};
+	BufferStorage p_storage;
 #endif // _DEBUG
 };
 

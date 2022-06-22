@@ -10,14 +10,12 @@ namespace RE {
 /**
  * @brief Represents an orthographic projection.
 */
-class View {
+class View2D {
 public:
-	View(const glm::vec2& viewDimensions);
-	~View();
+	View2D(const glm::vec2& viewDimensions);
+	~View2D();
 
 	void resizeView(const glm::vec2& newDims);
-
-	bool isInsideView(const glm::vec2& position, const glm::vec2& dimension);
 
 	void setCursorAbs(const glm::vec2& cursorAbs);
 
