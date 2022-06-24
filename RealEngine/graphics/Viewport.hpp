@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -10,7 +10,7 @@
 
 namespace RE {
 
-const unsigned int UNIF_BUF_VIEWPORT_MATRIX = 0u;/**< Binding point of the view matrix uniform buffer */
+const BufferTypedIndex UNIF_BUF_VIEWPORT_MATRIX = {RE::BufferType::UNIFORM, 0u};/**< Binding point of the view matrix uniform buffer */
 
 /**
  * @brief Controls transformation from Normalized device coordinates to Window coordinates

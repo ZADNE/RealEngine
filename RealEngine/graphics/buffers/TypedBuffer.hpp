@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -7,6 +7,21 @@
 #include <RealEngine/graphics/buffers/Buffer.hpp>
 
 namespace RE {
+
+struct BufferTypedIndex {
+
+	BufferTypedIndex(BufferType type, GLuint bindingIndex) :
+		type(type), bindingIndex(bindingIndex) {
+		using enum BufferType;
+		assert(type == ATOMIC_COUNTER ||
+			type == TRANSFORM_FEEDBACK ||
+			type == UNIFORM ||
+			type == SHADER_STORAGE);
+	}
+
+	BufferType type;
+	GLuint bindingIndex;
+};
 
 enum class BindNow {
 	NO,
@@ -26,17 +41,17 @@ public:
 
 	template<typename... Args>
 	TypedBuffer(BufferType type, Args... args) :
-		TypedBuffer(type, std::numeric_limits<GLuint>::max(), BindNow::YES, args...) {}
+		TypedBuffer(BufferTypedIndex{type, std::numeric_limits<GLuint>::max()}, BindNow::YES, args...) {}
 
 	template<typename... Args>
-	TypedBuffer(BufferType type, GLuint bindingIndex, Args... args) :
-		TypedBuffer(type, bindingIndex, BindNow::YES, args...) {}
+	TypedBuffer(BufferTypedIndex typedIndex, Args... args) :
+		TypedBuffer(typedIndex, BindNow::YES, args...) {}
 
 	template<typename... Args>
-	TypedBuffer(BufferType type, GLuint bindingIndex, BindNow bindNow, Args... args) :
+	TypedBuffer(BufferTypedIndex typedIndex, BindNow bindNow, Args... args) :
 		Buffer(args...),
-		p_type(type),
-		p_bindingIndex(bindingIndex) {
+		p_type(typedIndex.type),
+		p_bindingIndex(typedIndex.bindingIndex) {
 		if (bindNow == BindNow::YES) {
 			bindIndexed();
 		}
@@ -44,11 +59,11 @@ public:
 
 	void changeType(BufferType type);
 
-	void changeType(BufferType type, GLuint bindingIndex);
+	void changeType(BufferTypedIndex typedIndex);
 
 	BufferType getType() const { return p_type; }
 
-	GLuint getBindingIndex() const{ return p_bindingIndex; }
+	GLuint getBindingIndex() const { return p_bindingIndex; }
 
 	using Buffer::bind;
 	void bind();

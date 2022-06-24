@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/main/Window.hpp>
@@ -125,8 +125,8 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 	//Create window matrix uniform buffer
 	Viewport::m_windowMatrix = glm::ortho(0.0f, static_cast<float>(p_dims.x), 0.0f, static_cast<float>(p_dims.y));
 	Viewport::m_windowSize = p_dims;
-	Viewport::m_windowMatrixUniformBuffer.emplace(RE::BufferType::UNIFORM, RE::UNIF_BUF_VIEWPORT_MATRIX,
-		sizeof(Viewport::m_windowMatrix), RE::BufferUsageFlags::DYNAMIC_STORAGE, &Viewport::m_windowMatrix);
+	Viewport::m_windowMatrixUniformBuffer.emplace(UNIF_BUF_VIEWPORT_MATRIX,
+		sizeof(Viewport::m_windowMatrix), BufferUsageFlags::DYNAMIC_STORAGE, &Viewport::m_windowMatrix);
 
 	//Initialize ImGui
 	IMGUI_CHECKVERSION();

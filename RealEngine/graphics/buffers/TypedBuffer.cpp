@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/graphics/buffers/TypedBuffer.hpp>
@@ -10,9 +10,9 @@ void TypedBuffer::changeType(BufferType type) {
 	p_bindingIndex = std::numeric_limits<GLuint>::max();
 }
 
-void TypedBuffer::changeType(BufferType type, GLuint bindingIndex) {
-	p_type = type;
-	p_bindingIndex = bindingIndex;
+void TypedBuffer::changeType(BufferTypedIndex typedIndex) {
+	p_type = typedIndex.type;
+	p_bindingIndex = typedIndex.bindingIndex;
 }
 
 void TypedBuffer::bind() {
