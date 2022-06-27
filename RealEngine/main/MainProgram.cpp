@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/main/MainProgram.hpp>
@@ -169,9 +169,11 @@ void MainProgram::processEvent(SDL_Event* evnt) {
 		}
 		break;
 	case SDL_MOUSEMOTION:
-		//Y coordinates are inverted to get standard math coordinates
+		//Y coords are inverted to get standard math coordinates
+		//Coords also have to be clamped to window dims
+		//because SDL reports coords outside of the window when a key is held
 		p_inputManager.setCursor(
-			{evnt->motion.x, p_window.getDims().y - evnt->motion.y - 1},
+			glm::clamp({evnt->motion.x, p_window.getDims().y - evnt->motion.y - 1}, glm::ivec2(0), p_window.getDims() - 1),
 			{evnt->motion.xrel, -evnt->motion.yrel}
 		);
 		break;

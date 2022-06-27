@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -68,6 +68,20 @@ inline GLenum bufferAccesToGLEnum(BufferAccessFrequency accessFreq, BufferAccess
 	return enums[static_cast<int>(accessFreq) * 3 + static_cast<int>(accessNature)];
 }
 
+struct BufferTypedIndex {
+	BufferTypedIndex(BufferType type, GLuint bindingIndex) :
+		type(type), bindingIndex(bindingIndex) {
+		using enum BufferType;
+		assert(type == ATOMIC_COUNTER ||
+			type == TRANSFORM_FEEDBACK ||
+			type == UNIFORM ||
+			type == SHADER_STORAGE);
+	}
+
+	BufferType type;
+	GLuint bindingIndex;
+};
+
 /**
  * @brief Is a continuous block of memory stored in the GPU's memory.
  *
@@ -120,7 +134,7 @@ public:
 
 	/**
 	 * @brief Contructs a mutable buffer of given access hints
-	 * 
+	 *
 	 * Initial size of the buffer is zero bytes.
 	 * @param accessFreq Hints how often the buffer will be access by the GPU
 	 * @param accessNature Hints how the buffer will be used
@@ -159,22 +173,20 @@ public:
 
 	/**
 	 * @brief Binds the buffer to an indexed binding point (as well as generic binding point)
-	 * 
+	 *
 	 * Indexed binding is only available for these types:
 	 * ATOMIC_COUNTER, TRANSFORM_FEEDBACK, UNIFORM, and SHADER_STORAGE.
-	 * @param bindType The type of binding point to bind this buffer to.
-	 * @param index The index within the type to bind this buffer to.
+	 * @param index The typed index to bind this buffer to.
 	*/
-	void bindIndexed(BufferType bindType, GLuint index);
+	void bindIndexed(const BufferTypedIndex& index);
 
 	/**
 	 * @brief Connects the buffer with an interface block within given shader program
 	 * @param shaderProgram Program that contains the interface block
 	 * @param interfaceBlockIndex Index of the interface block within the program
-	 * @param bufferType The type of interface block/buffer to connect to. UNIFORM and SHADER_STORAGE are useable.
-	 * @param bindingIndex Index of the interface block within the program
+	 * @param index The typed index of the buffer to connect to (should be this buffer). Only UNIFORM and SHADER_STORAGE are available.
 	*/
-	void connectToInterfaceBlock(const ShaderProgram& shaderProgram, GLuint interfaceBlockIndex, BufferType bufferType, GLuint bindingIndex) const;
+	void connectToInterfaceBlock(const ShaderProgram& shaderProgram, GLuint interfaceBlockIndex, const BufferTypedIndex& index) const;
 
 	/**
 	 * @brief Overwrites a portion of or whole buffer

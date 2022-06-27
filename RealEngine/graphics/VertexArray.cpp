@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/graphics/VertexArray.hpp>
@@ -78,27 +78,27 @@ void VertexArray::unbind() const {
 #endif // _DEBUG
 }
 
-void VertexArray::renderArrays(Primitive prim, GLint first, GLsizei count) {
+void VertexArray::renderArrays(Primitive prim, GLint first, GLsizei count) const {
 	throwIfNotCurrentlyBound();
 	glDrawArrays(static_cast<GLenum>(prim), first, count);
 }
 
-void VertexArray::renderArrays(Primitive prim, GLint first, GLsizei count, GLsizei instancecount) {
+void VertexArray::renderArrays(Primitive prim, GLint first, GLsizei count, GLsizei instancecount) const {
 	throwIfNotCurrentlyBound();
 	glDrawArraysInstanced(static_cast<GLenum>(prim), first, count, instancecount);
 }
 
-void VertexArray::renderElements(Primitive prim, GLsizei count, IndexType type, const void* offset) {
+void VertexArray::renderElements(Primitive prim, GLsizei count, IndexType type, const void* offset) const {
 	throwIfNotCurrentlyBound();
 	glDrawElements(static_cast<GLenum>(prim), count, static_cast<GLenum>(type), offset);
 }
 
-void VertexArray::renderElements(Primitive prim, GLsizei count, IndexType type, const void* offset, GLsizei instancecount) {
+void VertexArray::renderElements(Primitive prim, GLsizei count, IndexType type, const void* offset, GLsizei instancecount) const {
 	throwIfNotCurrentlyBound();
 	glDrawElementsInstanced(static_cast<GLenum>(prim), count, static_cast<GLenum>(type), offset, instancecount);
 }
 
-void VertexArray::throwIfNotCurrentlyBound() {
+void VertexArray::throwIfNotCurrentlyBound() const {
 #ifdef _DEBUG
 	if (m_currentlyBoundID != m_ID) {
 		throw "Rendered with vertex array that is not bound";

@@ -1,12 +1,10 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/main/Error.hpp>
 
 #include <iostream>
 #include <string>
-
-#include <SDL2/SDL.h>
 
 #include <RealEngine/main/RealEngine.hpp>
 

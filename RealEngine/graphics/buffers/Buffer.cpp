@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/graphics/buffers/Buffer.hpp>
@@ -87,9 +87,9 @@ void Buffer::unbind(BufferType bindType) {
 #endif // _DEBUG
 }
 
-void Buffer::bindIndexed(BufferType bindType, GLuint index) {
+void Buffer::bindIndexed(const BufferTypedIndex& index) {
 #ifdef _DEBUG
-	switch (bindType) {
+	switch (index.type) {
 	case ATOMIC_COUNTER:
 	case TRANSFORM_FEEDBACK:
 	case UNIFORM:
@@ -99,15 +99,20 @@ void Buffer::bindIndexed(BufferType bindType, GLuint index) {
 		throw "Indexed binding used on type that does not use it";
 	}
 #endif // _DEBUG
-	glBindBufferBase(static_cast<GLenum>(bindType), index, p_ID);
+	glBindBufferBase(static_cast<GLenum>(index.type), index.bindingIndex, p_ID);
 }
 
-void Buffer::connectToInterfaceBlock(const ShaderProgram& shaderProgram, GLuint interfaceBlockIndex, BufferType bufferType, GLuint bindingIndex) const {
-	if (bufferType == UNIFORM) {
-		glUniformBlockBinding(shaderProgram.m_ID, interfaceBlockIndex, bindingIndex);
-	} else if (bufferType == SHADER_STORAGE) {
-		glShaderStorageBlockBinding(shaderProgram.m_ID, interfaceBlockIndex, bindingIndex);
+void Buffer::connectToInterfaceBlock(const ShaderProgram& shaderProgram, GLuint interfaceBlockIndex, const BufferTypedIndex& index) const {
+	if (index.type == UNIFORM) {
+		glUniformBlockBinding(shaderProgram.m_ID, interfaceBlockIndex, index.bindingIndex);
+	} else if (index.type == SHADER_STORAGE) {
+		glShaderStorageBlockBinding(shaderProgram.m_ID, interfaceBlockIndex, index.bindingIndex);
 	}
+#ifdef _DEBUG
+	else {
+		throw "Interface blocks must be either UNIFORM or SHADER_STORAGE";
+	}
+#endif // _DEBUG
 }
 
 void Buffer::overwrite(GLintptr offsetInBytes, GLsizeiptr countBytes, const void* data) {

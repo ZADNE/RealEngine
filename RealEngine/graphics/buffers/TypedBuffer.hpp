@@ -8,21 +8,6 @@
 
 namespace RE {
 
-struct BufferTypedIndex {
-
-	BufferTypedIndex(BufferType type, GLuint bindingIndex) :
-		type(type), bindingIndex(bindingIndex) {
-		using enum BufferType;
-		assert(type == ATOMIC_COUNTER ||
-			type == TRANSFORM_FEEDBACK ||
-			type == UNIFORM ||
-			type == SHADER_STORAGE);
-	}
-
-	BufferType type;
-	GLuint bindingIndex;
-};
-
 enum class BindNow {
 	NO,
 	YES
@@ -44,14 +29,13 @@ public:
 		TypedBuffer(BufferTypedIndex{type, std::numeric_limits<GLuint>::max()}, BindNow::YES, args...) {}
 
 	template<typename... Args>
-	TypedBuffer(BufferTypedIndex typedIndex, Args... args) :
-		TypedBuffer(typedIndex, BindNow::YES, args...) {}
+	TypedBuffer(BufferTypedIndex index, Args... args) :
+		TypedBuffer(index, BindNow::YES, args...) {}
 
 	template<typename... Args>
-	TypedBuffer(BufferTypedIndex typedIndex, BindNow bindNow, Args... args) :
+	TypedBuffer(BufferTypedIndex index, BindNow bindNow, Args... args) :
 		Buffer(args...),
-		p_type(typedIndex.type),
-		p_bindingIndex(typedIndex.bindingIndex) {
+		p_index(index) {
 		if (bindNow == BindNow::YES) {
 			bindIndexed();
 		}
@@ -59,11 +43,11 @@ public:
 
 	void changeType(BufferType type);
 
-	void changeType(BufferTypedIndex typedIndex);
+	void changeType(BufferTypedIndex index);
 
-	BufferType getType() const { return p_type; }
+	BufferType getType() const { return p_index.type; }
 
-	GLuint getBindingIndex() const { return p_bindingIndex; }
+	GLuint getBindingIndex() const { return p_index.bindingIndex; }
 
 	using Buffer::bind;
 	void bind();
@@ -78,8 +62,7 @@ public:
 	void connectToInterfaceBlock(const ShaderProgram& shaderProgram, GLuint interfaceBlockIndex);
 
 protected:
-	BufferType p_type;
-	GLuint p_bindingIndex;
+	BufferTypedIndex p_index;
 };
 
 }
