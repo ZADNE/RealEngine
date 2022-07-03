@@ -244,11 +244,11 @@ MainProgram::MainProgram() {
 	Room::m_window = &p_window;
 
 	auto spriteShader = RE::RM::getShaderProgram({.vert = sprite_vert, .frag = sprite_frag});
-	Viewport::getWindowMatrixUniformBuffer().connectToInterfaceBlock(*spriteShader, 0u);
+	spriteShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
 	SpriteBatch::std().switchShaderProgram(spriteShader);
 
 	auto geometryShader = RE::RM::getShaderProgram({.vert = geometry_vetr, .frag = geometry_frag});
-	Viewport::getWindowMatrixUniformBuffer().connectToInterfaceBlock(*geometryShader, 0u);
+	geometryShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
 	GeometryBatch::std().switchShaderProgram(geometryShader);
 }
 

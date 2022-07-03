@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/graphics/ShaderProgram.hpp>
@@ -89,13 +89,12 @@ void ShaderProgram::dispatchCompute(const glm::uvec3& groupCount, bool use) cons
 void ShaderProgram::dispatchCompute(GLintptr indirect, bool use) const {
 	if (use) {
 		this->use();
-	}
-	else {
-#ifdef _DEBUG
+	} else {
+	#ifdef _DEBUG
 		if (m_currentlyUsedID != m_ID) {
 			throw "Tried to dispatch compute groups without having the program bound for usage!";
 		}
-#endif // _DEBUG
+	#endif // _DEBUG
 	}
 	glDispatchComputeIndirect(indirect);
 	if (use) {
@@ -132,6 +131,19 @@ void ShaderProgram::printInfo() const {
 		GLint loc = glGetUniformLocation(m_ID, &name[0]);
 		std::cout << "|  layout (location = " << std::to_string(loc) << ") uniform " << GLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
 	}
+}
+
+void ShaderProgram::backInterfaceBlock(GLuint interfaceBlockIndex, const BufferTypedIndex& index) const {
+	if (index.type == RE::BufferType::UNIFORM) {
+		glUniformBlockBinding(m_ID, interfaceBlockIndex, index.bindingIndex);
+	} else if (index.type == RE::BufferType::SHADER_STORAGE) {
+		glShaderStorageBlockBinding(m_ID, interfaceBlockIndex, index.bindingIndex);
+	}
+#ifdef _DEBUG
+	else {
+		throw "Interface blocks must be either UNIFORM or SHADER_STORAGE";
+	}
+#endif // _DEBUG
 }
 
 void ShaderProgram::setUniform(int location, float val) const { glProgramUniform1f(m_ID, location, val); }

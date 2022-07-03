@@ -3,6 +3,9 @@
  */
 #include <RealEngine/graphics/buffers/Buffer.hpp>
 
+#ifdef _DEBUG
+#include <iostream>
+#endif // _DEBUG
 
 namespace RE {
 
@@ -58,36 +61,32 @@ Buffer::~Buffer() {
 }
 
 Buffer::Buffer(Buffer&& other) noexcept :
-	p_ID(other.p_ID) {
+	p_ID(other.p_ID),
+	p_sizeInBytes(other.p_sizeInBytes),
+	p_access(other.p_access)
+#ifndef _DEBUG
+{
+#else
+	, p_storage(other.p_storage) {
+#endif // _DEBUG
 	other.p_ID = 0;
 }
 
-Buffer& Buffer::operator=(Buffer&& other) noexcept {
+Buffer& Buffer::operator=(Buffer && other) noexcept {
 	std::swap(p_ID, other.p_ID);
+	p_sizeInBytes = other.p_sizeInBytes;
+	p_access = other.p_access;
+#ifdef _DEBUG
+	p_storage = other.p_storage;
+#endif // _DEBUG
 	return *this;
 }
 
 void Buffer::bind(BufferType bindType) {
-#ifdef _DEBUG
-	if (p_currentlyBound[bufferTypeToIndex(bindType)] != 0) {
-		throw "Overbound buffers";
-	}
-	p_currentlyBound[bufferTypeToIndex(bindType)] = p_ID;
-#endif // _DEBUG
 	glBindBuffer(static_cast<GLenum>(bindType), p_ID);
 }
 
-void Buffer::unbind(BufferType bindType) {
-#ifdef _DEBUG
-	if (p_currentlyBound[bufferTypeToIndex(bindType)] != p_ID) {
-		throw "Overbound buffers";
-	}
-	p_currentlyBound[bufferTypeToIndex(bindType)] = 0;
-	glBindBuffer(static_cast<GLenum>(bindType), 0);
-#endif // _DEBUG
-}
-
-void Buffer::bindIndexed(const BufferTypedIndex& index) {
+void Buffer::bindIndexed(const BufferTypedIndex & index) {
 #ifdef _DEBUG
 	switch (index.type) {
 	case ATOMIC_COUNTER:
@@ -100,19 +99,6 @@ void Buffer::bindIndexed(const BufferTypedIndex& index) {
 	}
 #endif // _DEBUG
 	glBindBufferBase(static_cast<GLenum>(index.type), index.bindingIndex, p_ID);
-}
-
-void Buffer::connectToInterfaceBlock(const ShaderProgram& shaderProgram, GLuint interfaceBlockIndex, const BufferTypedIndex& index) const {
-	if (index.type == UNIFORM) {
-		glUniformBlockBinding(shaderProgram.m_ID, interfaceBlockIndex, index.bindingIndex);
-	} else if (index.type == SHADER_STORAGE) {
-		glShaderStorageBlockBinding(shaderProgram.m_ID, interfaceBlockIndex, index.bindingIndex);
-	}
-#ifdef _DEBUG
-	else {
-		throw "Interface blocks must be either UNIFORM or SHADER_STORAGE";
-	}
-#endif // _DEBUG
 }
 
 void Buffer::overwrite(GLintptr offsetInBytes, GLsizeiptr countBytes, const void* data) {
@@ -145,7 +131,13 @@ void Buffer::flushMapped(GLintptr offsetInBytes, GLsizeiptr lengthInBytes) {
 }
 
 bool Buffer::unmap() {
-	return glUnmapNamedBuffer(p_ID);
+	auto rval = glUnmapNamedBuffer(p_ID);
+#ifdef _DEBUG
+	if (rval == GL_FALSE) {
+		std::cout << "Buffer unmapping failed!\n";
+	}
+#endif // _DEBUG
+	return rval;
 }
 
 }

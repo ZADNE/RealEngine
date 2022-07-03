@@ -52,14 +52,8 @@ public:
 	using Buffer::bind;
 	void bind();
 
-	using Buffer::unbind;
-	void unbind();
-
 	using Buffer::bindIndexed;
 	void bindIndexed();
-
-	using Buffer::connectToInterfaceBlock;
-	void connectToInterfaceBlock(const ShaderProgram& shaderProgram, GLuint interfaceBlockIndex);
 
 protected:
 	BufferTypedIndex p_index;

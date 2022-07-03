@@ -1,7 +1,9 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
+
+#include <cassert>
 
 #include <GL/glew.h>
 
@@ -22,6 +24,20 @@ enum class BufferType : GLenum {
 	TEXTURE = GL_TEXTURE_BUFFER,
 	TRANSFORM_FEEDBACK = GL_TRANSFORM_FEEDBACK_BUFFER,
 	UNIFORM = GL_UNIFORM_BUFFER
+};
+
+struct BufferTypedIndex {
+	BufferTypedIndex(BufferType type, GLuint bindingIndex) :
+		type(type), bindingIndex(bindingIndex) {
+		using enum BufferType;
+		assert(type == BufferType::ATOMIC_COUNTER ||
+			type == BufferType::TRANSFORM_FEEDBACK ||
+			type == BufferType::UNIFORM ||
+			type == BufferType::SHADER_STORAGE);
+	}
+
+	BufferType type;
+	GLuint bindingIndex;
 };
 
 }

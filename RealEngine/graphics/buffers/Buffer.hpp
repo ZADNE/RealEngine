@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-#include <RealEngine/graphics/buffers/BufferType.hpp>
+#include <RealEngine/graphics/buffers/types.hpp>
 #include <RealEngine/graphics/ShaderProgram.hpp>
 
 namespace RE {
@@ -67,20 +67,6 @@ inline GLenum bufferAccesToGLEnum(BufferAccessFrequency accessFreq, BufferAccess
 	};
 	return enums[static_cast<int>(accessFreq) * 3 + static_cast<int>(accessNature)];
 }
-
-struct BufferTypedIndex {
-	BufferTypedIndex(BufferType type, GLuint bindingIndex) :
-		type(type), bindingIndex(bindingIndex) {
-		using enum BufferType;
-		assert(type == ATOMIC_COUNTER ||
-			type == TRANSFORM_FEEDBACK ||
-			type == UNIFORM ||
-			type == SHADER_STORAGE);
-	}
-
-	BufferType type;
-	GLuint bindingIndex;
-};
 
 /**
  * @brief Is a continuous block of memory stored in the GPU's memory.
@@ -164,14 +150,6 @@ public:
 	void bind(BufferType bindType);
 
 	/**
-	 * @brief Unbinds the buffer from a generic binding point.
-	 *
-	 * A bound buffer has to be unbound before another buffer can be bound.
-	 * @param bindType The type of binding point to unbind this buffer from.
-	*/
-	void unbind(BufferType bindType);
-
-	/**
 	 * @brief Binds the buffer to an indexed binding point (as well as generic binding point)
 	 *
 	 * Indexed binding is only available for these types:
@@ -179,14 +157,6 @@ public:
 	 * @param index The typed index to bind this buffer to.
 	*/
 	void bindIndexed(const BufferTypedIndex& index);
-
-	/**
-	 * @brief Connects the buffer with an interface block within given shader program
-	 * @param shaderProgram Program that contains the interface block
-	 * @param interfaceBlockIndex Index of the interface block within the program
-	 * @param index The typed index of the buffer to connect to (should be this buffer). Only UNIFORM and SHADER_STORAGE are available.
-	*/
-	void connectToInterfaceBlock(const ShaderProgram& shaderProgram, GLuint interfaceBlockIndex, const BufferTypedIndex& index) const;
 
 	/**
 	 * @brief Overwrites a portion of or whole buffer
@@ -299,7 +269,6 @@ protected:
 	GLenum p_access = 0;			/**< Access hints of the buffer; relevant only for mutable buffers */
 
 #ifdef _DEBUG
-	static inline GLuint p_currentlyBound[14] = {};
 	BufferStorage p_storage;
 #endif // _DEBUG
 };

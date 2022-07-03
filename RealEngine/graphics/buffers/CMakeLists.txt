@@ -1,5 +1,5 @@
 ﻿target_sources(${PROJECT_NAME} PUBLIC
 	Buffer.hpp				Buffer.cpp
-	BufferType.hpp			
+	types.hpp			
 	TypedBuffer.hpp			TypedBuffer.cpp
 )

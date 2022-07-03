@@ -18,16 +18,8 @@ void TypedBuffer::bind() {
 	Buffer::bind(p_index.type);
 }
 
-void TypedBuffer::unbind() {
-	Buffer::unbind(p_index.type);
-}
-
 void TypedBuffer::bindIndexed() {
 	Buffer::bindIndexed(p_index);
-}
-
-void TypedBuffer::connectToInterfaceBlock(const ShaderProgram& shaderProgram, GLuint interfaceBlockIndex) {
-	Buffer::connectToInterfaceBlock(shaderProgram, interfaceBlockIndex, p_index);
 }
 
 }

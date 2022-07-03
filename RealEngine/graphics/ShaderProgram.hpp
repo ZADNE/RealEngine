@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -14,7 +14,7 @@
 #include <glm/mat4x4.hpp>
 
 #include <RealEngine/main/Error.hpp>
-#include <RealEngine/graphics/buffers/BufferType.hpp>
+#include <RealEngine/graphics/buffers/types.hpp>
 #include <RealEngine/graphics/textures/TextureUnit.hpp>
 #include <RealEngine/graphics/textures/ImageUnit.hpp>
 
@@ -139,7 +139,6 @@ struct ShaderProgramSources {
 * @brief Controls how vertices are rendered to screen.
 */
 class ShaderProgram {
-	friend class Buffer;
 public:
 	/**
 	 * @brief Constructs shader program from given source codes
@@ -190,6 +189,12 @@ public:
 	*/
 	void printInfo() const;
 
+	/**
+	 * @brief Backs the interface block with a buffer indexed binding point
+	 * @param interfaceBlockIndex Index of the interface block within this program
+	 * @param index The typed index of the buffer that will back the interface block. Only UNIFORM and SHADER_STORAGE are available.
+	*/
+	void backInterfaceBlock(GLuint interfaceBlockIndex, const BufferTypedIndex& index) const;
 
 	/**
 	 * @brief Resolves location of uniform "name" and sets its value
