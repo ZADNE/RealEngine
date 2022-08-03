@@ -37,53 +37,53 @@ int bufferTypeToIndex(BufferType type) {
 }
 
 Buffer::Buffer(GLsizeiptr sizeInBytes, BufferUsageFlags flags, const void* data/* = nullptr*/) :
-	p_sizeInBytes(sizeInBytes) {
-	glCreateBuffers(1, &p_ID);
-	glNamedBufferStorage(p_ID, p_sizeInBytes, data, static_cast<GLbitfield>(flags));
+	m_sizeInBytes(sizeInBytes) {
+	glCreateBuffers(1, &m_ID);
+	glNamedBufferStorage(m_ID, m_sizeInBytes, data, static_cast<GLbitfield>(flags));
 #ifdef _DEBUG
-	p_storage = IMMUTABLE;
+	m_storage = IMMUTABLE;
 #endif // _DEBUG
 }
 
 
 Buffer::Buffer(GLsizeiptr sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data/* = nullptr*/) :
-	p_sizeInBytes(sizeInBytes),
-	p_access(bufferAccesToGLEnum(accessFreq, accessNature)) {
-	glCreateBuffers(1, &p_ID);
-	glNamedBufferData(p_ID, p_sizeInBytes, data, p_access);
+	m_sizeInBytes(sizeInBytes),
+	m_access(bufferAccesToGLEnum(accessFreq, accessNature)) {
+	glCreateBuffers(1, &m_ID);
+	glNamedBufferData(m_ID, m_sizeInBytes, data, m_access);
 #ifdef _DEBUG
-	p_storage = MUTABLE;
+	m_storage = MUTABLE;
 #endif // _DEBUG
 }
 
 Buffer::~Buffer() {
-	glDeleteBuffers(1, &p_ID);
+	glDeleteBuffers(1, &m_ID);
 }
 
 Buffer::Buffer(Buffer&& other) noexcept :
-	p_ID(other.p_ID),
-	p_sizeInBytes(other.p_sizeInBytes),
-	p_access(other.p_access)
+	m_ID(other.m_ID),
+	m_sizeInBytes(other.m_sizeInBytes),
+	m_access(other.m_access)
 #ifndef _DEBUG
 {
 #else
-	, p_storage(other.p_storage) {
+	, m_storage(other.m_storage) {
 #endif // _DEBUG
-	other.p_ID = 0;
+	other.m_ID = 0;
 }
 
 Buffer& Buffer::operator=(Buffer && other) noexcept {
-	std::swap(p_ID, other.p_ID);
-	p_sizeInBytes = other.p_sizeInBytes;
-	p_access = other.p_access;
+	std::swap(m_ID, other.m_ID);
+	m_sizeInBytes = other.m_sizeInBytes;
+	m_access = other.m_access;
 #ifdef _DEBUG
-	p_storage = other.p_storage;
+	m_storage = other.m_storage;
 #endif // _DEBUG
 	return *this;
 }
 
 void Buffer::bind(BufferType bindType) {
-	glBindBuffer(static_cast<GLenum>(bindType), p_ID);
+	glBindBuffer(static_cast<GLenum>(bindType), m_ID);
 }
 
 void Buffer::bindIndexed(const BufferTypedIndex & index) {
@@ -98,40 +98,40 @@ void Buffer::bindIndexed(const BufferTypedIndex & index) {
 		throw "Indexed binding used on type that does not use it";
 	}
 #endif // _DEBUG
-	glBindBufferBase(static_cast<GLenum>(index.type), index.bindingIndex, p_ID);
+	glBindBufferBase(static_cast<GLenum>(index.type), index.bindingIndex, m_ID);
 }
 
 void Buffer::overwrite(GLintptr offsetInBytes, GLsizeiptr countBytes, const void* data) {
-	glInvalidateBufferSubData(p_ID, offsetInBytes, countBytes);
-	glNamedBufferSubData(p_ID, offsetInBytes, countBytes, data);
+	glInvalidateBufferSubData(m_ID, offsetInBytes, countBytes);
+	glNamedBufferSubData(m_ID, offsetInBytes, countBytes, data);
 }
 
 void Buffer::redefine(GLsizeiptr sizeInBytes, const void* data) {
-	assert(p_storage == MUTABLE);
-	if (sizeInBytes > p_sizeInBytes) {
-		p_sizeInBytes = sizeInBytes;
+	assert(m_storage == MUTABLE);
+	if (sizeInBytes > m_sizeInBytes) {
+		m_sizeInBytes = sizeInBytes;
 		invalidate();
-		glNamedBufferData(p_ID, sizeInBytes, data, p_access);
+		glNamedBufferData(m_ID, sizeInBytes, data, m_access);
 	} else {
 		invalidate(sizeInBytes);
-		glNamedBufferSubData(p_ID, 0, sizeInBytes, data);
+		glNamedBufferSubData(m_ID, 0, sizeInBytes, data);
 	}
 }
 
 void Buffer::invalidate() {
-	glInvalidateBufferData(p_ID);
+	glInvalidateBufferData(m_ID);
 }
 
 void Buffer::invalidate(GLsizeiptr lengthInBytes) {
-	glInvalidateBufferSubData(p_ID, 0, lengthInBytes);
+	glInvalidateBufferSubData(m_ID, 0, lengthInBytes);
 }
 
 void Buffer::flushMapped(GLintptr offsetInBytes, GLsizeiptr lengthInBytes) {
-	glFlushMappedNamedBufferRange(p_ID, offsetInBytes, lengthInBytes);
+	glFlushMappedNamedBufferRange(m_ID, offsetInBytes, lengthInBytes);
 }
 
 bool Buffer::unmap() {
-	auto rval = glUnmapNamedBuffer(p_ID);
+	auto rval = glUnmapNamedBuffer(m_ID);
 #ifdef _DEBUG
 	if (rval == GL_FALSE) {
 		std::cout << "Buffer unmapping failed!\n";

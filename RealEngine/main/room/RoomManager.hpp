@@ -68,8 +68,8 @@ public:
 	void notifyWindowResized(const glm::ivec2& newSize);
 
 protected:
-	std::vector<Room*> p_rooms;								/**< Non-owning vector of all managed rooms */
-	Room* p_currentRoom = nullptr;							/**< Pointer to current room */
+	std::vector<Room*> m_rooms;								/**< Non-owning vector of all managed rooms */
+	Room* m_currentRoom = nullptr;							/**< Pointer to current room */
 };
 
 }

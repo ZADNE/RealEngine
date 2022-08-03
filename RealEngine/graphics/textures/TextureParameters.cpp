@@ -53,11 +53,11 @@ namespace RE {
 		if (rti.version != 400) {
 			throw "Unsupported version of rti";
 		}
-		p_flags = rti.flags;
-		p_subimageDims = glm::dvec2{ rti.subimageDims } + 1.0;
-		p_pivot = glm::dvec2{ rti.pivot } / 2.0;
-		p_subimagesSpritesCount = glm::dvec2{ rti.subimagesSpritesCount } + 1.0;
-		p_definedByRaster = false;
+		m_flags = rti.flags;
+		m_subimageDims = glm::dvec2{ rti.subimageDims } + 1.0;
+		m_pivot = glm::dvec2{ rti.pivot } / 2.0;
+		m_subimagesSpritesCount = glm::dvec2{ rti.subimagesSpritesCount } + 1.0;
+		m_definedByRaster = false;
 		m_borderColor = rti.borderColor;
 	}
 
@@ -65,10 +65,10 @@ namespace RE {
 		//Encode RTI
 		RealTextureInformation rti;
 		rti.version = 400;
-		rti.flags = p_flags;
-		rti.subimageDims = glm::ivec2_32{ p_subimageDims } - 1;
-		rti.pivot = glm::ivec2_32{ p_pivot * 2.0f};
-		rti.subimagesSpritesCount = glm::ivec2_32{ p_subimagesSpritesCount } - 1;
+		rti.flags = m_flags;
+		rti.subimageDims = glm::ivec2_32{ m_subimageDims } - 1;
+		rti.pivot = glm::ivec2_32{ m_pivot * 2.0f};
+		rti.subimagesSpritesCount = glm::ivec2_32{ m_subimagesSpritesCount } - 1;
 		rti.borderColor = m_borderColor;
 
 		//Convert RTI to network endianness

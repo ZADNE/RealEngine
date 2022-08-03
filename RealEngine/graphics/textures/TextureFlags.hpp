@@ -202,12 +202,12 @@ namespace RE {
 		/**
 		 * @brief Default constructs flags to all zeros
 		*/
-		TextureFlags() : p_flags(0) {}
+		TextureFlags() : m_flags(0) {}
 
 		/**
 		 * @brief Conversion from raw type (no validity check!)
 		*/
-		TextureFlags(TextureFlagsType flags) : p_flags(flags) {}
+		TextureFlags(TextureFlagsType flags) : m_flags(flags) {}
 
 		/**
 		 * @brief Constructs flags from all the settings
@@ -220,7 +220,7 @@ namespace RE {
 		/**
 		 * @brief Conversion to raw type
 		*/
-		explicit operator TextureFlagsType() const { return p_flags; }
+		explicit operator TextureFlagsType() const { return m_flags; }
 
 		TextureChannels getChannels() const;
 		TextureFormatType getFormatType() const;
@@ -244,7 +244,7 @@ namespace RE {
 		void setWrapStyleY(TextureWrapStyle wrapStyle);
 		void setBitdepthPerChannel(TextureBitdepthPerChannel bitdepth);
 	protected:
-		TextureFlagsType p_flags;/**< Raw integer type storing the flags */
+		TextureFlagsType m_flags;/**< Raw integer type storing the flags */
 	};
 
 }

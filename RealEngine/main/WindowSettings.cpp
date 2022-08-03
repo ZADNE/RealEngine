@@ -19,11 +19,11 @@ WindowSettings::WindowSettings() {
 	json j;
 	try {
 		i >> j;
-		p_dims.x = j["window"]["width"].get<int>();
-		p_dims.y = j["window"]["height"].get<int>();
-		p_flags.fullscreen = j["window"]["fullscreen"].get<bool>();
-		p_flags.borderless = j["window"]["borderless"].get<bool>();
-		p_flags.vSync = j["window"]["vsync"].get<bool>();
+		m_dims.x = j["window"]["width"].get<int>();
+		m_dims.y = j["window"]["height"].get<int>();
+		m_flags.fullscreen = j["window"]["fullscreen"].get<bool>();
+		m_flags.borderless = j["window"]["borderless"].get<bool>();
+		m_flags.vSync = j["window"]["vsync"].get<bool>();
 	}
 	catch (...) {
 		//Settings either don't exist or are currupted
@@ -38,23 +38,23 @@ WindowSettings::WindowSettings() {
 }
 
 WindowSettings::WindowSettings(const glm::ivec2& dims, WindowFlags flags) :
-	p_dims(dims), p_flags(flags) {
+	m_dims(dims), m_flags(flags) {
 
 }
 
 void WindowSettings::reset() {
-	p_dims = glm::vec2(1280.0f, 1000.0f);
-	p_flags = WindowFlags{};
+	m_dims = glm::vec2(1280.0f, 1000.0f);
+	m_flags = WindowFlags{};
 }
 
 void WindowSettings::save() {
 	nlohmann::ordered_json j = {
 		{"window", {
-			{"width", (unsigned int)p_dims.x},
-			{"height", (unsigned int)p_dims.y},
-			{"fullscreen", (bool)p_flags.fullscreen},
-			{"borderless", (bool)p_flags.borderless},
-			{"vsync", (bool)p_flags.vSync}
+			{"width", (unsigned int)m_dims.x},
+			{"height", (unsigned int)m_dims.y},
+			{"fullscreen", (bool)m_flags.fullscreen},
+			{"borderless", (bool)m_flags.borderless},
+			{"vsync", (bool)m_flags.vSync}
 		}}
 	};
 

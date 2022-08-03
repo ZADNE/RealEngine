@@ -25,27 +25,27 @@ MainProgram* MainProgram::std = nullptr;
 
 int MainProgram::run() {
 	doRoomTransitionIfScheduled();
-	if (!p_roomManager.getCurrentRoom()) {
+	if (!m_roomManager.getCurrentRoom()) {
 		throw std::runtime_error("Initial room was not set");
 	}
 
 	//Adopt display settings of the first room
-	adoptRoomSettings(p_roomManager.getCurrentRoom()->getDisplaySettings());
+	adoptRoomSettings(m_roomManager.getCurrentRoom()->getDisplaySettings());
 
 	m_programShouldRun = true;
-	p_synchronizer.resumeSteps();
+	m_synchronizer.resumeSteps();
 
 	//MAIN PROGRAM LOOP
 	std::cout << "Entering main loop!" << std::endl;
 	while (m_programShouldRun) {
-		p_synchronizer.beginFrame();
+		m_synchronizer.beginFrame();
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Perform simulation steps to catch up the time
-		while (p_synchronizer.shouldStepHappen()) {
+		while (m_synchronizer.shouldStepHappen()) {
 			//Check for user input
 			if (m_checkForInput) {
-				p_inputManager.update();
+				m_inputManager.update();
 				pollEvents();
 			} else {
 				SDL_PumpEvents();
@@ -55,17 +55,17 @@ int MainProgram::run() {
 		}
 
 		//Draw frame
-		render(p_synchronizer.getDrawInterpolationFactor());
+		render(m_synchronizer.getDrawInterpolationFactor());
 
-		p_window.swapBuffer();
+		m_window.swapBuffer();
 
 		doRoomTransitionIfScheduled();
 
-		p_synchronizer.endFrame();
+		m_synchronizer.endFrame();
 	}
 
 	//Exit the program
-	p_roomManager.getCurrentRoom()->sessionEnd();
+	m_roomManager.getCurrentRoom()->sessionEnd();
 
 	return m_programExitCode;
 }
@@ -77,7 +77,7 @@ void MainProgram::scheduleProgramExit(int exitcode/* = EXIT_SUCCESS*/) {
 
 void MainProgram::checkForInput(bool check) {
 	m_checkForInput = check;
-	p_inputManager.update();
+	m_inputManager.update();
 }
 
 std::vector<RE::DisplayInfo> MainProgram::getDisplays() const {
@@ -112,8 +112,8 @@ std::vector<RE::DisplayInfo> MainProgram::getDisplays() const {
 }
 
 void MainProgram::resizeWindow(const glm::ivec2& newDims, bool save) {
-	p_window.resize(newDims, save);
-	p_roomManager.notifyWindowResized(newDims);
+	m_window.resize(newDims, save);
+	m_roomManager.notifyWindowResized(newDims);
 }
 
 void MainProgram::setRelativeCursorMode(bool relative) {
@@ -121,7 +121,7 @@ void MainProgram::setRelativeCursorMode(bool relative) {
 }
 
 void MainProgram::step() {
-	p_roomManager.getCurrentRoom()->step();
+	m_roomManager.getCurrentRoom()->step();
 }
 
 void MainProgram::render(double interpolationFactor) {
@@ -131,7 +131,7 @@ void MainProgram::render(double interpolationFactor) {
 		ImGui::NewFrame();
 	}
 
-	p_roomManager.getCurrentRoom()->render(interpolationFactor);
+	m_roomManager.getCurrentRoom()->render(interpolationFactor);
 
 	if (m_usingImGui) {//ImGui frame end
 		ImGui::Render();
@@ -145,44 +145,44 @@ void MainProgram::processEvent(SDL_Event* evnt) {
 	case SDL_KEYDOWN:
 		key = SDLKToREKey(evnt->key.keysym.sym);
 		if (evnt->key.repeat == 0) {
-			p_inputManager.press(RE::Key::ANY_KEY);
-			p_inputManager.press(key);
+			m_inputManager.press(RE::Key::ANY_KEY);
+			m_inputManager.press(key);
 		}
 		break;
 	case SDL_KEYUP:
 		if (evnt->key.repeat == 0) {
-			p_inputManager.press(RE::Key::ANY_KEY, -1);
-			p_inputManager.release(SDLKToREKey(evnt->key.keysym.sym));
+			m_inputManager.press(RE::Key::ANY_KEY, -1);
+			m_inputManager.release(SDLKToREKey(evnt->key.keysym.sym));
 		}
 		break;
 	case SDL_MOUSEBUTTONDOWN:
 		if (evnt->key.repeat == 0) {
 			auto key = SDLKToREKey(evnt->button.button);
-			p_inputManager.press(RE::Key::ANY_KEY);
-			p_inputManager.press(key, evnt->button.clicks);
+			m_inputManager.press(RE::Key::ANY_KEY);
+			m_inputManager.press(key, evnt->button.clicks);
 		}
 		break;
 	case SDL_MOUSEBUTTONUP:
 		if (evnt->key.repeat == 0) {
-			p_inputManager.press(RE::Key::ANY_KEY, -1);
-			p_inputManager.release(SDLKToREKey(evnt->button.button));
+			m_inputManager.press(RE::Key::ANY_KEY, -1);
+			m_inputManager.release(SDLKToREKey(evnt->button.button));
 		}
 		break;
 	case SDL_MOUSEMOTION:
 		//Y coords are inverted to get standard math coordinates
 		//Coords also have to be clamped to window dims
 		//because SDL reports coords outside of the window when a key is held
-		p_inputManager.setCursor(
-			glm::clamp({evnt->motion.x, p_window.getDims().y - evnt->motion.y - 1}, glm::ivec2(0), p_window.getDims() - 1),
+		m_inputManager.setCursor(
+			glm::clamp({evnt->motion.x, m_window.getDims().y - evnt->motion.y - 1}, glm::ivec2(0), m_window.getDims() - 1),
 			{evnt->motion.xrel, -evnt->motion.yrel}
 		);
 		break;
 	case SDL_MOUSEWHEEL:
 		key = (evnt->wheel.y > 0) ? (Key::UMW) : (Key::DMW);
-		p_inputManager.press(key, std::abs(evnt->wheel.y));
+		m_inputManager.press(key, std::abs(evnt->wheel.y));
 
 		key = (evnt->wheel.x > 0) ? (Key::RMW) : (Key::LMW);
-		p_inputManager.press(key, std::abs(evnt->wheel.x));
+		m_inputManager.press(key, std::abs(evnt->wheel.x));
 		break;
 	case SDL_QUIT:
 		scheduleProgramExit();
@@ -192,28 +192,28 @@ void MainProgram::processEvent(SDL_Event* evnt) {
 
 void MainProgram::adoptRoomSettings(const RoomDisplaySettings& s) {
 	glClearColor(s.clearColor.r, s.clearColor.g, s.clearColor.b, s.clearColor.a);
-	p_synchronizer.setStepsPerSecond(s.stepsPerSecond);
-	p_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
+	m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
+	m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
 	m_usingImGui = s.usingImGui;
 }
 
 void MainProgram::doRoomTransitionIfScheduled() {
 	if (m_nextRoomIndex == NO_NEXT_ROOM) return;
 
-	p_synchronizer.pauseSteps();
-	auto prev = p_roomManager.getCurrentRoom();
-	auto current = p_roomManager.gotoRoom(m_nextRoomIndex, m_roomTransitionParameters);
+	m_synchronizer.pauseSteps();
+	auto prev = m_roomManager.getCurrentRoom();
+	auto current = m_roomManager.gotoRoom(m_nextRoomIndex, m_roomTransitionParameters);
 	if (prev != current) {//If successfully changed the room
 		//Adopt the display settings of the entered room
 		adoptRoomSettings(current->getDisplaySettings());
 		//Pressed/released events belong to the previous room
-		p_inputManager.update();
+		m_inputManager.update();
 		//Ensure at least one step before the first frame is rendered
 		step();
 	}
 	m_nextRoomIndex = NO_NEXT_ROOM;
 
-	p_synchronizer.resumeSteps();
+	m_synchronizer.resumeSteps();
 }
 
 void MainProgram::scheduleRoomTransition(size_t index, RoomTransitionParameters params) {
@@ -239,9 +239,9 @@ void MainProgram::pollEvents() {
 MainProgram::MainProgram() {
 	std = this;
 	Room::m_mainProgram = this;
-	Room::m_inputManager = &p_inputManager;
-	Room::m_synchronizer = &p_synchronizer;
-	Room::m_window = &p_window;
+	Room::m_inputManager = &m_inputManager;
+	Room::m_synchronizer = &m_synchronizer;
+	Room::m_window = &m_window;
 
 	auto spriteShader = RE::RM::getShaderProgram({.vert = sprite_vert, .frag = sprite_frag});
 	spriteShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);

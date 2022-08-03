@@ -17,27 +17,27 @@ RoomManager::~RoomManager() {
 }
 
 Room* RoomManager::getCurrentRoom() const {
-	return p_currentRoom;
+	return m_currentRoom;
 }
 
 Room* RoomManager::gotoRoom(size_t index, const RoomTransitionParameters& params) {
-	if (index < p_rooms.size()) {//If index is valid
-		if (p_currentRoom) {
-			p_currentRoom->sessionEnd();//End session of the current room
+	if (index < m_rooms.size()) {//If index is valid
+		if (m_currentRoom) {
+			m_currentRoom->sessionEnd();//End session of the current room
 		}
-		p_currentRoom = p_rooms[index];//Get the new room
-		p_currentRoom->sessionStart(params);//And start its session
+		m_currentRoom = m_rooms[index];//Get the new room
+		m_currentRoom->sessionStart(params);//And start its session
 	}
-	return p_currentRoom;
+	return m_currentRoom;
 }
 
 size_t RoomManager::addRoom(Room* room){
-	p_rooms.emplace_back(room);
-	return p_rooms.size() - 1;
+	m_rooms.emplace_back(room);
+	return m_rooms.size() - 1;
 }
 
 void RoomManager::notifyWindowResized(const glm::ivec2& newSize) {
-	for (auto& room : p_rooms) {
+	for (auto& room : m_rooms) {
 		room->windowResized(newSize);
 	}
 }

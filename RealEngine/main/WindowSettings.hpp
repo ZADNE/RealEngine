@@ -39,9 +39,9 @@ public:
 	*/
 	WindowSettings(const glm::ivec2& dims, WindowFlags flags);
 
-	bool isFullscreen() const { return p_flags.fullscreen; }
-	bool isBorderless() const { return p_flags.borderless; }
-	bool isVSynced() const { return p_flags.vSync; }
+	bool isFullscreen() const { return m_flags.fullscreen; }
+	bool isBorderless() const { return m_flags.borderless; }
+	bool isVSynced() const { return m_flags.vSync; }
 
 	/**
 	 * @brief Save current settings to a file.
@@ -55,8 +55,8 @@ protected:
 	*/
 	void reset();
 
-	glm::ivec2 p_dims;	/**< dimensions of the window */
-	WindowFlags p_flags;/**< flags of the window */
+	glm::ivec2 m_dims;	/**< dimensions of the window */
+	WindowFlags m_flags;/**< flags of the window */
 };
 
 }

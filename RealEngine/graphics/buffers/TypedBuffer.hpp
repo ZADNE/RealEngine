@@ -35,7 +35,7 @@ public:
 	template<typename... Args>
 	TypedBuffer(BufferTypedIndex index, BindNow bindNow, Args... args) :
 		Buffer(args...),
-		p_index(index) {
+		m_index(index) {
 		if (bindNow == BindNow::YES) {
 			bindIndexed();
 		}
@@ -45,9 +45,9 @@ public:
 
 	void changeType(BufferTypedIndex index);
 
-	BufferType getType() const { return p_index.type; }
+	BufferType getType() const { return m_index.type; }
 
-	GLuint getBindingIndex() const { return p_index.bindingIndex; }
+	GLuint getBindingIndex() const { return m_index.bindingIndex; }
 
 	using Buffer::bind;
 	void bind();
@@ -56,7 +56,7 @@ public:
 	void bindIndexed();
 
 protected:
-	BufferTypedIndex p_index;
+	BufferTypedIndex m_index;
 };
 
 }

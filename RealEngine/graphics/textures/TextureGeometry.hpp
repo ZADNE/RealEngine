@@ -28,7 +28,7 @@ public:
 	 *
 	 * All getters will return zeros for this as they lose relevance.
 	*/
-	TextureGeometry() : p_definedByRaster(true) {}
+	TextureGeometry() : m_definedByRaster(true) {}
 
 	/**
 	 * @brief Constructs geometry that has single subimage of given dimensions and pivot
@@ -49,13 +49,13 @@ public:
 	 * @brief Gets whether geometry is to be defined by image (only default-constructed is)
 	 * @return True if geometry is to be defined by image, false otherwise.
 	*/
-	bool isGeometryDefinedByImage() const { return p_definedByRaster; }
+	bool isGeometryDefinedByImage() const { return m_definedByRaster; }
 
 	/**
 	 * @brief Gets dimensions of a subimage (all subimages have same dimensions)
 	 * @return Dimensions of subimage
 	*/
-	glm::vec2 getSubimageDims() const { return p_subimageDims; }
+	glm::vec2 getSubimageDims() const { return m_subimageDims; }
 
 	/**
 	 * @brief Gets pivot of a subimage (all subimages have same pivot)
@@ -63,7 +63,7 @@ public:
 	 * Pivot is a point which defines the center of the subimage for transformations (such as rotation or scale).
 	 * @return Pivot of subimage
 	*/
-	glm::vec2 getPivot() const { return p_pivot; }
+	glm::vec2 getPivot() const { return m_pivot; }
 
 	/**
 	 * @brief Gets the count of subimages in sprites (all sprites have same count of subimages) and count of sprites.
@@ -72,12 +72,12 @@ public:
 	 * There can also be multiple sprites in single geometry so these are placed under each other.
 	 * @return Count of subimages in sprite and count of sprites
 	*/
-	glm::vec2 getSubimagesSpritesCount() const { return p_subimagesSpritesCount; }
+	glm::vec2 getSubimagesSpritesCount() const { return m_subimagesSpritesCount; }
 protected:
-	glm::vec2 p_subimageDims{};			/**< Dimensions of subimages*/
-	glm::vec2 p_pivot{};				/**< Pivot of subimages*/
-	glm::vec2 p_subimagesSpritesCount{};/**< Count of subimages in sprite and count of sprites*/
-	bool p_definedByRaster = false;		/**< Flag that defines whether geometry is to be defined by raster*/
+	glm::vec2 m_subimageDims{};			/**< Dimensions of subimages*/
+	glm::vec2 m_pivot{};				/**< Pivot of subimages*/
+	glm::vec2 m_subimagesSpritesCount{};/**< Count of subimages in sprite and count of sprites*/
+	bool m_definedByRaster = false;		/**< Flag that defines whether geometry is to be defined by raster*/
 };
 
 }

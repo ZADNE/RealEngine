@@ -18,21 +18,21 @@
 namespace RE {
 
 void Window::goFullscreen(bool fullscreen, bool save) {
-	p_flags.fullscreen = fullscreen;
+	m_flags.fullscreen = fullscreen;
 	SDL_SetWindowFullscreen(m_SDLwindow, (fullscreen) ? SDL_WINDOW_FULLSCREEN : 0);
-	SDL_GetWindowSize(m_SDLwindow, &p_dims.x, &p_dims.y);
+	SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
 	if (save) this->save();
 }
 
 void Window::goBorderless(bool borderless, bool save) {
-	p_flags.borderless = borderless;
+	m_flags.borderless = borderless;
 	SDL_SetWindowBordered(m_SDLwindow, (borderless) ? SDL_FALSE : SDL_TRUE);
 	if (save) this->save();
 }
 
 void Window::setVSync(bool vSync, bool save) {
-	p_flags.vSync = vSync;
-	if (p_flags.vSync) {
+	m_flags.vSync = vSync;
+	if (m_flags.vSync) {
 		if (SDL_GL_SetSwapInterval(-1)) {
 			//Cannot use adaptive vSync, use regular vSync
 			error(SDL_GetError());
@@ -57,15 +57,15 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 	WindowSettings(settings), m_windowTitle(title) {
 	//Prepare flags
 	Uint32 SDL_flags = SDL_WINDOW_OPENGL;
-	if (p_flags.invisible)
+	if (m_flags.invisible)
 		SDL_flags |= SDL_WINDOW_HIDDEN;
-	if (p_flags.fullscreen)
+	if (m_flags.fullscreen)
 		SDL_flags |= SDL_WINDOW_FULLSCREEN;
-	if (p_flags.borderless)
+	if (m_flags.borderless)
 		SDL_flags |= SDL_WINDOW_BORDERLESS;
 
 	//Create window
-	m_SDLwindow = SDL_CreateWindow(m_windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, p_dims.x, p_dims.y, SDL_flags);
+	m_SDLwindow = SDL_CreateWindow(m_windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_dims.x, m_dims.y, SDL_flags);
 	if (!m_SDLwindow) {
 		error(SDL_GetError());
 		fatalError("Could not create window");
@@ -90,7 +90,7 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 	std::printf("Vendor:       %s\n", glGetString(GL_VENDOR));
 
 	//Set vertical synchronisation
-	setVSync(p_flags.vSync, false);
+	setVSync(m_flags.vSync, false);
 
 #ifdef _DEBUG
 	//Enable OpenGL error callbacks
@@ -123,8 +123,8 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 	glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
 	//Create window matrix uniform buffer
-	Viewport::m_windowMatrix = glm::ortho(0.0f, static_cast<float>(p_dims.x), 0.0f, static_cast<float>(p_dims.y));
-	Viewport::m_windowSize = p_dims;
+	Viewport::m_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
+	Viewport::m_windowSize = m_dims;
 	Viewport::m_windowMatrixUniformBuffer.emplace(UNIF_BUF_VIEWPORT_MATRIX,
 		sizeof(Viewport::m_windowMatrix), BufferUsageFlags::DYNAMIC_STORAGE, &Viewport::m_windowMatrix);
 
@@ -152,10 +152,10 @@ Window::~Window() {
 void Window::resize(const glm::ivec2& newDims, bool save) {
 	SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
 	SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-	SDL_GetWindowSize(m_SDLwindow, &p_dims.x, &p_dims.y);
+	SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
 
-	Viewport::m_windowMatrix = glm::ortho(0.0f, static_cast<float>(p_dims.x), 0.0f, static_cast<float>(p_dims.y));
-	Viewport::m_windowSize = p_dims;
+	Viewport::m_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
+	Viewport::m_windowSize = m_dims;
 	Viewport::setToWholeWindow();
 	Viewport::setWindowMatrixToMatchViewport();
 

@@ -8,8 +8,8 @@
 namespace RE {
 
 	Sprite::Sprite(TexturePtr texture, float sprite, float subimage/* = 0.0f*/) :
-		p_texture(texture),
-		p_subimageSprite(subimage, sprite) {
+		m_texture(texture),
+		m_subimageSprite(subimage, sprite) {
 
 	}
 
@@ -26,7 +26,7 @@ namespace RE {
 	}
 
 	glm::vec2 Sprite::getSubimageSprite() const {
-		return p_subimageSprite;
+		return m_subimageSprite;
 	}
 
 	void Sprite::step() {
@@ -35,49 +35,49 @@ namespace RE {
 
 	SpeedSprite::SpeedSprite(TexturePtr texture, float sprite, float subimage/* = 0.0f*/, float imageSpeed/* = 1.0f*/) :
 		Sprite(texture, sprite, subimage),
-		p_imageSpeed(imageSpeed) {
+		m_imageSpeed(imageSpeed) {
 
 	}
 
 	void SpeedSprite::step() {
-		p_subimageSprite.x += getSpeed();
-		if ((p_subimageSprite.x) >= p_texture->getSubimagesSpritesCount().x) {//Positive image speed
-			p_subimageSprite.x = 0.0f;
+		m_subimageSprite.x += getSpeed();
+		if ((m_subimageSprite.x) >= m_texture->getSubimagesSpritesCount().x) {//Positive image speed
+			m_subimageSprite.x = 0.0f;
 		}
-		else if (p_subimageSprite.x < 0.0f) {//Negative image speed
-			p_subimageSprite.x = p_texture->getSubimagesSpritesCount().x + getSpeed();
+		else if (m_subimageSprite.x < 0.0f) {//Negative image speed
+			m_subimageSprite.x = m_texture->getSubimagesSpritesCount().x + getSpeed();
 		}
 	}
 
 	void SpeedSprite::setSpeed(float newSpeed) {
-		p_imageSpeed = newSpeed;
+		m_imageSpeed = newSpeed;
 	}
 
 	float SpeedSprite::getSpeed() const {
-		return p_imageSpeed;
+		return m_imageSpeed;
 	}
 
 	FullSprite::FullSprite(TexturePtr texture, float sprite, float subimage, float imageSpeed, RE::Color color, const glm::vec2& scale) :
 		SpeedSprite{ texture, sprite, subimage, imageSpeed },
-		p_color(color),
-		p_scale(scale) {
+		m_color(color),
+		m_scale(scale) {
 
 	}
 
 	void FullSprite::setColor(RE::Color color) {
-		p_color = color;
+		m_color = color;
 	}
 
 	void FullSprite::setScale(const glm::vec2& scale) {
-		p_scale = scale;
+		m_scale = scale;
 	}
 
 	RE::Color FullSprite::getColor() const {
-		return p_color;
+		return m_color;
 	}
 
 	glm::vec2 FullSprite::getScale() const {
-		return p_scale;
+		return m_scale;
 	}
 
 }

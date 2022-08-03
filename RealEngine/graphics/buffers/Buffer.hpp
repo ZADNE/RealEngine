@@ -243,7 +243,7 @@ public:
 	*/
 	template<typename T>
 	T* map(GLintptr offsetInBytes, GLsizeiptr lengthInBytes, BufferMapUsageFlags mappingUsage) {
-		return reinterpret_cast<T*>(glMapNamedBufferRange(p_ID, offsetInBytes, lengthInBytes, static_cast<GLenum>(mappingUsage)));
+		return reinterpret_cast<T*>(glMapNamedBufferRange(m_ID, offsetInBytes, lengthInBytes, static_cast<GLenum>(mappingUsage)));
 	}
 
 	/**
@@ -264,12 +264,12 @@ protected:
 	using enum BufferAccessNature;
 	using enum BufferUsageFlags;
 
-	GLuint p_ID = 0;				/**< Internal name of the buffer */
-	GLsizeiptr p_sizeInBytes = 0;	/**< Size of the buffer */
-	GLenum p_access = 0;			/**< Access hints of the buffer; relevant only for mutable buffers */
+	GLuint m_ID = 0;				/**< Internal name of the buffer */
+	GLsizeiptr m_sizeInBytes = 0;	/**< Size of the buffer */
+	GLenum m_access = 0;			/**< Access hints of the buffer; relevant only for mutable buffers */
 
 #ifdef _DEBUG
-	BufferStorage p_storage;
+	BufferStorage m_storage;
 #endif // _DEBUG
 };
 

@@ -65,7 +65,7 @@ public:
 	 * @brief Gets current dimensions of the window
 	 * @return Current dimensions
 	*/
-	glm::ivec2 getDims() const { return p_dims; }
+	glm::ivec2 getDims() const { return m_dims; }
 private:
 	/**
 	 * @brief Constructs window.

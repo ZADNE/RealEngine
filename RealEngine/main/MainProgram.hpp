@@ -167,10 +167,10 @@ protected:
 	*/
 	virtual ~MainProgram();
 
-	RoomManager p_roomManager; /**< Manages rooms - you have to add at least 1 room and enter it in the contructor of your derived class */
-	Window p_window{WindowSettings{}, RealEngine::getVersion()}; /**< window also creates and initializes OpenGL context */
-	InputManager p_inputManager; /**< Record key presses/releases, mouse movement etc. */
-	Synchronizer p_synchronizer{50u, 50u}; /**< Maintains constant speed of simulation, can also limit FPS */
+	RoomManager m_roomManager; /**< Manages rooms - you have to add at least 1 room and enter it in the contructor of your derived class */
+	Window m_window{WindowSettings{}, RealEngine::getVersion()}; /**< window also creates and initializes OpenGL context */
+	InputManager m_inputManager; /**< Record key presses/releases, mouse movement etc. */
+	Synchronizer m_synchronizer{50u, 50u}; /**< Maintains constant speed of simulation, can also limit FPS */
 private:
 	void step();
 	void render(double interpolationFactor);

@@ -25,10 +25,10 @@ namespace RE {
 
 		virtual void step();
 
-		const Texture* getTexture() const { return p_texture.get(); };
+		const Texture* getTexture() const { return m_texture.get(); };
 	protected:
-		glm::vec2 p_subimageSprite;//X = subimage of the sprite, Y = sprite of the texture
-		TexturePtr p_texture;
+		glm::vec2 m_subimageSprite;//X = subimage of the sprite, Y = sprite of the texture
+		TexturePtr m_texture;
 	};
 
 	/**
@@ -44,7 +44,7 @@ namespace RE {
 
 		float getSpeed() const override;
 	protected:
-		float p_imageSpeed;//Speed is added each beginStep to the current image position
+		float m_imageSpeed;//Speed is added each beginStep to the current image position
 	};
 
 	/**
@@ -60,8 +60,8 @@ namespace RE {
 		virtual RE::Color getColor() const override;
 		virtual glm::vec2 getScale() const override;
 	protected:
-		glm::vec2 p_scale;
-		RE::Color p_color;
+		glm::vec2 m_scale;
+		RE::Color m_color;
 	};
 
 }
