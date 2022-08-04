@@ -41,7 +41,10 @@ public:
 	 *
 	 * This happens when the program ends.
 	*/
-	virtual ~Room();
+	virtual ~Room() = default;
+
+	Room(const Room&) = delete;
+	Room& operator=(const Room&) = delete;
 
 	/**
 	 * @brief Informs the room that a new session happens inside it.

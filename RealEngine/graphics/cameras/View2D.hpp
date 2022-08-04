@@ -13,7 +13,6 @@ namespace RE {
 class View2D {
 public:
 	View2D(const glm::vec2& viewDimensions);
-	~View2D();
 
 	void resizeView(const glm::vec2& newDims);
 

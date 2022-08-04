@@ -17,10 +17,6 @@ View2D::View2D(const glm::vec2& viewDimensions):
 	update();
 }
 
-View2D::~View2D() {
-
-}
-
 void View2D::resizeView(const glm::vec2& newDims) {
 	m_viewDimensions = newDims;
 	m_orthoMatrix = glm::ortho(0.0f, newDims.x, 0.0f, newDims.y);

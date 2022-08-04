@@ -40,6 +40,9 @@ public:
 	GeometryBatch();
 	~GeometryBatch();
 
+	GeometryBatch(const GeometryBatch&) = delete;
+	GeometryBatch& operator=(const GeometryBatch&) = delete;
+
 	void begin();
 	void end();
 

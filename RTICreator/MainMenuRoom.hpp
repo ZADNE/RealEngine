@@ -5,7 +5,7 @@
 #include <optional>
 
 #include <RealEngine/main/room/Room.hpp>
-#include <RealEngine/graphics/View.hpp>
+#include <RealEngine/graphics/cameras/View2D.hpp>
 #include <RealEngine/graphics/Viewport.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>
 
@@ -15,14 +15,13 @@
 class MainMenuRoom : public RE::Room {
 public:
 	MainMenuRoom(RE::CommandLineArguments args);
-	~MainMenuRoom();
 
-	virtual void sessionStart(const RE::RoomTransitionParameters& params) override;
-	virtual void sessionEnd() override;
-	virtual void step() override;
-	virtual void render(double interpolationFactor) override;
+	void sessionStart(const RE::RoomTransitionParameters& params) override;
+	void sessionEnd() override;
+	void step() override;
+	void render(double interpolationFactor) override;
 
-	virtual const RE::RoomDisplaySettings& getDisplaySettings() override {
+	const RE::RoomDisplaySettings& getDisplaySettings() override {
 		static RE::RoomDisplaySettings settings{
 			.clearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
 			.framesPerSecondLimit = 144,
@@ -31,7 +30,7 @@ public:
 		return settings;
 	}
 
-	virtual void windowResized(const glm::ivec2& newDims) override;
+	void windowResized(const glm::ivec2& newDims) override;
 private:
 	void parametersGUI();
 
@@ -47,8 +46,8 @@ private:
 	glm::vec2 m_cursorPosPrev = glm::vec2(0.0f, 0.0f);
 
 	//View
-	RE::View m_texView;
-	RE::UniformBuffer m_texViewUBO{ RE::UNIF_BUF_VIEWPORT_MATRIX, false, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE };
+	RE::View2D m_texView;
+	RE::TypedBuffer m_texViewUBO{ RE::UNIF_BUF_VIEWPORT_MATRIX, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE };
 	glm::vec2 m_overlap = glm::vec2(0.2f, 0.2f);
 	glm::vec3 m_backgroundColor = glm::vec3(0.1f, 0.1f, 0.1f);
 

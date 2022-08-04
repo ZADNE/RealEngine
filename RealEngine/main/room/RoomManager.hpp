@@ -26,11 +26,6 @@ public:
 	RoomManager();
 
 	/**
-	 * @brief Destructs room manager. Does not destruct the rooms it managed.
-	*/
-	~RoomManager();
-
-	/**
 	 * @brief Gets current room, that is the room which has active session.
 	 * @return Pointer to current room, nullptr before first room is entered.
 	*/

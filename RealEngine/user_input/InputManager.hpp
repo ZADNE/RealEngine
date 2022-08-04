@@ -17,9 +17,11 @@ class InputManager {
 	friend class MainProgram;
 public:
 	InputManager();
-	~InputManager();
 
-	void update();//Should be called each step
+	/**
+	 * @brief Should be called each step
+	*/
+	void update();
 
 	//Returns for how many steps straight it has been down (0 = is not currently down)
 	int isDown(RE::Key keyID) const;

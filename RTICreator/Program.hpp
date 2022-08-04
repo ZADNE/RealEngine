@@ -12,7 +12,7 @@
 class Program : public RE::MainProgram {
 public:
 	Program(RE::CommandLineArguments args);
-	~Program();
+
 private:
 	MainMenuRoom m_mainMenuRoom;
 };

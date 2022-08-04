@@ -31,10 +31,6 @@ MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
 	}
 }
 
-MainMenuRoom::~MainMenuRoom() {
-
-}
-
 void MainMenuRoom::sessionStart(const RE::RoomTransitionParameters& params) {
 
 }

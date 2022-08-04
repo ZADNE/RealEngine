@@ -50,7 +50,6 @@ using ShaderProgramPtr = std::shared_ptr<const ShaderProgram>;
 class ShaderProgramCache {
 public:
 	ShaderProgramCache() {}
-	~ShaderProgramCache() {}
 
 	/**
 	* @brief Gets shader program as a shared resource.

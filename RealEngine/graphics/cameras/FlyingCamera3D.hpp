@@ -13,8 +13,6 @@ class FlyingCamera3D {
 public:
 	FlyingCamera3D(const glm::vec3& pos, const glm::vec3& yawPitchRoll);
 
-	~FlyingCamera3D();
-
 	/**
 	 * @brief Adds given angles (in radians) to the current ones
 	*/

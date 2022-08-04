@@ -162,11 +162,6 @@ protected:
 	*/
 	MainProgram();
 
-	/**
-	 * @brief Destructs the main program
-	*/
-	virtual ~MainProgram();
-
 	RoomManager m_roomManager; /**< Manages rooms - you have to add at least 1 room and enter it in the contructor of your derived class */
 	Window m_window{WindowSettings{}, RealEngine::getVersion()}; /**< window also creates and initializes OpenGL context */
 	InputManager m_inputManager; /**< Record key presses/releases, mouse movement etc. */

@@ -252,8 +252,4 @@ MainProgram::MainProgram() {
 	GeometryBatch::std().switchShaderProgram(geometryShader);
 }
 
-MainProgram::~MainProgram() {
-
-}
-
 }

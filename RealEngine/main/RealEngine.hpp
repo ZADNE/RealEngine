@@ -44,6 +44,9 @@ public:
 	*/
 	~RealEngine();
 
+	RealEngine(const RealEngine&) = delete;
+	RealEngine& operator=(const RealEngine&) = delete;
+
 	/**
 	 * @brief Gets human readable string with the version of RealEngine
 	 * @return Human readable version string

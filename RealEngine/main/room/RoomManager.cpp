@@ -12,10 +12,6 @@ RoomManager::RoomManager() {
 
 }
 
-RoomManager::~RoomManager() {
-
-}
-
 Room* RoomManager::getCurrentRoom() const {
 	return m_currentRoom;
 }

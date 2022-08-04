@@ -9,10 +9,6 @@ Room::Room() {
 
 }
 
-Room::~Room() {
-
-}
-
 const RoomDisplaySettings& Room::getDisplaySettings() {
 	static RoomDisplaySettings settings{};
 	return settings;

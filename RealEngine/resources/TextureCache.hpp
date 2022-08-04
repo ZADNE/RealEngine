@@ -14,7 +14,6 @@ using TexturePtr = std::shared_ptr<const Texture>;
 class TextureCache {
 public:
 	TextureCache() {}
-	~TextureCache() {}
 
 	/**
 	 * @brief Gets texture as a shared resource.
