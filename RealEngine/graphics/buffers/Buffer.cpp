@@ -86,15 +86,9 @@ void Buffer::bind(BufferType bindType) {
 	glBindBuffer(static_cast<GLenum>(bindType), m_ID);
 }
 
-void Buffer::bindIndexed(const BufferTypedIndex & index) {
+void Buffer::bindIndexed(const BufferTypedIndex& index) {
 #ifdef _DEBUG
-	switch (index.type) {
-	case ATOMIC_COUNTER:
-	case TRANSFORM_FEEDBACK:
-	case UNIFORM:
-	case SHADER_STORAGE:
-		break;
-	default:
+	if (!isIndexedBufferType(index.type)) {
 		throw "Indexed binding used on type that does not use it";
 	}
 #endif // _DEBUG

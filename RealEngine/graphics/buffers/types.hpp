@@ -9,6 +9,9 @@
 
 namespace RE {
 
+/**
+ * @brief Lists all possible types of buffers
+*/
 enum class BufferType : GLenum {
 	ARRAY = GL_ARRAY_BUFFER,
 	ATOMIC_COUNTER = GL_ATOMIC_COUNTER_BUFFER,
@@ -26,14 +29,28 @@ enum class BufferType : GLenum {
 	UNIFORM = GL_UNIFORM_BUFFER
 };
 
+/**
+ * @brief Returns true if the given buffer type can be bound to an indexed binding point
+*/
+inline bool isIndexedBufferType(BufferType type) {
+	switch (type){
+	case RE::BufferType::ATOMIC_COUNTER:
+	case RE::BufferType::SHADER_STORAGE:
+	case RE::BufferType::TRANSFORM_FEEDBACK:
+	case RE::BufferType::UNIFORM:
+		return true;
+	default:
+		return false;
+	}
+}
+
+/**
+ * @brief Is a POD struct with buffer type and binding index
+*/
 struct BufferTypedIndex {
 	BufferTypedIndex(BufferType type, GLuint bindingIndex) :
 		type(type), bindingIndex(bindingIndex) {
-		using enum BufferType;
-		assert(type == BufferType::ATOMIC_COUNTER ||
-			type == BufferType::TRANSFORM_FEEDBACK ||
-			type == BufferType::UNIFORM ||
-			type == BufferType::SHADER_STORAGE);
+
 	}
 
 	BufferType type;

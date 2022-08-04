@@ -37,7 +37,11 @@ public:
 		Buffer(args...),
 		m_index(index) {
 		if (bindNow == BindNow::YES) {
-			bindIndexed();
+			if (isIndexedBufferType(m_index.type)) {
+				bindIndexed();
+			} else {
+				bind();
+			}
 		}
 	}
 
