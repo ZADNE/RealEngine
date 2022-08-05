@@ -1,5 +1,6 @@
 ﻿add_subdirectory(buffers)
 add_subdirectory(cameras)
+add_subdirectory(renderers)
 add_subdirectory(textures)
 
 target_sources(${PROJECT_NAME} PUBLIC
