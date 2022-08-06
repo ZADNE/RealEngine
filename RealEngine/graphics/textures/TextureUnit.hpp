@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -10,9 +10,9 @@ namespace RE {
  * @brief Represents a binding point that a texture can be bound to
 */
 class TextureUnit {
-	friend class ShaderProgram;
 	friend class Texture;
 	friend class TextureProxy;
+	friend class GL46_ShaderProgram;
 public:
 	TextureUnit(GLuint unit) : m_unit(unit) {}
 

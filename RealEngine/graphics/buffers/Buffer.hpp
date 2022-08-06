@@ -6,7 +6,6 @@
 #include <vector>
 
 #include <RealEngine/graphics/buffers/types.hpp>
-#include <RealEngine/graphics/ShaderProgram.hpp>
 
 namespace RE {
 

@@ -63,6 +63,7 @@ int MainProgram::run() {
 
 		m_synchronizer.endFrame();
 	}
+	std::cout << "Leaving main loop!" << std::endl;
 
 	//Exit the program
 	m_roomManager.getCurrentRoom()->sessionEnd();

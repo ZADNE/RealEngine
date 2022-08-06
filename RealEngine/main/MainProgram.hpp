@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  *	@file
  */
@@ -7,11 +7,11 @@
 
 #include <glm/vec2.hpp>
 
-#include <RealEngine/main/RealEngine.hpp>
+#include <RealEngine/main/Error.hpp>
 #include <RealEngine/main/room/RoomManager.hpp>
 #include <RealEngine/main/room/RoomDisplaySettings.hpp>
 #include <RealEngine/main/room/RoomTransitionParameters.hpp>
-#include <RealEngine/main/Window.hpp>
+#include <RealEngine/main/window/Window.hpp>
 #include <RealEngine/main/Synchronizer.hpp>
 #include <RealEngine/user_input/InputManager.hpp>
 
@@ -90,8 +90,6 @@ int runProgram(int argc, char* argv[]) {
  * @see Synchronizer
 */
 class MainProgram {
-private:
-	RealEngine m_realEngine;/**< Empty class that initializes and de-initializes systems */
 public:
 	MainProgram(const MainProgram& other) = delete;
 	void operator=(const MainProgram& other) = delete;
@@ -132,7 +130,7 @@ public:
 
 	/**
 	 * @brief Pointer to main program
-	 * 
+	 *
 	 * Use program() within rooms instead.
 	*/
 	static MainProgram* std;
@@ -162,8 +160,8 @@ protected:
 	*/
 	MainProgram();
 
+	Window m_window{WindowSettings{}, WindowSubsystems::getVersion()}; /**< Window also creates and initializes OpenGL context */
 	RoomManager m_roomManager; /**< Manages rooms - you have to add at least 1 room and enter it in the contructor of your derived class */
-	Window m_window{WindowSettings{}, RealEngine::getVersion()}; /**< window also creates and initializes OpenGL context */
 	InputManager m_inputManager; /**< Record key presses/releases, mouse movement etc. */
 	Synchronizer m_synchronizer{50u, 50u}; /**< Maintains constant speed of simulation, can also limit FPS */
 private:

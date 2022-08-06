@@ -1,14 +1,22 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/RealEngine.hpp>
+#include <RealEngine/main/window/WindowSubsystems.hpp>
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 
 #include <RealEngine/main/Error.hpp>
+#include <RealEngine/graphics/renderers/GL46_Renderer.hpp>
 
 namespace RE {
+
+std::string to_string(Renderer r) {
+	switch (r) {
+	case RE::Renderer::OPENGL_46: return "OPENGL_46";
+	default: return "Unknown renderer";
+	}
+}
 
 void printSDLVersion() {
 #ifdef _DEBUG
@@ -21,9 +29,9 @@ void printSDLVersion() {
 	std::printf("SDL linked:   %u.%u.%u\n", linked.major, linked.minor, linked.patch);
 }
 
-RealEngine::RealEngine() {
+WindowSubsystems::WindowSubsystems(Renderer renderer) {
 	log(getVersion());
-	int err;
+	int err = 0;
 
 	//SDL2
 	if (err = SDL_Init(SDL_INIT_EVERYTHING)) {
@@ -32,29 +40,20 @@ RealEngine::RealEngine() {
 	}
 	printSDLVersion();
 
-	if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)) {
-		error("Cannot use doublebuffer!");
-	}
-
-#ifdef _DEBUG
-	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG)) {
-		error("Cannot use debug context!");
-	}
-#endif // _DEBUG
-
-	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)) {
-		error("Cannot use core profile context!");
+	switch (renderer) {
+	case RE::Renderer::OPENGL_46: GL46_Renderer::use(); break;
+	default: goto quitSDL_fail;
 	}
 
 	return;//Successfully initialized
 
-//quitSDL_fail:
+quitSDL_fail:
 	SDL_Quit();
 fail:
 	throw err;
 }
 
-RealEngine::~RealEngine() {
+WindowSubsystems::~WindowSubsystems() {
 	SDL_Quit();
 }
 

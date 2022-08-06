@@ -6,8 +6,6 @@
 #include <iostream>
 #include <string>
 
-#include <RealEngine/main/RealEngine.hpp>
-
 namespace RE {
 
 [[noreturn]] void fatalError(std::string_view error, int exitCode/* = EXIT_FAILURE*/) {

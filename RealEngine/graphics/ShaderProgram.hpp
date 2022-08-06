@@ -17,7 +17,7 @@
 #include <RealEngine/graphics/buffers/types.hpp>
 #include <RealEngine/graphics/textures/TextureUnit.hpp>
 #include <RealEngine/graphics/textures/ImageUnit.hpp>
-
+#include <RealEngine/graphics/renderers/IShaderProgram.hpp>
 
 namespace RE {
 
@@ -37,7 +37,8 @@ enum class ShaderType : GLenum {
 * @brief Represents source codes of a shader stage
 */
 class ShaderSources {
-	friend class ShaderProgram;
+	friend class GL46_Renderer;
+	friend class GL46_ShaderProgram;
 	template<typename T>friend struct std::hash;
 public:
 	/**
@@ -139,6 +140,8 @@ struct ShaderProgramSources {
 * @brief Controls how vertices are rendered to screen.
 */
 class ShaderProgram {
+	friend class GL46_Renderer;
+	friend class GL46_ShaderProgram;
 public:
 	/**
 	 * @brief Constructs shader program from given source codes
@@ -202,11 +205,11 @@ public:
 	*/
 	template<typename... Args>
 	void setUniform(const std::string& name, Args... args) const {
-		auto loc = glGetUniformLocation(m_ID, name.c_str());
+		auto loc = s_impl->getUniformLocation(*this, name);
 	#ifdef _DEBUG
 		if (loc < 0) error(std::string{"Uniform \""} + name + "\" does not exist in program " + std::to_string(m_ID) + "!");
 	#endif // _DEBUG
-		setUniform(loc, args...);
+		s_impl->setUniform(*this, loc, args...);
 	}
 
 	void setUniform(int location, float val) const;										/**< Sets float uniform at given location */
@@ -252,34 +255,15 @@ public:
 	void setUniform(int location, ImageUnit unit) const;								/**< Sets image uniform at given location */
 
 private:
-	//Used to compile from scratch
-	void compileProgram(const ShaderProgramSources& source);
 
-	//Helper function
-	void compileShader(const ShaderSources& source, GLuint shaderID);
-
-	//Helper function
-	void linkProgram();
-
-	//Prints program's info log
-	void printProgramInfoLog() const;
+	GLuint m_ID = 0;/**< Internal identifier of the program */
 
 	/**
-	 * @brief Gets internal ID of the program
+	 * @brief The backing implementation of the program.
 	 *
-	 * Use with caution!
-	 *
-	 * @return Internal ID of the program
+	 * This is set up at RealEngine initialization.
 	*/
-	/*GLuint getProgramID() const {
-		return m_ID;
-	}*/
-
-	GLuint m_ID = 0;/**< OpenGL name of the program */
-
-#ifdef _DEBUG
-	static inline GLuint m_currentlyUsedID = 0u;
-#endif // _DEBUG
+	static IShaderProgram* s_impl;
 };
 
 }

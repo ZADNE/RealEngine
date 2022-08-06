@@ -1,7 +1,7 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/WindowSettings.hpp>
+#include <RealEngine/main/window/WindowSettings.hpp>
 
 #include <fstream>
 #include <filesystem>
@@ -24,6 +24,12 @@ WindowSettings::WindowSettings() {
 		m_flags.fullscreen = j["window"]["fullscreen"].get<bool>();
 		m_flags.borderless = j["window"]["borderless"].get<bool>();
 		m_flags.vSync = j["window"]["vsync"].get<bool>();
+		auto renderer = j["window"]["renderer"].get<std::string>();
+		if (renderer == to_string(Renderer::OPENGL_46)) {
+			m_renderer = Renderer::OPENGL_46;
+		} else {
+			throw std::exception("Unknown renderer");
+		}
 	}
 	catch (...) {
 		//Settings either don't exist or are currupted
@@ -37,14 +43,15 @@ WindowSettings::WindowSettings() {
 	}
 }
 
-WindowSettings::WindowSettings(const glm::ivec2& dims, WindowFlags flags) :
-	m_dims(dims), m_flags(flags) {
+WindowSettings::WindowSettings(const glm::ivec2& dims, WindowFlags flags, Renderer renderer) :
+	m_dims(dims), m_flags(flags), m_renderer(renderer) {
 
 }
 
 void WindowSettings::reset() {
 	m_dims = glm::vec2(1280.0f, 1000.0f);
 	m_flags = WindowFlags{};
+	m_renderer = Renderer::OPENGL_46;
 }
 
 void WindowSettings::save() {
@@ -54,7 +61,8 @@ void WindowSettings::save() {
 			{"height", (unsigned int)m_dims.y},
 			{"fullscreen", (bool)m_flags.fullscreen},
 			{"borderless", (bool)m_flags.borderless},
-			{"vsync", (bool)m_flags.vSync}
+			{"vsync", (bool)m_flags.vSync},
+			{"renderer", to_string(m_renderer)}
 		}}
 	};
 

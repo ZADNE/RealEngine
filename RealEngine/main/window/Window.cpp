@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/Window.hpp>
+#include <RealEngine/main/window/Window.hpp>
 
 #include <GL/glew.h>
 
@@ -54,7 +54,7 @@ const std::string& Window::getTitle() const {
 }
 
 Window::Window(const WindowSettings& settings, const std::string& title) :
-	WindowSettings(settings), m_windowTitle(title) {
+	WindowSettings(settings), m_realEngine(settings.getRenderer()), m_windowTitle(title) {
 	//Prepare flags
 	Uint32 SDL_flags = SDL_WINDOW_OPENGL;
 	if (m_flags.invisible)

@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -7,7 +7,8 @@
 #include <SDL2/SDL_video.h>
 #include <glm/vec2.hpp>
 
-#include <RealEngine/main/WindowSettings.hpp>
+#include <RealEngine/main/window/WindowSubsystems.hpp>
+#include <RealEngine/main/window/WindowSettings.hpp>
 #include <RealEngine/graphics/buffers/Buffer.hpp>
 
 namespace RE {
@@ -18,9 +19,9 @@ class MainProgram;
  * @brief Displays the scene.
  *
  * There can only be a single window within program
- * and it is created by the main program.
- * 
- * The window creates GL context, initializes GLEW and ImGui.
+ * and it is created by the MainProgram.
+ *
+ * The window initializes all subsystems of the RealEngine (SDL2, renderer, ImGui, ...).
 */
 class Window : public WindowSettings {
 	friend class MainProgram;
@@ -66,10 +67,10 @@ public:
 	 * @return Current dimensions
 	*/
 	glm::ivec2 getDims() const { return m_dims; }
+
 private:
 	/**
-	 * @brief Constructs window.
-	 * The window is constructed with its own OpenGL context and is dispalyed immediately.
+	 * @brief Constructs the window and displays it immediately.
 	 *
 	 * @param settings Settings to initialize the window with.
 	 * @param title Title for the window
@@ -94,6 +95,7 @@ private:
 	*/
 	void swapBuffer();
 
+	WindowSubsystems m_realEngine;		/**< Empty class that initializes and de-initializes subsystems */
 	SDL_Window* m_SDLwindow = nullptr;	/**< handle to SDL window */
 	SDL_GLContext m_GLContext = nullptr;/**< handle to OpenGL context */
 	std::string m_windowTitle;			/**< Title of the window */

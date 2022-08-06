@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -6,6 +6,8 @@
 #include <string>
 
 #include <glm/vec2.hpp>
+
+#include <RealEngine/main/window/WindowSubsystems.hpp>
 
 namespace RE {
 
@@ -27,21 +29,21 @@ class WindowSettings {
 public:
 	/**
 	 * @brief Constructs settings from file that was saved before.
-	 * 
+	 *
 	 * If the file cannot be loaded, settings are constructed with most basic options.
 	*/
 	WindowSettings();
 
 	/**
-	 * @brief Constructs settings
-	 * @param dims Dimensions of window
-	 * @param flags Flags of the window
+	 * @brief Constructs settings from given parameters
 	*/
-	WindowSettings(const glm::ivec2& dims, WindowFlags flags);
+	WindowSettings(const glm::ivec2& dims, WindowFlags flags, Renderer renderer);
 
 	bool isFullscreen() const { return m_flags.fullscreen; }
 	bool isBorderless() const { return m_flags.borderless; }
 	bool isVSynced() const { return m_flags.vSync; }
+
+	Renderer getRenderer() const { return m_renderer; }
 
 	/**
 	 * @brief Save current settings to a file.
@@ -49,14 +51,16 @@ public:
 	 * Saved settings can be loaded by default contructor.
 	*/
 	void save();
+
 protected:
 	/**
 	 * @brief Resets settings to default state.
 	*/
 	void reset();
 
-	glm::ivec2 m_dims;	/**< dimensions of the window */
-	WindowFlags m_flags;/**< flags of the window */
+	glm::ivec2 m_dims;		/**< dimensions of the window */
+	WindowFlags m_flags;	/**< flags of the window */
+	Renderer m_renderer;	/**< the backing renderer of the window */
 };
 
 }
