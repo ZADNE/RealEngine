@@ -22,7 +22,7 @@ struct ShaderProgramSources;
 class ShaderProgram;
 
 /**
-* @brief Is a renderer-agnostic interface to shader program implementation.
+* @brief Is a renderer-agnostic interface to ShaderProgram implementation.
 *
 * This is used internally by ShaderProgram.
 *

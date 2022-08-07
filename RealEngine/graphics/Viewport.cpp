@@ -1,26 +1,25 @@
 ﻿/*! 
  *  @author    Dubsky Tomas
  */
-#include "Viewport.hpp"
-
-#include <GL/glew.h>
+#include <RealEngine/graphics/Viewport.hpp>
 
 namespace RE {
 
 std::optional<TypedBuffer> Viewport::s_windowMatrixUniformBuffer;
 glm::ivec2 Viewport::s_windowSize{};
 glm::mat4 Viewport::s_windowMatrix{};
+IViewport* Viewport::s_impl = nullptr;
 
 void Viewport::setWindowMatrixToMatchViewport() {
 	s_windowMatrixUniformBuffer->overwrite(0u, s_windowMatrix);
 }
 
 void Viewport::set(const glm::ivec2& pos, const glm::ivec2& size) {
-	glViewport(pos.x, pos.y, size.x, size.y);
+	s_impl->set(pos, size);
 }
 
 void Viewport::setToWholeWindow() {
-	glViewport(0, 0, s_windowSize.x, s_windowSize.y);
+	s_impl->set(glm::ivec2{0, 0}, s_windowSize);
 }
 
 }

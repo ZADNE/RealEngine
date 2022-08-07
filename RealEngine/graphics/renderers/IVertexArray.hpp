@@ -63,6 +63,13 @@ enum class IndexType : GLenum {
 
 class VertexArray;
 
+/**
+* @brief Is a renderer-agnostic interface to VertexArray implementation.
+*
+* This is used internally by VertexArray.
+*
+* @see RE::VertexArray
+*/
 class IVertexArray {
 public:
 	virtual void construct(VertexArray& va) const = 0;

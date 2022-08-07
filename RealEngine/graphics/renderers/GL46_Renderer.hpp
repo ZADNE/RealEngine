@@ -5,6 +5,7 @@
 
 #include <RealEngine/graphics/renderers/GL46_ShaderProgram.hpp>
 #include <RealEngine/graphics/renderers/GL46_VertexArray.hpp>
+#include <RealEngine/graphics/renderers/GL46_Viewport.hpp>
 
 namespace RE {
 
@@ -29,6 +30,7 @@ private:
 
 	GL46_ShaderProgram m_shaderProgram;
 	GL46_VertexArray m_vertexArray;
+	GL46_Viewport m_viewport;
 };
 
 }
