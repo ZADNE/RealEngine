@@ -7,6 +7,7 @@
 
 #include <SDL2/SDL.h>
 
+#include <RealEngine/graphics/buffers/Buffer.hpp>
 #include <RealEngine/graphics/ShaderProgram.hpp>
 #include <RealEngine/graphics/VertexArray.hpp>
 #include <RealEngine/graphics/Viewport.hpp>
@@ -31,12 +32,14 @@ void GL46_Renderer::use() {
 }
 
 GL46_Renderer::GL46_Renderer() {
+	Buffer::s_impl = &m_buffer;
 	ShaderProgram::s_impl = &m_shaderProgram;
 	VertexArray::s_impl = &m_vertexArray;
 	Viewport::s_impl = &m_viewport;
 }
 
 GL46_Renderer::~GL46_Renderer() {
+	Buffer::s_impl = nullptr;
 	ShaderProgram::s_impl = nullptr;
 	VertexArray::s_impl = nullptr;
 	Viewport::s_impl = nullptr;

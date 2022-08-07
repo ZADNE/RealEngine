@@ -2,79 +2,20 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <utility>
-#include <vector>
-
-#include <RealEngine/graphics/buffers/types.hpp>
+#include <RealEngine/graphics/renderers/IBuffer.hpp>
 
 namespace RE {
-
-enum class BufferStorage {
-	IMMUTABLE,
-	MUTABLE
-};
-
-enum class BufferAccessFrequency {
-	STREAM = 0,
-	STATIC = 1,
-	DYNAMIC = 2
-};
-
-enum class BufferAccessNature {
-	DRAW = 0,
-	READ = 1,
-	COPY = 2
-};
-
-enum class BufferUsageFlags : GLbitfield {
-	NO_FLAGS = 0u,
-	DYNAMIC_STORAGE = GL_DYNAMIC_STORAGE_BIT,
-	MAP_READ = GL_MAP_READ_BIT,
-	MAP_WRITE = GL_MAP_WRITE_BIT,
-	MAP_PERSISTENT = GL_MAP_PERSISTENT_BIT,
-	MAP_COHERENT = GL_MAP_COHERENT_BIT,
-	CLIENT_STORAGE = GL_CLIENT_STORAGE_BIT,
-};
-
-inline BufferUsageFlags operator|(BufferUsageFlags a, BufferUsageFlags b) {
-	return static_cast<BufferUsageFlags>(static_cast<GLbitfield>(a) | static_cast<GLbitfield>(b));
-}
-
-/**
- * @brief Restricts the usage of a buffer mapping
-*/
-enum class BufferMapUsageFlags : GLbitfield {
-	READ = GL_MAP_READ_BIT,								/**< Indicates that the mapping may be used to read buffer's data */
-	WRITE = GL_MAP_WRITE_BIT,							/**< Indicates that the mapping may be used to modify buffer's data */
-	PERSISTENT = GL_MAP_PERSISTENT_BIT,					/**< Indicates that the client intends to hold and use the mapping during subsequent GL operation */
-	COHERENT = GL_MAP_COHERENT_BIT,						/**< Indicates that a persistent mapping is also to be coherent */
-	INVALIDATE_RANGE = GL_MAP_INVALIDATE_RANGE_BIT,		/**< Indicates that the previous contents of the specified range may be discarded */
-	INVALIDATE_BUFFER = GL_MAP_INVALIDATE_BUFFER_BIT,	/**< Indicates that the previous contents of the entire buffer may be discarded */
-	FLUSH_EXPLICIT = GL_MAP_FLUSH_EXPLICIT_BIT,			/**< Indicates that one or more discrete subranges of the mapping may be modified */
-	UNSYNCHRONIZED = GL_MAP_UNSYNCHRONIZED_BIT			/**< Indicates that the GL should not attempt to synchronize pending operations on the buffer */
-};
-
-inline BufferMapUsageFlags operator|(BufferMapUsageFlags a, BufferMapUsageFlags b) {
-	return static_cast<BufferMapUsageFlags>(static_cast<GLbitfield>(a) | static_cast<GLbitfield>(b));
-}
-
-inline GLenum bufferAccesToGLEnum(BufferAccessFrequency accessFreq, BufferAccessNature accessNature) {
-	static const GLenum enums[] = {//I am not sure if these are quaranteed to be bit fields so I will do it ttihs way to be sure
-		GL_STREAM_DRAW, GL_STREAM_READ, GL_STREAM_COPY,
-		GL_STATIC_DRAW, GL_STATIC_READ, GL_STATIC_COPY,
-		GL_DYNAMIC_DRAW, GL_DYNAMIC_READ, GL_DYNAMIC_COPY
-	};
-	return enums[static_cast<int>(accessFreq) * 3 + static_cast<int>(accessNature)];
-}
 
 /**
  * @brief Is a continuous block of memory stored in the GPU's memory.
  *
  * A buffer can be either mutable or immutable. Mutable buffer can be resized,
  * while immutable buffer cannot change its size upon construction.
- * The mutability is chosen with the constructor that is used to construct the buffer.
+ * The mutability is determined by the constructor that is used to construct the buffer.
 */
 class Buffer {
+	friend class GL46_Renderer;
+	friend class GL46_Buffer;
 	friend class GL46_VertexArray;
 public:
 
@@ -242,7 +183,7 @@ public:
 	*/
 	template<typename T>
 	T* map(GLintptr offsetInBytes, GLsizeiptr lengthInBytes, BufferMapUsageFlags mappingUsage) {
-		return reinterpret_cast<T*>(glMapNamedBufferRange(m_ID, offsetInBytes, lengthInBytes, static_cast<GLenum>(mappingUsage)));
+		return reinterpret_cast<T*>(s_impl->map(*this, offsetInBytes, lengthInBytes, mappingUsage));
 	}
 
 	/**
@@ -257,6 +198,7 @@ public:
 	bool unmap();
 
 protected:
+
 	using enum BufferType;
 	using enum BufferStorage;
 	using enum BufferAccessFrequency;
@@ -270,6 +212,8 @@ protected:
 #ifdef _DEBUG
 	BufferStorage m_storage;
 #endif // _DEBUG
+
+	static IBuffer* s_impl;
 };
 
 }

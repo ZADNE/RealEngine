@@ -147,6 +147,9 @@ Window::~Window() {
 
 	//Destroy the SDL window
 	SDL_DestroyWindow(m_SDLwindow);
+
+	//Destroy the viewport's buffer (before its implementation is null)
+	Viewport::s_windowMatrixUniformBuffer.reset();
 }
 
 void Window::resize(const glm::ivec2& newDims, bool save) {

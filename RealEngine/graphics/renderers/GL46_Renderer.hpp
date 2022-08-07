@@ -3,6 +3,7 @@
  */
 #pragma once
 
+#include <RealEngine/graphics/renderers/GL46_Buffer.hpp>
 #include <RealEngine/graphics/renderers/GL46_ShaderProgram.hpp>
 #include <RealEngine/graphics/renderers/GL46_VertexArray.hpp>
 #include <RealEngine/graphics/renderers/GL46_Viewport.hpp>
@@ -28,6 +29,7 @@ private:
 	GL46_Renderer(const GL46_Renderer&) = delete;
 	GL46_Renderer& operator=(const GL46_Renderer&) = delete;
 
+	GL46_Buffer m_buffer;
 	GL46_ShaderProgram m_shaderProgram;
 	GL46_VertexArray m_vertexArray;
 	GL46_Viewport m_viewport;
