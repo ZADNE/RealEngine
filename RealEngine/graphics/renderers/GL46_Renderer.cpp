@@ -8,6 +8,7 @@
 #include <SDL2/SDL.h>
 
 #include <RealEngine/graphics/ShaderProgram.hpp>
+#include <RealEngine/graphics/VertexArray.hpp>
 
 namespace RE {
 
@@ -27,12 +28,15 @@ void GL46_Renderer::use() {
 	}
 	static GL46_Renderer renderer;
 }
+
 GL46_Renderer::GL46_Renderer() {
 	ShaderProgram::s_impl = &m_shaderProgram;
+	VertexArray::s_impl = &m_vertexArray;
 }
 
 GL46_Renderer::~GL46_Renderer() {
 	ShaderProgram::s_impl = nullptr;
+	VertexArray::s_impl = nullptr;
 }
 
 }

@@ -9,7 +9,7 @@
 namespace RE {
 
 /**
-* @brief Is OpenGL 4.6 implementation of shader program
+* @brief Is OpenGL 4.6 implementation of ShaderProgram
 *
 * Do not use this directly - use ShaderProgram class instead.
 */
@@ -67,7 +67,6 @@ public:
 	void setUniform(const ShaderProgram& sp, int location, int count, const glm::uvec3* val) const override;
 	void setUniform(const ShaderProgram& sp, int location, int count, const glm::uvec4* val) const override;
 
-
 	void setUniform(const ShaderProgram& sp, int location, int count, const glm::mat4* val) const override;
 
 	void setUniform(const ShaderProgram& sp, int location, TextureUnit unit) const override;
@@ -87,7 +86,7 @@ private:
 	void printProgramInfoLog(const ShaderProgram& sp) const;
 
 #ifdef _DEBUG
-	static inline GLuint m_currentlyUsedID = 0u;
+	static inline GLuint s_currentlyUsedID = 0u;
 #endif // _DEBUG
 };
 

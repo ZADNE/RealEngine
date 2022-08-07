@@ -24,7 +24,7 @@ class ShaderProgram;
 /**
 * @brief Is a renderer-agnostic interface to shader program implementation.
 *
-* This is used internally by ShaderProgram (it does not implement this interface directly).
+* This is used internally by ShaderProgram.
 *
 * @see RE::ShaderProgram
 */

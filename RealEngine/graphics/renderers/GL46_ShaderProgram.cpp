@@ -3,8 +3,6 @@
  */
 #include <RealEngine/graphics/renderers/GL46_ShaderProgram.hpp>
 
-#include <fstream>
-#include <vector>
 #include <iostream>
 #include <array>
 
@@ -43,20 +41,20 @@ void GL46_ShaderProgram::destruct(ShaderProgram& sp) const {
 
 void GL46_ShaderProgram::use(const ShaderProgram& sp) const {
 #ifdef _DEBUG
-	if (m_currentlyUsedID != 0) {
+	if (s_currentlyUsedID != 0) {
 		throw "Overbound shader programs";
 	}
-	m_currentlyUsedID = sp.m_ID;
+	s_currentlyUsedID = sp.m_ID;
 #endif // _DEBUG
 	glUseProgram(sp.m_ID);
 }
 
 void GL46_ShaderProgram::unuse(const ShaderProgram& sp) const {
 #ifdef _DEBUG
-	if (m_currentlyUsedID != sp.m_ID) {
+	if (s_currentlyUsedID != sp.m_ID) {
 		throw "Overbound shader programs";
 	}
-	m_currentlyUsedID = 0;
+	s_currentlyUsedID = 0;
 	glUseProgram(0);
 #endif // _DEBUG
 }
@@ -66,7 +64,7 @@ void GL46_ShaderProgram::dispatchCompute(const ShaderProgram& sp, const glm::uve
 		this->use(sp);
 	} else {
 	#ifdef _DEBUG
-		if (m_currentlyUsedID != sp.m_ID) {
+		if (s_currentlyUsedID != sp.m_ID) {
 			throw "Tried to dispatch compute groups without having the program bound for usage!";
 		}
 	#endif // _DEBUG
@@ -82,7 +80,7 @@ void GL46_ShaderProgram::dispatchCompute(const ShaderProgram& sp, GLintptr indir
 		this->use(sp);
 	} else {
 	#ifdef _DEBUG
-		if (m_currentlyUsedID != sp.m_ID) {
+		if (s_currentlyUsedID != sp.m_ID) {
 			throw "Tried to dispatch compute groups without having the program bound for usage!";
 		}
 	#endif // _DEBUG

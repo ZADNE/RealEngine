@@ -4,7 +4,6 @@
 #pragma once
 
 #include <string>
-#include <variant>
 
 constexpr int RE_VERSION_MAJOR = 1;
 constexpr int RE_VERSION_MINOR = 9;

@@ -123,10 +123,10 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 	glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
 	//Create window matrix uniform buffer
-	Viewport::m_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
-	Viewport::m_windowSize = m_dims;
-	Viewport::m_windowMatrixUniformBuffer.emplace(UNIF_BUF_VIEWPORT_MATRIX,
-		sizeof(Viewport::m_windowMatrix), BufferUsageFlags::DYNAMIC_STORAGE, &Viewport::m_windowMatrix);
+	Viewport::s_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
+	Viewport::s_windowSize = m_dims;
+	Viewport::s_windowMatrixUniformBuffer.emplace(UNIF_BUF_VIEWPORT_MATRIX,
+		sizeof(Viewport::s_windowMatrix), BufferUsageFlags::DYNAMIC_STORAGE, &Viewport::s_windowMatrix);
 
 	//Initialize ImGui
 	IMGUI_CHECKVERSION();
@@ -154,8 +154,8 @@ void Window::resize(const glm::ivec2& newDims, bool save) {
 	SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 	SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
 
-	Viewport::m_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
-	Viewport::m_windowSize = m_dims;
+	Viewport::s_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
+	Viewport::s_windowSize = m_dims;
 	Viewport::setToWholeWindow();
 	Viewport::setWindowMatrixToMatchViewport();
 

@@ -75,7 +75,7 @@ inline GLenum bufferAccesToGLEnum(BufferAccessFrequency accessFreq, BufferAccess
  * The mutability is chosen with the constructor that is used to construct the buffer.
 */
 class Buffer {
-	friend class VertexArray;
+	friend class GL46_VertexArray;
 public:
 
 	/**

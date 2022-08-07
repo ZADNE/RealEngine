@@ -4,6 +4,7 @@
 #pragma once
 
 #include <RealEngine/graphics/renderers/GL46_ShaderProgram.hpp>
+#include <RealEngine/graphics/renderers/GL46_VertexArray.hpp>
 
 namespace RE {
 
@@ -27,6 +28,7 @@ private:
 	GL46_Renderer& operator=(const GL46_Renderer&) = delete;
 
 	GL46_ShaderProgram m_shaderProgram;
+	GL46_VertexArray m_vertexArray;
 };
 
 }

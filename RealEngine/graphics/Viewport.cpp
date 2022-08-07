@@ -7,12 +7,12 @@
 
 namespace RE {
 
-std::optional<TypedBuffer> Viewport::m_windowMatrixUniformBuffer;
-glm::ivec2 Viewport::m_windowSize{};
-glm::mat4 Viewport::m_windowMatrix{};
+std::optional<TypedBuffer> Viewport::s_windowMatrixUniformBuffer;
+glm::ivec2 Viewport::s_windowSize{};
+glm::mat4 Viewport::s_windowMatrix{};
 
 void Viewport::setWindowMatrixToMatchViewport() {
-	m_windowMatrixUniformBuffer->overwrite(0u, m_windowMatrix);
+	s_windowMatrixUniformBuffer->overwrite(0u, s_windowMatrix);
 }
 
 void Viewport::set(const glm::ivec2& pos, const glm::ivec2& size) {
@@ -20,7 +20,7 @@ void Viewport::set(const glm::ivec2& pos, const glm::ivec2& size) {
 }
 
 void Viewport::setToWholeWindow() {
-	glViewport(0, 0, m_windowSize.x, m_windowSize.y);
+	glViewport(0, 0, s_windowSize.x, s_windowSize.y);
 }
 
 }
