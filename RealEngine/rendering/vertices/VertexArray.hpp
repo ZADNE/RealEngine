@@ -6,11 +6,19 @@
 
 namespace RE {
 
+/**
+ * @brief Controls how & where vertices are pulled.
+ * 
+ * A ShaderProgram has to be used in conjunction with this.
+*/
 class VertexArray {
 	friend class GL46_Renderer;
 	friend class GL46_VertexArray;
 public:
 
+	/**
+	 * @brief Constructs a blank vertex array that does not pull any vertices.
+	*/
 	VertexArray();
 	~VertexArray();
 
@@ -35,11 +43,14 @@ public:
 	void renderArrays(Primitive prim, GLint first, GLsizei count) const;
 	void renderArrays(Primitive prim, GLint first, GLsizei count, GLsizei instancecount) const;
 
-	void renderElements(Primitive prim, GLsizei count, IndexType type, const void* offset) const;
-	void renderElements(Primitive prim, GLsizei count, IndexType type, const void* offset, GLsizei instancecount) const;
+	void renderElements(Primitive prim, GLsizei count, IndexType type, const void* indices) const;
+	void renderElements(Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount) const;
+
+	void renderElementsBaseVertex(Primitive prim, GLsizei count, IndexType type, const void* indices, GLint basevertex) const;
+	void renderElementsBaseVertex(Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount, GLint basevertex) const;
 
 private:
-	GLuint m_ID = 0;
+	GLuint m_ID = 0;			/**< Internal identifier*/
 
 	static IVertexArray* s_impl;
 };

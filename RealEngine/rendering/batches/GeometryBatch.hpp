@@ -9,6 +9,8 @@
 
 #include <RealEngine/rendering/vertices/vertices.hpp>
 #include <RealEngine/rendering/batches/circles.hpp>
+#include <RealEngine/rendering/vertices/VertexArray.hpp>
+#include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/resources/ShaderProgramCache.hpp>
 
 namespace RE {
@@ -33,15 +35,11 @@ const size_t PRIMITIVES_COUNT = 7u;
 const size_t SHAPES_COUNT = 2u;
 
 /**
- * @brief Draws lines and circles.
+ * @brief Draws lines, circles and other vector shapes.
 */
 class GeometryBatch {
 public:
 	GeometryBatch();
-	~GeometryBatch();
-
-	GeometryBatch(const GeometryBatch&) = delete;
-	GeometryBatch& operator=(const GeometryBatch&) = delete;
 
 	void begin();
 	void end();
@@ -59,15 +57,13 @@ public:
 		return std;
 	}
 
-	GLenum prim_shapeToGLenum(size_t prim_shape) const;
 private:
-	GLuint m_vbo = 0;
-	GLuint m_vao = 0;
+	VertexArray m_va;
+	Buffer m_buf{BufferAccessFrequency::STREAM, BufferAccessNature::DRAW};
+	ShaderProgramPtr m_shaderProgram;
 
 	std::array<std::vector<RE::VertexPOCO>, PRIMITIVES_COUNT + SHAPES_COUNT> m_vertices;
 	std::array<std::vector<GLuint>, PRIMITIVES_COUNT + SHAPES_COUNT> m_indices;
-
-	ShaderProgramPtr m_shaderProgram;
 };
 
 }

@@ -91,6 +91,9 @@ public:
 
 	virtual void renderElements(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* offset) const = 0;
 	virtual void renderElements(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* offset, GLsizei instancecount) const = 0;
+
+	virtual void renderElementsBaseVertex(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices, GLint basevertex) const = 0;
+	virtual void renderElementsBaseVertex(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount, GLint basevertex) const = 0;
 };
 
 }

@@ -61,12 +61,20 @@ void VertexArray::renderArrays(Primitive prim, GLint first, GLsizei count, GLsiz
 	s_impl->renderArrays(*this, prim, first, count, instancecount);
 }
 
-void VertexArray::renderElements(Primitive prim, GLsizei count, IndexType type, const void* offset) const {
-	s_impl->renderElements(*this, prim, count, type, offset);
+void VertexArray::renderElements(Primitive prim, GLsizei count, IndexType type, const void* indices) const {
+	s_impl->renderElements(*this, prim, count, type, indices);
 }
 
-void VertexArray::renderElements(Primitive prim, GLsizei count, IndexType type, const void* offset, GLsizei instancecount) const {
-	s_impl->renderElements(*this, prim, count, type, offset, instancecount);
+void VertexArray::renderElements(Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount) const {
+	s_impl->renderElements(*this, prim, count, type, indices, instancecount);
+}
+
+void VertexArray::renderElementsBaseVertex(Primitive prim, GLsizei count, IndexType type, const void* indices, GLint basevertex) const {
+	s_impl->renderElementsBaseVertex(*this, prim, count, type, indices, basevertex);
+}
+
+void VertexArray::renderElementsBaseVertex(Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount, GLint basevertex) const {
+	s_impl->renderElementsBaseVertex(*this, prim, count, type, indices, instancecount, basevertex);
 }
 
 }

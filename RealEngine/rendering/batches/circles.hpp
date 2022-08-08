@@ -8,24 +8,35 @@
 
 namespace RE {
 
-	struct CirclePO {
-		CirclePO() {}
-		CirclePO(const glm::vec2& position, float radius, bool disC) : pos(position), rad(radius), disc(disC) {}
+#pragma warning(push)
+#pragma warning(disable: 26495)
 
-		glm::vec2 pos;
-		float rad;
-		bool disc;
-	};
+/**
+ * @brief Represents a 2D circle/disk.
+*/
+struct CirclePO {
+	CirclePO() {}
+	CirclePO(const glm::vec2& position, float radius, bool disC) : pos(position), rad(radius), disc(disC) {}
 
-	struct CirclePOCO : public CirclePO {
-		CirclePOCO() {}
-		//Solid color
-		CirclePOCO(const CirclePO& circle, RE::Color color) : CirclePO(circle), mid(color), edge(color) {}
-		//Transition in colors
-		CirclePOCO(const CirclePO& circle, RE::Color middle, RE::Color edgE) : CirclePO(circle), mid(middle), edge(edgE) {}
+	glm::vec2 pos;
+	float rad;
+	bool disc;
+};
 
-		RE::Color mid;
-		RE::Color edge;
-	};
+/**
+ * @brief Represents a colored 2D circle/disk.
+*/
+struct CirclePOCO : public CirclePO {
+	CirclePOCO() {}
+	//Solid color
+	CirclePOCO(const CirclePO& circle, RE::Color color) : CirclePO(circle), mid(color), edge(color) {}
+	//Transition in colors
+	CirclePOCO(const CirclePO& circle, RE::Color middle, RE::Color edgE) : CirclePO(circle), mid(middle), edge(edgE) {}
+
+	RE::Color mid;
+	RE::Color edge;
+};
+
+#pragma warning(pop)
 
 }

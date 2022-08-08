@@ -8,31 +8,43 @@
 #include <glm/gtc/constants.hpp>
 
 #include <RealEngine/resources/ResourceManager.hpp>
+#include <RealEngine/rendering/internal_interfaces/IVertexArray.hpp>
 
 namespace RE {
 
-GeometryBatch::GeometryBatch() {
-	if (m_vao == 0) {//If doesn't exist already
-		glGenVertexArrays(1, &m_vao);
+Primitive convertPrimEnum(size_t prim_shape) {
+	switch (prim_shape) {
+	case (size_t)PRIM::POINTS:
+		return Primitive::POINTS;
+	case (size_t)PRIM::LINE_STRIP:
+		return Primitive::LINE_STRIP;
+	case (size_t)PRIM::LINE_LOOP:
+		return Primitive::LINE_LOOP;
+	case (size_t)PRIM::LINES:
+		return Primitive::LINES;
+	case (size_t)PRIM::TRIANGLE_STRIP:
+		return Primitive::TRIANGLE_STRIP;
+	case (size_t)PRIM::TRIANGLE_FAN:
+		return Primitive::TRIANGLE_FAN;
+	case (size_t)PRIM::TRIANGLES:
+		return Primitive::TRIANGLES;
+	case (size_t)SHAPE::CIRCLE:
+		return Primitive::LINE_LOOP;
+	case (size_t)SHAPE::DISC:
+		return Primitive::TRIANGLE_FAN;
+	default:
+		//Shouldn't get here
+		return Primitive::LINE_LOOP;
 	}
-	glBindVertexArray(m_vao);
-
-	if (m_vbo == 0) {//If doesn't exist already
-		glGenBuffers(1, &m_vbo);
-	}
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-
-	glEnableVertexAttribArray(ATTR_POSITION);//Position
-	glVertexAttribPointer(ATTR_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPOCO), (void*)offsetof(VertexPOCO, position));
-	glEnableVertexAttribArray(ATTR_COLOR);//Color
-	glVertexAttribPointer(ATTR_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(VertexPOCO), (void*)offsetof(VertexPOCO, color));
-
-	glBindVertexArray(0);
 }
 
-GeometryBatch::~GeometryBatch() {
-	glDeleteVertexArrays(1, &m_vao);
-	glDeleteBuffers(1, &m_vbo);
+GeometryBatch::GeometryBatch() {
+	m_va.setAttribute(ATTR_POSITION, VertexComponentCount::XY, VertexComponentType::FLOAT, offsetof(VertexPOCO, position), false);
+	m_va.setAttribute(ATTR_COLOR, VertexComponentCount::RGBA, VertexComponentType::UNSIGNED_BYTE, offsetof(VertexPOCO, color), true);
+	m_va.setBindingPoint(0u, m_buf, 0, sizeof(VertexPOCO));
+	m_va.setBindingPoint(1u, m_buf, 0, sizeof(VertexPOCO));
+	m_va.connectAttributeToBindingPoint(ATTR_POSITION, 0u);
+	m_va.connectAttributeToBindingPoint(ATTR_COLOR, 1u);
 }
 
 void GeometryBatch::begin() {
@@ -54,46 +66,43 @@ void GeometryBatch::end() {
 	}
 	size_t offset = 0u;
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, totalSize * sizeof(VertexPOCO), NULL, GL_STREAM_DRAW);//Oprhaning the buffer
+	m_buf.redefine(totalSize * sizeof(VertexPOCO), nullptr);
 	for (size_t i = 0u; i < PRIMITIVES_COUNT + SHAPES_COUNT; ++i) {
-		if (m_vertices[i].empty()) {
-			continue;
-		}
-		glBufferSubData(GL_ARRAY_BUFFER, (GLintptr)offset, m_vertices[i].size() * sizeof(VertexPOCO), m_vertices[i].data());//Uploading
+		if (m_vertices[i].empty()) continue;
+		m_buf.overwrite(offset, m_vertices[i]);
 		offset += m_vertices[i].size() * sizeof(VertexPOCO);
 	}
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void GeometryBatch::draw() {
 	m_shaderProgram->use();
-	glBindVertexArray(m_vao);
+	m_va.bind();
 
 	size_t offset = 0u;
 
 	for (size_t i = 0u; i < PRIMITIVES_COUNT + SHAPES_COUNT; ++i) {
-		if (m_vertices[i].empty()) {
-			continue;
-		}
-		glDrawElementsBaseVertex(prim_shapeToGLenum(i), (GLsizei)m_indices[i].size(), GL_UNSIGNED_INT, (void*)m_indices[i].data(), (GLint)offset);
+		if (m_vertices[i].empty()) continue;
+		m_va.renderElementsBaseVertex(convertPrimEnum(i), (GLsizei)m_indices[i].size(), IndexType::UNSIGNED_INT, m_indices[i].data(), (GLint)offset);
 		offset += m_vertices[i].size();
 	}
 
-	glBindVertexArray(0);
+	m_va.unbind();
 	m_shaderProgram->unuse();
 }
 
 void GeometryBatch::addPrimitives(PRIM prim, size_t first, size_t countVer, const RE::VertexPOCO* data, bool separate/* = true*/) {
 	GLuint last = (GLuint)m_vertices[(size_t)prim].size();
+
 	//Vertices
 	size_t prevSize = m_vertices[(size_t)prim].size();
 	m_vertices[(size_t)prim].resize(prevSize + countVer);
 	std::copy(&data[first], &data[first + countVer], &m_vertices[(size_t)prim][prevSize]);
 	m_indices[(size_t)prim].reserve(m_indices[(size_t)prim].size() + countVer + separate);
+
 	for (size_t i = 0u; i < countVer; ++i) {
 		m_indices[(size_t)prim].push_back(last++);
 	}
+
 	//Separator
 	if (separate && (prim == PRIM::LINE_STRIP || prim == PRIM::LINE_LOOP || prim == PRIM::TRIANGLE_STRIP || prim == PRIM::TRIANGLE_FAN)) {
 		m_indices[(size_t)prim].push_back(PRIMITIVE_RESTART_INDEX<GLuint>());
@@ -135,32 +144,6 @@ void GeometryBatch::addCircles(size_t first, size_t count, const RE::CirclePOCO*
 
 void GeometryBatch::switchShaderProgram(ShaderProgramPtr shaderProgram) {
 	m_shaderProgram = shaderProgram;
-}
-
-GLenum GeometryBatch::prim_shapeToGLenum(size_t prim_shape) const {
-	switch (prim_shape) {
-	case (size_t)PRIM::POINTS:
-		return GLenum(GL_POINTS);
-	case (size_t)PRIM::LINE_STRIP:
-		return GLenum(GL_LINE_STRIP);
-	case (size_t)PRIM::LINE_LOOP:
-		return GLenum(GL_LINE_LOOP);
-	case (size_t)PRIM::LINES:
-		return GLenum(GL_LINES);
-	case (size_t)PRIM::TRIANGLE_STRIP:
-		return GLenum(GL_TRIANGLE_STRIP);
-	case (size_t)PRIM::TRIANGLE_FAN:
-		return GLenum(GL_TRIANGLE_FAN);
-	case (size_t)PRIM::TRIANGLES:
-		return GLenum(GL_TRIANGLES);
-	case (size_t)SHAPE::CIRCLE:
-		return GLenum(GL_LINE_LOOP);
-	case (size_t)SHAPE::DISC:
-		return GLenum(GL_TRIANGLE_FAN);
-	default:
-		//Shouldn't get here
-		return GLenum(GL_LINE_LOOP);
-	}
 }
 
 }

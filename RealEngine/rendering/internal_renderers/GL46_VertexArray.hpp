@@ -31,8 +31,11 @@ public:
 	void renderArrays(const VertexArray& va, Primitive prim, GLint first, GLsizei count) const override;
 	void renderArrays(const VertexArray& va, Primitive prim, GLint first, GLsizei count, GLsizei instancecount) const override;
 
-	void renderElements(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* offset) const override;
-	void renderElements(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* offset, GLsizei instancecount) const override;
+	void renderElements(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices) const override;
+	void renderElements(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount) const override;
+
+	void renderElementsBaseVertex(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices, GLint basevertex) const override;
+	void renderElementsBaseVertex(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount, GLint basevertex) const override;
 
 private:
 
