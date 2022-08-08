@@ -7,7 +7,7 @@
 #include <glm/mat4x4.hpp>
 
 #include <RealEngine/graphics/buffers/TypedBuffer.hpp>
-#include <RealEngine/graphics/renderers/IViewport.hpp>
+#include <RealEngine/graphics/internal_interfaces/IViewport.hpp>
 
 namespace RE {
 

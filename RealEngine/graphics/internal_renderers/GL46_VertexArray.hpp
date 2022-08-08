@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/graphics/renderers/IVertexArray.hpp>
+#include <RealEngine/graphics/internal_interfaces/IVertexArray.hpp>
 
 namespace RE {
 

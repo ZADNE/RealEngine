@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#include <RealEngine/graphics/renderers/IViewport.hpp>
+#include <RealEngine/graphics/internal_interfaces/IViewport.hpp>
 
 namespace RE {
 

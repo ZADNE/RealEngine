@@ -2,8 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-
-#include <RealEngine/graphics/renderers/IShaderProgram.hpp>
+#include <RealEngine/graphics/internal_interfaces/IShaderProgram.hpp>
 
 
 namespace RE {

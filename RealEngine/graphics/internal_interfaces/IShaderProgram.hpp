@@ -2,8 +2,11 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-
 #include <string>
+#include <compare>
+#include <vector>
+#include <string_view>
+#include <initializer_list>
 
 #include <GL/glew.h>
 #include <glm/vec2.hpp>
@@ -11,14 +14,128 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
+#include <RealEngine/main/Error.hpp>
 #include <RealEngine/graphics/buffers/Buffer.hpp>
 #include <RealEngine/graphics/textures/TextureUnit.hpp>
 #include <RealEngine/graphics/textures/ImageUnit.hpp>
 
 namespace RE {
 
-class ShaderSources;
-struct ShaderProgramSources;
+/**
+ * @brief Enum of all available shader stages.
+*/
+enum class ShaderType : GLenum {
+	VERTEX = GL_VERTEX_SHADER,
+	TESS_CONTROL = GL_TESS_CONTROL_SHADER,
+	TESS_EVALUATION = GL_TESS_EVALUATION_SHADER,
+	GEOMETRY = GL_GEOMETRY_SHADER,
+	FRAGMENT = GL_FRAGMENT_SHADER,
+	COMPUTE = GL_COMPUTE_SHADER
+};
+
+/**
+* @brief Represents source codes of a shader stage
+*/
+class ShaderSources {
+	friend class GL46_Renderer;
+	friend class GL46_ShaderProgram;
+	template<typename T>friend struct std::hash;
+public:
+	/**
+	 * @brief This string is prepended before the first given shader source
+	*/
+	inline static std::string_view preamble = "#version 460 core\n";
+
+	/**
+	 * @brief Constructs empty shader source
+	 *
+	 * This shader stage will not be used.
+	*/
+	ShaderSources() {
+
+	}
+
+	/**
+	 * @brief Constructs shader source from a single string
+	 * @param source Source code of the shader
+	*/
+	ShaderSources(std::string_view source) :
+		m_sources({preamble.data(), source.data()}),
+		m_lengths({static_cast<GLint>(preamble.size()), static_cast<GLint>(source.size())}) {
+
+	}
+
+	/**
+	 * @brief Constructs shader source from initalizer list of strings
+	 * @param list List of sources
+	*/
+	ShaderSources(std::initializer_list<std::string_view> list) :
+		m_sources(list.size() + 1u),
+		m_lengths(list.size() + 1u) {
+		m_sources.emplace_back(preamble.data());
+		m_lengths.emplace_back(static_cast<GLint>(preamble.size()));
+		for (auto& sw : list) {
+			m_sources.emplace_back(sw.data());
+			m_lengths.emplace_back(static_cast<GLint>(sw.size()));
+		}
+	}
+
+	auto operator<=>(const ShaderSources&) const = default;
+
+private:
+	std::vector<const char*> m_sources{};/**< C-strings containing the sources */
+	std::vector<GLint> m_lengths{};/**< Lengths of the sources */
+};
+
+/**
+* @brief POD representing source codes for all shaders within a shader program
+*/
+struct ShaderProgramSources {
+
+	const ShaderSources& operator[](ShaderType type) const {
+		switch (type) {
+		case RE::ShaderType::VERTEX:
+			return vert;
+		case RE::ShaderType::TESS_CONTROL:
+			return tesc;
+		case RE::ShaderType::TESS_EVALUATION:
+			return tese;
+		case RE::ShaderType::GEOMETRY:
+			return geom;
+		case RE::ShaderType::FRAGMENT:
+			return frag;
+		case RE::ShaderType::COMPUTE:
+			return comp;
+		default:
+			fatalError("Tried to access invalid shader type");
+		}
+	}
+
+	auto operator<=>(const ShaderProgramSources&) const = default;
+
+	/**
+	 * @brief Performs shallow equality test.
+	 *
+	 * Sources are considered equal when all their shaders point
+	 * to same memory location. The contents of strings are NOT compared.
+	*/
+	bool operator==(const ShaderProgramSources& other) const {
+		return vert == other.vert &&
+			tesc == other.tesc &&
+			tese == other.tese &&
+			geom == other.geom &&
+			frag == other.frag &&
+			comp == other.comp;
+	}
+
+	ShaderSources vert{};/**< Vertex shader stage of the program */
+	ShaderSources tesc{};/**< Tesselation control shader stage of the program */
+	ShaderSources tese{};/**< Tesselation evaluation stage of the program */
+	ShaderSources geom{};/**< Geometry shader stage of the program */
+	ShaderSources frag{};/**< Fragment shader stage of the program */
+	ShaderSources comp{};/**< Copute shader stage of the program */
+};
+
 class ShaderProgram;
 
 /**

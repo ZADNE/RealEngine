@@ -4,8 +4,4 @@
 	GL46_ShaderProgram.hpp	GL46_ShaderProgram.cpp
 	GL46_VertexArray.hpp	GL46_VertexArray.cpp
 	GL46_Viewport.hpp		GL46_Viewport.cpp
-	IBuffer.hpp		
-	IShaderProgram.hpp		
-	IVertexArray.hpp		
-	IViewport.hpp		
 )

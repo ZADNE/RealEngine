@@ -3,7 +3,7 @@
  */
 #include <RealEngine/graphics/buffers/Buffer.hpp>
 
-#include <RealEngine/graphics/renderers/IBuffer.hpp>
+#include <RealEngine/graphics/internal_interfaces/IBuffer.hpp>
 
 namespace RE {
 

@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#include <RealEngine/graphics/renderers/GL46_Renderer.hpp>
+#include <RealEngine/graphics/internal_renderers/GL46_Renderer.hpp>
 
 #include <SDL2/SDL.h>
 

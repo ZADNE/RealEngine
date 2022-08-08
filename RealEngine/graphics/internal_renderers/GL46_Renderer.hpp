@@ -3,10 +3,10 @@
  */
 #pragma once
 
-#include <RealEngine/graphics/renderers/GL46_Buffer.hpp>
-#include <RealEngine/graphics/renderers/GL46_ShaderProgram.hpp>
-#include <RealEngine/graphics/renderers/GL46_VertexArray.hpp>
-#include <RealEngine/graphics/renderers/GL46_Viewport.hpp>
+#include <RealEngine/graphics/internal_renderers/GL46_Buffer.hpp>
+#include <RealEngine/graphics/internal_renderers/GL46_ShaderProgram.hpp>
+#include <RealEngine/graphics/internal_renderers/GL46_VertexArray.hpp>
+#include <RealEngine/graphics/internal_renderers/GL46_Viewport.hpp>
 
 namespace RE {
 

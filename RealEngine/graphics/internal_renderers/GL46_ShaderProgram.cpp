@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/renderers/GL46_ShaderProgram.hpp>
+#include <RealEngine/graphics/internal_renderers/GL46_ShaderProgram.hpp>
 
 #include <iostream>
 #include <array>
