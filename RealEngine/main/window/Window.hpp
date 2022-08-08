@@ -9,7 +9,7 @@
 
 #include <RealEngine/main/window/WindowSubsystems.hpp>
 #include <RealEngine/main/window/WindowSettings.hpp>
-#include <RealEngine/graphics/buffers/Buffer.hpp>
+#include <RealEngine/rendering/buffers/Buffer.hpp>
 
 namespace RE {
 

@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <memory>
 
-#include <RealEngine/graphics/ShaderProgram.hpp>
+#include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 
 /**
  * @author The boost library

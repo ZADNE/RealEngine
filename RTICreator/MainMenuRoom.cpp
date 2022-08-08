@@ -13,8 +13,8 @@
 #include <Windows.h>
 
 #include <ImGui/imgui.h>
-#include <RealEngine/graphics/GeometryBatch.hpp>
-#include <RealEngine/graphics/SpriteBatch.hpp>
+#include <RealEngine/rendering/batches/GeometryBatch.hpp>
+#include <RealEngine/rendering/batches/SpriteBatch.hpp>
 #include <RealEngine/main/Error.hpp>
 
 #include <RTICreator/ComboConstants.hpp>

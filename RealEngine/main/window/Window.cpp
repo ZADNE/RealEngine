@@ -13,7 +13,7 @@
 #include <ImGui/imgui_impl_opengl3.h>
 
 #include <RealEngine/main/Error.hpp>
-#include <RealEngine/graphics/Viewport.hpp>
+#include <RealEngine/rendering/targets/Viewport.hpp>
 
 namespace RE {
 

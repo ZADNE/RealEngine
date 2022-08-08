@@ -7,7 +7,7 @@
 #include <GL/glew.h>
 
 #include <RealEngine/main/Error.hpp>
-#include <RealEngine/graphics/internal_renderers/GL46_Renderer.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46_Renderer.hpp>
 
 namespace RE {
 
