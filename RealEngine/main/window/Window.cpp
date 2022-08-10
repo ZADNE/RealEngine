@@ -3,8 +3,6 @@
  */
 #include <RealEngine/main/window/Window.hpp>
 
-#include <GL/glew.h>
-
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -54,7 +52,7 @@ const std::string& Window::getTitle() const {
 }
 
 Window::Window(const WindowSettings& settings, const std::string& title) :
-	WindowSettings(settings), m_realEngine(settings.getRenderer()), m_windowTitle(title) {
+	WindowSettings(settings), m_subsystems(settings.getRenderer()), m_windowTitle(title) {
 	//Prepare flags
 	Uint32 SDL_flags = SDL_WINDOW_OPENGL;
 	if (m_flags.invisible)
@@ -78,49 +76,10 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 		fatalError("Could not create OpenGL context");
 	}
 
-	//Initialize GLEW
-	if (glewInit() != GLEW_OK) {
-		fatalError("GLEW failed initialization!");
-	}
-
-	//Print OpenGL info
-	std::printf("OpenGL:       %s\n", glGetString(GL_VERSION));
-	std::printf("GLSL:         %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-	std::printf("Renderer:     %s\n", glGetString(GL_RENDERER));
-	std::printf("Vendor:       %s\n", glGetString(GL_VENDOR));
+	m_subsystems.initializeRenderer(getRenderer());
 
 	//Set vertical synchronisation
 	setVSync(m_flags.vSync, false);
-
-#ifdef _DEBUG
-	//Enable OpenGL error callbacks
-	if (glDebugMessageCallback) {
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glDebugMessageCallback(openglCallbackFunction, nullptr);
-		GLuint ids[] = {
-			131185 //HORDCODE INGORE: Buffer object video memory notification
-		};
-		glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, sizeof(ids) / sizeof(GLuint), ids, GL_FALSE);
-	}
-#endif // _DEBUG
-
-	//Disable dither that is probably no-op anyway
-	glDisable(GL_DITHER);
-
-	//Do not use multisample by default
-	glDisable(GL_MULTISAMPLE);
-
-	//Use blenbing by default
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//Byte alignment
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	//Primitive restart index
-	glEnable(GL_PRIMITIVE_RESTART);
-	glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
 	//Create window matrix uniform buffer
 	Viewport::s_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));

@@ -7,8 +7,6 @@
 
 #include <string_view>
 
-#include <GL/glew.h>
-
 namespace RE {
 
 /**
@@ -37,16 +35,5 @@ void error(std::string_view error, bool appendEOL = true);
  */
 void log(std::string_view message, bool appendEOL = true);
 
-//OpenGL-related
-
-/**
- * Polls all graphics errors and logs them as errors.
- */
-void checkForGraphicsErrors();
-
-/**
- * OpenGL error callback function
- */
-void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 
 }

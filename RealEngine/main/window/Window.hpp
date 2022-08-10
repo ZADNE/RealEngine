@@ -95,7 +95,7 @@ private:
 	*/
 	void swapBuffer();
 
-	WindowSubsystems m_realEngine;		/**< Empty class that initializes and de-initializes subsystems */
+	WindowSubsystems m_subsystems;		/**< Empty class that initializes and de-initializes subsystems */
 	SDL_Window* m_SDLwindow = nullptr;	/**< handle to SDL window */
 	SDL_GLContext m_GLContext = nullptr;/**< handle to OpenGL context */
 	std::string m_windowTitle;			/**< Title of the window */

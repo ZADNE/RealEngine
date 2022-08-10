@@ -21,9 +21,21 @@ namespace RE {
 class GL46_Renderer {
 public:
 	/**
-	 * @brief To be called only once at the start of the program.
+	 * @brief Tries to prepare for creation of OpenGL 4.6 context.
+	 * @return True if succeeded.
+	 * @warning Do not call use() if this fails.
+	 * 
+	 * Requires SDL2 to be initialized.
+	 * 
+	 * @note To be called only once at the start of the program.
 	*/
-	static void use();
+	static bool prepare();
+
+	/**
+	 * @brief Initializes the renderer.
+	 * @warning Do not call this if prepare() has failed.
+	*/
+	static void initialize();
 
 private:
 	GL46_Renderer();
@@ -37,6 +49,16 @@ private:
 	GL46_Texture m_textureImpl;
 	GL46_VertexArray m_vertexArrayImpl;
 	GL46_Viewport m_viewportImpl;
+
+	/**
+	 * OpenGL error callback function
+	 */
+	static void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 };
+
+/**
+ * @brief Polls all OpenGL errors and logs them as errors.
+ */
+void checkForGraphicsErrors();
 
 }

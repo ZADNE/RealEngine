@@ -58,10 +58,10 @@ public:
 
 private:
 
+	void initializeRenderer(Renderer renderer) const;
+
 	/**
-	 * @brief Initializes all RealEngine's subsystems
-	 *
-	 * The internal subsystem initialized are SDL2 and renderer.
+	 * @brief Initializes RealEngine's subsystems
 	 *
 	 * @throws int when a system failed to initialize
 	*/

@@ -4,7 +4,6 @@
 #include <RealEngine/main/window/WindowSubsystems.hpp>
 
 #include <SDL2/SDL.h>
-#include <GL/glew.h>
 
 #include <RealEngine/main/Error.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Renderer.hpp>
@@ -29,6 +28,12 @@ void printSDLVersion() {
 	std::printf("SDL linked:   %u.%u.%u\n", linked.major, linked.minor, linked.patch);
 }
 
+void WindowSubsystems::initializeRenderer(Renderer renderer) const {
+	switch (renderer) {
+	case RE::Renderer::OPENGL_46: GL46_Renderer::initialize(); break;
+	}
+}
+
 WindowSubsystems::WindowSubsystems(Renderer renderer) {
 	log(getVersion());
 	int err = 0;
@@ -41,7 +46,7 @@ WindowSubsystems::WindowSubsystems(Renderer renderer) {
 	printSDLVersion();
 
 	switch (renderer) {
-	case RE::Renderer::OPENGL_46: GL46_Renderer::use(); break;
+	case RE::Renderer::OPENGL_46: GL46_Renderer::prepare(); break;
 	default: goto quitSDL_fail;
 	}
 
