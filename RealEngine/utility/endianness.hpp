@@ -15,11 +15,11 @@
 namespace RE {
 
 /**
- * @brief Runtime check whether the system uses big endian
+ * @brief Checks at runtime whether the system uses big endian
  * or little endian byte order.
  * @return True if the system is big endian, false otherwise
 */
-constexpr bool isSystemBigEndian() {
+bool isSystemBigEndian() {
 	union {
 		uint32_t i;
 		uint8_t c[4];

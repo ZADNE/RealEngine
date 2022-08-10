@@ -159,7 +159,7 @@ namespace RE {
 	 * @return Same bits type casted to the underlying type
 	*/
 	template<typename T>
-	TextureFlagsType ft_cast(T val) {
+	constexpr TextureFlagsType ft_cast(T val) {
 		static_assert(std::is_enum_v<T>);
 		static_assert(std::is_same_v<std::underlying_type_t<T>, TextureFlagsType>);
 		return std::bit_cast<TextureFlagsType>(val);
@@ -183,36 +183,36 @@ namespace RE {
 		using enum TextureWrapStyle;
 		using enum TextureBitdepthPerChannel;
 
-		static inline const TextureFlagsType NEAR_NEAR_EDGE8 =
+		static inline constexpr TextureFlagsType NEAR_NEAR_EDGE8 =
 			ft_cast(NEAREST_NO_MIPMAPS) | ft_cast(NEAREST) | ft_cast(CLAMP_TO_EDGE) | (ft_cast(CLAMP_TO_EDGE) << TEX_WRAP_X_TO_Y_LEFTSHIFT) | ft_cast(BITS_8);
-		static inline const TextureFlagsType NEAR_LIN_EDGE8 =
+		static inline constexpr TextureFlagsType NEAR_LIN_EDGE8 =
 			ft_cast(NEAREST_NO_MIPMAPS) | ft_cast(LINEAR) | ft_cast(CLAMP_TO_EDGE) | (ft_cast(CLAMP_TO_EDGE) << TEX_WRAP_X_TO_Y_LEFTSHIFT) | ft_cast(BITS_8);
 
 	public:
 
 		/** RGBA, 8 bits per channel, normalized - unsigned, near min&mag filter, clamping to edge */
-		static inline const TextureFlagsType RGBA8_NU_NEAR_NEAR_EDGE = ft_cast(RGBA) | ft_cast(NORMALIZED_UNSIGNED) | NEAR_NEAR_EDGE8;
+		static inline constexpr TextureFlagsType RGBA8_NU_NEAR_NEAR_EDGE = ft_cast(RGBA) | ft_cast(NORMALIZED_UNSIGNED) | NEAR_NEAR_EDGE8;
 		/** RGBA, 8 bits per channel, integral - unsigned, near min&mag filter, clamping to edge */
-		static inline const TextureFlagsType RGBA8_IU_NEAR_NEAR_EDGE = ft_cast(RGBA) | ft_cast(INTEGRAL_UNSIGNED) | NEAR_NEAR_EDGE8;
+		static inline constexpr TextureFlagsType RGBA8_IU_NEAR_NEAR_EDGE = ft_cast(RGBA) | ft_cast(INTEGRAL_UNSIGNED) | NEAR_NEAR_EDGE8;
 		/** RGBA, 8 bits per channel, normalized - unsigned, near min, linear mag filter, clamping to edge */
-		static inline const TextureFlagsType RGBA8_NU_NEAR_LIN_EDGE = ft_cast(RGBA) | ft_cast(NORMALIZED_UNSIGNED) | NEAR_LIN_EDGE8;
+		static inline constexpr TextureFlagsType RGBA8_NU_NEAR_LIN_EDGE = ft_cast(RGBA) | ft_cast(NORMALIZED_UNSIGNED) | NEAR_LIN_EDGE8;
 		/** RGBA, 8 bits per channel, integral - unsigned, near min, linear mag filter, clamping to edge */
-		static inline const TextureFlagsType RGBA8_IU_NEAR_LIN_EDGE = ft_cast(RGBA) | ft_cast(INTEGRAL_UNSIGNED) | NEAR_LIN_EDGE8;
+		static inline constexpr TextureFlagsType RGBA8_IU_NEAR_LIN_EDGE = ft_cast(RGBA) | ft_cast(INTEGRAL_UNSIGNED) | NEAR_LIN_EDGE8;
 
 		/**
 		 * @brief Default constructs flags to all zeros
 		*/
-		TextureFlags() : m_flags(0) {}
+		constexpr TextureFlags() : m_flags(0) {}
 
 		/**
 		 * @brief Conversion from raw type (no validity check!)
 		*/
-		TextureFlags(TextureFlagsType flags) : m_flags(flags) {}
+		constexpr TextureFlags(TextureFlagsType flags) : m_flags(flags) {}
 
 		/**
 		 * @brief Constructs flags from all the settings
 		*/
-		TextureFlags(TextureChannels channels, TextureFormat format,
+		constexpr TextureFlags(TextureChannels channels, TextureFormat format,
 			TextureMinFilter minFilter, TextureMagFilter magFilter,
 			TextureWrapStyle wrapStyleX, TextureWrapStyle wrapStyleY,
 			TextureBitdepthPerChannel bitdepth);

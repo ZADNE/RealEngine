@@ -3,12 +3,6 @@
  */
 #include <RealEngine/rendering/textures/Texture.hpp>
 
-#include <cmath>
-#include <iostream>
-#include <sstream>
-
-#include <GL/glew.h>
-#include <glm/vec4.hpp>
 #include <lodepng/lodepng.hpp>
 
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
@@ -16,13 +10,8 @@
 
 namespace RE {
 
-GLenum toGLenum(TextureChannels channels) {
-	static_assert(TEX_CHANNELS_BITS == 0b0000'0000'0000'0011, "TextureFlags - channel bits reaaranged");
-	static const GLenum enums[] = {
-		GL_RED, GL_RG, GL_RGB, GL_RGBA
-	};
-	return enums[ft_cast(channels)];
-}
+ITexture* Texture::s_impl = nullptr;
+ITexture* TextureProxy::s_impl = nullptr;
 
 LodePNGColorType toLodePNGColorType(TextureChannels channels) {
 	static_assert(TEX_CHANNELS_BITS == 0b0000'0000'0000'0011, "TextureFlags - channel bits reaaranged");
@@ -42,61 +31,6 @@ TextureChannels toTextureChannels(LodePNGColorType colorType) {
 	}
 }
 
-GLenum textureInternalFormat(TextureChannels channels, TextureFormat type, TextureBitdepthPerChannel bitdepth) {
-	static_assert((TEX_CHANNELS_BITS | TEX_FORMAT_BITS) == 0b0000'0000'0000'1111, "TextureFlags - channel or format bits reaaranged");
-	static const GLenum internalFormats[3][16] = {{
-		GL_R8,		GL_RG8,			GL_RGB8,		GL_RGBA8,
-		GL_R8_SNORM,GL_RG8_SNORM,	GL_RGB8_SNORM,	GL_RGBA8_SNORM,
-		GL_R8UI,	GL_RG8UI,		GL_RGB8UI,		GL_RGBA8UI,
-		GL_R8I,		GL_RG8I,		GL_RGB8I,		GL_RGBA8I
-	},{
-		GL_R16,		GL_RG16,		GL_RGB16,		GL_RGBA16,
-		GL_R16_SNORM,GL_RG16_SNORM,	GL_RGB16_SNORM,	GL_RGBA16_SNORM,
-		GL_R16UI,	GL_RG16UI,		GL_RGB16UI,		GL_RGBA16UI,
-		GL_R16I,	GL_RG16I,		GL_RGB16I,		GL_RGBA16I
-	},{
-		GL_R32F,	GL_RG32F,		GL_RGB32F,		GL_RGBA32F,
-		GL_R32F,	GL_RG32F,		GL_RGB32F,		GL_RGBA32F,
-		GL_R32UI,	GL_RG32UI,		GL_RGB32UI,		GL_RGBA32UI,
-		GL_R32I,	GL_RG32I,		GL_RGB32I,		GL_RGBA32I
-	}};
-	return internalFormats[ft_cast(bitdepth) >> TEX_BITDEPTH_TO_VAL_RIGHTSHIFT][ft_cast(channels) | ft_cast(type)];
-}
-
-int uintlog2(unsigned int arg) {
-	if (arg > 0) {
-		int log = 0;
-		while (arg >>= 1) ++log;
-		return log;
-	} else {
-		return 0;
-	}
-}
-
-int wrapStyleToGLEnum(TextureWrapStyle style) {
-	switch (style) {
-	case RE::TextureWrapStyle::CLAMP_TO_EDGE: return GL_CLAMP_TO_EDGE;
-	case RE::TextureWrapStyle::CLAMP_TO_BORDER: return GL_CLAMP_TO_BORDER;
-	case RE::TextureWrapStyle::REPEAT_NORMALLY: return GL_REPEAT;
-	case RE::TextureWrapStyle::REPEAT_MIRRORED: return GL_MIRRORED_REPEAT;
-	default:
-		return GL_CLAMP_TO_EDGE;
-	}
-}
-
-int minFilterToGLEnum(TextureMinFilter filter) {
-	switch (filter) {
-	case RE::TextureMinFilter::NEAREST_NO_MIPMAPS: return GL_NEAREST;
-	case RE::TextureMinFilter::LINEAR_NO_MIPMAPS: return GL_LINEAR;
-	case RE::TextureMinFilter::NEAREST_MIPMAP_NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
-	case RE::TextureMinFilter::NEAREST_MIPMAP_LINEAR: return GL_NEAREST_MIPMAP_LINEAR;
-	case RE::TextureMinFilter::LINEAR_MIPMAP_NEAREST: return GL_LINEAR_MIPMAP_NEAREST;
-	case RE::TextureMinFilter::LINEAR_MIPMAP_LINEAR: return GL_LINEAR_MIPMAP_LINEAR;
-	default:
-		return GL_NEAREST;
-	}
-}
-
 glm::vec4 colorToFloatColor(Color color, TextureFormat type) {
 	glm::vec4 borderRGBA = glm::vec4{color.r, color.g, color.b, color.a};
 	switch (type) {
@@ -111,6 +45,14 @@ glm::vec4 colorToFloatColor(Color color, TextureFormat type) {
 TextureProxy::TextureProxy(const Texture& texture) :
 	m_ID(texture.m_ID) {
 
+}
+
+void TextureProxy::bind() const {
+	s_impl->bind(*this);
+}
+
+void TextureProxy::bind(TextureUnit unit) const {
+	s_impl->bind(*this, unit);
 }
 
 Texture::Texture(Texture&& other) noexcept :
@@ -187,12 +129,7 @@ Texture::Texture(const Raster& raster, const TextureParameters& params/* = DEFAU
 }
 
 Texture::~Texture() {
-	if (m_ID != 0) {
-		glDeleteTextures(1, &m_ID);
-	#if defined(_DEBUG) && defined(RE_LOG_TEXTURE_DESTROYED)
-		std::cout << "Destroyed " << identificationString() << '\n';
-	#endif // defined(_DEBUG) && defined(RE_LOG_TEXTURE_DESTROYED)
-	}
+	s_impl->destruct(*this);
 }
 
 TextureParameters Texture::getParameters() const {
@@ -201,63 +138,69 @@ TextureParameters Texture::getParameters() const {
 
 void Texture::setMinFilter(TextureMinFilter minFilter) {
 	m_flags.setMinFilter(minFilter);
-	glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, minFilterToGLEnum(minFilter));
+	s_impl->setMinFilter(*this, minFilter);
 }
 
 void Texture::setMagFilter(TextureMagFilter magFilter) {
 	m_flags.setMagFilter(magFilter);
-	glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, (magFilter == TextureMagFilter::LINEAR) ? GL_LINEAR : GL_NEAREST);
+	s_impl->setMagFilter(*this, magFilter);
 }
 
 void Texture::setWrapStyleX(TextureWrapStyle wrapStyleX) {
 	m_flags.setWrapStyleX(wrapStyleX);
-	glTextureParameteri(m_ID, GL_TEXTURE_WRAP_S, wrapStyleToGLEnum(wrapStyleX));
+	s_impl->setWrapStyleX(*this, wrapStyleX);
 }
 
 void Texture::setWrapStyleY(TextureWrapStyle wrapStyleY) {
 	m_flags.setWrapStyleY(wrapStyleY);
-	glTextureParameteri(m_ID, GL_TEXTURE_WRAP_T, wrapStyleToGLEnum(wrapStyleY));
+	s_impl->setWrapStyleY(*this, wrapStyleY);
 }
 
-void Texture::setBorderColor(RE::Color col) {
+void Texture::setBorderColor(Color col) {
 	m_borderColor = col;
 	glm::vec4 borderRGBA = colorToFloatColor(col, getFormat());
-	glTextureParameterfv(m_ID, GL_TEXTURE_BORDER_COLOR, &borderRGBA.r);
+	s_impl->setBorderColor(*this, m_borderColor);
 }
 
 void Texture::setBorderColor(const glm::vec4& col) {
-	m_borderColor = RE::Color{col * 255.0f};
-	glTextureParameterfv(m_ID, GL_TEXTURE_BORDER_COLOR, &col.r);
+	m_borderColor = Color{col * 255.0f};
+	s_impl->setBorderColor(*this, col);
+}
+
+void Texture::bind() const {
+	s_impl->bind(*this);
+}
+
+void Texture::bind(TextureUnit unit) const {
+	s_impl->bind(*this, unit);
 }
 
 void Texture::bindImage(ImageUnit unit, GLint level, ImageAccess access) const {
-	glBindImageTexture(unit.m_unit, m_ID, level, GL_FALSE, 0, static_cast<GLenum>(access), textureInternalFormat(getChannels(), getFormat(), getBitdepthPerChannel()));
+	s_impl->bindImage(*this, unit, level, access);
 }
 
-void Texture::setTexelsWithinImage(GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
-	glTextureSubImage2D(m_ID, level, offset.x, offset.y,
-		size.x, size.y, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, raster);
+void Texture::setTexels(GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
+	s_impl->setTexels(*this, level, offset, size, raster);
 }
 
-void Texture::copyTexelsBetweenImages(GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
-	glCopyImageSubData(m_ID, GL_TEXTURE_2D, srcLevel, srcPos.x, srcPos.y, 0,
-		destination.m_ID, GL_TEXTURE_2D, dstLevel, dstPos.x, dstPos.y, 0, size.x, size.y, 1);
+void Texture::copyTexels(GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
+	s_impl->copyTexels(*this, srcLevel, srcPos, destination, dstLevel, dstPos, size);
 }
 
 void Texture::clear(const glm::vec4& color) const {
-	glClearTexImage(m_ID, 0, GL_RGBA, GL_FLOAT, &color);
+	s_impl->clear(*this, 0, color);
 }
 
 void Texture::clear(const glm::ivec4& color) const {
-	glClearTexImage(m_ID, 0, GL_RGBA_INTEGER, GL_INT, &color);
+	s_impl->clear(*this, 0, color);
 }
 
 void Texture::clear(const glm::uvec4& color) const {
-	glClearTexImage(m_ID, 0, GL_RGBA_INTEGER, GL_UNSIGNED_INT, &color);
+	s_impl->clear(*this, 0, color);
 }
 
-void Texture::clear(RE::Color color) const {
-	glClearTexImage(m_ID, 0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, &color);
+void Texture::clear(Color color) const {
+	s_impl->clear(*this, 0, color);
 }
 
 bool Texture::saveToFile(const std::string& filePathPNG) {
@@ -268,8 +211,8 @@ bool Texture::saveToFile(const std::string& filePathPNG, const TextureParameters
 	auto channels = params.getChannels();
 	//Download pixels
 	std::vector<unsigned char> pixels;
-	pixels.resize(Raster::requiredMemory(m_trueDims, channels));
-	glGetTextureImage(m_ID, 0, toGLenum(channels), GL_UNSIGNED_BYTE, static_cast<GLsizei>(pixels.size()), pixels.data());
+	pixels.resize(Raster::minimumRequiredMemory(m_trueDims, channels));
+	s_impl->getTexels(*this, 0, static_cast<GLsizei>(pixels.size()), pixels.data());
 
 	//Insert rti chunk
 	lodepng::State state{};
@@ -292,12 +235,6 @@ bool Texture::saveToFile(const std::string& filePathPNG, const TextureParameters
 	return true;
 }
 
-std::string Texture::identificationString() const {
-	std::stringstream stream;
-	stream << "texture (ID: " << m_ID << " - " << m_trueDims.x << "x" << m_trueDims.y << "x" << to_string(getChannels()) << ")";
-	return stream.str();
-}
-
 void Texture::init(const Raster& raster, const TextureParameters& params) {
 	if (params.isGeometryDefinedByImage()) {//Geometry defined by image
 		m_subimageDims = raster.getDims();
@@ -312,18 +249,7 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
 	m_trueDims = raster.getDims();
 	m_borderColor = params.getBorderColor();
 
-	//Create texture
-	glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
-
-	//Create storage for the texture
-	GLsizei levels = getMinFilterMipmapsUsage() == TextureMinFilterMipmapsUsage::YES ? uintlog2(std::max(m_trueDims.x, m_trueDims.y)) : 1;
-	auto internalFormat = textureInternalFormat(getChannels(), getFormat(), getBitdepthPerChannel());
-	glTextureStorage2D(m_ID, levels, internalFormat, m_trueDims.x, m_trueDims.y);
-
-	//Upload pixels for the texture (if specified)
-	if (raster.getTexels().size() > 0u) {
-		glTextureSubImage2D(m_ID, 0, 0, 0, m_trueDims.x, m_trueDims.y, toGLenum(raster.getChannels()), GL_UNSIGNED_BYTE, raster.getTexels().data());
-	}
+	s_impl->construct(*this, raster);
 
 	//Set parameters of the texture
 	setMinFilter(getMinFilter());
@@ -331,15 +257,6 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
 	setWrapStyleX(getWrapStyleX());
 	setWrapStyleY(getWrapStyleY());
 	setBorderColor(getBorderColor());
-
-	//Generate mipmaps for the texture
-	if (levels > 1) {
-		glGenerateTextureMipmap(m_ID);
-	}
-
-#if defined(_DEBUG) && defined(RE_LOG_TEXTURE_CREATED)
-	std::cout << "Created " << identificationString() << '\n';
-#endif // defined(_DEBUG) && defined(RE_LOG_TEXTURE_CREATED)
 }
 
 }

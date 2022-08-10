@@ -7,9 +7,9 @@
 namespace RE {
 
 /**
-* @brief Is OpenGL 4.6 implementation of VertexArray
+* @brief Is OpenGL 4.6 implementation of VertexArray class.
 *
-* Do not use this directly - use VertexArray class instead.
+* Do not use this directly - use VertexArray instead.
 */
 class GL46_VertexArray : public IVertexArray {
 public:

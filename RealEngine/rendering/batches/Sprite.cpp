@@ -17,8 +17,8 @@ namespace RE {
 		return 1.0f;
 	}
 
-	RE::Color Sprite::getColor() const {
-		return RE::Color{ 255u, 255u, 255u, 255u };
+	Color Sprite::getColor() const {
+		return Color{ 255u, 255u, 255u, 255u };
 	}
 
 	glm::vec2 Sprite::getScale() const {
@@ -57,14 +57,14 @@ namespace RE {
 		return m_imageSpeed;
 	}
 
-	FullSprite::FullSprite(TexturePtr texture, float sprite, float subimage, float imageSpeed, RE::Color color, const glm::vec2& scale) :
+	FullSprite::FullSprite(TexturePtr texture, float sprite, float subimage, float imageSpeed, Color color, const glm::vec2& scale) :
 		SpeedSprite{ texture, sprite, subimage, imageSpeed },
 		m_color(color),
 		m_scale(scale) {
 
 	}
 
-	void FullSprite::setColor(RE::Color color) {
+	void FullSprite::setColor(Color color) {
 		m_color = color;
 	}
 
@@ -72,7 +72,7 @@ namespace RE {
 		m_scale = scale;
 	}
 
-	RE::Color FullSprite::getColor() const {
+	Color FullSprite::getColor() const {
 		return m_color;
 	}
 

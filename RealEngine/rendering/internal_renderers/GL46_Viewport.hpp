@@ -2,15 +2,14 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-
 #include <RealEngine/rendering/internal_interfaces/IViewport.hpp>
 
 namespace RE {
 
 /**
-* @brief Is OpenGL 4.6 implementation of Viewport
+* @brief Is OpenGL 4.6 implementation of Viewport class.
 *
-* Do not use this directly - use Viewport class instead.
+* Do not use this directly - use Viewport instead.
 */
 class GL46_Viewport : public IViewport {
 public:

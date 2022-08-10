@@ -29,12 +29,12 @@ struct CirclePO {
 struct CirclePOCO : public CirclePO {
 	CirclePOCO() {}
 	//Solid color
-	CirclePOCO(const CirclePO& circle, RE::Color color) : CirclePO(circle), mid(color), edge(color) {}
+	CirclePOCO(const CirclePO& circle, Color color) : CirclePO(circle), mid(color), edge(color) {}
 	//Transition in colors
-	CirclePOCO(const CirclePO& circle, RE::Color middle, RE::Color edgE) : CirclePO(circle), mid(middle), edge(edgE) {}
+	CirclePOCO(const CirclePO& circle, Color middle, Color edgE) : CirclePO(circle), mid(middle), edge(edgE) {}
 
-	RE::Color mid;
-	RE::Color edge;
+	Color mid;
+	Color edge;
 };
 
 #pragma warning(pop)

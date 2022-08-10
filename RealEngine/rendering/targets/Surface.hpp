@@ -84,7 +84,7 @@ public:
 	//color = normalized RGBA [0.0f; 1.0f]
 	//index = which texture of the surface should be cleared
 	void clear(const glm::vec4& color, int index);
-	void clear(RE::Color color, int index);
+	void clear(Color color, int index);
 
 	//Getters
 	TextureProxy getTextureProxy(int index = 0) const { return TextureProxy{m_textures[index]}; }
@@ -113,7 +113,7 @@ private:
 };
 
 /**
-* Class used for targeting only specific textures
+ * @brief Is used for targeting only specific textures
 */
 class SurfaceTargetTextures {
 	friend Surface;

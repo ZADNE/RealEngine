@@ -1,6 +1,7 @@
 ﻿target_sources(${PROJECT_NAME} PUBLIC
-	IBuffer.hpp		
+	IBuffer.hpp				
 	IShaderProgram.hpp		
+	ITexture.hpp			
 	IVertexArray.hpp		
-	IViewport.hpp		
+	IViewport.hpp			
 )

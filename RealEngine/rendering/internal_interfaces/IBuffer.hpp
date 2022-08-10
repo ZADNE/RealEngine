@@ -70,7 +70,7 @@ inline GLenum bufferAccesToGLEnum(BufferAccessFrequency accessFreq, BufferAccess
 class Buffer;
 
 /**
-* @brief Is a renderer-agnostic interface to Buffer implementation.
+* @brief Is a renderer-agnostic interface to Buffer's implementation.
 *
 * This is used internally by Buffer.
 *

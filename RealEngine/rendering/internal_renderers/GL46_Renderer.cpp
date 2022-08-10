@@ -9,6 +9,7 @@
 
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/vertices/ShaderProgram.hpp>
+#include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
 #include <RealEngine/rendering/targets/Viewport.hpp>
 
@@ -32,15 +33,19 @@ void GL46_Renderer::use() {
 }
 
 GL46_Renderer::GL46_Renderer() {
-	Buffer::s_impl = &m_buffer;
-	ShaderProgram::s_impl = &m_shaderProgram;
-	VertexArray::s_impl = &m_vertexArray;
-	Viewport::s_impl = &m_viewport;
+	Buffer::s_impl = &m_bufferImpl;
+	ShaderProgram::s_impl = &m_shaderProgramImpl;
+	Texture::s_impl = &m_textureImpl;
+	TextureProxy::s_impl = &m_textureImpl;
+	VertexArray::s_impl = &m_vertexArrayImpl;
+	Viewport::s_impl = &m_viewportImpl;
 }
 
 GL46_Renderer::~GL46_Renderer() {
 	Buffer::s_impl = nullptr;
 	ShaderProgram::s_impl = nullptr;
+	Texture::s_impl = nullptr;
+	TextureProxy::s_impl = nullptr;
 	VertexArray::s_impl = nullptr;
 	Viewport::s_impl = nullptr;
 }

@@ -8,9 +8,9 @@
 namespace RE {
 
 /**
-* @brief Is OpenGL 4.6 implementation of ShaderProgram
+* @brief Is OpenGL 4.6 implementation of ShaderProgram class.
 *
-* Do not use this directly - use ShaderProgram class instead.
+* Do not use this directly - use ShaderProgram instead.
 */
 class GL46_ShaderProgram : public IShaderProgram {
 public:

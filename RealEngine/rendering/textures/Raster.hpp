@@ -61,12 +61,12 @@ namespace RE {
 		 *
 		 * @return Memory requirements of the raster
 		*/
-		size_t requiredMemory() const;
+		size_t minimumRequiredMemory() const;
 
 		/**
-		 * @see requiredMemory()
+		 * @see minimumRequiredMemory()
 		*/
-		static size_t requiredMemory(const glm::uvec2& dims, TextureChannels channels);
+		static size_t minimumRequiredMemory(const glm::uvec2& dims, TextureChannels channels);
 
 	private:
 		glm::uvec2 m_dims;/**< dimensions of the raster */

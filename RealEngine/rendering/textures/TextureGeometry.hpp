@@ -28,14 +28,15 @@ public:
 	 *
 	 * All getters will return zeros for this as they lose relevance.
 	*/
-	TextureGeometry() : m_definedByRaster(true) {}
+	constexpr TextureGeometry() : m_definedByRaster(true) {}
 
 	/**
 	 * @brief Constructs geometry that has single subimage of given dimensions and pivot
 	 * @param dims Dimension of the single subimage
 	 * @param pivot Pivot of the subimage
 	*/
-	TextureGeometry(const glm::vec2& dims, const glm::vec2& pivot = {0.0f, 0.0f});
+	constexpr TextureGeometry(const glm::vec2& dims, const glm::vec2& pivot = {0.0f, 0.0f}) :
+		m_subimageDims(dims), m_pivot(pivot), m_subimagesSpritesCount(1.0f, 1.0f) {}
 
 	/**
 	 * @brief Contructs geometry as a grid of subimages
@@ -43,7 +44,8 @@ public:
 	 * @param pivot Pivot of the subimages (same for all subimages)
 	 * @param subimagesSpritesCount x = number of subimages in sprite, y = number of sprites
 	*/
-	TextureGeometry(const glm::vec2& subimageDims, const glm::vec2& pivot, const glm::vec2& subimagesSpritesCount);
+	constexpr TextureGeometry(const glm::vec2& subimageDims, const glm::vec2& pivot, const glm::vec2& subimagesSpritesCount) :
+		m_subimageDims(subimageDims), m_pivot(pivot), m_subimagesSpritesCount(subimagesSpritesCount) {}
 
 	/**
 	 * @brief Gets whether geometry is to be defined by image (only default-constructed is)

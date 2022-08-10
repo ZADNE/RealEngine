@@ -19,7 +19,7 @@ namespace RE {
 		Sprite(TexturePtr texture, float sprite, float subimage = 0.0f);
 
 		virtual float getSpeed() const;
-		virtual RE::Color getColor() const;
+		virtual Color getColor() const;
 		virtual glm::vec2 getScale() const;
 		virtual glm::vec2 getSubimageSprite() const;
 
@@ -52,16 +52,16 @@ namespace RE {
 	*/
 	class FullSprite : public SpeedSprite {
 	public:
-		FullSprite(TexturePtr texture, float sprite, float subimage, float imageSpeed, RE::Color color, const glm::vec2& scale);
+		FullSprite(TexturePtr texture, float sprite, float subimage, float imageSpeed, Color color, const glm::vec2& scale);
 
-		void setColor(RE::Color color);
+		void setColor(Color color);
 		void setScale(const glm::vec2& scale);
 
-		virtual RE::Color getColor() const override;
+		virtual Color getColor() const override;
 		virtual glm::vec2 getScale() const override;
 	protected:
 		glm::vec2 m_scale;
-		RE::Color m_color;
+		Color m_color;
 	};
 
 }

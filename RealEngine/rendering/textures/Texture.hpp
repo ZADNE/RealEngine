@@ -5,37 +5,29 @@
 #include <string>
 #include <compare>
 
-#include <GL/glew.h>
-
-#include <glm/vec2.hpp>
-#include <glm/vec4.hpp>
-
-#include <RealEngine/rendering/vertices/vertices.hpp>
-#include <RealEngine/rendering/textures/TextureParameters.hpp>
-#include <RealEngine/rendering/textures/Raster.hpp>
-#include <RealEngine/rendering/textures/TextureUnit.hpp>
-#include <RealEngine/rendering/textures/ImageUnit.hpp>
+#include <RealEngine/rendering/internal_interfaces/ITexture.hpp>
 
 
 namespace RE {
 
-/**
- * @brief Holds a non-owning handle to a texture.
- *
- * Once the texture that it represents is destroyed, the proxy
- * becomes invalid and should not be used!
-*/
-
 class Texture;
 
+/**
+ * @brief Holds a non-owning handle to a Texture.
+ *
+ * @warning Once the texture that it represents is destroyed, the proxy
+ * becomes invalid and should not be used!
+*/
 class TextureProxy {
 	friend class Texture;
+	friend class GL46_Renderer;
+	friend class GL46_Texture;
 public:
 
 	/**
 	 * @brief TO BE REMOVED
 	*/
-	explicit TextureProxy(GLuint ID) : m_ID(ID) {}
+	//explicit TextureProxy(GLuint ID) : m_ID(ID) {}
 
 	/**
 	 * @brief Contructs proxy that represents the given texture
@@ -48,7 +40,7 @@ public:
 	 *
 	 * Behaviour is undefined if the originating texture was destroyed.
 	*/
-	void bind() const { glBindTexture(GL_TEXTURE_2D, m_ID); }
+	void bind() const;
 
 	/**
 	 * @brief Binds the texture that this proxy represents to the given texture unit.
@@ -57,11 +49,13 @@ public:
 	 *
 	 * @param unit Texture unit to bind the texture to.
 	*/
-	void bind(TextureUnit unit) const { glBindTextureUnit(unit.m_unit, m_ID); }
+	void bind(TextureUnit unit) const;
 
 	auto operator<=>(const TextureProxy&) const = default;
 private:
 	GLuint m_ID; /**< OpenGL name of the texture */
+
+	static ITexture* s_impl;
 };
 
 /**
@@ -74,16 +68,17 @@ private:
 */
 class Texture {
 	friend class TextureProxy;
+	friend class GL46_Renderer;
+	friend class GL46_Texture;
 public:
-	static inline const TextureFlags DEFAULT_FLAGS{TextureFlags::RGBA8_NU_NEAR_NEAR_EDGE};
-	static inline const RE::Color DEFAULT_BORDER_COLOR{255, 20, 147, 255};
+	static inline constexpr TextureFlags DEFAULT_FLAGS{TextureFlags::RGBA8_NU_NEAR_NEAR_EDGE};
+	static inline constexpr Color DEFAULT_BORDER_COLOR{255, 20, 147, 255};
 
 	/**
 	 * @brief Default parameters for texture use RGBA_NU_NEAR_NEAR_EDGE flags and geometry defined by raster
 	 * @see TextureFlags::RGBA_NU_NEAR_NEAR_EDGE
 	*/
-	static inline const TextureParameters DEFAULT_PARAMETERS{{}, DEFAULT_FLAGS, DEFAULT_BORDER_COLOR};
-
+	static inline constexpr TextureParameters DEFAULT_PARAMETERS{{}, DEFAULT_FLAGS, DEFAULT_BORDER_COLOR};
 
 	/**
 	 * @brief Constructs texture from PNG
@@ -148,7 +143,7 @@ public:
 	glm::vec2 getSubimageDims() const { return m_subimageDims; }
 	glm::vec2 getPivot() const { return m_pivot; }
 	glm::vec2 getSubimagesSpritesCount() const { return m_subimagesSpritesCount; }
-	RE::Color getBorderColor() const { return m_borderColor; };
+	Color getBorderColor() const { return m_borderColor; };
 
 	glm::uvec2 getTrueDims() const { return m_trueDims; }
 
@@ -164,7 +159,7 @@ public:
 	void setSubimageDims(const glm::vec2& subimageDims) { m_subimageDims = subimageDims; }
 	void setPivot(const glm::vec2& pivot) { m_pivot = pivot; }
 	void setSubimagesSpritesCount(const glm::vec2& subimagesSpritesCount) { m_subimagesSpritesCount = subimagesSpritesCount; }
-	void setBorderColor(RE::Color col);
+	void setBorderColor(Color col);
 	void setBorderColor(const glm::vec4& col);
 
 	/**
@@ -181,14 +176,14 @@ public:
 	/**
 	 * @brief Binds the texture to the active texture unit.
 	*/
-	void bind() const { glBindTexture(GL_TEXTURE_2D, m_ID); }
+	void bind() const;
 
 	/**
 	 * @brief Binds the texture to the given texture unit.
 	 *
 	 * @param unit Texture unit to bind the texture to.
 	*/
-	void bind(TextureUnit unit) const { glBindTextureUnit(unit.m_unit, m_ID); }
+	void bind(TextureUnit unit) const;
 
 	/**
 	 * @brief Binds an image of the texture to the image unit
@@ -205,7 +200,7 @@ public:
 	 * @param size Size of the rectangle that is to be replaced
 	 * @param raster The texels that will be copied into the image. The format must be RGBA 8-bits per channel
 	*/
-	void setTexelsWithinImage(GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const;
+	void setTexels(GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const;
 
 	/**
 	 * @brief Copies texels between two images
@@ -216,7 +211,7 @@ public:
 	 * @param dstPos Position within the destination the destination level (image) to copy to
 	 * @param size Size of the area that is to be copied
 	*/
-	void copyTexelsBetweenImages(GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const;
+	void copyTexels(GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const;
 
 	/**
 	 * @brief Clears first level of the texture with given color.
@@ -225,7 +220,7 @@ public:
 	void clear(const glm::vec4& color) const;
 	void clear(const glm::ivec4& color) const;
 	void clear(const glm::uvec4& color) const;
-	void clear(RE::Color color) const;
+	void clear(Color color) const;
 
 	/**
 	 * @brief Saves texture as a PNG file.
@@ -242,12 +237,8 @@ public:
 	*/
 	bool saveToFile(const std::string& filePathPNG, const TextureParameters& params);
 
-	/**
-	 * @brief Conctructs human readable identification string of the texture.
-	 * @return Human readable identification string of the texture
-	*/
-	std::string identificationString() const;
 private:
+
 	void init(const Raster& raster, const TextureParameters& params);
 
 	GLuint m_ID = 0u;			/**< OpenGL name of the texture */
@@ -259,7 +250,9 @@ private:
 
 	glm::uvec2 m_trueDims{};	/**< True dimensions of the OpenGL texture */
 
-	RE::Color m_borderColor{};/**< Border color of the texture */
+	Color m_borderColor{};/**< Border color of the texture */
+
+	static ITexture* s_impl;
 };
 
 }

@@ -5,7 +5,7 @@
 
 namespace RE {
 
-TextureFlags::TextureFlags(TextureChannels channels, TextureFormat format,
+constexpr TextureFlags::TextureFlags(TextureChannels channels, TextureFormat format,
 	TextureMinFilter minFilter, TextureMagFilter magFilter,
 	TextureWrapStyle wrapStyleX, TextureWrapStyle wrapStyleY,
 	TextureBitdepthPerChannel bitdepth) :

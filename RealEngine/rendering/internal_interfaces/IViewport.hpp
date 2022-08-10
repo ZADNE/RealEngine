@@ -8,7 +8,7 @@
 namespace RE {
 
 /**
-* @brief Is a renderer-agnostic interface to Viewport implementation.
+* @brief Is a renderer-agnostic interface to Viewport's implementation.
 *
 * This is used internally by Viewport.
 *

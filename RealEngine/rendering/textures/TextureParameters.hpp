@@ -36,7 +36,7 @@ public:
 	* @param flags Flags of the parameters
 	* @param borderColor Border color of the parameters
 	*/
-	TextureParameters(const TextureGeometry& geometry, TextureFlags flags, RE::Color borderColor) :
+	constexpr TextureParameters(const TextureGeometry& geometry, TextureFlags flags, Color borderColor) :
 		TextureGeometry(geometry), TextureFlags(flags), m_borderColor(borderColor) {}
 
 	/**
@@ -47,7 +47,7 @@ public:
 	* @param geometry Geometry of the parameters
 	* @param flags Flags of the parameters
 	*/
-	TextureParameters(const TextureGeometry& geometry, TextureFlags flags) :
+	constexpr TextureParameters(const TextureGeometry& geometry, TextureFlags flags) :
 		TextureParameters(geometry, flags, { 0u, 0u, 0u, 255u }) {}
 
 	/**
@@ -69,7 +69,7 @@ public:
 	* is not used.
 	* @return Border color of the texture
 	*/
-	RE::Color getBorderColor() const { return m_borderColor; }
+	Color getBorderColor() const { return m_borderColor; }
 
 	/**
 	* @brief Converts parameters to raw bytes, encoded as Real Texture Infromation (RTI)
@@ -77,7 +77,7 @@ public:
 	*/
 	std::vector<unsigned char> convertToRTI() const;
 private:
-	RE::Color m_borderColor;/**< Border color of the texture*/
+	Color m_borderColor;/**< Border color of the texture*/
 };
 
 }

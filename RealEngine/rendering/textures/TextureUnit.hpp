@@ -13,6 +13,7 @@ class TextureUnit {
 	friend class Texture;
 	friend class TextureProxy;
 	friend class GL46_ShaderProgram;
+	friend class GL46_Texture;
 public:
 	TextureUnit(GLuint unit) : m_unit(unit) {}
 

@@ -23,7 +23,7 @@ namespace RE {
 		glm::ivec2_32 pivot;
 		glm::uvec2_32 subimagesSpritesCount;
 		glm::uvec2_32 subimageDims;
-		RE::Color borderColor;
+		Color borderColor;
 
 		void toHost() {
 			ntohBulk(version, flags,

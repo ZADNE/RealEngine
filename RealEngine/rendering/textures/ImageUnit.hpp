@@ -22,6 +22,7 @@ class ImageUnit {
 	friend class Texture;
 	friend class TextureProxy;
 	friend class GL46_ShaderProgram;
+	friend class GL46_Texture;
 public:
 	ImageUnit(GLuint unit) : m_unit(unit) {}
 private:

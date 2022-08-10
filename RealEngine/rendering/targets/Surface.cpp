@@ -136,7 +136,7 @@ void Surface::clear(const glm::vec4& color, int index) {
 	m_textures[index].clear(color);
 }
 
-void Surface::clear(RE::Color color, int index) {
+void Surface::clear(Color color, int index) {
 	m_textures[index].clear(color);
 }
 
