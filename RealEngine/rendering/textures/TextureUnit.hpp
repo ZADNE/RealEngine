@@ -15,9 +15,9 @@ class TextureUnit {
 	friend class GL46_ShaderProgram;
 	friend class GL46_Texture;
 public:
+
 	TextureUnit(GLuint unit) : m_unit(unit) {}
 
-	void setActive() const { glActiveTexture(GL_TEXTURE0 + m_unit); }
 private:
 	GLuint  m_unit;/**< Binding point name */
 };

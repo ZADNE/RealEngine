@@ -4,6 +4,7 @@
 #pragma once
 
 #include <RealEngine/rendering/internal_renderers/GL46_Buffer.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46_MainFramebuffer.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_ShaderProgram.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Texture.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_VertexArray.hpp>
@@ -45,6 +46,7 @@ private:
 	GL46_Renderer& operator=(const GL46_Renderer&) = delete;
 
 	GL46_Buffer m_bufferImpl;
+	GL46_MainFramebuffer m_mainFramebufferImpl;
 	GL46_ShaderProgram m_shaderProgramImpl;
 	GL46_Texture m_textureImpl;
 	GL46_VertexArray m_vertexArrayImpl;

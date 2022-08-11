@@ -18,6 +18,7 @@
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/vertices/default_shaders.hpp>
 #include <RealEngine/rendering/targets/Viewport.hpp>
+#include <RealEngine/rendering/targets/MainFramebuffer.hpp>
 
 namespace RE {
 
@@ -39,7 +40,7 @@ int MainProgram::run() {
 	std::cout << "Entering main loop!" << std::endl;
 	while (m_programShouldRun) {
 		m_synchronizer.beginFrame();
-		glClear(GL_COLOR_BUFFER_BIT);
+		MainFramebuffer::clear(ClearFlags::COLOR);
 
 		//Perform simulation steps to catch up the time
 		while (m_synchronizer.shouldStepHappen()) {
@@ -192,7 +193,7 @@ void MainProgram::processEvent(SDL_Event* evnt) {
 }
 
 void MainProgram::adoptRoomSettings(const RoomDisplaySettings& s) {
-	glClearColor(s.clearColor.r, s.clearColor.g, s.clearColor.b, s.clearColor.a);
+	MainFramebuffer::setClearColor(s.clearColor);
 	m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
 	m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
 	m_usingImGui = s.usingImGui;
