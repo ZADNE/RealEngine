@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -7,7 +7,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
-#include <RealEngine/rendering/targets/Surface.hpp>
+#include <RealEngine/rendering/output/Surface.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/rendering/vertices/vertices.hpp>
 #include <RealEngine/rendering/batches/Sprite.hpp>
@@ -129,7 +129,7 @@ private:
 	void createDrawBatches();
 
 	VertexArray m_vao;
-	Buffer m_vbo{ 0, STREAM, DRAW };
+	Buffer m_vbo{0, STREAM, DRAW};
 
 	std::vector<Glyph*> m_glyphPointers;
 	std::vector<Glyph> m_glyphs;
@@ -144,7 +144,7 @@ private:
 
 	const glm::vec4 m_UVRectangle = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 	const glm::vec4 m_SUVRectangle = glm::vec4(0.0f, 1.0f, 1.0f, -1.0f);//Used for drawing surfaces
-	static inline const Color WHITE{ 255, 255, 255, 255 };
+	static inline const Color WHITE{255, 255, 255, 255};
 };
 
 }

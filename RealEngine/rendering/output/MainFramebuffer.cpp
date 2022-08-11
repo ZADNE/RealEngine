@@ -1,7 +1,7 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/targets/MainFramebuffer.hpp>
+#include <RealEngine/rendering/output/MainFramebuffer.hpp>
 
 namespace RE {
 

@@ -1,7 +1,7 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/targets/Viewport.hpp>
+#include <RealEngine/rendering/output/Viewport.hpp>
 
 namespace RE {
 

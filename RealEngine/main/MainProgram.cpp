@@ -17,8 +17,8 @@
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/vertices/default_shaders.hpp>
-#include <RealEngine/rendering/targets/Viewport.hpp>
-#include <RealEngine/rendering/targets/MainFramebuffer.hpp>
+#include <RealEngine/rendering/output/Viewport.hpp>
+#include <RealEngine/rendering/output/MainFramebuffer.hpp>
 
 namespace RE {
 

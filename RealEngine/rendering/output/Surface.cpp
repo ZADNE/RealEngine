@@ -1,14 +1,14 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/targets/Surface.hpp>
+#include <RealEngine/rendering/output/Surface.hpp>
 
 #include <iostream>
 
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <RealEngine/main/Error.hpp>
-#include <RealEngine/rendering/targets/Viewport.hpp>
+#include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/vertices/default_shaders.hpp>
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
 #include <RealEngine/resources/ResourceManager.hpp>
