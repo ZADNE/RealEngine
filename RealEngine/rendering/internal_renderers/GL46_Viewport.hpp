@@ -15,6 +15,7 @@ class GL46_Viewport : public IViewport {
 public:
 
 	void set(const glm::ivec2& pos, const glm::ivec2& size) const override;
+
 };
 
 }

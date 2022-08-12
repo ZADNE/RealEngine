@@ -105,24 +105,13 @@ public:
 	Texture(const Raster& raster, const TextureParameters& params = DEFAULT_PARAMETERS);
 
 	Texture(const Texture&) = delete;
-
-	/**
-	 * @brief Move contructs from another texture
-	 * @param other Texture to be moved from
-	*/
 	Texture(Texture&& other) noexcept;
 
 	Texture& operator=(const Texture&) = delete;
-
-	/**
-	 * @brief Move assigns value of another texture
-	 * @param other Texture to be moved from
-	 * @return this
-	*/
 	Texture& operator=(Texture&& other) noexcept;
 
 	/**
-	 * @brief Destroys texture
+	 * @brief Destroys the texture
 	*/
 	~Texture();
 

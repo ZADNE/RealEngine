@@ -8,7 +8,7 @@
 #include <SDL2/SDL.h>
 
 #include <RealEngine/rendering/buffers/Buffer.hpp>
-#include <RealEngine/rendering/output/MainFramebuffer.hpp>
+#include <RealEngine/rendering/output/Framebuffer.hpp>
 #include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
@@ -93,7 +93,7 @@ namespace RE {
 
 	GL46_Renderer::GL46_Renderer() {
 		Buffer::s_impl = &m_bufferImpl;
-		MainFramebuffer::s_impl = &m_mainFramebufferImpl;
+		Framebuffer::s_impl = &m_mainFramebufferImpl;
 		ShaderProgram::s_impl = &m_shaderProgramImpl;
 		Texture::s_impl = &m_textureImpl;
 		TextureProxy::s_impl = &m_textureImpl;
@@ -103,7 +103,7 @@ namespace RE {
 
 	GL46_Renderer::~GL46_Renderer() {
 		Buffer::s_impl = nullptr;
-		MainFramebuffer::s_impl = nullptr;
+		Framebuffer::s_impl = nullptr;
 		ShaderProgram::s_impl = nullptr;
 		Texture::s_impl = nullptr;
 		TextureProxy::s_impl = nullptr;
