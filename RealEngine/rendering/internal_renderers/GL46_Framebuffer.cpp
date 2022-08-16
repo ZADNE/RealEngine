@@ -5,7 +5,7 @@
 
 #include <RealEngine/rendering/output/Framebuffer.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
-#include <RealEngine/main/Error.hpp>
+#include <RealEngine/utility/error.hpp>
 
 #include <GL/glew.h>
 

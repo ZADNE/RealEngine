@@ -6,7 +6,7 @@
 #include <fstream>
 #include <cstring>
 
-#include <RealEngine/main/Error.hpp>
+#include <RealEngine/utility/error.hpp>
 #include <RealEngine/utility/endianness.hpp>
 
 

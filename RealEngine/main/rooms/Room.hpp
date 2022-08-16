@@ -2,14 +2,10 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <string>
-#include <vector>
-#include <any>
-
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
-#include <RealEngine/main/MainProgram.hpp>
+#include <RealEngine/main/program/MainProgram.hpp>
 
 namespace RE {
 
@@ -32,9 +28,10 @@ public:
 	/**
 	 * @brief Constructs a room.
 	 *
-	 * This happens when the room is added to the manager.
+	 * You are supposed to do this in the constructor of your program
+	 * and then add them to the room manager.
 	*/
-	Room();
+	Room(RoomDisplaySettings initialSettings = RoomDisplaySettings{});
 
 	/**
 	 * @brief Destructs a room.
@@ -83,13 +80,6 @@ public:
 	virtual void render(double interpolationFactor) = 0;
 
 	/**
-	 * @brief Gets the settings that will be used for this room
-	 * 
-	 * The settings are adopted every time the room is entered
-	*/
-	virtual const RoomDisplaySettings& getDisplaySettings();
-
-	/**
 	 * @brief Callback used to notify that the window's size has changed
 	 * 
 	 * This callback is called for all rooms, even those that are not active.
@@ -121,14 +111,29 @@ public:
 
 	/**
 	 * @brief Gets window
-	 * @return Window , guaranteed to be valid.
+	 * @return Window, guaranteed to be valid.
 	*/
 	Window* window() const;
+
+	/**
+	 * @brief Gets the settings that should be used for this room
+	*/
+	RoomDisplaySettings getDisplaySettings();
+
+	/**
+	 * @brief Dynamically changes the room's display settings
+	*/
+	void changeDisplaySettings(RoomDisplaySettings displaySettings);
+
 private:
-	inline static MainProgram* m_mainProgram = nullptr;			/**< Pointer set by main program */
-	inline static const InputManager* m_inputManager = nullptr;	/**< Pointer set by main program */
-	inline static Synchronizer* m_synchronizer = nullptr;		/**< Pointer set by main program */
-	inline static Window* m_window = nullptr;					/**< Pointer set by main program */
+
+	RoomDisplaySettings m_displaySettings;
+
+	inline static MainProgram* s_mainProgram = nullptr;			/**< Pointer set by main program */
+	inline static const InputManager* s_inputManager = nullptr;	/**< Pointer set by main program */
+	inline static Synchronizer* s_synchronizer = nullptr;		/**< Pointer set by main program */
+	inline static Window* s_window = nullptr;					/**< Pointer set by main program */
+	inline static RoomManager* s_roomManager = nullptr;			/**< Pointer set by main program */
 };
 
 }

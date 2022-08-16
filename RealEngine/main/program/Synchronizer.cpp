@@ -1,7 +1,7 @@
 ﻿/*! 
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/Synchronizer.hpp>
+#include <RealEngine/main/program/Synchronizer.hpp>
 
 #include <thread>
 #include <cassert>

@@ -6,8 +6,8 @@
 
 #include <glm/vec2.hpp>
 
-#include <RealEngine/main/CommandLineArguments.hpp>
-#include <RealEngine/main/room/RoomTransitionParameters.hpp>
+#include <RealEngine/main/program/CommandLineArguments.hpp>
+#include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
 
 namespace RE {
 
@@ -64,7 +64,7 @@ public:
 
 protected:
 	std::vector<Room*> m_rooms;								/**< Non-owning vector of all managed rooms */
-	Room* m_currentRoom = nullptr;							/**< Pointer to current room */
+	Room* m_currentRoom = nullptr;							/**< Pointer to the current room */
 };
 
 }

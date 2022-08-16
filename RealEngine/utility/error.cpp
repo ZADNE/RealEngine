@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/Error.hpp>
+#include <RealEngine/utility/error.hpp>
 
 #include <iostream>
 #include <string>

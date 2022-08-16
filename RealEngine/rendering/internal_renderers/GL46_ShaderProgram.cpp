@@ -9,7 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <RealEngine/utility/GLTypeToString.hpp>
-#include <RealEngine/main/Error.hpp>
+#include <RealEngine/utility/error.hpp>
 #include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 
 namespace RE {

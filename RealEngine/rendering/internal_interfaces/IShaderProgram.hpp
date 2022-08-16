@@ -14,7 +14,7 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
-#include <RealEngine/main/Error.hpp>
+#include <RealEngine/utility/error.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/textures/TextureUnit.hpp>
 #include <RealEngine/rendering/textures/ImageUnit.hpp>

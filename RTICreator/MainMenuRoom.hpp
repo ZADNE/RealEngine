@@ -4,7 +4,7 @@
 #pragma once
 #include <optional>
 
-#include <RealEngine/main/room/Room.hpp>
+#include <RealEngine/main/rooms/Room.hpp>
 #include <RealEngine/rendering/cameras/View2D.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
@@ -20,18 +20,10 @@ public:
 	void sessionEnd() override;
 	void step() override;
 	void render(double interpolationFactor) override;
-
-	const RE::RoomDisplaySettings& getDisplaySettings() override {
-		static RE::RoomDisplaySettings settings{
-			.clearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
-			.framesPerSecondLimit = 144,
-			.usingImGui = true
-		};
-		return settings;
-	}
-
 	void windowResized(const glm::ivec2& newDims) override;
+
 private:
+
 	void parametersGUI();
 
 	void selectAndLoad();

@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/main/MainProgram.hpp>
+#include <RealEngine/main/program/MainProgram.hpp>
 
 #include <RTICreator/MainMenuRoom.hpp>
 

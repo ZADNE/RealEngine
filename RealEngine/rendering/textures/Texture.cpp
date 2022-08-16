@@ -6,7 +6,7 @@
 #include <lodepng/lodepng.hpp>
 
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
-#include <RealEngine/main/Error.hpp>
+#include <RealEngine/utility/error.hpp>
 
 namespace RE {
 

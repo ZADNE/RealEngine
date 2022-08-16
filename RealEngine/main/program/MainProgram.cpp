@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/MainProgram.hpp>
+#include <RealEngine/main/program/MainProgram.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -12,7 +12,7 @@
 #include <ImGui/imgui_impl_sdl.h>
 #include <ImGui/imgui_impl_opengl3.h>
 
-#include <RealEngine/main/room/Room.hpp>
+#include <RealEngine/main/rooms/Room.hpp>
 #include <RealEngine/resources/ResourceManager.hpp>
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
@@ -241,10 +241,11 @@ namespace RE {
 
 	MainProgram::MainProgram() {
 		std = this;
-		Room::m_mainProgram = this;
-		Room::m_inputManager = &m_inputManager;
-		Room::m_synchronizer = &m_synchronizer;
-		Room::m_window = &m_window;
+		Room::s_mainProgram = this;
+		Room::s_inputManager = &m_inputManager;
+		Room::s_synchronizer = &m_synchronizer;
+		Room::s_window = &m_window;
+		Room::s_roomManager = &m_roomManager;
 
 		auto spriteShader = RE::RM::getShaderProgram({ .vert = sprite_vert, .frag = sprite_frag });
 		spriteShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);

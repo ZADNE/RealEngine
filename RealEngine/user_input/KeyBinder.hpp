@@ -13,8 +13,8 @@
 
 #include <magic_enum/magic_enum.hpp>
 #include <RealEngine/user_input/Key.hpp>
-#include <RealEngine/main/Error.hpp>
-#include <RealEngine/main/MainProgram.hpp>
+#include <RealEngine/utility/error.hpp>
+#include <RealEngine/main/program/MainProgram.hpp>
 
 namespace RE {
 

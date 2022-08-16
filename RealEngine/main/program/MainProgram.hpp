@@ -7,12 +7,12 @@
 
 #include <glm/vec2.hpp>
 
-#include <RealEngine/main/Error.hpp>
-#include <RealEngine/main/room/RoomManager.hpp>
-#include <RealEngine/main/room/RoomDisplaySettings.hpp>
-#include <RealEngine/main/room/RoomTransitionParameters.hpp>
+#include <RealEngine/utility/error.hpp>
+#include <RealEngine/main/rooms/RoomManager.hpp>
+#include <RealEngine/main/rooms/RoomDisplaySettings.hpp>
+#include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
 #include <RealEngine/main/window/Window.hpp>
-#include <RealEngine/main/Synchronizer.hpp>
+#include <RealEngine/main/program/Synchronizer.hpp>
 #include <RealEngine/user_input/InputManager.hpp>
 
 union SDL_Event;
@@ -150,9 +150,10 @@ public:
 	void resizeWindow(const glm::ivec2& newDims, bool save);
 
 	void setRelativeCursorMode(bool relative);
+
 protected:
 	/**
-	 * @brief Constructs main program.
+	 * @brief Constructs the main program.
 	 *
 	 * Do not forget to add rooms to room manager
 	 * and to enter a room inside your derived class
@@ -165,13 +166,14 @@ protected:
 	InputManager m_inputManager; /**< Record key presses/releases, mouse movement etc. */
 	Synchronizer m_synchronizer{50u, 50u}; /**< Maintains constant speed of simulation, can also limit FPS */
 private:
+
 	void step();
 	void render(double interpolationFactor);
 
 	void pollEvents();
 	void processEvent(SDL_Event* evnt);
 
-	void adoptRoomSettings(const RoomDisplaySettings& s);
+	void adoptRoomSettings(const RoomDisplaySettings& rds);
 
 	bool m_programShouldRun = false;
 	int m_programExitCode = EXIT_SUCCESS;

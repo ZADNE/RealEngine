@@ -5,7 +5,7 @@
 
 #include <SDL2/SDL.h>
 
-#include <RealEngine/main/Error.hpp>
+#include <RealEngine/utility/error.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Renderer.hpp>
 
 namespace RE {
