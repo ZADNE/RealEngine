@@ -6,7 +6,7 @@
 
 #include <RealEngine/main/room/Room.hpp>
 #include <RealEngine/rendering/cameras/View2D.hpp>
-#include <RealEngine/rendering/targets/Viewport.hpp>
+#include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 
 /**

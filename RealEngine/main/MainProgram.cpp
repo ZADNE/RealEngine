@@ -40,7 +40,7 @@ namespace RE {
 		std::cout << "Entering main loop!" << std::endl;
 		while (m_programShouldRun) {
 			m_synchronizer.beginFrame();
-			Framebuffer::clear(ClearFlags::COLOR);
+			DefaultFrameBuffer::clearColor(m_clearColor);
 
 			//Perform simulation steps to catch up the time
 			while (m_synchronizer.shouldStepHappen()) {
@@ -48,8 +48,7 @@ namespace RE {
 				if (m_checkForInput) {
 					m_inputManager.update();
 					pollEvents();
-				}
-				else {
+				} else {
 					SDL_PumpEvents();
 				}
 				//Do the simulation step
@@ -194,7 +193,7 @@ namespace RE {
 	}
 
 	void MainProgram::adoptRoomSettings(const RoomDisplaySettings& s) {
-		Framebuffer::setClearColor(s.clearColor);
+		m_clearColor = s.clearColor;
 		m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
 		m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
 		m_usingImGui = s.usingImGui;

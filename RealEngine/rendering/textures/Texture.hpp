@@ -70,6 +70,7 @@ class Texture {
 	friend class TextureProxy;
 	friend class GL46_Renderer;
 	friend class GL46_Texture;
+	friend class GL46_Framebuffer;
 public:
 	static inline constexpr TextureFlags DEFAULT_FLAGS{TextureFlags::RGBA8_NU_NEAR_NEAR_EDGE};
 	static inline constexpr Color DEFAULT_BORDER_COLOR{255, 20, 147, 255};
@@ -150,17 +151,6 @@ public:
 	void setSubimagesSpritesCount(const glm::vec2& subimagesSpritesCount) { m_subimagesSpritesCount = subimagesSpritesCount; }
 	void setBorderColor(Color col);
 	void setBorderColor(const glm::vec4& col);
-
-	/**
-	 * @brief Gets internal identifier of the texture.
-	 *
-	 * This breaches class encapsulation - use with caution!
-	 *
-	 * @return Internal ID of the texture.
-	*/
-	GLuint getID() const {
-		return m_ID;
-	}
 
 	/**
 	 * @brief Binds the texture to the active texture unit.

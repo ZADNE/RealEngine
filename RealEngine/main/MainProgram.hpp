@@ -178,10 +178,11 @@ private:
 
 	bool m_checkForInput = true;
 	bool m_usingImGui = false;
+	glm::vec4 m_clearColor{};
 
 	void doRoomTransitionIfScheduled();
 
-	static const size_t NO_NEXT_ROOM = std::numeric_limits<size_t>::max();
+	static constexpr size_t NO_NEXT_ROOM = std::numeric_limits<size_t>::max();
 	size_t m_nextRoomIndex = NO_NEXT_ROOM;
 	RoomTransitionParameters m_roomTransitionParameters;
 };

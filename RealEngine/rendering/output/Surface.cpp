@@ -159,7 +159,7 @@ void Surface::attachTexturesToFBO() {
 
 	for (GLenum i = 0; i < (GLenum)m_textures.size(); i++) {
 		buffers[i] = GL_COLOR_ATTACHMENT0 + i;
-		glNamedFramebufferTexture(m_frameBuffer, buffers[i], m_textures[i].getID(), 0);
+		//glNamedFramebufferTexture(m_frameBuffer, buffers[i], m_textures[i].getID(), 0);
 	}
 
 	glNamedFramebufferDrawBuffers(m_frameBuffer, (GLsizei)m_textures.size(), buffers);

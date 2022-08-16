@@ -15,13 +15,13 @@ public:
 	void construct(Framebuffer& fb) const override;
 	void destruct(Framebuffer& fb) const override;
 
-	void attachImage(const Framebuffer& fb, const Texture& te, int level, FramebufferAttachment attachment) const override;
+	void attachImage(Framebuffer& fb, FramebufferAttachment attachment, const Texture& te, int level) const override;
 
-	void associateAttachementsWithOutputs(const Framebuffer& fb, const std::vector<const FramebufferOutput>& outputs) const override;
-	void selectAttachmentForColorReading(const Framebuffer& fb, unsigned int colorAttachmentIndex) const override;
+	void associateAttachementsWithOutputs(Framebuffer& fb, const std::vector<FramebufferOutput>& outputs) const override;
+	void selectAttachmentForColorReading(Framebuffer& fb, unsigned int colorAttachmentIndex) const override;
 
 	void targetMe(const Framebuffer& fb, FramebufferTarget target) const override;
-	FramebufferTargetability targetability(const Framebuffer& fb, FramebufferTarget target) const override;
+	FramebufferTargetability checkTargetability(const Framebuffer& fb, FramebufferTarget target) const override;
 
 	void clearColorAttachment(const Framebuffer& fb, unsigned int attachmentIndex, const glm::vec4& color) const override;
 	void clearColorAttachment(const Framebuffer& fb, unsigned int attachmentIndex, const glm::ivec4& color) const override;

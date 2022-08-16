@@ -75,13 +75,13 @@ public:
 	virtual void construct(Framebuffer& fb) const = 0;
 	virtual void destruct(Framebuffer& fb) const = 0;
 
-	virtual void attachImage(const Framebuffer& fb, const Texture& te, int level, FramebufferAttachment attachment) const = 0;
+	virtual void attachImage(Framebuffer& fb, FramebufferAttachment attachment, const Texture& te, int level) const = 0;
 
-	virtual void associateAttachementsWithOutputs(const Framebuffer& fb, const std::vector<const FramebufferOutput>& outputs) const = 0;
-	virtual void selectAttachmentForColorReading(const Framebuffer& fb, unsigned int colorAttachmentIndex) const = 0;
+	virtual void associateAttachementsWithOutputs(Framebuffer& fb, const std::vector<FramebufferOutput>& outputs) const = 0;
+	virtual void selectAttachmentForColorReading(Framebuffer& fb, unsigned int colorAttachmentIndex) const = 0;
 
 	virtual void targetMe(const Framebuffer& fb, FramebufferTarget target) const = 0;
-	virtual FramebufferTargetability targetability(const Framebuffer& fb, FramebufferTarget target) const = 0;
+	virtual FramebufferTargetability checkTargetability(const Framebuffer& fb, FramebufferTarget target) const = 0;
 
 	virtual void clearColorAttachment(const Framebuffer& fb, unsigned int attachmentIndex, const glm::vec4& color) const = 0;
 	virtual void clearColorAttachment(const Framebuffer& fb, unsigned int attachmentIndex, const glm::ivec4& color) const = 0;

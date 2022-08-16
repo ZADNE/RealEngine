@@ -99,9 +99,15 @@ namespace RE {
 		TextureProxy::s_impl = &m_textureImpl;
 		VertexArray::s_impl = &m_vertexArrayImpl;
 		Viewport::s_impl = &m_viewportImpl;
+
+		m_defaultFramebuffer = Framebuffer(0u);
+		DefaultFrameBuffer::s_defaultFramebuffer = &(*m_defaultFramebuffer);
 	}
 
 	GL46_Renderer::~GL46_Renderer() {
+		DefaultFrameBuffer::s_defaultFramebuffer = nullptr;
+		m_defaultFramebuffer.reset();
+
 		Buffer::s_impl = nullptr;
 		Framebuffer::s_impl = nullptr;
 		ShaderProgram::s_impl = nullptr;
