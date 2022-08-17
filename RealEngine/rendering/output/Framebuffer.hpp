@@ -64,7 +64,7 @@ public:
 	 * 
 	 * Framebuffer can get into invalid state via incorrect usage of attachImage(),
 	 * associateAttachementsWithOutputs() or selectAttachmentForColorReading() functions.
-	 * @return FramebufferTargetability::COMPLETE when can be targetted.
+	 * @return FramebufferTargetability::TARGETABLE when can be targetted.
 	*/
 	FramebufferTargetability checkTargetability(FramebufferTarget target) const;
 

@@ -118,14 +118,14 @@ public:
 	/**
 	 * @brief Gets the settings that should be used for this room
 	*/
-	RoomDisplaySettings getDisplaySettings();
+	RoomDisplaySettings getDisplaySettings() const;
+
+private:
 
 	/**
 	 * @brief Dynamically changes the room's display settings
 	*/
-	void changeDisplaySettings(RoomDisplaySettings displaySettings);
-
-private:
+	void setDisplaySettings(RoomDisplaySettings displaySettings);
 
 	RoomDisplaySettings m_displaySettings;
 

@@ -3,6 +3,8 @@
  *	@file
  */
 #pragma once
+#include <concepts>
+
 #include <SDL2/SDL_main.h>
 
 #include <glm/vec2.hpp>
@@ -32,6 +34,11 @@ struct DisplayInfo {
 	void* driverSpecific;
 };
 
+class MainProgram;
+
+template<class T>
+concept DerivedFromMainProgram = std::derived_from<T, MainProgram>;
+
 /**
  * @brief Use this function to run a RealEngine program.
  *
@@ -47,7 +54,7 @@ struct DisplayInfo {
  * @param argv Pointer to the first element of an array of C-strings that represent program's arguments
  * @return The exit code that should be returned from main.
 */
-template<class T>
+template<DerivedFromMainProgram T>
 int runProgram(int argc, char* argv[]) {
 	//Contruct command line arguments
 	CommandLineArguments args = std::span(argv, argc);
@@ -150,6 +157,8 @@ public:
 	void resizeWindow(const glm::ivec2& newDims, bool save);
 
 	void setRelativeCursorMode(bool relative);
+
+	void setDisplaySettingsForCurrentRoom(RoomDisplaySettings displaySettings);
 
 protected:
 	/**

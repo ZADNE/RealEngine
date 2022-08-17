@@ -30,11 +30,11 @@ Window* Room::window() const {
 	return s_window;
 }
 
-RoomDisplaySettings Room::getDisplaySettings() {
+RoomDisplaySettings Room::getDisplaySettings() const {
 	return m_displaySettings;
 }
 
-void Room::changeDisplaySettings(RoomDisplaySettings displaySettings) {
+void Room::setDisplaySettings(RoomDisplaySettings displaySettings) {
 	m_displaySettings = displaySettings;
 }
 

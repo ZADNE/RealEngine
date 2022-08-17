@@ -62,7 +62,7 @@ void GL46_Framebuffer::targetMe(const Framebuffer& fb, FramebufferTarget target)
 
 FramebufferTargetability GL46_Framebuffer::checkTargetability(const Framebuffer& fb, FramebufferTarget target) const {
 	switch (glCheckNamedFramebufferStatus(fb.m_ID, convertFramebufferTarget(target))){
-	case GL_FRAMEBUFFER_COMPLETE: return FramebufferTargetability::COMPLETE;
+	case GL_FRAMEBUFFER_COMPLETE: return FramebufferTargetability::TARGETABLE;
 	default: return FramebufferTargetability::NOT_COMPLETE;
 	}
 }

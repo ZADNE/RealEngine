@@ -100,9 +100,9 @@ void MainMenuRoom::render(double interpolationFactor) {
 					if (ImGui::Button("Reset view"))
 						resetView();
 					if (ImGui::ColorPicker3("Background color", &m_backgroundColor.x)) {
-						auto rds = getDisplaySettings();
-						rds.clearColor = glm::vec4(m_backgroundColor, 1.0f);
-						changeDisplaySettings(rds);
+						auto displaySettings = getDisplaySettings();
+						displaySettings.clearColor = glm::vec4(m_backgroundColor, 1.0f);
+						program()->setDisplaySettingsForCurrentRoom(displaySettings);
 					}
 					ImGui::EndTabItem();
 				}

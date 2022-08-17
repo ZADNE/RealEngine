@@ -11,10 +11,9 @@
 
 #include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/rendering/vertices/vertices.hpp>
+#include <RealEngine/rendering/output/Framebuffer.hpp>
 
 namespace RE {
-
-class SurfaceTargetTextures;
 
 /**
 * @brief Represents a canvas that can be drawn into.
@@ -41,34 +40,20 @@ public:
 	*/
 	Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures = 1, bool disableBlend = false, bool updateUniforms = true);
 
-	Surface(const Surface& other) = delete;
-	Surface(Surface&& other) noexcept;
-
-	Surface& operator=(const Surface& other) = delete;
-	Surface& operator=(Surface&& other) noexcept;
-
-
-	/**
-	 * @brief Destroys the surface and all its textures
-	 */
-	~Surface();
-
 	/**
 	 * @brief Sets further drawing to be done to this surface
 	 */
 	void setTarget() const;
 
 	/**
-	 * @brief Set further drawing to be done directly to window
+	 * @brief Set further drawing to be done directly to window (= default framebuffer)
 	 */
 	void resetTarget() const;
 
 	/**
-	 * @brief Allows disabling of drawing to some textures
-	 *
-	 * @param targetTextures Structure describing which texture should be drawn to
+	 * @brief Asociates textures with indexed outputs
 	 */
-	void setTargetTextures(const SurfaceTargetTextures& targetTextures);
+	void associateTexturesWithOutputs(const std::vector<FramebufferOutput>& outputs);
 
 	/**
 	 * @brief Resizes surface.
@@ -102,38 +87,14 @@ public:
 	void setPivot(const glm::vec2& pivot);
 private:
 	std::vector<Texture> m_textures;
-	GLuint m_frameBuffer = 0;
+	Framebuffer m_framebuffer;
 	bool m_disableBlend;
 	bool m_updateUniformBuffer;
 	TextureParameters m_params;
 
-	void attachTexturesToFBO();
+	void attachTexturesToFramebuffer();
 
 	glm::mat4 m_previousViewMatrix;
-};
-
-/**
- * @brief Is used for targeting only specific textures
-*/
-class SurfaceTargetTextures {
-	friend Surface;
-public:
-	/**
-	* Initializes all textures as untargetted
-	*/
-	SurfaceTargetTextures();
-
-	/**
-	* Sets texture at given offset to target given attachment
-	*/
-	SurfaceTargetTextures& targetTexture(unsigned int index, unsigned int attachment);
-
-	/**
-	* Sets all textures as untargetted
-	*/
-	void untargetAllTextures();
-private:
-	GLenum m_buffers[16];
 };
 
 }
