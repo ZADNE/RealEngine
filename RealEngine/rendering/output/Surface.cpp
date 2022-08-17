@@ -12,6 +12,7 @@
 #include <RealEngine/rendering/vertices/default_shaders.hpp>
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
 #include <RealEngine/resources/ResourceManager.hpp>
+#include <RealEngine/rendering/capabilities.hpp>
 
 
 namespace RE {
@@ -35,7 +36,7 @@ void Surface::setTarget() const {
 	Viewport::set(glm::ivec2(0, 0), m_textures[0].getTrueDims());
 
 	if (m_disableBlend) {
-		glDisable(GL_BLEND);
+		BlendingCapability::disable();
 	}
 
 	if (m_updateUniformBuffer) {
@@ -51,7 +52,7 @@ void Surface::resetTarget() const {
 	Viewport::setToWholeWindow();
 
 	if (m_disableBlend) {
-		glEnable(GL_BLEND);
+		BlendingCapability::enable();
 	}
 
 	if (m_updateUniformBuffer) {

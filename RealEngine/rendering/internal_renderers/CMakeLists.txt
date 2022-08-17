@@ -1,5 +1,6 @@
 ﻿target_sources(${PROJECT_NAME} PUBLIC
 	GL46_Buffer.hpp			GL46_Buffer.cpp
+	GL46_Capabilities.hpp	GL46_Capabilities.cpp
 	GL46_Framebuffer.hpp	GL46_Framebuffer.cpp
 	GL46_Renderer.hpp		GL46_Renderer.cpp
 	GL46_ShaderProgram.hpp	GL46_ShaderProgram.cpp

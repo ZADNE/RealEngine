@@ -5,6 +5,7 @@
 #include <optional>
 
 #include <RealEngine/rendering/internal_renderers/GL46_Buffer.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46_Capabilities.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Framebuffer.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_ShaderProgram.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Texture.hpp>
@@ -49,6 +50,7 @@ private:
 	GL46_Renderer& operator=(const GL46_Renderer&) = delete;
 
 	GL46_Buffer m_bufferImpl;
+	GL46_Capabilities m_capabilitiesImpl;
 	GL46_Framebuffer m_mainFramebufferImpl;
 	GL46_ShaderProgram m_shaderProgramImpl;
 	GL46_Texture m_textureImpl;
