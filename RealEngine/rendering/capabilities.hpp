@@ -8,7 +8,6 @@ namespace RE {
 
 class Capabilities {
 	friend class GL46_Renderer;
-	friend class GL46_Capabilities;
 protected:
 	static ICapabilities* s_impl;
 };

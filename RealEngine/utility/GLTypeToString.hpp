@@ -4,10 +4,8 @@
 #pragma once
 #include <string_view>
 
-#include <GL/glew.h>
-
 namespace RE {
 
-std::string_view GLTypeToString(GLenum type);
+std::string_view GLTypeToString(unsigned int type);
 
 }

@@ -7,6 +7,7 @@
 #include <RealEngine/rendering/internal_renderers/GL46_Buffer.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Capabilities.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Framebuffer.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46_Ordering.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_ShaderProgram.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Texture.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_VertexArray.hpp>
@@ -52,6 +53,7 @@ private:
 	GL46_Buffer m_bufferImpl;
 	GL46_Capabilities m_capabilitiesImpl;
 	GL46_Framebuffer m_mainFramebufferImpl;
+	GL46_Ordering m_orderingImpl;
 	GL46_ShaderProgram m_shaderProgramImpl;
 	GL46_Texture m_textureImpl;
 	GL46_VertexArray m_vertexArrayImpl;
@@ -60,7 +62,7 @@ private:
 	std::optional<Framebuffer> m_defaultFramebuffer;
 
 	/**
-	* OpenGL error callback function
+	* @brief OpenGL error callback function
 	*/
 	static void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 };

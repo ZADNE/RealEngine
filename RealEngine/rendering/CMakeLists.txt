@@ -9,4 +9,5 @@ add_subdirectory(vertices)
 
 target_sources(${PROJECT_NAME} PUBLIC
 	capabilities.hpp		capabilities.cpp
+	Ordering.hpp			Ordering.cpp
 )

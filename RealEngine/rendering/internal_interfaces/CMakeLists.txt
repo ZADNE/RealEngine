@@ -2,6 +2,7 @@
 	IBuffer.hpp				
 	ICapabilities.hpp		
 	IFramebuffer.hpp		
+	IOrdering.hpp			
 	IShaderProgram.hpp		
 	ITexture.hpp			
 	IVertexArray.hpp		
