@@ -14,30 +14,24 @@ namespace RE {
 class GL46_Buffer : public IBuffer {
 public:
 
-	void constructImmutable(Buffer& bf, GLsizeiptr sizeInBytes, BufferUsageFlags flags, const void* data) const override;
-	void constructMutable(Buffer& bf, GLsizeiptr sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const override;
+	void constructImmutable(Buffer& bf, int sizeInBytes, BufferUsageFlags flags, const void* data) const override;
+	void constructMutable(Buffer& bf, int sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const override;
 	void destruct(Buffer& bf) const override;
 
 	void bind(Buffer& bf, BufferType bindType) const override;
 	void bindIndexed(Buffer& bf, const BufferTypedIndex& index) const override;
 
-	void overwrite(Buffer& bf, GLintptr offsetInBytes, GLsizeiptr countBytes, const void* data) const override;
+	void overwrite(Buffer& bf, int offsetInBytes, int countBytes, const void* data) const override;
 
-	void redefine(Buffer& bf, GLsizeiptr sizeInBytes, const void* data) const override;
+	void redefine(Buffer& bf, int sizeInBytes, const void* data) const override;
 
 	void invalidate(Buffer& bf) const override;
-	void invalidate(Buffer& bf, GLsizeiptr lengthInBytes) const override;
+	void invalidate(Buffer& bf, int lengthInBytes) const override;
 
-	void* map(Buffer& bf, GLintptr offsetInBytes, GLsizeiptr lengthInBytes, BufferMapUsageFlags mappingUsage) const override;
-	void flushMapped(Buffer& bf, GLintptr offsetInBytes, GLsizeiptr lengthInBytes) const override;
+	void* map(Buffer& bf, int offsetInBytes, int lengthInBytes, BufferMapUsageFlags mappingUsage) const override;
+	void flushMapped(Buffer& bf, int offsetInBytes, int lengthInBytes) const override;
 	bool unmap(Buffer& bf) const override;
 
-protected:
-	using enum BufferType;
-	using enum BufferStorage;
-	using enum BufferAccessFrequency;
-	using enum BufferAccessNature;
-	using enum BufferUsageFlags;
 };
 
 }

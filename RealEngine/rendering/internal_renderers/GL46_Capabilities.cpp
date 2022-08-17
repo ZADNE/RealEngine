@@ -11,7 +11,7 @@
 
 namespace RE {
 
-GLenum convertCapability(Capability cap) {
+GLenum convert(Capability cap) {
 	switch (cap){
 	case RE::Capability::BLENDING: return GL_BLEND;
 	default: fatalError("Capability error with unexpected value: " + std::to_string(static_cast<int>(cap)));
@@ -19,7 +19,7 @@ GLenum convertCapability(Capability cap) {
 }
 
 void GL46_Capabilities::set(Capability cap, bool enabled) const {
-	auto cap_gl = convertCapability(cap);
+	auto cap_gl = convert(cap);
 	if (enabled) {
 		glEnable(cap_gl);
 	} else {

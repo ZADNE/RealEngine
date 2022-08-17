@@ -55,7 +55,7 @@ public:
 	 * @param indirect The offset into the buffer object currently bound as the DISPATCH_INDIRECT buffer
 	 * @param use If true, the program is bound and unbound for usage. If false it is expected to be already bound.
 	*/
-	void dispatchCompute(GLintptr indirect, bool use) const;
+	void dispatchCompute(int indirect, bool use) const;
 
 	/**
 	* @brief Prints diagnostic information about the shader program
@@ -67,7 +67,7 @@ public:
 	 * @param interfaceBlockIndex Index of the interface block within this program
 	 * @param index The typed index of the buffer that will back the interface block. Only UNIFORM and SHADER_STORAGE are available.
 	*/
-	void backInterfaceBlock(GLuint interfaceBlockIndex, const BufferTypedIndex& index) const;
+	void backInterfaceBlock(unsigned int interfaceBlockIndex, const BufferTypedIndex& index) const;
 
 	/**
 	 * @brief Resolves location of uniform "name" and sets its value
@@ -97,26 +97,26 @@ public:
 	void setUniform(int location, int count, const glm::vec3* val) const;				/**< Sets vec3 array uniform at given location */
 	void setUniform(int location, int count, const glm::vec4* val) const;				/**< Sets vec4 array uniform at given location */
 
-	void setUniform(int location, GLint val) const;										/**< Sets int uniform at given location */
-	void setUniform(int location, GLint val0, GLint val1) const;						/**< Sets ivec2 uniform at given location */
+	void setUniform(int location, int val) const;										/**< Sets int uniform at given location */
+	void setUniform(int location, int val0, int val1) const;							/**< Sets ivec2 uniform at given location */
 	void setUniform(int location, const glm::ivec2& val) const;							/**< Sets ivec2 uniform at given location */
-	void setUniform(int location, GLint val0, GLint val1, GLint val2) const;			/**< Sets ivec3 uniform at given location */
+	void setUniform(int location, int val0, int val1, int val2) const;					/**< Sets ivec3 uniform at given location */
 	void setUniform(int location, const glm::ivec3& val) const;							/**< Sets ivec3 uniform at given location */
-	void setUniform(int location, GLint val0, GLint val1, GLint val2, GLint val3) const;/**< Sets ivec4 uniform at given location */
+	void setUniform(int location, int val0, int val1, int val2, int val3) const;		/**< Sets ivec4 uniform at given location */
 	void setUniform(int location, const glm::ivec4& val) const;							/**< Sets ivec4 uniform at given location */
-	void setUniform(int location, int count, const GLint* val) const;					/**< Sets int array uniform at given location */
+	void setUniform(int location, int count, const int* val) const;						/**< Sets int array uniform at given location */
 	void setUniform(int location, int count, const glm::ivec2* val) const;				/**< Sets ivec2 array uniform at given location */
 	void setUniform(int location, int count, const glm::ivec3* val) const;				/**< Sets ivec3 array uniform at given location */
 	void setUniform(int location, int count, const glm::ivec4* val) const;				/**< Sets ivec4 array uniform at given location */
 
-	void setUniform(int location, GLuint val) const;									/**< Sets unsigned int uniform at given location */
-	void setUniform(int location, GLuint val0, GLuint val1) const;						/**< Sets uvec2 uniform at given location */
+	void setUniform(int location, unsigned int val) const;								/**< Sets unsigned int uniform at given location */
+	void setUniform(int location, unsigned int val0, unsigned int val1) const;			/**< Sets uvec2 uniform at given location */
 	void setUniform(int location, const glm::uvec2& val) const;							/**< Sets uvec2 uniform at given location */
-	void setUniform(int location, GLuint val0, GLuint val1, GLuint val2) const;			/**< Sets uvec3 uniform at given location */
+	void setUniform(int location, unsigned int val0, unsigned int val1, unsigned int val2) const;/**< Sets uvec3 uniform at given location */
 	void setUniform(int location, const glm::uvec3& val) const;							/**< Sets uvec3 uniform at given location */
-	void setUniform(int location, GLuint val0, GLuint val1, GLuint val2, GLuint val3) const;/**< Sets uvec4 uniform at given location */
+	void setUniform(int location, unsigned int val0, unsigned int val1, unsigned int val2, unsigned int val3) const;/**< Sets uvec4 uniform at given location */
 	void setUniform(int location, const glm::uvec4& val) const;							/**< Sets uvec4 uniform at given location */
-	void setUniform(int location, int count, const GLuint* val) const;					/**< Sets unsigned int array uniform at given location */
+	void setUniform(int location, int count, const unsigned int* val) const;			/**< Sets unsigned int array uniform at given location */
 	void setUniform(int location, int count, const glm::uvec2* val) const;				/**< Sets uvec4 array uniform at given location */
 	void setUniform(int location, int count, const glm::uvec3* val) const;				/**< Sets uvec4 array uniform at given location */
 	void setUniform(int location, int count, const glm::uvec4* val) const;				/**< Sets uvec4 array uniform at given location */
@@ -129,7 +129,7 @@ public:
 
 private:
 
-	GLuint m_ID = 0;/**< Internal identifier of the program */
+	unsigned int m_ID = 0;/**< Internal identifier of the program */
 
 	/**
 	 * @brief The backing implementation of the program.

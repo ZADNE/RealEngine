@@ -7,14 +7,20 @@
 
 namespace RE {
 
+using enum BufferType;
+using enum BufferStorage;
+using enum BufferAccessFrequency;
+using enum BufferAccessNature;
+using enum BufferUsageFlags;
+
 IBuffer* Buffer::s_impl = nullptr;
 
-Buffer::Buffer(GLsizeiptr sizeInBytes, BufferUsageFlags flags, const void* data/* = nullptr*/) {
+Buffer::Buffer(int sizeInBytes, BufferUsageFlags flags, const void* data/* = nullptr*/) {
 	s_impl->constructImmutable(*this, sizeInBytes, flags, data);
 }
 
 
-Buffer::Buffer(GLsizeiptr sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data/* = nullptr*/) {
+Buffer::Buffer(int sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data/* = nullptr*/) {
 	s_impl->constructMutable(*this, sizeInBytes, accessFreq, accessNature, data);
 }
 
@@ -52,11 +58,11 @@ void Buffer::bindIndexed(const BufferTypedIndex& index) {
 	s_impl->bindIndexed(*this, index);
 }
 
-void Buffer::overwrite(GLintptr offsetInBytes, GLsizeiptr countBytes, const void* data) {
+void Buffer::overwrite(int offsetInBytes, int countBytes, const void* data) {
 	s_impl->overwrite(*this, offsetInBytes, countBytes, data);
 }
 
-void Buffer::redefine(GLsizeiptr sizeInBytes, const void* data) {
+void Buffer::redefine(int sizeInBytes, const void* data) {
 	s_impl->redefine(*this, sizeInBytes, data);
 }
 
@@ -64,11 +70,11 @@ void Buffer::invalidate() {
 	s_impl->invalidate(*this);
 }
 
-void Buffer::invalidate(GLsizeiptr lengthInBytes) {
+void Buffer::invalidate(int lengthInBytes) {
 	s_impl->invalidate(*this, lengthInBytes);
 }
 
-void Buffer::flushMapped(GLintptr offsetInBytes, GLsizeiptr lengthInBytes) {
+void Buffer::flushMapped(int offsetInBytes, int lengthInBytes) {
 	s_impl->flushMapped(*this, offsetInBytes, lengthInBytes);
 }
 

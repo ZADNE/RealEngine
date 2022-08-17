@@ -37,7 +37,7 @@ void ShaderProgram::dispatchCompute(const glm::uvec3& groupCount, bool use) cons
 	s_impl->dispatchCompute(*this, groupCount, use);
 }
 
-void ShaderProgram::dispatchCompute(GLintptr indirect, bool use) const {
+void ShaderProgram::dispatchCompute(int indirect, bool use) const {
 	s_impl->dispatchCompute(*this, indirect, use);
 }
 
@@ -45,7 +45,7 @@ void ShaderProgram::printInfo() const {
 	s_impl->printInfo(*this);
 }
 
-void ShaderProgram::backInterfaceBlock(GLuint interfaceBlockIndex, const BufferTypedIndex& index) const {
+void ShaderProgram::backInterfaceBlock(unsigned int interfaceBlockIndex, const BufferTypedIndex& index) const {
 	s_impl->backInterfaceBlock(*this, interfaceBlockIndex, index);
 }
 
@@ -61,26 +61,26 @@ void ShaderProgram::setUniform(int location, int count, const glm::vec2* val) co
 void ShaderProgram::setUniform(int location, int count, const glm::vec3* val) const { s_impl->setUniform(*this, location, count, val); }
 void ShaderProgram::setUniform(int location, int count, const glm::vec4* val) const { s_impl->setUniform(*this, location, count, val); }
 
-void ShaderProgram::setUniform(int location, GLint val) const { s_impl->setUniform(*this, location, val); }
-void ShaderProgram::setUniform(int location, GLint val0, GLint val1) const { s_impl->setUniform(*this, location, val0, val1); }
+void ShaderProgram::setUniform(int location, int val) const { s_impl->setUniform(*this, location, val); }
+void ShaderProgram::setUniform(int location, int val0, int val1) const { s_impl->setUniform(*this, location, val0, val1); }
 void ShaderProgram::setUniform(int location, const glm::ivec2& val) const { setUniform(location, val.x, val.y); }
-void ShaderProgram::setUniform(int location, GLint val0, GLint val1, GLint val2) const { s_impl->setUniform(*this, location, val0, val1, val2); }
+void ShaderProgram::setUniform(int location, int val0, int val1, int val2) const { s_impl->setUniform(*this, location, val0, val1, val2); }
 void ShaderProgram::setUniform(int location, const glm::ivec3& val) const { setUniform(location, val.x, val.y, val.z); }
-void ShaderProgram::setUniform(int location, GLint val0, GLint val1, GLint val2, GLint val3) const { s_impl->setUniform(*this, location, val0, val1, val2, val3); }
+void ShaderProgram::setUniform(int location, int val0, int val1, int val2, int val3) const { s_impl->setUniform(*this, location, val0, val1, val2, val3); }
 void ShaderProgram::setUniform(int location, const glm::ivec4& val) const { setUniform(location, val.x, val.y, val.z, val.w); }
-void ShaderProgram::setUniform(int location, int count, const GLint* val) const { s_impl->setUniform(*this, location, count, val); }
+void ShaderProgram::setUniform(int location, int count, const int* val) const { s_impl->setUniform(*this, location, count, val); }
 void ShaderProgram::setUniform(int location, int count, const glm::ivec2* val) const { s_impl->setUniform(*this, location, count, val); }
 void ShaderProgram::setUniform(int location, int count, const glm::ivec3* val) const { s_impl->setUniform(*this, location, count, val); }
 void ShaderProgram::setUniform(int location, int count, const glm::ivec4* val) const { s_impl->setUniform(*this, location, count, val); }
 
-void ShaderProgram::setUniform(int location, GLuint val) const { s_impl->setUniform(*this, location, val); }
-void ShaderProgram::setUniform(int location, GLuint val0, GLuint val1) const { s_impl->setUniform(*this, location, val0, val1); }
+void ShaderProgram::setUniform(int location, unsigned int val) const { s_impl->setUniform(*this, location, val); }
+void ShaderProgram::setUniform(int location, unsigned int val0, unsigned int val1) const { s_impl->setUniform(*this, location, val0, val1); }
 void ShaderProgram::setUniform(int location, const glm::uvec2& val) const { setUniform(location, val.x, val.y); }
-void ShaderProgram::setUniform(int location, GLuint val0, GLuint val1, GLuint val2) const { s_impl->setUniform(*this, location, val0, val1, val2); }
+void ShaderProgram::setUniform(int location, unsigned int val0, unsigned int val1, unsigned int val2) const { s_impl->setUniform(*this, location, val0, val1, val2); }
 void ShaderProgram::setUniform(int location, const glm::uvec3& val) const { setUniform(location, val.x, val.y, val.z); }
-void ShaderProgram::setUniform(int location, GLuint val0, GLuint val1, GLuint val2, GLuint val3) const { s_impl->setUniform(*this, location, val0, val1, val2, val3); }
+void ShaderProgram::setUniform(int location, unsigned int val0, unsigned int val1, unsigned int val2, unsigned int val3) const { s_impl->setUniform(*this, location, val0, val1, val2, val3); }
 void ShaderProgram::setUniform(int location, const glm::uvec4& val) const { setUniform(location, val.x, val.y, val.z, val.w); }
-void ShaderProgram::setUniform(int location, int count, const GLuint* val) const { s_impl->setUniform(*this, location, count, val); }
+void ShaderProgram::setUniform(int location, int count, const unsigned int* val) const { s_impl->setUniform(*this, location, count, val); }
 void ShaderProgram::setUniform(int location, int count, const glm::uvec2* val) const { s_impl->setUniform(*this, location, count, val); }
 void ShaderProgram::setUniform(int location, int count, const glm::uvec3* val) const { s_impl->setUniform(*this, location, count, val); }
 void ShaderProgram::setUniform(int location, int count, const glm::uvec4* val) const { s_impl->setUniform(*this, location, count, val); }

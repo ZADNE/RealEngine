@@ -26,7 +26,7 @@ public:
 	 * @param data	If a valid pointer is provided, it is used to initialize the contents of the buffer.
 	 *				If the nullptr is provided, the contents of the buffer are undefined.
 	*/
-	Buffer(GLsizeiptr sizeInBytes, BufferUsageFlags flags, const void* data = nullptr);
+	Buffer(int sizeInBytes, BufferUsageFlags flags, const void* data = nullptr);
 
 	/**
 	 * @brief Contructs an immutable buffer as a storage for given type
@@ -56,7 +56,7 @@ public:
 	 * @param data	If a valid pointer is provided, it is used to initialize the contents of the buffer.
 	 *				If the nullptr is provided, the contents of the buffer are undefined.
 	*/
-	Buffer(GLsizeiptr sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data = nullptr);
+	Buffer(int sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data = nullptr);
 
 	/**
 	 * @brief Contructs a mutable buffer of given access hints
@@ -104,7 +104,7 @@ public:
 	 * @param countBytes Number of bytes to overwrite
 	 * @param data The data to overwrite with
 	*/
-	void overwrite(GLintptr offsetInBytes, GLsizeiptr countBytes, const void* data);
+	void overwrite(int offsetInBytes, int countBytes, const void* data);
 
 	/**
 	 * @brief Overwrites the buffer with instance of a type
@@ -113,7 +113,7 @@ public:
 	 * @param data The instance to overwrite the buffer with
 	*/
 	template<typename T>
-	void overwrite(GLintptr offsetInBytes, const T& data) {
+	void overwrite(int offsetInBytes, const T& data) {
 		overwrite(offsetInBytes, sizeof(T), reinterpret_cast<const void*>(&data));
 	}
 
@@ -124,7 +124,7 @@ public:
 	 * @param data Array (provided as a vector) to overwrite the buffer with
 	*/
 	template<typename T>
-	void overwrite(GLintptr offsetInBytes, const std::vector<T>& data) {
+	void overwrite(int offsetInBytes, const std::vector<T>& data) {
 		overwrite(offsetInBytes, data.size() * sizeof(T), reinterpret_cast<const void*>(data.data()));
 	}
 
@@ -136,7 +136,7 @@ public:
 	 * @param sizeInBytes Size of the data required to write
 	 * @param data The data to write
 	*/
-	void redefine(GLsizeiptr sizeInBytes, const void* data);
+	void redefine(int sizeInBytes, const void* data);
 
 	/**
 	 * @brief Ensures that the buffer is big enough to store the data and writes it
@@ -175,21 +175,21 @@ public:
 	 * @brief Makes a range of the buffer undefined
 	 * @param lengthInBytes Length of the range at the beginning of the buffer to invalidate
 	*/
-	void invalidate(GLsizeiptr lengthInBytes);
+	void invalidate(int lengthInBytes);
 
 	/**
 	 * @brief Maps a range of the buffer to the client's memory
 	 * @tparam T Reinterpreted type of the returned pointer
 	*/
 	template<typename T>
-	T* map(GLintptr offsetInBytes, GLsizeiptr lengthInBytes, BufferMapUsageFlags mappingUsage) {
+	T* map(int offsetInBytes, int lengthInBytes, BufferMapUsageFlags mappingUsage) {
 		return reinterpret_cast<T*>(s_impl->map(*this, offsetInBytes, lengthInBytes, mappingUsage));
 	}
 
 	/**
 	 * @brief Indicates modifications to a mapped range of the buffer
 	*/
-	void flushMapped(GLintptr offsetInBytes, GLsizeiptr lengthInBytes);
+	void flushMapped(int offsetInBytes, int lengthInBytes);
 
 	/**
 	 * @brief Releases the mapping of the buffer
@@ -199,18 +199,12 @@ public:
 
 protected:
 
-	using enum BufferType;
-	using enum BufferStorage;
-	using enum BufferAccessFrequency;
-	using enum BufferAccessNature;
-	using enum BufferUsageFlags;
-
-	GLuint m_ID = 0;				/**< Internal name of the buffer */
-	GLsizeiptr m_sizeInBytes = 0;	/**< Size of the buffer */
-	GLenum m_access = 0;			/**< Access hints of the buffer; relevant only for mutable buffers */
+	unsigned int m_ID = 0;				/**< Internal name of the buffer */
+	int m_sizeInBytes = 0;				/**< Size of the buffer */
+	unsigned int m_access = 0;			/**< Access hints of the buffer; relevant only for mutable buffers */
 
 #ifdef _DEBUG
-	BufferStorage m_storage;
+	BufferStorage m_storage = BufferStorage::IMMUTABLE;
 #endif // _DEBUG
 
 	static IBuffer* s_impl;

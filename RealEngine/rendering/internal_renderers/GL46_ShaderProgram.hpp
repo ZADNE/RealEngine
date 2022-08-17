@@ -22,11 +22,11 @@ public:
 	void unuse(const ShaderProgram& sp) const override;
 
 	void dispatchCompute(const ShaderProgram& sp, const glm::uvec3& groupCount, bool use) const override;
-	void dispatchCompute(const ShaderProgram& sp, GLintptr indirect, bool use) const override;
+	void dispatchCompute(const ShaderProgram& sp, int indirect, bool use) const override;
 
 	void printInfo(const ShaderProgram& sp) const override;
 
-	void backInterfaceBlock(const ShaderProgram& sp, GLuint interfaceBlockIndex, const BufferTypedIndex& index) const override;
+	void backInterfaceBlock(const ShaderProgram& sp, unsigned int interfaceBlockIndex, const BufferTypedIndex& index) const override;
 
 	int getUniformLocation(const ShaderProgram& sp, const std::string& name) const override;
 
@@ -42,26 +42,26 @@ public:
 	void setUniform(const ShaderProgram& sp, int location, int count, const glm::vec3* val) const override;
 	void setUniform(const ShaderProgram& sp, int location, int count, const glm::vec4* val) const override;
 
-	void setUniform(const ShaderProgram& sp, int location, GLint val) const override;
-	void setUniform(const ShaderProgram& sp, int location, GLint val0, GLint val1) const override;
+	void setUniform(const ShaderProgram& sp, int location, int val) const override;
+	void setUniform(const ShaderProgram& sp, int location, int val0, int val1) const override;
 	void setUniform(const ShaderProgram& sp, int location, const glm::ivec2& val) const override;
-	void setUniform(const ShaderProgram& sp, int location, GLint val0, GLint val1, GLint val2) const override;
+	void setUniform(const ShaderProgram& sp, int location, int val0, int val1, int val2) const override;
 	void setUniform(const ShaderProgram& sp, int location, const glm::ivec3& val) const override;
-	void setUniform(const ShaderProgram& sp, int location, GLint val0, GLint val1, GLint val2, GLint val3) const override;
+	void setUniform(const ShaderProgram& sp, int location, int val0, int val1, int val2, int val3) const override;
 	void setUniform(const ShaderProgram& sp, int location, const glm::ivec4& val) const override;
-	void setUniform(const ShaderProgram& sp, int location, int count, const GLint* val) const override;
+	void setUniform(const ShaderProgram& sp, int location, int count, const int* val) const override;
 	void setUniform(const ShaderProgram& sp, int location, int count, const glm::ivec2* val) const override;
 	void setUniform(const ShaderProgram& sp, int location, int count, const glm::ivec3* val) const override;
 	void setUniform(const ShaderProgram& sp, int location, int count, const glm::ivec4* val) const override;
 
-	void setUniform(const ShaderProgram& sp, int location, GLuint val) const override;
-	void setUniform(const ShaderProgram& sp, int location, GLuint val0, GLuint val1) const override;
+	void setUniform(const ShaderProgram& sp, int location, unsigned int val) const override;
+	void setUniform(const ShaderProgram& sp, int location, unsigned int val0, unsigned int val1) const override;
 	void setUniform(const ShaderProgram& sp, int location, const glm::uvec2& val) const override;
-	void setUniform(const ShaderProgram& sp, int location, GLuint val0, GLuint val1, GLuint val2) const override;
+	void setUniform(const ShaderProgram& sp, int location, unsigned int val0, unsigned int val1, unsigned int val2) const override;
 	void setUniform(const ShaderProgram& sp, int location, const glm::uvec3& val) const override;
-	void setUniform(const ShaderProgram& sp, int location, GLuint val0, GLuint val1, GLuint val2, GLuint val3) const override;
+	void setUniform(const ShaderProgram& sp, int location, unsigned int val0, unsigned int val1, unsigned int val2, unsigned int val3) const override;
 	void setUniform(const ShaderProgram& sp, int location, const glm::uvec4& val) const override;
-	void setUniform(const ShaderProgram& sp, int location, int count, const GLuint* val) const override;
+	void setUniform(const ShaderProgram& sp, int location, int count, const unsigned int* val) const override;
 	void setUniform(const ShaderProgram& sp, int location, int count, const glm::uvec2* val) const override;
 	void setUniform(const ShaderProgram& sp, int location, int count, const glm::uvec3* val) const override;
 	void setUniform(const ShaderProgram& sp, int location, int count, const glm::uvec4* val) const override;
@@ -76,7 +76,7 @@ private:
 	void compileProgram(ShaderProgram& sp, const ShaderProgramSources& source) const;
 
 	//Helper function
-	void compileShader(ShaderProgram& sp, const ShaderSources& source, GLuint shaderID) const;
+	void compileShader(ShaderProgram& sp, const ShaderSources& source, unsigned int shaderID) const;
 
 	//Helper function
 	void linkProgram(ShaderProgram& sp) const;
@@ -85,7 +85,7 @@ private:
 	void printProgramInfoLog(const ShaderProgram& sp) const;
 
 #ifdef _DEBUG
-	static inline GLuint s_currentlyUsedID = 0u;
+	static inline unsigned int s_currentlyUsedID = 0u;
 #endif // _DEBUG
 };
 

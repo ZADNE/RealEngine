@@ -5,8 +5,6 @@
 #include <array>
 #include <vector>
 
-#include <GL/glew.h>
-
 #include <RealEngine/rendering/vertices/vertices.hpp>
 #include <RealEngine/rendering/batches/circles.hpp>
 #include <RealEngine/rendering/vertices/VertexArray.hpp>

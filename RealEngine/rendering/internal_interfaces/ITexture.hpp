@@ -2,8 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <GL/glew.h>
-
 #include <RealEngine/rendering/textures/Raster.hpp>
 #include <RealEngine/rendering/textures/TextureUnit.hpp>
 #include <RealEngine/rendering/textures/ImageUnit.hpp>

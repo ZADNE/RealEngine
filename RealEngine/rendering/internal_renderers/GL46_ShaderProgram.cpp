@@ -6,6 +6,7 @@
 #include <iostream>
 #include <array>
 
+#include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <RealEngine/utility/GLTypeToString.hpp>
@@ -13,6 +14,8 @@
 #include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 
 namespace RE {
+
+using enum ShaderType;
 
 const std::array SHADER_STAGES = {
 	ShaderType::VERTEX,
@@ -22,6 +25,18 @@ const std::array SHADER_STAGES = {
 	ShaderType::FRAGMENT,
 	ShaderType::COMPUTE
 };
+
+GLenum convert(ShaderType st) {
+	switch (st) {
+	case VERTEX:			return GL_VERTEX_SHADER;
+	case TESS_CONTROL:		return GL_TESS_CONTROL_SHADER;
+	case TESS_EVALUATION:	return GL_TESS_EVALUATION_SHADER;
+	case GEOMETRY:			return GL_GEOMETRY_SHADER;
+	case FRAGMENT:			return GL_FRAGMENT_SHADER;
+	case COMPUTE:			return GL_COMPUTE_SHADER;
+	default: throw "Unknown shader type!";
+	}
+}
 
 void GL46_ShaderProgram::construct(ShaderProgram& sp, const ShaderProgramSources& sources) const {
 	compileProgram(sp, sources);
@@ -75,7 +90,7 @@ void GL46_ShaderProgram::dispatchCompute(const ShaderProgram& sp, const glm::uve
 	}
 }
 
-void GL46_ShaderProgram::dispatchCompute(const ShaderProgram& sp, GLintptr indirect, bool use) const {
+void GL46_ShaderProgram::dispatchCompute(const ShaderProgram& sp, int indirect, bool use) const {
 	if (use) {
 		this->use(sp);
 	} else {
@@ -94,35 +109,35 @@ void GL46_ShaderProgram::dispatchCompute(const ShaderProgram& sp, GLintptr indir
 void GL46_ShaderProgram::printInfo(const ShaderProgram& sp) const {
 	std::cout << "|SHADER: " << sp.m_ID << '\n';
 	//ATTRIBUTE INFO
-	GLint numberAttributes;
+	int numberAttributes;
 	glGetProgramiv(sp.m_ID, GL_ACTIVE_ATTRIBUTES, &numberAttributes);
 	std::cout << "|ATTRIBUTES: " << std::to_string(numberAttributes) << "\n";
-	for (GLint i = 0; i < numberAttributes; i++) {
+	for (int i = 0; i < numberAttributes; i++) {
 		GLsizei length;
-		GLint size;
+		int size;
 		GLenum type;
 		GLchar name[32];
 		glGetActiveAttrib(sp.m_ID, i, 32, &length, &size, &type, &name[0]);
-		GLint loc = glGetAttribLocation(sp.m_ID, &name[0]);
+		int loc = glGetAttribLocation(sp.m_ID, &name[0]);
 		std::cout << "|  layout (location = " << std::to_string(loc) << ") in " << GLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
 	}
 
 	//UNIFORM INFO
-	GLint numberUniforms;
+	int numberUniforms;
 	glGetProgramiv(sp.m_ID, GL_ACTIVE_UNIFORMS, &numberUniforms);
 	std::cout << "|UNIFORMS: " << std::to_string(numberUniforms) << "\n";
-	for (GLint i = 0; i < numberUniforms; i++) {
+	for (int i = 0; i < numberUniforms; i++) {
 		GLsizei length;
-		GLint size;
+		int size;
 		GLenum type;
 		GLchar name[32];
 		glGetActiveUniform(sp.m_ID, i, 32, &length, &size, &type, &name[0]);
-		GLint loc = glGetUniformLocation(sp.m_ID, &name[0]);
+		int loc = glGetUniformLocation(sp.m_ID, &name[0]);
 		std::cout << "|  layout (location = " << std::to_string(loc) << ") uniform " << GLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
 	}
 }
 
-void GL46_ShaderProgram::backInterfaceBlock(const ShaderProgram& sp, GLuint interfaceBlockIndex, const BufferTypedIndex& index) const {
+void GL46_ShaderProgram::backInterfaceBlock(const ShaderProgram& sp, unsigned int interfaceBlockIndex, const BufferTypedIndex& index) const {
 	if (index.type == RE::BufferType::UNIFORM) {
 		glUniformBlockBinding(sp.m_ID, interfaceBlockIndex, index.bindingIndex);
 	} else if (index.type == RE::BufferType::SHADER_STORAGE) {
@@ -151,26 +166,26 @@ void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int c
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const glm::vec3* val) const { glProgramUniform3fv(sp.m_ID, location, count, glm::value_ptr(*val)); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const glm::vec4* val) const { glProgramUniform4fv(sp.m_ID, location, count, glm::value_ptr(*val)); }
 
-void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, GLint val) const { glProgramUniform1i(sp.m_ID, location, val); }
-void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, GLint val0, GLint val1) const { glProgramUniform2i(sp.m_ID, location, val0, val1); }
+void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int val) const { glProgramUniform1i(sp.m_ID, location, val); }
+void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int val0, int val1) const { glProgramUniform2i(sp.m_ID, location, val0, val1); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, const glm::ivec2& val) const { setUniform(sp, location, val.x, val.y); }
-void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, GLint val0, GLint val1, GLint val2) const { glProgramUniform3i(sp.m_ID, location, val0, val1, val2); }
+void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int val0, int val1, int val2) const { glProgramUniform3i(sp.m_ID, location, val0, val1, val2); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, const glm::ivec3& val) const { setUniform(sp, location, val.x, val.y, val.z); }
-void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, GLint val0, GLint val1, GLint val2, GLint val3) const { glProgramUniform4i(sp.m_ID, location, val0, val1, val2, val3); }
+void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int val0, int val1, int val2, int val3) const { glProgramUniform4i(sp.m_ID, location, val0, val1, val2, val3); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, const glm::ivec4& val) const { setUniform(sp, location, val.x, val.y, val.z, val.w); }
-void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const GLint* val) const { glProgramUniform1iv(sp.m_ID, location, count, val); }
+void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const int* val) const { glProgramUniform1iv(sp.m_ID, location, count, val); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const glm::ivec2* val) const { glProgramUniform2iv(sp.m_ID, location, count, glm::value_ptr(*val)); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const glm::ivec3* val) const { glProgramUniform3iv(sp.m_ID, location, count, glm::value_ptr(*val)); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const glm::ivec4* val) const { glProgramUniform4iv(sp.m_ID, location, count, glm::value_ptr(*val)); }
 
-void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, GLuint val) const { glProgramUniform1ui(sp.m_ID, location, val); }
-void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, GLuint val0, GLuint val1) const { glProgramUniform2ui(sp.m_ID, location, val0, val1); }
+void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, unsigned int val) const { glProgramUniform1ui(sp.m_ID, location, val); }
+void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, unsigned int val0, unsigned int val1) const { glProgramUniform2ui(sp.m_ID, location, val0, val1); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, const glm::uvec2& val) const { setUniform(sp, location, val.x, val.y); }
-void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, GLuint val0, GLuint val1, GLuint val2) const { glProgramUniform3ui(sp.m_ID, location, val0, val1, val2); }
+void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, unsigned int val0, unsigned int val1, unsigned int val2) const { glProgramUniform3ui(sp.m_ID, location, val0, val1, val2); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, const glm::uvec3& val) const { setUniform(sp, location, val.x, val.y, val.z); }
-void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, GLuint val0, GLuint val1, GLuint val2, GLuint val3) const { glProgramUniform4ui(sp.m_ID, location, val0, val1, val2, val3); }
+void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, unsigned int val0, unsigned int val1, unsigned int val2, unsigned int val3) const { glProgramUniform4ui(sp.m_ID, location, val0, val1, val2, val3); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, const glm::uvec4& val) const { setUniform(sp, location, val.x, val.y, val.z, val.w); }
-void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const GLuint* val) const { glProgramUniform1uiv(sp.m_ID, location, count, val); }
+void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const unsigned int* val) const { glProgramUniform1uiv(sp.m_ID, location, count, val); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const glm::uvec2* val) const { glProgramUniform2uiv(sp.m_ID, location, count, glm::value_ptr(*val)); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const glm::uvec3* val) const { glProgramUniform3uiv(sp.m_ID, location, count, glm::value_ptr(*val)); }
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, int count, const glm::uvec4* val) const { glProgramUniform4uiv(sp.m_ID, location, count, glm::value_ptr(*val)); }
@@ -185,7 +200,7 @@ void GL46_ShaderProgram::compileProgram(ShaderProgram& sp, const ShaderProgramSo
 	sp.m_ID = glCreateProgram();
 
 	//Create, compile and attach shaders
-	GLuint shaderID[SHADER_STAGES.size()] = {0};
+	unsigned int shaderID[SHADER_STAGES.size()] = {0};
 	size_t i = 0;
 	for (auto STAGE : SHADER_STAGES) {
 		if (!source[STAGE].m_sources.empty()) {
@@ -212,16 +227,16 @@ void GL46_ShaderProgram::compileProgram(ShaderProgram& sp, const ShaderProgramSo
 	}
 }
 
-void GL46_ShaderProgram::compileShader(ShaderProgram& sp, const ShaderSources& sources, GLuint shaderID) const {
+void GL46_ShaderProgram::compileShader(ShaderProgram& sp, const ShaderSources& sources, unsigned int shaderID) const {
 	glShaderSource(shaderID, static_cast<GLsizei>(sources.m_sources.size()), sources.m_sources.data(), sources.m_lengths.data());
 
 	glCompileShader(shaderID);
 
-	GLint compileSuccess = 0;
+	int compileSuccess = 0;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &compileSuccess);
 
 	if (compileSuccess == GL_FALSE) {
-		GLint maxLength = 0;
+		int maxLength = 0;
 		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &maxLength);
 
 		std::vector<GLchar> infoLog(maxLength);
@@ -241,10 +256,10 @@ void GL46_ShaderProgram::linkProgram(ShaderProgram& sp) const {
 	//Link our program
 	glLinkProgram(sp.m_ID);
 
-	GLint isLinked = 0;
+	int isLinked = 0;
 	glGetProgramiv(sp.m_ID, GL_LINK_STATUS, &isLinked);
 	if (isLinked == GL_FALSE) {
-		GLint maxLength = 0;
+		int maxLength = 0;
 		glGetProgramiv(sp.m_ID, GL_INFO_LOG_LENGTH, &maxLength);
 
 		//The maxLength includes the NULL character
@@ -268,7 +283,7 @@ void GL46_ShaderProgram::linkProgram(ShaderProgram& sp) const {
 }
 
 void GL46_ShaderProgram::printProgramInfoLog(const ShaderProgram& sp) const {
-	GLint logLength = 0;
+	int logLength = 0;
 	glGetProgramiv(sp.m_ID, GL_INFO_LOG_LENGTH, &logLength);
 
 	if (logLength > 0) {//If there is a log

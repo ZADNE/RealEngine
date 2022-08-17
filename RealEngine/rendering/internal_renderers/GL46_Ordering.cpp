@@ -11,7 +11,7 @@
 
 namespace RE {
 
-GLbitfield convertIncoherentAccessBarrierFlags(IncoherentAccessBarrierFlags barriers) {
+GLbitfield convert(IncoherentAccessBarrierFlags barriers) {
 	GLbitfield barriers_gl = 0;
 	using enum IncoherentAccessBarrierFlags;
 	if (barriers & VERTEX_ATTRIB_ARRAY) barriers_gl |= GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT;
@@ -43,7 +43,7 @@ void GL46_Ordering::issueDrawBarrier() const {
 }
 
 void GL46_Ordering::issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers) const {
-	auto barriers_gl = convertIncoherentAccessBarrierFlags(barriers);
+	auto barriers_gl = convert(barriers);
 	glMemoryBarrier(barriers_gl);
 }
 

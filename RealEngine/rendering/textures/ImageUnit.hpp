@@ -2,7 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <GL/glew.h>
 
 namespace RE {
 
