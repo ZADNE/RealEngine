@@ -102,7 +102,7 @@ void Surface::attachTexturesToFramebuffer() {
 	std::vector<FramebufferOutput> fbOutputs;
 	fbOutputs.reserve(m_textures.size());
 
-	for (size_t i = 0; i < m_textures.size(); i++) {
+	for (unsigned int i = 0; i < static_cast<unsigned int>(m_textures.size()); i++) {
 		fbOutputs.push_back(FramebufferOutputN(i));
 		m_framebuffer.attachImage(FramebufferAttachmentColorN(i), m_textures[i], 0);
 	}

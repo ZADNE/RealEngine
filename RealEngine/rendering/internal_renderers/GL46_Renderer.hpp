@@ -60,11 +60,6 @@ private:
 	GL46_Viewport m_viewportImpl;
 
 	std::optional<Framebuffer> m_defaultFramebuffer;
-
-	/**
-	* @brief OpenGL error callback function
-	*/
-	static void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 };
 
 /**

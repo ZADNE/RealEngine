@@ -17,7 +17,7 @@ class TextureProxy;
 */
 class GL46_Texture : public ITexture {
 public:
-	
+
 	void construct(Texture& te, const Raster& raster) const override;
 	void destruct(Texture& te) const override;
 
@@ -32,16 +32,16 @@ public:
 	void bind(const TextureProxy& te) const override;
 	void bind(const Texture& te, TextureUnit unit) const override;
 	void bind(const TextureProxy& te, TextureUnit unit) const override;
-	void bindImage(const Texture& te, ImageUnit unit, GLint level, ImageAccess access) const override;
+	void bindImage(const Texture& te, ImageUnit unit, int level, ImageAccess access) const override;
 
-	void setTexels(const Texture& te, GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const override;
-	void copyTexels(const Texture& te, GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const override;
-	void getTexels(const Texture& te, GLint level, GLsizei bufSize, void* pixels) const override;
+	void setTexels(const Texture& te, int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const override;
+	void copyTexels(const Texture& te, int srcLevel, const glm::ivec2& srcPos, const Texture& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const override;
+	void getTexels(const Texture& te, int level, int bufSize, void* pixels) const override;
 
-	void clear(const Texture& te, GLint level, const glm::vec4& color) const override;
-	void clear(const Texture& te, GLint level, const glm::ivec4& color) const override;
-	void clear(const Texture& te, GLint level, const glm::uvec4& color) const override;
-	void clear(const Texture& te, GLint level, const Color& color) const override;
+	void clear(const Texture& te, int level, const glm::vec4& color) const override;
+	void clear(const Texture& te, int level, const glm::ivec4& color) const override;
+	void clear(const Texture& te, int level, const glm::uvec4& color) const override;
+	void clear(const Texture& te, int level, const Color& color) const override;
 
 };
 

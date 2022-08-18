@@ -21,7 +21,7 @@ class TextureProxy;
 */
 class ITexture {
 public:
-	
+
 	virtual void construct(Texture& te, const Raster& raster) const = 0;
 	virtual void destruct(Texture& te) const = 0;
 
@@ -36,16 +36,16 @@ public:
 	virtual void bind(const TextureProxy& te) const = 0;
 	virtual void bind(const Texture& te, TextureUnit unit) const = 0;
 	virtual void bind(const TextureProxy& te, TextureUnit unit) const = 0;
-	virtual void bindImage(const Texture& te, ImageUnit unit, GLint level, ImageAccess access) const = 0;
+	virtual void bindImage(const Texture& te, ImageUnit unit, int level, ImageAccess access) const = 0;
 
-	virtual void setTexels(const Texture& te, GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const = 0;
-	virtual void copyTexels(const Texture& te, GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const = 0;
-	virtual void getTexels(const Texture& te, GLint level, GLsizei bufSize, void* pixels) const = 0;
+	virtual void setTexels(const Texture& te, int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const = 0;
+	virtual void copyTexels(const Texture& te, int srcLevel, const glm::ivec2& srcPos, const Texture& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const = 0;
+	virtual void getTexels(const Texture& te, int level, int bufSize, void* pixels) const = 0;
 
-	virtual void clear(const Texture& te, GLint level, const glm::vec4& color) const = 0;
-	virtual void clear(const Texture& te, GLint level, const glm::ivec4& color) const = 0;
-	virtual void clear(const Texture& te, GLint level, const glm::uvec4& color) const = 0;
-	virtual void clear(const Texture& te, GLint level, const Color& color) const = 0;
+	virtual void clear(const Texture& te, int level, const glm::vec4& color) const = 0;
+	virtual void clear(const Texture& te, int level, const glm::ivec4& color) const = 0;
+	virtual void clear(const Texture& te, int level, const glm::uvec4& color) const = 0;
+	virtual void clear(const Texture& te, int level, const Color& color) const = 0;
 
 };
 

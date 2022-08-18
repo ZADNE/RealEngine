@@ -8,7 +8,7 @@ namespace RE {
 
 /**
  * @brief Controls how & where vertices are pulled.
- * 
+ *
  * A ShaderProgram has to be used in conjunction with this.
 */
 class VertexArray {
@@ -29,28 +29,28 @@ public:
 	VertexArray& operator=(VertexArray&& other) noexcept;
 
 
-	void setAttribute(GLuint attribute, VertexComponentCount components, VertexComponentType type, GLuint relativeOffset, bool normalize = true);
-	void unsetAttribute(GLuint attribute);
+	void setAttribute(unsigned int attribute, VertexComponentCount components, VertexComponentType type, unsigned int relativeOffset, bool normalize = true);
+	void unsetAttribute(unsigned int attribute);
 
-	void setBindingPoint(GLuint bindingPoint, const Buffer& buffer, GLintptr offset, GLsizei stride);
-	void unsetBindingPoint(GLuint bindingPoint);
+	void setBindingPoint(unsigned int bindingPoint, const Buffer& buffer, int offset, int stride);
+	void unsetBindingPoint(unsigned int bindingPoint);
 
-	void connectAttributeToBindingPoint(GLuint attribute, GLuint bindingPoint);
+	void connectAttributeToBindingPoint(unsigned int attribute, unsigned int bindingPoint);
 
 	void bind() const;
 	void unbind() const;
 
-	void renderArrays(Primitive prim, GLint first, GLsizei count) const;
-	void renderArrays(Primitive prim, GLint first, GLsizei count, GLsizei instancecount) const;
+	void renderArrays(Primitive prim, int first, int count) const;
+	void renderArrays(Primitive prim, int first, int count, int instancecount) const;
 
-	void renderElements(Primitive prim, GLsizei count, IndexType type, const void* indices) const;
-	void renderElements(Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount) const;
+	void renderElements(Primitive prim, int count, IndexType type, const void* indices) const;
+	void renderElements(Primitive prim, int count, IndexType type, const void* indices, int instancecount) const;
 
-	void renderElementsBaseVertex(Primitive prim, GLsizei count, IndexType type, const void* indices, GLint basevertex) const;
-	void renderElementsBaseVertex(Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount, GLint basevertex) const;
+	void renderElementsBaseVertex(Primitive prim, int count, IndexType type, const void* indices, int basevertex) const;
+	void renderElementsBaseVertex(Primitive prim, int count, IndexType type, const void* indices, int instancecount, int basevertex) const;
 
 private:
-	GLuint m_ID = 0;			/**< Internal identifier*/
+	unsigned int m_ID = 0;			/**< Internal identifier*/
 
 	static IVertexArray* s_impl;
 };

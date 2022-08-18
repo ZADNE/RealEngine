@@ -7,7 +7,7 @@ namespace RE {
 
 void TypedBuffer::changeType(BufferType type) {
 	m_index.type = type;
-	m_index.bindingIndex = std::numeric_limits<GLuint>::max();
+	m_index.bindingIndex = std::numeric_limits<unsigned int>::max();
 }
 
 void TypedBuffer::changeType(BufferTypedIndex index) {

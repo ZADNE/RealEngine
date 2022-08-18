@@ -8,7 +8,7 @@
 
 namespace RE {
 
-enum class VertexComponentCount : GLint {
+enum class VertexComponentCount : int {
 	ONE = 1,
 	TWO = 2,
 	THREE = 3,
@@ -25,38 +25,38 @@ enum class VertexComponentCount : GLint {
 	RGBA = FOUR
 };
 
-enum class VertexComponentType : GLenum {
-	BYTE = GL_BYTE,
-	SHORT = GL_SHORT,
-	INT = GL_INT,
-	UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
-	UNSIGNED_SHORT = GL_UNSIGNED_SHORT,
-	UNSIGNED_INT = GL_UNSIGNED_INT,
-	FIXED = GL_FIXED,
-	HALF_FLOAT = GL_HALF_FLOAT,
-	FLOAT = GL_FLOAT,
-	DOUBLE = GL_DOUBLE
+enum class VertexComponentType : unsigned int {
+	BYTE,
+	SHORT,
+	INT,
+	UNSIGNED_BYTE,
+	UNSIGNED_SHORT,
+	UNSIGNED_INT,
+	FIXED,
+	HALF_FLOAT,
+	FLOAT,
+	DOUBLE
 };
 
-enum class Primitive : GLenum {
-	POINTS = GL_POINTS,
-	LINE_STRIP = GL_LINE_STRIP,
-	LINE_LOOP = GL_LINE_LOOP,
-	LINES = GL_LINES,
-	LINE_STRIP_ADJACENCY = GL_LINE_STRIP_ADJACENCY,
-	LINES_ADJACENCY = GL_LINES_ADJACENCY,
-	TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
-	TRIANGLE_FAN = GL_TRIANGLE_FAN,
-	TRIANGLES = GL_TRIANGLES,
-	TRIANGLE_STRIP_ADJACENCY = GL_TRIANGLE_STRIP_ADJACENCY,
-	TRIANGLES_ADJACENCY = GL_TRIANGLES_ADJACENCY,
-	PATCHES = GL_PATCHES
+enum class Primitive : unsigned int {
+	POINTS,
+	LINE_STRIP,
+	LINE_LOOP,
+	LINES,
+	LINE_STRIP_ADJACENCY,
+	LINES_ADJACENCY,
+	TRIANGLE_STRIP,
+	TRIANGLE_FAN,
+	TRIANGLES,
+	TRIANGLE_STRIP_ADJACENCY,
+	TRIANGLES_ADJACENCY,
+	PATCHES
 };
 
-enum class IndexType : GLenum {
-	UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
-	UNSIGNED_SHORT = GL_UNSIGNED_SHORT,
-	UNSIGNED_INT = GL_UNSIGNED_INT
+enum class IndexType : unsigned int {
+	UNSIGNED_BYTE,
+	UNSIGNED_SHORT,
+	UNSIGNED_INT
 };
 
 class VertexArray;
@@ -73,25 +73,25 @@ public:
 	virtual void construct(VertexArray& va) const = 0;
 	virtual void destruct(VertexArray& va) const = 0;
 
-	virtual void setAttribute(VertexArray& va, GLuint attribute, VertexComponentCount components, VertexComponentType type, GLuint relativeOffset, bool normalize = true) const = 0;
-	virtual void unsetAttribute(VertexArray& va, GLuint attribute) const = 0;
+	virtual void setAttribute(VertexArray& va, unsigned int attribute, VertexComponentCount components, VertexComponentType type, unsigned int relativeOffset, bool normalize = true) const = 0;
+	virtual void unsetAttribute(VertexArray& va, unsigned int attribute) const = 0;
 
-	virtual void setBindingPoint(VertexArray& va, GLuint bindingPoint, const Buffer& buffer, GLintptr offset, GLsizei stride) const = 0;
-	virtual void unsetBindingPoint(VertexArray& va, GLuint bindingPoint) const = 0;
+	virtual void setBindingPoint(VertexArray& va, unsigned int bindingPoint, const Buffer& buffer, int offset, int stride) const = 0;
+	virtual void unsetBindingPoint(VertexArray& va, unsigned int bindingPoint) const = 0;
 
-	virtual void connectAttributeToBindingPoint(VertexArray& va, GLuint attribute, GLuint bindingPoint) const = 0;
+	virtual void connectAttributeToBindingPoint(VertexArray& va, unsigned int attribute, unsigned int bindingPoint) const = 0;
 
 	virtual void bind(const VertexArray& va) const = 0;
 	virtual void unbind(const VertexArray& va) const = 0;
 
-	virtual void renderArrays(const VertexArray& va, Primitive prim, GLint first, GLsizei count) const = 0;
-	virtual void renderArrays(const VertexArray& va, Primitive prim, GLint first, GLsizei count, GLsizei instancecount) const = 0;
+	virtual void renderArrays(const VertexArray& va, Primitive prim, int first, int count) const = 0;
+	virtual void renderArrays(const VertexArray& va, Primitive prim, int first, int count, int instancecount) const = 0;
 
-	virtual void renderElements(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* offset) const = 0;
-	virtual void renderElements(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* offset, GLsizei instancecount) const = 0;
+	virtual void renderElements(const VertexArray& va, Primitive prim, int count, IndexType type, const void* offset) const = 0;
+	virtual void renderElements(const VertexArray& va, Primitive prim, int count, IndexType type, const void* offset, int instancecount) const = 0;
 
-	virtual void renderElementsBaseVertex(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices, GLint basevertex) const = 0;
-	virtual void renderElementsBaseVertex(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount, GLint basevertex) const = 0;
+	virtual void renderElementsBaseVertex(const VertexArray& va, Primitive prim, int count, IndexType type, const void* indices, int basevertex) const = 0;
+	virtual void renderElementsBaseVertex(const VertexArray& va, Primitive prim, int count, IndexType type, const void* indices, int instancecount, int basevertex) const = 0;
 };
 
 }

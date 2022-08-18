@@ -15,10 +15,10 @@ class TextureUnit {
 	friend class GL46_Texture;
 public:
 
-	TextureUnit(GLuint unit) : m_unit(unit) {}
+	TextureUnit(unsigned int unit) : m_unit(unit) {}
 
 private:
-	GLuint  m_unit;/**< Binding point name */
+	unsigned int m_unit;		/**< Name of the binding point */
 };
 
 }

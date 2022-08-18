@@ -18,30 +18,30 @@ VertexArray::~VertexArray() {
 VertexArray::VertexArray(VertexArray&& other) noexcept :
 	m_ID(other.m_ID) {
 	other.m_ID = 0;
-} 
+}
 
 VertexArray& VertexArray::operator=(VertexArray&& other) noexcept {
 	std::swap(m_ID, other.m_ID);
 	return *this;
 }
 
-void VertexArray::setAttribute(GLuint attribute, VertexComponentCount components, VertexComponentType type, GLuint relativeOffset, bool normalize/* = true*/) {
+void VertexArray::setAttribute(unsigned int attribute, VertexComponentCount components, VertexComponentType type, unsigned int relativeOffset, bool normalize/* = true*/) {
 	s_impl->setAttribute(*this, attribute, components, type, relativeOffset, normalize);
 }
 
-void VertexArray::unsetAttribute(GLuint attribute) {
+void VertexArray::unsetAttribute(unsigned int attribute) {
 	s_impl->unsetAttribute(*this, attribute);
 }
 
-void VertexArray::setBindingPoint(GLuint bindingPoint, const Buffer& buffer, GLintptr offset, GLsizei stride) {
+void VertexArray::setBindingPoint(unsigned int bindingPoint, const Buffer& buffer, int offset, int stride) {
 	s_impl->setBindingPoint(*this, bindingPoint, buffer, offset, stride);
 }
 
-void VertexArray::unsetBindingPoint(GLuint bindingPoint) {
+void VertexArray::unsetBindingPoint(unsigned int bindingPoint) {
 	s_impl->unsetBindingPoint(*this, bindingPoint);
 }
 
-void VertexArray::connectAttributeToBindingPoint(GLuint attribute, GLuint bindingPoint) {
+void VertexArray::connectAttributeToBindingPoint(unsigned int attribute, unsigned int bindingPoint) {
 	s_impl->connectAttributeToBindingPoint(*this, attribute, bindingPoint);
 }
 
@@ -53,27 +53,27 @@ void VertexArray::unbind() const {
 	s_impl->unbind(*this);
 }
 
-void VertexArray::renderArrays(Primitive prim, GLint first, GLsizei count) const {
+void VertexArray::renderArrays(Primitive prim, int first, int count) const {
 	s_impl->renderArrays(*this, prim, first, count);
 }
 
-void VertexArray::renderArrays(Primitive prim, GLint first, GLsizei count, GLsizei instancecount) const {
+void VertexArray::renderArrays(Primitive prim, int first, int count, int instancecount) const {
 	s_impl->renderArrays(*this, prim, first, count, instancecount);
 }
 
-void VertexArray::renderElements(Primitive prim, GLsizei count, IndexType type, const void* indices) const {
+void VertexArray::renderElements(Primitive prim, int count, IndexType type, const void* indices) const {
 	s_impl->renderElements(*this, prim, count, type, indices);
 }
 
-void VertexArray::renderElements(Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount) const {
+void VertexArray::renderElements(Primitive prim, int count, IndexType type, const void* indices, int instancecount) const {
 	s_impl->renderElements(*this, prim, count, type, indices, instancecount);
 }
 
-void VertexArray::renderElementsBaseVertex(Primitive prim, GLsizei count, IndexType type, const void* indices, GLint basevertex) const {
+void VertexArray::renderElementsBaseVertex(Primitive prim, int count, IndexType type, const void* indices, int basevertex) const {
 	s_impl->renderElementsBaseVertex(*this, prim, count, type, indices, basevertex);
 }
 
-void VertexArray::renderElementsBaseVertex(Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount, GLint basevertex) const {
+void VertexArray::renderElementsBaseVertex(Primitive prim, int count, IndexType type, const void* indices, int instancecount, int basevertex) const {
 	s_impl->renderElementsBaseVertex(*this, prim, count, type, indices, instancecount, basevertex);
 }
 

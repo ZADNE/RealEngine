@@ -61,7 +61,7 @@ enum class FramebufferOutput : unsigned int {
 /**
  * @brief Calculates enum value for n-th color output
 */
-inline FramebufferOutput FramebufferOutputN(unsigned int n){
+inline FramebufferOutput FramebufferOutputN(unsigned int n) {
 	return static_cast<FramebufferOutput>(static_cast<unsigned int>(FramebufferOutput::TO_COLOR0) + n);
 }
 

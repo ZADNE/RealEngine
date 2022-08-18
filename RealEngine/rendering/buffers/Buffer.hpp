@@ -125,7 +125,7 @@ public:
 	*/
 	template<typename T>
 	void overwrite(int offsetInBytes, const std::vector<T>& data) {
-		overwrite(offsetInBytes, data.size() * sizeof(T), reinterpret_cast<const void*>(data.data()));
+		overwrite(offsetInBytes, static_cast<int>(data.size() * sizeof(T)), reinterpret_cast<const void*>(data.data()));
 	}
 
 	/**

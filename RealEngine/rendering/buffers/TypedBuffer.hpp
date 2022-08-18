@@ -26,7 +26,7 @@ public:
 
 	template<typename... Args>
 	TypedBuffer(BufferType type, Args... args) :
-		TypedBuffer(BufferTypedIndex{type, std::numeric_limits<GLuint>::max()}, BindNow::YES, args...) {}
+		TypedBuffer(BufferTypedIndex{type, std::numeric_limits<unsigned int>::max()}, BindNow::YES, args...) {}
 
 	template<typename... Args>
 	TypedBuffer(BufferTypedIndex index, Args... args) :
@@ -51,7 +51,7 @@ public:
 
 	BufferType getType() const { return m_index.type; }
 
-	GLuint getBindingIndex() const { return m_index.bindingIndex; }
+	unsigned int getBindingIndex() const { return m_index.bindingIndex; }
 
 	using Buffer::bind;
 	void bind();

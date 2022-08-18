@@ -8,7 +8,7 @@ namespace RE {
 /**
  * @brief Lists all possible types of buffers
 */
-enum class BufferType {
+enum class BufferType : unsigned int {
 	ARRAY,
 	ATOMIC_COUNTER,
 	COPY_READ,
@@ -29,7 +29,7 @@ enum class BufferType {
  * @brief Returns true if the given buffer type can be bound to an indexed binding point
 */
 inline bool isIndexedBufferType(BufferType type) {
-	switch (type){
+	switch (type) {
 	case RE::BufferType::ATOMIC_COUNTER:
 	case RE::BufferType::SHADER_STORAGE:
 	case RE::BufferType::TRANSFORM_FEEDBACK:

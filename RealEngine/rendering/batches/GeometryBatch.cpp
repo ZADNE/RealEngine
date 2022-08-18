@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
@@ -60,17 +60,17 @@ void GeometryBatch::begin() {
 
 void GeometryBatch::end() {
 	//Uploading to VBO
-	size_t totalSize = 0u;
+	int totalSize = 0;
 	for (auto& vector : m_vertices) {
-		totalSize += vector.size();
+		totalSize += static_cast<int>(vector.size());
 	}
-	size_t offset = 0u;
+	int offset = 0;
 
 	m_buf.redefine(totalSize * sizeof(VertexPOCO), nullptr);
 	for (size_t i = 0u; i < PRIMITIVES_COUNT + SHAPES_COUNT; ++i) {
 		if (m_vertices[i].empty()) continue;
 		m_buf.overwrite(offset, m_vertices[i]);
-		offset += m_vertices[i].size() * sizeof(VertexPOCO);
+		offset += static_cast<int>(m_vertices[i].size() * sizeof(VertexPOCO));
 	}
 }
 
@@ -82,7 +82,7 @@ void GeometryBatch::draw() {
 
 	for (size_t i = 0u; i < PRIMITIVES_COUNT + SHAPES_COUNT; ++i) {
 		if (m_vertices[i].empty()) continue;
-		m_va.renderElementsBaseVertex(convertPrimEnum(i), (GLsizei)m_indices[i].size(), IndexType::UNSIGNED_INT, m_indices[i].data(), (GLint)offset);
+		m_va.renderElementsBaseVertex(convertPrimEnum(i), static_cast<int>(m_indices[i].size()), IndexType::UNSIGNED_INT, m_indices[i].data(), static_cast<int>(offset));
 		offset += m_vertices[i].size();
 	}
 
@@ -91,7 +91,7 @@ void GeometryBatch::draw() {
 }
 
 void GeometryBatch::addPrimitives(PRIM prim, size_t first, size_t countVer, const RE::VertexPOCO* data, bool separate/* = true*/) {
-	GLuint last = (GLuint)m_vertices[(size_t)prim].size();
+	unsigned int last = (unsigned int)m_vertices[(size_t)prim].size();
 
 	//Vertices
 	size_t prevSize = m_vertices[(size_t)prim].size();
@@ -105,17 +105,17 @@ void GeometryBatch::addPrimitives(PRIM prim, size_t first, size_t countVer, cons
 
 	//Separator
 	if (separate && (prim == PRIM::LINE_STRIP || prim == PRIM::LINE_LOOP || prim == PRIM::TRIANGLE_STRIP || prim == PRIM::TRIANGLE_FAN)) {
-		m_indices[(size_t)prim].push_back(PRIMITIVE_RESTART_INDEX<GLuint>());
+		m_indices[(size_t)prim].push_back(PRIMITIVE_RESTART_INDEX<unsigned int>());
 	}
 }
 
 void GeometryBatch::addCircles(size_t first, size_t count, const RE::CirclePOCO* data) {
-	GLuint last;
+	unsigned int last;
 	VertexPOCO mid;
 	VertexPOCO edge;
 	for (size_t i = 0u; i < count; ++i) {//For each circle
 		size_t index = (size_t)(data[first + i].disc ? SHAPE::DISC : SHAPE::CIRCLE);
-		last = (GLuint)m_vertices[index].size();
+		last = (unsigned int)m_vertices[index].size();
 		mid.position = data[first + i].pos;
 		mid.color = data[first + i].mid;
 		edge.color = data[first + i].edge;
@@ -138,7 +138,7 @@ void GeometryBatch::addCircles(size_t first, size_t count, const RE::CirclePOCO*
 		if (data[first + i].disc) {
 			m_indices[index].push_back(last - (int)steps);
 		}
-		m_indices[index].push_back(PRIMITIVE_RESTART_INDEX<GLuint>());
+		m_indices[index].push_back(PRIMITIVE_RESTART_INDEX<unsigned int>());
 	}
 }
 

@@ -175,15 +175,15 @@ void Texture::bind(TextureUnit unit) const {
 	s_impl->bind(*this, unit);
 }
 
-void Texture::bindImage(ImageUnit unit, GLint level, ImageAccess access) const {
+void Texture::bindImage(ImageUnit unit, int level, ImageAccess access) const {
 	s_impl->bindImage(*this, unit, level, access);
 }
 
-void Texture::setTexels(GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
+void Texture::setTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
 	s_impl->setTexels(*this, level, offset, size, raster);
 }
 
-void Texture::copyTexels(GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
+void Texture::copyTexels(int srcLevel, const glm::ivec2& srcPos, const Texture& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
 	s_impl->copyTexels(*this, srcLevel, srcPos, destination, dstLevel, dstPos, size);
 }
 
@@ -212,7 +212,7 @@ bool Texture::saveToFile(const std::string& filePathPNG, const TextureParameters
 	//Download pixels
 	std::vector<unsigned char> pixels;
 	pixels.resize(Raster::minimumRequiredMemory(m_trueDims, channels));
-	s_impl->getTexels(*this, 0, static_cast<GLsizei>(pixels.size()), pixels.data());
+	s_impl->getTexels(*this, 0, static_cast<int>(pixels.size()), pixels.data());
 
 	//Insert rti chunk
 	lodepng::State state{};

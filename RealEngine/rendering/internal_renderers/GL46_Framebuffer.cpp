@@ -11,12 +11,12 @@
 
 namespace RE {
 
-GLenum convertFramebufferTarget(FramebufferTarget target) {
+GLenum convert(FramebufferTarget target) {
 	switch (target) {
-	case RE::FramebufferTarget::DRAWING: return GL_DRAW_FRAMEBUFFER;
-	case RE::FramebufferTarget::READING: return GL_READ_FRAMEBUFFER;
-	case RE::FramebufferTarget::DRAWING_AND_READING: return GL_FRAMEBUFFER;
-	default: fatalError("Bad enum value of RE::FramebufferTarget!");
+	case FramebufferTarget::DRAWING: return GL_DRAW_FRAMEBUFFER;
+	case FramebufferTarget::READING: return GL_READ_FRAMEBUFFER;
+	case FramebufferTarget::DRAWING_AND_READING: return GL_FRAMEBUFFER;
+	default: fatalError("Bad enum value of FramebufferTarget!");
 	}
 }
 
@@ -30,10 +30,10 @@ void GL46_Framebuffer::destruct(Framebuffer& fb) const {
 
 void GL46_Framebuffer::attachImage(Framebuffer& fb, FramebufferAttachment attachment, const Texture& te, int level) const {
 	GLenum attachment_gl;
-	switch (attachment){
-	case RE::FramebufferAttachment::DEPTH: attachment_gl = GL_DEPTH_ATTACHMENT; break;
-	case RE::FramebufferAttachment::STENCIL: attachment_gl = GL_STENCIL_ATTACHMENT; break;
-	case RE::FramebufferAttachment::DEPTH_AND_STENCIL: attachment_gl = GL_DEPTH_STENCIL_ATTACHMENT; break;
+	switch (attachment) {
+	case FramebufferAttachment::DEPTH: attachment_gl = GL_DEPTH_ATTACHMENT; break;
+	case FramebufferAttachment::STENCIL: attachment_gl = GL_STENCIL_ATTACHMENT; break;
+	case FramebufferAttachment::DEPTH_AND_STENCIL: attachment_gl = GL_DEPTH_STENCIL_ATTACHMENT; break;
 	default: attachment_gl = GL_COLOR_ATTACHMENT0 + static_cast<GLenum>(attachment); break;
 	}
 	glNamedFramebufferTexture(fb.m_ID, attachment_gl, te.m_ID, level);
@@ -42,7 +42,7 @@ void GL46_Framebuffer::attachImage(Framebuffer& fb, FramebufferAttachment attach
 void GL46_Framebuffer::associateAttachementsWithOutputs(Framebuffer& fb, const std::vector<FramebufferOutput>& outputs) const {
 	std::vector<GLenum> outputs_gl;
 	outputs_gl.resize(outputs.size(), GL_NONE);//Expensive malloc...
-	for (size_t i = 0; i < outputs.size(); i++){
+	for (size_t i = 0; i < outputs.size(); i++) {
 		if (outputs[i] == FramebufferOutput::DISCARD) {
 			outputs_gl[i] = GL_NONE;
 		} else {
@@ -57,11 +57,11 @@ void GL46_Framebuffer::selectAttachmentForColorReading(Framebuffer& fb, unsigned
 }
 
 void GL46_Framebuffer::targetMe(const Framebuffer& fb, FramebufferTarget target) const {
-	glBindFramebuffer(convertFramebufferTarget(target), fb.m_ID);
+	glBindFramebuffer(convert(target), fb.m_ID);
 }
 
 FramebufferTargetability GL46_Framebuffer::checkTargetability(const Framebuffer& fb, FramebufferTarget target) const {
-	switch (glCheckNamedFramebufferStatus(fb.m_ID, convertFramebufferTarget(target))){
+	switch (glCheckNamedFramebufferStatus(fb.m_ID, convert(target))) {
 	case GL_FRAMEBUFFER_COMPLETE: return FramebufferTargetability::TARGETABLE;
 	default: return FramebufferTargetability::NOT_COMPLETE;
 	}

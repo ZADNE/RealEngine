@@ -204,7 +204,7 @@ void GL46_ShaderProgram::compileProgram(ShaderProgram& sp, const ShaderProgramSo
 	size_t i = 0;
 	for (auto STAGE : SHADER_STAGES) {
 		if (!source[STAGE].m_sources.empty()) {
-			shaderID[i] = glCreateShader(static_cast<GLenum>(STAGE));
+			shaderID[i] = glCreateShader(convert(STAGE));
 		#ifdef _DEBUG
 			if (shaderID[i] == 0) {
 				fatalError("Failed to create shader!");

@@ -38,10 +38,10 @@ public:
 };
 
 struct DrawBatch {
-	DrawBatch(GLint offset, GLuint count, TextureProxy texture) : offset(offset), count(count), texture(texture) {};
+	DrawBatch(int offset, unsigned int count, TextureProxy texture) : offset(offset), count(count), texture(texture) {};
 
-	GLint offset;
-	GLsizei count;
+	int offset;
+	int count;
 	TextureProxy texture;
 };
 

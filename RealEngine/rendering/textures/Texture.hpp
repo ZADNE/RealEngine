@@ -25,11 +25,6 @@ class TextureProxy {
 public:
 
 	/**
-	 * @brief TO BE REMOVED
-	*/
-	//explicit TextureProxy(GLuint ID) : m_ID(ID) {}
-
-	/**
 	 * @brief Contructs proxy that represents the given texture
 	 * @param texture Texture to present
 	*/
@@ -53,7 +48,7 @@ public:
 
 	auto operator<=>(const TextureProxy&) const = default;
 private:
-	GLuint m_ID; /**< OpenGL name of the texture */
+	unsigned int m_ID; /**< OpenGL name of the texture */
 
 	static ITexture* s_impl;
 };
@@ -170,7 +165,7 @@ public:
 	 * @param level Mipmap level of the texture to bind
 	 * @param access Access to the image
 	*/
-	void bindImage(ImageUnit unit, GLint level, ImageAccess access) const;
+	void bindImage(ImageUnit unit, int level, ImageAccess access) const;
 
 	/**
 	 * @brief Replaces a portion of an image within the texture with given raster
@@ -179,7 +174,7 @@ public:
 	 * @param size Size of the rectangle that is to be replaced
 	 * @param raster The texels that will be copied into the image. The format must be RGBA 8-bits per channel
 	*/
-	void setTexels(GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const;
+	void setTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const;
 
 	/**
 	 * @brief Copies texels between two images
@@ -190,7 +185,7 @@ public:
 	 * @param dstPos Position within the destination the destination level (image) to copy to
 	 * @param size Size of the area that is to be copied
 	*/
-	void copyTexels(GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const;
+	void copyTexels(int srcLevel, const glm::ivec2& srcPos, const Texture& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const;
 
 	/**
 	 * @brief Clears first level of the texture with given color.
@@ -220,7 +215,7 @@ private:
 
 	void init(const Raster& raster, const TextureParameters& params);
 
-	GLuint m_ID = 0u;			/**< OpenGL name of the texture */
+	unsigned int m_ID = 0u;			/**< OpenGL name of the texture */
 	TextureFlags m_flags{};		/**< Flags associated with the texture */
 
 	glm::vec2 m_subimageDims{};	/**< Dimensions of the texture */

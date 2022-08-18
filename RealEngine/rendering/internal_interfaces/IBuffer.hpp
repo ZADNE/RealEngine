@@ -27,13 +27,13 @@ enum class BufferAccessNature {
 };
 
 enum class BufferUsageFlags : unsigned int {
-	NO_FLAGS = 0u,
-	DYNAMIC_STORAGE,
-	MAP_READ,
-	MAP_WRITE,
-	MAP_PERSISTENT,
-	MAP_COHERENT,
-	CLIENT_STORAGE
+	NO_FLAGS = 0,
+	DYNAMIC_STORAGE = 1,
+	MAP_READ = 2,
+	MAP_WRITE = 4,
+	MAP_PERSISTENT = 8,
+	MAP_COHERENT = 16,
+	CLIENT_STORAGE = 32
 };
 
 inline BufferUsageFlags operator|(BufferUsageFlags a, BufferUsageFlags b) {
@@ -48,14 +48,14 @@ inline bool operator&(BufferUsageFlags a, BufferUsageFlags b) {
  * @brief Restricts the usage of a buffer mapping
 */
 enum class BufferMapUsageFlags : unsigned int {
-	READ,					/**< Indicates that the mapping may be used to read buffer's data */
-	WRITE,					/**< Indicates that the mapping may be used to modify buffer's data */
-	PERSISTENT,				/**< Indicates that the client intends to hold and use the mapping during subsequent GL operation */
-	COHERENT,				/**< Indicates that a persistent mapping is also to be coherent */
-	INVALIDATE_RANGE,		/**< Indicates that the previous contents of the specified range may be discarded */
-	INVALIDATE_BUFFER,		/**< Indicates that the previous contents of the entire buffer may be discarded */
-	FLUSH_EXPLICIT,			/**< Indicates that one or more discrete subranges of the mapping may be modified */
-	UNSYNCHRONIZED			/**< Indicates that the GL should not attempt to synchronize pending operations on the buffer */
+	READ = 1,					/**< Indicates that the mapping may be used to read buffer's data */
+	WRITE = 2,					/**< Indicates that the mapping may be used to modify buffer's data */
+	PERSISTENT = 4,				/**< Indicates that the client intends to hold and use the mapping during subsequent GL operation */
+	COHERENT = 8,				/**< Indicates that a persistent mapping is also to be coherent */
+	INVALIDATE_RANGE = 16,		/**< Indicates that the previous contents of the specified range may be discarded */
+	INVALIDATE_BUFFER = 32,		/**< Indicates that the previous contents of the entire buffer may be discarded */
+	FLUSH_EXPLICIT = 64,		/**< Indicates that one or more discrete subranges of the mapping may be modified */
+	UNSYNCHRONIZED = 128		/**< Indicates that the GL should not attempt to synchronize pending operations on the buffer */
 };
 
 inline BufferMapUsageFlags operator|(BufferMapUsageFlags a, BufferMapUsageFlags b) {

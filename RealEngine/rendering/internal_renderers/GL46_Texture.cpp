@@ -3,12 +3,15 @@
  */
 #include <RealEngine/rendering/internal_renderers/GL46_Texture.hpp>
 
+#include <GL/glew.h>
+
 #include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/utility/math.hpp>
+#include <RealEngine/utility/error.hpp>
 
 namespace RE {
 
-GLenum toGLenum(TextureChannels channels) {
+GLenum convert(TextureChannels channels) {
 	static_assert(TEX_CHANNELS_BITS == 0b0000'0000'0000'0011, "TextureFlags - channel bits reaaranged");
 	static const GLenum enums[] = {
 		GL_RED, GL_RG, GL_RGB, GL_RGBA
@@ -16,7 +19,16 @@ GLenum toGLenum(TextureChannels channels) {
 	return enums[ft_cast(channels)];
 }
 
-GLenum textureInternalFormat(TextureChannels channels, TextureFormat type, TextureBitdepthPerChannel bitdepth) {
+GLenum convert(ImageAccess access) {
+	switch (access) {
+	case ImageAccess::READ_ONLY: return GL_READ_ONLY;
+	case ImageAccess::WRITE_ONLY: return GL_WRITE_ONLY;
+	case ImageAccess::READ_WRITE: return GL_READ_WRITE;
+	default: fatalError("Bad enum value of ImageAccess!");
+	}
+}
+
+GLenum convert(TextureChannels channels, TextureFormat type, TextureBitdepthPerChannel bitdepth) {
 	static_assert((TEX_CHANNELS_BITS | TEX_FORMAT_BITS) == 0b0000'0000'0000'1111, "TextureFlags - channel or format bits reaaranged");
 	static const GLenum internalFormats[3][16] = {{
 		GL_R8,		GL_RG8,			GL_RGB8,		GL_RGBA8,
@@ -67,12 +79,12 @@ void GL46_Texture::construct(Texture& te, const Raster& raster) const {
 
 	//Create storage for the texture
 	GLsizei levels = te.getMinFilterMipmapsUsage() == TextureMinFilterMipmapsUsage::YES ? uintlog2(std::max(te.m_trueDims.x, te.m_trueDims.y)) + 1 : 1;
-	auto internalFormat = textureInternalFormat(te.getChannels(), te.getFormat(), te.getBitdepthPerChannel());
+	auto internalFormat = convert(te.getChannels(), te.getFormat(), te.getBitdepthPerChannel());
 	glTextureStorage2D(te.m_ID, levels, internalFormat, te.m_trueDims.x, te.m_trueDims.y);
 
 	//Upload pixels for the texture (if specified)
 	if (raster.getTexels().size() > 0u) {
-		glTextureSubImage2D(te.m_ID, 0, 0, 0, te.m_trueDims.x, te.m_trueDims.y, toGLenum(raster.getChannels()), GL_UNSIGNED_BYTE, raster.getTexels().data());
+		glTextureSubImage2D(te.m_ID, 0, 0, 0, te.m_trueDims.x, te.m_trueDims.y, convert(raster.getChannels()), GL_UNSIGNED_BYTE, raster.getTexels().data());
 	}
 
 	//Generate mipmaps for the texture
@@ -121,37 +133,37 @@ void GL46_Texture::bind(const TextureProxy& te, TextureUnit unit) const {
 	glBindTextureUnit(unit.m_unit, te.m_ID);
 }
 
-void GL46_Texture::bindImage(const Texture& te, ImageUnit unit, GLint level, ImageAccess access) const {
-	glBindImageTexture(unit.m_unit, te.m_ID, level, GL_FALSE, 0, static_cast<GLenum>(access), textureInternalFormat(te.getChannels(), te.getFormat(), te.getBitdepthPerChannel()));
+void GL46_Texture::bindImage(const Texture& te, ImageUnit unit, int level, ImageAccess access) const {
+	glBindImageTexture(unit.m_unit, te.m_ID, level, GL_FALSE, 0, convert(access), convert(te.getChannels(), te.getFormat(), te.getBitdepthPerChannel()));
 }
 
-void GL46_Texture::setTexels(const Texture& te, GLint level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
+void GL46_Texture::setTexels(const Texture& te, int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
 	glTextureSubImage2D(te.m_ID, level, offset.x, offset.y,
 		size.x, size.y, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, raster);
 }
 
-void GL46_Texture::copyTexels(const Texture& te, GLint srcLevel, const glm::ivec2& srcPos, const Texture& destination, GLint dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
+void GL46_Texture::copyTexels(const Texture& te, int srcLevel, const glm::ivec2& srcPos, const Texture& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
 	glCopyImageSubData(te.m_ID, GL_TEXTURE_2D, srcLevel, srcPos.x, srcPos.y, 0,
 		destination.m_ID, GL_TEXTURE_2D, dstLevel, dstPos.x, dstPos.y, 0, size.x, size.y, 1);
 }
 
-void GL46_Texture::getTexels(const Texture& te, GLint level, GLsizei bufSize, void* pixels) const {
-	glGetTextureImage(te.m_ID, 0, toGLenum(te.getChannels()), GL_UNSIGNED_BYTE, bufSize, pixels);
+void GL46_Texture::getTexels(const Texture& te, int level, int bufSize, void* pixels) const {
+	glGetTextureImage(te.m_ID, 0, convert(te.getChannels()), GL_UNSIGNED_BYTE, bufSize, pixels);
 }
 
-void GL46_Texture::clear(const Texture& te, GLint level, const glm::vec4& color) const {
+void GL46_Texture::clear(const Texture& te, int level, const glm::vec4& color) const {
 	glClearTexImage(te.m_ID, level, GL_RGBA, GL_FLOAT, &color);
 }
 
-void GL46_Texture::clear(const Texture& te, GLint level, const glm::ivec4& color) const {
+void GL46_Texture::clear(const Texture& te, int level, const glm::ivec4& color) const {
 	glClearTexImage(te.m_ID, level, GL_RGBA_INTEGER, GL_INT, &color);
 }
 
-void GL46_Texture::clear(const Texture& te, GLint level, const glm::uvec4& color) const {
+void GL46_Texture::clear(const Texture& te, int level, const glm::uvec4& color) const {
 	glClearTexImage(te.m_ID, level, GL_RGBA_INTEGER, GL_UNSIGNED_INT, &color);
 }
 
-void GL46_Texture::clear(const Texture& te, GLint level, const Color& color) const {
+void GL46_Texture::clear(const Texture& te, int level, const Color& color) const {
 	glClearTexImage(te.m_ID, level, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, &color);
 }
 

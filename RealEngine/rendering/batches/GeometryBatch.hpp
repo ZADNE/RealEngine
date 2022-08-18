@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -61,7 +61,7 @@ private:
 	ShaderProgramPtr m_shaderProgram;
 
 	std::array<std::vector<RE::VertexPOCO>, PRIMITIVES_COUNT + SHAPES_COUNT> m_vertices;
-	std::array<std::vector<GLuint>, PRIMITIVES_COUNT + SHAPES_COUNT> m_indices;
+	std::array<std::vector<unsigned int>, PRIMITIVES_COUNT + SHAPES_COUNT> m_indices;
 };
 
 }
