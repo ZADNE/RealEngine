@@ -3,9 +3,11 @@
  */
 #include <RealEngine/utility/GLTypeToString.hpp>
 
+#include <GL/glew.h>
+
 namespace RE {
 
-std::string_view GLTypeToString(GLenum type) {
+std::string_view GLTypeToString(unsigned int type) {
 	switch (type) {
 		//SCALARS
 	case GL_FLOAT:

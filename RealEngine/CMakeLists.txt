@@ -1,5 +1,5 @@
-﻿add_subdirectory(graphics)
-add_subdirectory(main)
+﻿add_subdirectory(main)
+add_subdirectory(rendering)
 add_subdirectory(resources)
 add_subdirectory(user_input)
 add_subdirectory(utility)

@@ -7,7 +7,7 @@
 #include <array>
 
 #include <ImGui/imgui.h>
-#include <RealEngine/graphics/textures/Texture.hpp>
+#include <RealEngine/rendering/textures/Texture.hpp>
 
 static constexpr std::array MIN_FILTERS = {
 	RE::TextureMinFilter::NEAREST_NO_MIPMAPS, RE::TextureMinFilter::LINEAR_NO_MIPMAPS,

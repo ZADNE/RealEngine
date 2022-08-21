@@ -13,13 +13,20 @@
 #include <Windows.h>
 
 #include <ImGui/imgui.h>
-#include <RealEngine/graphics/GeometryBatch.hpp>
-#include <RealEngine/graphics/SpriteBatch.hpp>
-#include <RealEngine/main/Error.hpp>
+#include <RealEngine/rendering/batches/GeometryBatch.hpp>
+#include <RealEngine/rendering/batches/SpriteBatch.hpp>
+#include <RealEngine/utility/error.hpp>
 
 #include <RTICreator/ComboConstants.hpp>
 
+constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
+	.clearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
+	.framesPerSecondLimit = 144,
+	.usingImGui = true
+};
+
 MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
+	Room(INITIAL_DISPLAY_SETTINGS),
 	m_texView(window()->getDims()) {
 
 	//Set last visited location to location of this executable
@@ -92,8 +99,11 @@ void MainMenuRoom::render(double interpolationFactor) {
 					ImGui::SliderFloat2("Overlap (to see wrapping)", &m_overlap.x, 0.0f, 1.0f);
 					if (ImGui::Button("Reset view"))
 						resetView();
-					if (ImGui::ColorPicker3("Background color", &m_backgroundColor.x))
-						glClearColor(m_backgroundColor.r, m_backgroundColor.g, m_backgroundColor.b, 1.0f);
+					if (ImGui::ColorPicker3("Background color", &m_backgroundColor.x)) {
+						auto displaySettings = getDisplaySettings();
+						displaySettings.clearColor = glm::vec4(m_backgroundColor, 1.0f);
+						program()->setDisplaySettingsForCurrentRoom(displaySettings);
+					}
 					ImGui::EndTabItem();
 				}
 			}
