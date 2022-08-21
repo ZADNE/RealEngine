@@ -53,27 +53,27 @@ void VertexArray::unbind() const {
 	s_impl->unbind(*this);
 }
 
-void VertexArray::renderArrays(Primitive prim, int first, int count) const {
+void VertexArray::renderArrays(Primitive prim, int first, size_t count) const {
 	s_impl->renderArrays(*this, prim, first, count);
 }
 
-void VertexArray::renderArrays(Primitive prim, int first, int count, int instancecount) const {
+void VertexArray::renderArrays(Primitive prim, int first, size_t count, int instancecount) const {
 	s_impl->renderArrays(*this, prim, first, count, instancecount);
 }
 
-void VertexArray::renderElements(Primitive prim, int count, IndexType type, const void* indices) const {
+void VertexArray::renderElements(Primitive prim, size_t count, IndexType type, const void* indices) const {
 	s_impl->renderElements(*this, prim, count, type, indices);
 }
 
-void VertexArray::renderElements(Primitive prim, int count, IndexType type, const void* indices, int instancecount) const {
+void VertexArray::renderElements(Primitive prim, size_t count, IndexType type, const void* indices, int instancecount) const {
 	s_impl->renderElements(*this, prim, count, type, indices, instancecount);
 }
 
-void VertexArray::renderElementsBaseVertex(Primitive prim, int count, IndexType type, const void* indices, int basevertex) const {
+void VertexArray::renderElementsBaseVertex(Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const {
 	s_impl->renderElementsBaseVertex(*this, prim, count, type, indices, basevertex);
 }
 
-void VertexArray::renderElementsBaseVertex(Primitive prim, int count, IndexType type, const void* indices, int instancecount, int basevertex) const {
+void VertexArray::renderElementsBaseVertex(Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const {
 	s_impl->renderElementsBaseVertex(*this, prim, count, type, indices, instancecount, basevertex);
 }
 

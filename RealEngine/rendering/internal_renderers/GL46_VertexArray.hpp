@@ -28,14 +28,14 @@ public:
 	void bind(const VertexArray& va) const override;
 	void unbind(const VertexArray& va) const override;
 
-	void renderArrays(const VertexArray& va, Primitive prim, int first, int count) const override;
-	void renderArrays(const VertexArray& va, Primitive prim, int first, int count, int instancecount) const override;
+	void renderArrays(const VertexArray& va, Primitive prim, int first, size_t count) const override;
+	void renderArrays(const VertexArray& va, Primitive prim, int first, size_t count, int instancecount) const override;
 
-	void renderElements(const VertexArray& va, Primitive prim, int count, IndexType type, const void* indices) const override;
-	void renderElements(const VertexArray& va, Primitive prim, int count, IndexType type, const void* indices, int instancecount) const override;
+	void renderElements(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* indices) const override;
+	void renderElements(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount) const override;
 
-	void renderElementsBaseVertex(const VertexArray& va, Primitive prim, int count, IndexType type, const void* indices, int basevertex) const override;
-	void renderElementsBaseVertex(const VertexArray& va, Primitive prim, int count, IndexType type, const void* indices, int instancecount, int basevertex) const override;
+	void renderElementsBaseVertex(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const override;
+	void renderElementsBaseVertex(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const override;
 
 private:
 

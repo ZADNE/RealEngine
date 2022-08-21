@@ -14,23 +14,23 @@ namespace RE {
 class GL46_Buffer : public IBuffer {
 public:
 
-	void constructImmutable(Buffer& bf, int sizeInBytes, BufferUsageFlags flags, const void* data) const override;
-	void constructMutable(Buffer& bf, int sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const override;
+	void constructImmutable(Buffer& bf, size_t sizeInBytes, BufferUsageFlags flags, const void* data) const override;
+	void constructMutable(Buffer& bf, size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const override;
 	void destruct(Buffer& bf) const override;
 
-	void bind(Buffer& bf, BufferType bindType) const override;
-	void bindIndexed(Buffer& bf, const BufferTypedIndex& index) const override;
+	void bind(const Buffer& bf, BufferType bindType) const override;
+	void bindIndexed(const Buffer& bf, const BufferTypedIndex& index) const override;
 
-	void overwrite(Buffer& bf, int offsetInBytes, int countBytes, const void* data) const override;
+	void overwrite(const Buffer& bf, size_t offsetInBytes, size_t countBytes, const void* data) const override;
 
-	void redefine(Buffer& bf, int sizeInBytes, const void* data) const override;
+	void redefine(Buffer& bf, size_t sizeInBytes, const void* data) const override;
 
-	void invalidate(Buffer& bf) const override;
-	void invalidate(Buffer& bf, int lengthInBytes) const override;
+	void invalidate(const Buffer& bf) const override;
+	void invalidate(const Buffer& bf, size_t lengthInBytes) const override;
 
-	void* map(Buffer& bf, int offsetInBytes, int lengthInBytes, BufferMapUsageFlags mappingUsage) const override;
-	void flushMapped(Buffer& bf, int offsetInBytes, int lengthInBytes) const override;
-	bool unmap(Buffer& bf) const override;
+	void* map(const Buffer& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const override;
+	void flushMapped(const Buffer& bf, size_t offsetInBytes, size_t lengthInBytes) const override;
+	bool unmap(const Buffer& bf) const override;
 
 };
 

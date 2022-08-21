@@ -147,8 +147,12 @@ void GL46_Texture::copyTexels(const Texture& te, int srcLevel, const glm::ivec2&
 		destination.m_ID, GL_TEXTURE_2D, dstLevel, dstPos.x, dstPos.y, 0, size.x, size.y, 1);
 }
 
-void GL46_Texture::getTexels(const Texture& te, int level, int bufSize, void* pixels) const {
-	glGetTextureImage(te.m_ID, 0, convert(te.getChannels()), GL_UNSIGNED_BYTE, bufSize, pixels);
+void GL46_Texture::getTexels(const Texture& te, int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* pixels) const {
+	glGetTextureSubImage(
+		te.m_ID, 0,
+		offset.x, offset.y, 0,
+		size.x, size.y, 1,
+		GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, static_cast<GLsizei>(bufSize), pixels);
 }
 
 void GL46_Texture::clear(const Texture& te, int level, const glm::vec4& color) const {

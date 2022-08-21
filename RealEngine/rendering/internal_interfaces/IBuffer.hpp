@@ -45,7 +45,7 @@ inline bool operator&(BufferUsageFlags a, BufferUsageFlags b) {
 }
 
 /**
- * @brief Restricts the usage of a buffer mapping
+	* @brief Restricts the usage of a buffer mapping
 */
 enum class BufferMapUsageFlags : unsigned int {
 	READ = 1,					/**< Indicates that the mapping may be used to read buffer's data */
@@ -78,23 +78,23 @@ class Buffer;
 class IBuffer {
 public:
 
-	virtual void constructImmutable(Buffer& bf, int sizeInBytes, BufferUsageFlags flags, const void* data) const = 0;
-	virtual void constructMutable(Buffer& bf, int sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const = 0;
+	virtual void constructImmutable(Buffer& bf, size_t sizeInBytes, BufferUsageFlags flags, const void* data) const = 0;
+	virtual void constructMutable(Buffer& bf, size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const = 0;
 	virtual void destruct(Buffer& bf) const = 0;
 
-	virtual void bind(Buffer& bf, BufferType bindType) const = 0;
-	virtual void bindIndexed(Buffer& bf, const BufferTypedIndex& index) const = 0;
+	virtual void bind(const Buffer& bf, BufferType bindType) const = 0;
+	virtual void bindIndexed(const Buffer& bf, const BufferTypedIndex& index) const = 0;
 
-	virtual void overwrite(Buffer& bf, int offsetInBytes, int countBytes, const void* data) const = 0;
+	virtual void overwrite(const Buffer& bf, size_t offsetInBytes, size_t countBytes, const void* data) const = 0;
 
-	virtual void redefine(Buffer& bf, int sizeInBytes, const void* data) const = 0;
+	virtual void redefine(Buffer& bf, size_t sizeInBytes, const void* data) const = 0;
 
-	virtual void invalidate(Buffer& bf) const = 0;
-	virtual void invalidate(Buffer& bf, int lengthInBytes) const = 0;
+	virtual void invalidate(const Buffer& bf) const = 0;
+	virtual void invalidate(const Buffer& bf, size_t lengthInBytes) const = 0;
 
-	virtual void* map(Buffer& bf, int offsetInBytes, int lengthInBytes, BufferMapUsageFlags mappingUsage) const = 0;
-	virtual void flushMapped(Buffer& bf, int offsetInBytes, int lengthInBytes) const = 0;
-	virtual bool unmap(Buffer& bf) const = 0;
+	virtual void* map(const Buffer& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const = 0;
+	virtual void flushMapped(const Buffer& bf, size_t offsetInBytes, size_t lengthInBytes) const = 0;
+	virtual bool unmap(const Buffer& bf) const = 0;
 
 };
 

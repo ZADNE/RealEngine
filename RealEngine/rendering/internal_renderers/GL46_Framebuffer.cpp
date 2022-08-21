@@ -46,7 +46,7 @@ void GL46_Framebuffer::associateAttachementsWithOutputs(Framebuffer& fb, const s
 		if (outputs[i] == FramebufferOutput::DISCARD) {
 			outputs_gl[i] = GL_NONE;
 		} else {
-			outputs_gl[i] = GL_COLOR_ATTACHMENT0 + static_cast<GLenum>(outputs[i]);
+			outputs_gl[i] = GL_COLOR_ATTACHMENT0 + static_cast<GLenum>(outputs[i]) - static_cast<GLenum>(FramebufferOutput::TO_COLOR0);
 		}
 	}
 	glNamedFramebufferDrawBuffers(fb.m_ID, static_cast<GLsizei>(outputs_gl.size()), outputs_gl.data());

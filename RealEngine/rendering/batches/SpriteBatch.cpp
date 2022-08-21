@@ -269,7 +269,7 @@ void SpriteBatch::createDrawBatches() {
 	}
 
 	//Uploade m_vertices to VBO
-	m_vbo.redefine(static_cast<int>(m_vertices.size()) * sizeof(VertexPOCOUV), m_vertices.data());
+	m_vbo.redefine(m_vertices.size() * sizeof(VertexPOCOUV), m_vertices.data());
 }
 
 bool SpriteBatch::compareNegToPos(Glyph* a, Glyph* b) {

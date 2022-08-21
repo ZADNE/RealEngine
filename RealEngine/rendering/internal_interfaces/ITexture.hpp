@@ -40,7 +40,7 @@ public:
 
 	virtual void setTexels(const Texture& te, int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const = 0;
 	virtual void copyTexels(const Texture& te, int srcLevel, const glm::ivec2& srcPos, const Texture& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const = 0;
-	virtual void getTexels(const Texture& te, int level, int bufSize, void* pixels) const = 0;
+	virtual void getTexels(const Texture& te, int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* pixels) const = 0;
 
 	virtual void clear(const Texture& te, int level, const glm::vec4& color) const = 0;
 	virtual void clear(const Texture& te, int level, const glm::ivec4& color) const = 0;

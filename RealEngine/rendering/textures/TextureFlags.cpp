@@ -1,17 +1,9 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/rendering/textures/TextureFlags.hpp>
 
 namespace RE {
-
-constexpr TextureFlags::TextureFlags(TextureChannels channels, TextureFormat format,
-	TextureMinFilter minFilter, TextureMagFilter magFilter,
-	TextureWrapStyle wrapStyleX, TextureWrapStyle wrapStyleY,
-	TextureBitdepthPerChannel bitdepth) :
-	m_flags(ft_cast(channels) | ft_cast(format) | ft_cast(minFilter) | ft_cast(magFilter)
-		| ft_cast(wrapStyleX) | (ft_cast(wrapStyleY) << TEX_WRAP_X_TO_Y_LEFTSHIFT) | ft_cast(bitdepth)) {
-}
 
 TextureChannels TextureFlags::getChannels() const {
 	return static_cast<TextureChannels>(m_flags & TEX_CHANNELS_BITS);

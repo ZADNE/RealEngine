@@ -130,34 +130,34 @@ void GL46_VertexArray::unbind(const VertexArray& va) const {
 #endif // _DEBUG
 }
 
-void GL46_VertexArray::renderArrays(const VertexArray& va, Primitive prim, int first, GLsizei count) const {
+void GL46_VertexArray::renderArrays(const VertexArray& va, Primitive prim, int first, size_t count) const {
 	throwIfNotCurrentlyBound(va);
-	glDrawArrays(convert(prim), first, count);
+	glDrawArrays(convert(prim), static_cast<GLint>(first), static_cast<GLsizei>(count));
 }
 
-void GL46_VertexArray::renderArrays(const VertexArray& va, Primitive prim, int first, GLsizei count, GLsizei instancecount) const {
+void GL46_VertexArray::renderArrays(const VertexArray& va, Primitive prim, int first, size_t count, int instancecount) const {
 	throwIfNotCurrentlyBound(va);
-	glDrawArraysInstanced(convert(prim), first, count, instancecount);
+	glDrawArraysInstanced(convert(prim), static_cast<GLint>(first), static_cast<GLsizei>(count), instancecount);
 }
 
-void GL46_VertexArray::renderElements(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices) const {
+void GL46_VertexArray::renderElements(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* indices) const {
 	throwIfNotCurrentlyBound(va);
-	glDrawElements(convert(prim), count, convert(type), indices);
+	glDrawElements(convert(prim), static_cast<GLsizei>(count), convert(type), indices);
 }
 
-void GL46_VertexArray::renderElements(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount) const {
+void GL46_VertexArray::renderElements(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount) const {
 	throwIfNotCurrentlyBound(va);
-	glDrawElementsInstanced(convert(prim), count, convert(type), indices, instancecount);
+	glDrawElementsInstanced(convert(prim), static_cast<GLsizei>(count), convert(type), indices, instancecount);
 }
 
-void GL46_VertexArray::renderElementsBaseVertex(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices, int basevertex) const {
+void GL46_VertexArray::renderElementsBaseVertex(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const {
 	throwIfNotCurrentlyBound(va);
-	glDrawElementsBaseVertex(convert(prim), count, convert(type), const_cast<void*>(indices), basevertex);
+	glDrawElementsBaseVertex(convert(prim), static_cast<GLsizei>(count), convert(type), const_cast<void*>(indices), basevertex);
 }
 
-void GL46_VertexArray::renderElementsBaseVertex(const VertexArray& va, Primitive prim, GLsizei count, IndexType type, const void* indices, GLsizei instancecount, int basevertex) const {
+void GL46_VertexArray::renderElementsBaseVertex(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const {
 	throwIfNotCurrentlyBound(va);
-	glDrawElementsInstancedBaseVertex(convert(prim), count, convert(type), indices, instancecount, basevertex);
+	glDrawElementsInstancedBaseVertex(convert(prim), static_cast<GLsizei>(count), convert(type), indices, instancecount, basevertex);
 }
 
 void GL46_VertexArray::throwIfNotCurrentlyBound(const VertexArray& va) const {

@@ -40,14 +40,14 @@ public:
 	void bind() const;
 	void unbind() const;
 
-	void renderArrays(Primitive prim, int first, int count) const;
-	void renderArrays(Primitive prim, int first, int count, int instancecount) const;
+	void renderArrays(Primitive prim, int first, size_t count) const;
+	void renderArrays(Primitive prim, int first, size_t count, int instancecount) const;
 
-	void renderElements(Primitive prim, int count, IndexType type, const void* indices) const;
-	void renderElements(Primitive prim, int count, IndexType type, const void* indices, int instancecount) const;
+	void renderElements(Primitive prim, size_t count, IndexType type, const void* indices) const;
+	void renderElements(Primitive prim, size_t count, IndexType type, const void* indices, int instancecount) const;
 
-	void renderElementsBaseVertex(Primitive prim, int count, IndexType type, const void* indices, int basevertex) const;
-	void renderElementsBaseVertex(Primitive prim, int count, IndexType type, const void* indices, int instancecount, int basevertex) const;
+	void renderElementsBaseVertex(Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const;
+	void renderElementsBaseVertex(Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const;
 
 private:
 	unsigned int m_ID = 0;			/**< Internal identifier*/

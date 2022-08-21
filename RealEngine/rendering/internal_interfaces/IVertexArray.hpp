@@ -84,14 +84,14 @@ public:
 	virtual void bind(const VertexArray& va) const = 0;
 	virtual void unbind(const VertexArray& va) const = 0;
 
-	virtual void renderArrays(const VertexArray& va, Primitive prim, int first, int count) const = 0;
-	virtual void renderArrays(const VertexArray& va, Primitive prim, int first, int count, int instancecount) const = 0;
+	virtual void renderArrays(const VertexArray& va, Primitive prim, int first, size_t count) const = 0;
+	virtual void renderArrays(const VertexArray& va, Primitive prim, int first, size_t count, int instancecount) const = 0;
 
-	virtual void renderElements(const VertexArray& va, Primitive prim, int count, IndexType type, const void* offset) const = 0;
-	virtual void renderElements(const VertexArray& va, Primitive prim, int count, IndexType type, const void* offset, int instancecount) const = 0;
+	virtual void renderElements(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* offset) const = 0;
+	virtual void renderElements(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* offset, int instancecount) const = 0;
 
-	virtual void renderElementsBaseVertex(const VertexArray& va, Primitive prim, int count, IndexType type, const void* indices, int basevertex) const = 0;
-	virtual void renderElementsBaseVertex(const VertexArray& va, Primitive prim, int count, IndexType type, const void* indices, int instancecount, int basevertex) const = 0;
+	virtual void renderElementsBaseVertex(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const = 0;
+	virtual void renderElementsBaseVertex(const VertexArray& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const = 0;
 };
 
 }

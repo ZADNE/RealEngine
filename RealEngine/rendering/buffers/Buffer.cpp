@@ -15,12 +15,12 @@ using enum BufferUsageFlags;
 
 IBuffer* Buffer::s_impl = nullptr;
 
-Buffer::Buffer(int sizeInBytes, BufferUsageFlags flags, const void* data/* = nullptr*/) {
+Buffer::Buffer(size_t sizeInBytes, BufferUsageFlags flags, const void* data/* = nullptr*/) {
 	s_impl->constructImmutable(*this, sizeInBytes, flags, data);
 }
 
 
-Buffer::Buffer(int sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data/* = nullptr*/) {
+Buffer::Buffer(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data/* = nullptr*/) {
 	s_impl->constructMutable(*this, sizeInBytes, accessFreq, accessNature, data);
 }
 
@@ -50,36 +50,40 @@ Buffer& Buffer::operator=(Buffer && other) noexcept {
 	return *this;
 }
 
-void Buffer::bind(BufferType bindType) {
+void Buffer::bind(BufferType bindType) const {
 	s_impl->bind(*this, bindType);
 }
 
-void Buffer::bindIndexed(const BufferTypedIndex& index) {
+void Buffer::bindIndexed(const BufferTypedIndex & index) const {
 	s_impl->bindIndexed(*this, index);
 }
 
-void Buffer::overwrite(int offsetInBytes, int countBytes, const void* data) {
+void Buffer::overwrite(size_t offsetInBytes, size_t countBytes, const void* data) const {
 	s_impl->overwrite(*this, offsetInBytes, countBytes, data);
 }
 
-void Buffer::redefine(int sizeInBytes, const void* data) {
+void Buffer::redefine(size_t sizeInBytes, const void* data) {
 	s_impl->redefine(*this, sizeInBytes, data);
 }
 
-void Buffer::invalidate() {
+void Buffer::invalidate() const {
 	s_impl->invalidate(*this);
 }
 
-void Buffer::invalidate(int lengthInBytes) {
+void Buffer::invalidate(size_t lengthInBytes) const {
 	s_impl->invalidate(*this, lengthInBytes);
 }
 
-void Buffer::flushMapped(int offsetInBytes, int lengthInBytes) {
+void Buffer::flushMapped(size_t offsetInBytes, size_t lengthInBytes) const {
 	s_impl->flushMapped(*this, offsetInBytes, lengthInBytes);
 }
 
-bool Buffer::unmap() {
+bool Buffer::unmap() const {
 	return s_impl->unmap(*this);
+}
+
+size_t Buffer::size() const {
+	return m_sizeInBytes;
 }
 
 }

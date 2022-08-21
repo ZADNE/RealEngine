@@ -36,7 +36,7 @@ public:
 
 	void setTexels(const Texture& te, int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const override;
 	void copyTexels(const Texture& te, int srcLevel, const glm::ivec2& srcPos, const Texture& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const override;
-	void getTexels(const Texture& te, int level, int bufSize, void* pixels) const override;
+	void getTexels(const Texture& te, int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* pixels) const override;
 
 	void clear(const Texture& te, int level, const glm::vec4& color) const override;
 	void clear(const Texture& te, int level, const glm::ivec4& color) const override;

@@ -215,7 +215,9 @@ public:
 	constexpr TextureFlags(TextureChannels channels, TextureFormat format,
 		TextureMinFilter minFilter, TextureMagFilter magFilter,
 		TextureWrapStyle wrapStyleX, TextureWrapStyle wrapStyleY,
-		TextureBitdepthPerChannel bitdepth);
+		TextureBitdepthPerChannel bitdepth) :
+		m_flags(ft_cast(channels) | ft_cast(format) | ft_cast(minFilter) | ft_cast(magFilter)
+			| ft_cast(wrapStyleX) | (ft_cast(wrapStyleY) << TEX_WRAP_X_TO_Y_LEFTSHIFT) | ft_cast(bitdepth)) {}
 
 	/**
 	 * @brief Conversion to raw type

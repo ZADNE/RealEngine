@@ -177,7 +177,13 @@ public:
 	void setTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const;
 
 	/**
-	 * @brief Copies texels between two images
+	 * @brief Replaces whole level 0 of the texture with given raster
+	*/
+	void setTexels(const void* raster) const;
+
+	/**
+	 * @brief Copies texels between two images (of potentially two textures)
+	 * @details Both images need to use the same texel format!
 	 * @param srcLevel Level (image) of this texture to be used as source
 	 * @param srcPos Position within the source level (image) to copy from
 	 * @param destination Destination texture that will receive the texels
@@ -188,8 +194,22 @@ public:
 	void copyTexels(int srcLevel, const glm::ivec2& srcPos, const Texture& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const;
 
 	/**
-	 * @brief Clears first level of the texture with given color.
-	 * @param color Color to clear the texture with.
+	 * @brief Reads back a portion of a level of the texture
+	 * @param level Level of the texture to read
+	 * @param offset Offset within the target image to read
+	 * @param size Size of the rectangle that is to be read
+	 * @param bufSize Size of the buffer that will receive the texels
+	 * @param buffer The buffer that will receive the texels
+	*/
+	void getTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* buffer);
+
+	/**
+	 * @brief Reads back whole level 0 of the texture
+	*/
+	void getTexels(size_t bufSize, void* buffer);
+
+	/**
+	 * @brief Clears level 0 of the texture with given color
 	*/
 	void clear(const glm::vec4& color) const;
 	void clear(const glm::ivec4& color) const;
@@ -197,7 +217,7 @@ public:
 	void clear(Color color) const;
 
 	/**
-	 * @brief Saves texture as a PNG file.
+	 * @brief Saves level 0 as a PNG file.
 	 * @param filePathPNG Filepath to save, existing file will be overwritten withot warnings.
 	 * @return True if saved succesfully, false otherwise.
 	*/
