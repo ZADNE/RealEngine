@@ -11,27 +11,32 @@
 #include <SDL2/SDL_thread.h>
 #include <nlohmann/json.hpp>
 
-#include <magic_enum/magic_enum.hpp>
 #include <RealEngine/user_input/Key.hpp>
 #include <RealEngine/utility/error.hpp>
 #include <RealEngine/main/program/MainProgram.hpp>
 
 namespace RE {
 
-template<typename KeyBindings>
-using KeyBindingValueList = std::array<Key, magic_enum::enum_count<KeyBindings>()>;
+template<typename KeyBindings, typename KeyBindingInfo>
+using KeyBindingInfoList = std::array<KeyBindingInfo, static_cast<size_t>(KeyBindings::COUNT)>;
 
 /**
  * @brief Provides a mechanism for user-changeable key bindings
  *
- * Keybinder holds compile-time list of key bindings. Upon creation, the key bindings
+ * Keybinder holds a list of key-binding points. Upon creation, the key-binding points
  * are assigned previously saved values (= bound keys). If the saved bindings cannot be loaded,
  * default bindings are assigned.
+ * 
+ * The key bound to a point can accessed via operator[]. The bindings can be overbound synchronously
+ * via changeBinding() or asynchronously via listenChangeBinding().
  *
- * @tparam KeyBindings Enum class that contains the binding points. The values must be continous sequence 0..N-1
- * @tparam defaultValuesList List with default values of the bindings. These are used when saved bindings cannot be loaded.
+ * @tparam KeyBindings			Enum class that contains the binding points. The values must be continous sequence 0..N-1
+ * @tparam KeyBindingInfo		A type that holds additional info about the binding point.
+ *								It must have member 'defaultValue' that return RE::Key and member 'name' that return a string type.
+ * @tparam infoList				Array with info about each binding point.
 */
-template<typename KeyBindings, const KeyBindingValueList<const KeyBindings>& defaultValuesList>
+template<typename KeyBindings, typename KeyBindingInfo,
+	const KeyBindingInfoList<KeyBindings, KeyBindingInfo>& infoList>
 class KeyBinder {
 	friend class MainProgram;
 public:
@@ -78,7 +83,7 @@ public:
 	 * @param binding The binding to change
 	*/
 	void resetBinding(KeyBindings binding) {
-		changeBinding(binding, defaultValuesList[static_cast<size_t>(binding)]);
+		changeBinding(binding, infoList[static_cast<size_t>(binding)].defaultValue);
 	};
 
 	/**
@@ -94,16 +99,16 @@ public:
 		i >> j;
 
 		for (auto item = j.begin(); item != j.end(); item++) {
-			auto binding = magic_enum::enum_cast<KeyBindings>(item.key());
+			auto binding = getBindingEnum(item.key());
 			if (binding.has_value()) {
 				m_bindings[static_cast<size_t>(*binding)] = stringToKey(item.value().get<std::string>());
 			}
 		}
 
 		bool returnVal = false;
-		for (size_t i = 0; i < magic_enum::enum_count<KeyBindings>(); i++) {
+		for (size_t i = 0; i < infoList.size(); i++) {
 			if (m_bindings[i] == Key::NO_KEY) {
-				m_bindings[i] = defaultValuesList[i];
+				m_bindings[i] = infoList[i].defaultValue;
 				returnVal = true;
 			}
 		}
@@ -115,7 +120,9 @@ public:
 	 * @param permanently If true, the reset bindings are saved
 	*/
 	void resetBindings(bool permanently) {
-		std::copy(defaultValuesList.begin(), defaultValuesList.end(), m_bindings.begin());
+		for (size_t i = 0; i < static_cast<size_t>(KeyBindings::COUNT); i++) {
+			m_bindings[i] = infoList[i].defaultValue;
+		}
 		if (permanently) { saveCurrentBindings(); }
 	}
 
@@ -125,8 +132,8 @@ public:
 	void saveCurrentBindings() {
 		nlohmann::ordered_json j;
 
-		for (auto& enum_entry : magic_enum::enum_entries<KeyBindings>()) {
-			j[std::string(enum_entry.second)] = keyToString(m_bindings[static_cast<size_t>(enum_entry.first)]);
+		for (size_t i = 0; i < static_cast<size_t>(KeyBindings::COUNT); i++){
+			j[infoList[i].name] = keyToString(m_bindings[i]);
 		}
 
 		std::ofstream o(m_bindingFileName, std::ofstream::trunc);
@@ -151,7 +158,18 @@ public:
 		auto thread = SDL_CreateThread((listenForKey<CallbackReceiver, callback>), "keybind_listener", info);
 		SDL_DetachThread(thread);
 	};
+
 private:
+
+	std::optional<KeyBindings> getBindingEnum(std::string_view name) {
+		for (size_t i = 0; i < infoList.size(); i++) {
+			if (infoList[i].name == name) {
+				return static_cast<KeyBindings>(i);//Found the enum
+			}
+		}
+		return {};//Did not find the enum
+	}
+
 	template<typename CallbackReceiver>
 	struct ListeningInfo {
 		KeyBindings binding;
@@ -205,7 +223,7 @@ private:
 
 	std::string m_bindingFileName = "bindings.json";
 
-	KeyBindingValueList<KeyBindings> m_bindings;
+	std::array<RE::Key, static_cast<size_t>(KeyBindings::COUNT)> m_bindings;
 };
 
 }
