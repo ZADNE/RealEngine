@@ -9,19 +9,41 @@
 
 namespace RE {
 
+class MainProgram;
+
 /**
  * @brief Is a proxy-like object to many RealEngine systems
  * @details This class contains everything systems-related that a Room can access.
+ * @see Room::system()
 */
 class RoomSystemAccess {
 public:
 
 	/**
-	 * @brief This object is created by the MainProgram and accessed via Room::systemAccess()
+	 * @brief This object is created by the MainProgram and accessed via Room::system()
 	*/
-	RoomSystemAccess(InputManager& inputManager, Synchronizer& synchronizer, Window& window, RoomManager& roomManager) :
-		m_inputManager(inputManager), m_synchronizer(synchronizer), m_window(window), m_roomManager(roomManager) {}
-	
+	RoomSystemAccess(MainProgram& mainProgram, InputManager& inputManager, Synchronizer& synchronizer, Window& window, RoomManager& roomManager) :
+		m_mainProgram(mainProgram), m_inputManager(inputManager), m_synchronizer(synchronizer), m_window(window), m_roomManager(roomManager) {}
+
+#pragma region MainProgram
+
+	/**
+	 * @copydoc MainProgram::scheduleExit
+	*/
+	void scheduleExit(int exitcode = EXIT_SUCCESS);
+
+	/**
+	 * @copydoc MainProgram::scheduleRoomTransition
+	*/
+	void scheduleRoomTransition(size_t name, RoomTransitionParameters params);
+
+	/**
+	 * @copydoc MainProgram::setRelativeCursorMode
+	*/
+	void setRelativeCursorMode(bool relative);
+
+#pragma endregion
+
 #pragma region Synchronizer
 
 	/**
@@ -53,15 +75,21 @@ public:
 	*/
 	void goFullscreen(bool fullscreen, bool save);
 
+	bool isFullscreen() const; 
+
 	/**
 	 * @copydoc Window::goBorderless
 	*/
 	void goBorderless(bool borderless, bool save);
 
+	bool isBorderless() const;
+
 	/**
 	 * @copydoc Window::setVSync
 	*/
 	void setVSync(bool vSync, bool save);
+
+	bool isVSynced() const;
 
 	/**
 	 * @copydoc Window::setTitle
@@ -83,10 +111,16 @@ public:
 	*/
 	glm::ivec2 getWindowDims() const;
 
+	/**
+	 * @copydoc WindowSettings::save
+	*/
+	void saveWindowSettings();
+
 #pragma endregion
 
 private:
 
+	MainProgram& m_mainProgram;
 	InputManager& m_inputManager;
 	Synchronizer& m_synchronizer;
 	Window& m_window;

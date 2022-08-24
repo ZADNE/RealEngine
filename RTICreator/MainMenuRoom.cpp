@@ -29,6 +29,8 @@ MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args, size_t roomName) :
 	Room(roomName, INITIAL_DISPLAY_SETTINGS),
 	m_texView(system().getWindowDims()) {
 
+	system().setWindowTitle("RTICreator v3.0.0");
+
 	//Set last visited location to location of this executable
 	m_lastVisitedLoc = args[0];
 

@@ -68,11 +68,11 @@ public:
 	 * RealEngine program should return to the enviroment.
 	 * The exit code can be altered by scheduleExit().
 	 *
-	 * @param roomName Name of the room that should be entered first
+	 * @param room The first room to enter
 	 * @param params Parameters that the room will be entered with
 	 * @return The exit code that should be returned to the enviroment.
 	*/
-	static int run(size_t name, const RoomTransitionParameters& params);
+	static int run(Room& room, const RoomTransitionParameters& params);
 
 	/**
 	 * @brief Schedules the program to exit.
@@ -92,10 +92,10 @@ public:
 	 * - start session of next room via sessionStart(params)
 	 * - ensures that at least one step() happens in the next room before render()
 	 *
-	 * @param index The index of next room, no transition will happen if the index is invalid.
+	 * @param name Name of the next room, no transition will happen if there is no room with such name.
 	 * @param params Parameters to start the next room's session with.
 	*/
-	void scheduleRoomTransition(size_t index, RoomTransitionParameters params);
+	void scheduleRoomTransition(size_t name, RoomTransitionParameters params);
 
 	/**
 	 * @brief Pointer to main program
@@ -128,7 +128,7 @@ private:
 	/**
 	 * @brief Does the actual game loop on the singleton instance
 	*/
-	int doRun(size_t name, const RoomTransitionParameters& params);
+	int doRun(Room& room, const RoomTransitionParameters& params);
 
 	void step();
 	void render(double interpolationFactor);
@@ -154,7 +154,7 @@ private:
 	void doRoomTransitionIfScheduled();
 
 	static constexpr size_t NO_NEXT_ROOM = std::numeric_limits<size_t>::max();
-	size_t m_nextRoomIndex = NO_NEXT_ROOM;
+	size_t m_nextRoomName = NO_NEXT_ROOM;
 	RoomTransitionParameters m_roomTransitionParameters;
 };
 

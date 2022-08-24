@@ -10,5 +10,5 @@ int main(int argc, char* argv[]) {
 
 	static MainMenuRoom mainMenuRoom{RE::CommandLineArguments(argv, argc), 0};
 
-	return RE::MainProgram::run(mainMenuRoom.getName(), {});
+	return RE::MainProgram::run(mainMenuRoom, {});
 }

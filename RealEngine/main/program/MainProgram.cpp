@@ -29,9 +29,9 @@ void MainProgram::initialize() {
 	instance();
 }
 
-int MainProgram::run(size_t roomName, const RoomTransitionParameters& params) {
+int MainProgram::run(Room& room, const RoomTransitionParameters& params) {
 	try {
-		return instance().doRun(roomName, params);
+		return instance().doRun(room, params);
 	}
 	catch (const std::exception& e) {
 		fatalError(std::string("Exception: ") + e.what());
@@ -92,8 +92,8 @@ void MainProgram::setRelativeCursorMode(bool relative) {
 	SDL_SetRelativeMouseMode(relative ? SDL_TRUE : SDL_FALSE);
 }
 
-int MainProgram::doRun(size_t name, const RoomTransitionParameters& params) {
-	scheduleRoomTransition(name, params);
+int MainProgram::doRun(Room& room, const RoomTransitionParameters& params) {
+	scheduleRoomTransition(room.getName(), params);
 	doRoomTransitionIfScheduled();
 	if (!m_roomManager.getCurrentRoom()) {
 		throw std::runtime_error("Initial room was not set");
@@ -219,11 +219,11 @@ void MainProgram::adoptRoomSettings(const RoomDisplaySettings& s) {
 }
 
 void MainProgram::doRoomTransitionIfScheduled() {
-	if (m_nextRoomIndex == NO_NEXT_ROOM) return;
+	if (m_nextRoomName == NO_NEXT_ROOM) return;
 
 	m_synchronizer.pauseSteps();
 	auto prev = m_roomManager.getCurrentRoom();
-	auto current = m_roomManager.goToRoom(m_nextRoomIndex, m_roomTransitionParameters);
+	auto current = m_roomManager.goToRoom(m_nextRoomName, m_roomTransitionParameters);
 	if (prev != current) {//If successfully changed the room
 		//Adopt the display settings of the entered room
 		adoptRoomSettings(current->getDisplaySettings());
@@ -232,13 +232,13 @@ void MainProgram::doRoomTransitionIfScheduled() {
 		//Ensure at least one step before the first frame is rendered
 		step();
 	}
-	m_nextRoomIndex = NO_NEXT_ROOM;
+	m_nextRoomName = NO_NEXT_ROOM;
 
 	m_synchronizer.resumeSteps();
 }
 
-void MainProgram::scheduleRoomTransition(size_t index, RoomTransitionParameters params) {
-	m_nextRoomIndex = index;
+void MainProgram::scheduleRoomTransition(size_t name, RoomTransitionParameters params) {
+	m_nextRoomName = name;
 	m_roomTransitionParameters = params;
 }
 
@@ -257,7 +257,7 @@ void MainProgram::pollEvents() {
 }
 
 MainProgram::MainProgram() :
-	m_roomSystemAccess(m_inputManager, m_synchronizer, m_window, m_roomManager) {
+	m_roomSystemAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
 
 	auto spriteShader = RE::RM::getShaderProgram({.vert = sprite_vert, .frag = sprite_frag});
 	spriteShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);

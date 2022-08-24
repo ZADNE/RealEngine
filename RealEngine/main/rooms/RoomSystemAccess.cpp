@@ -3,6 +3,7 @@
  */
 #include <RealEngine/main/rooms/RoomSystemAccess.hpp>
 
+#include <RealEngine/main/program/MainProgram.hpp>
 #include <RealEngine/main/rooms/Room.hpp>
 
 namespace RE {
@@ -33,12 +34,24 @@ void RoomSystemAccess::goFullscreen(bool fullscreen, bool save) {
 	m_window.goFullscreen(fullscreen, save);
 }
 
+bool RoomSystemAccess::isFullscreen() const {
+	return m_window.isFullscreen();
+}
+
 void RoomSystemAccess::goBorderless(bool borderless, bool save) {
 	m_window.goBorderless(borderless, save);
 }
 
+bool RoomSystemAccess::isBorderless() const {
+	return m_window.isBorderless();
+}
+
 void RoomSystemAccess::setVSync(bool vSync, bool save) {
 	m_window.setVSync(vSync, save);
+}
+
+bool RoomSystemAccess::isVSynced() const {
+	return m_window.isVSynced();
 }
 
 void RoomSystemAccess::setWindowTitle(const std::string& title) {
@@ -59,6 +72,27 @@ glm::ivec2 RoomSystemAccess::getWindowDims() const {
 	return m_window.getDims();
 }
 
+void RoomSystemAccess::saveWindowSettings() {
+	m_window.save();
+}
+
 #pragma endregion
+
+#pragma region MainProgram
+
+void RoomSystemAccess::scheduleExit(int exitcode) {
+	m_mainProgram.scheduleExit(exitcode);
+}
+
+void RoomSystemAccess::scheduleRoomTransition(size_t name, RoomTransitionParameters params) {
+	m_mainProgram.scheduleRoomTransition(name, params);
+}
+
+void RoomSystemAccess::setRelativeCursorMode(bool relative) {
+	m_mainProgram.setRelativeCursorMode(relative);
+}
+
+#pragma endregion
+
 
 }
