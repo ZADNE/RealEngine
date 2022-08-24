@@ -24,7 +24,76 @@ namespace RE {
 
 MainProgram* MainProgram::std = nullptr;
 
-int MainProgram::run() {
+void MainProgram::initialize() {
+	//Force initialization of the singleton instance
+	instance();
+}
+
+int MainProgram::run(size_t roomName, const RoomTransitionParameters& params) {
+	try {
+		return instance().doRun(roomName, params);
+	}
+	catch (const std::exception& e) {
+		fatalError(std::string("Exception: ") + e.what());
+	}
+	catch (const char* str) {
+		fatalError(std::string("C-string exception: ") + str);
+	}
+	catch (int i) {
+		fatalError(std::string("int exception: ") + std::to_string(i));
+	}
+	catch (...) {
+		fatalError("Unknown exception!");
+	}
+}
+
+void MainProgram::scheduleExit(int exitcode/* = EXIT_SUCCESS*/) {
+	m_programShouldRun = false;
+	m_programExitCode = exitcode;
+}
+
+void MainProgram::checkForInput(bool check) {
+	m_checkForInput = check;
+	m_inputManager.update();
+}
+
+std::vector<RE::DisplayInfo> MainProgram::getDisplays() const {
+	std::vector<RE::DisplayInfo> infos;
+	int numberOfDisplays = SDL_GetNumVideoDisplays();
+	if (numberOfDisplays < 0) { return infos; }
+	infos.reserve(numberOfDisplays);
+	for (int i = 0; i < numberOfDisplays; ++i) {
+		DisplayInfo info;
+		info.name = SDL_GetDisplayName(i);
+		SDL_Rect rect;
+		if (SDL_GetDisplayBounds(i, &rect)) { continue; }
+		info.bounds.x = rect.x;
+		info.bounds.y = rect.y;
+		info.bounds.z = rect.w;
+		info.bounds.w = rect.h;
+		if (SDL_GetDisplayUsableBounds(i, &rect)) { continue; }
+		info.boundsUsable.x = rect.x;
+		info.boundsUsable.y = rect.y;
+		info.boundsUsable.z = rect.w;
+		info.boundsUsable.w = rect.h;
+		SDL_DisplayMode mode;
+		if (SDL_GetCurrentDisplayMode(i, &mode)) { continue; }
+		info.dims.x = mode.w;
+		info.dims.y = mode.h;
+		info.refreshRate = mode.refresh_rate;
+		info.driverSpecific = mode.driverdata;
+		info.pixelFormat = mode.format;
+		infos.push_back(info);
+	}
+	return infos;
+}
+
+void MainProgram::setRelativeCursorMode(bool relative) {
+	SDL_SetRelativeMouseMode(relative ? SDL_TRUE : SDL_FALSE);
+}
+
+int MainProgram::doRun(size_t name, const RoomTransitionParameters& params) {
+	scheduleRoomTransition(name, params);
 	doRoomTransitionIfScheduled();
 	if (!m_roomManager.getCurrentRoom()) {
 		throw std::runtime_error("Initial room was not set");
@@ -70,61 +139,6 @@ int MainProgram::run() {
 	m_roomManager.getCurrentRoom()->sessionEnd();
 
 	return m_programExitCode;
-}
-
-void MainProgram::scheduleProgramExit(int exitcode/* = EXIT_SUCCESS*/) {
-	m_programShouldRun = false;
-	m_programExitCode = exitcode;
-}
-
-void MainProgram::checkForInput(bool check) {
-	m_checkForInput = check;
-	m_inputManager.update();
-}
-
-std::vector<RE::DisplayInfo> MainProgram::getDisplays() const {
-	std::vector<RE::DisplayInfo> infos;
-	int numberOfDisplays = SDL_GetNumVideoDisplays();
-	if (numberOfDisplays < 0) { return infos; }
-	infos.reserve(numberOfDisplays);
-	for (int i = 0; i < numberOfDisplays; ++i) {
-		DisplayInfo info;
-		info.name = SDL_GetDisplayName(i);
-		SDL_Rect rect;
-		if (SDL_GetDisplayBounds(i, &rect)) { continue; }
-		info.bounds.x = rect.x;
-		info.bounds.y = rect.y;
-		info.bounds.z = rect.w;
-		info.bounds.w = rect.h;
-		if (SDL_GetDisplayUsableBounds(i, &rect)) { continue; }
-		info.boundsUsable.x = rect.x;
-		info.boundsUsable.y = rect.y;
-		info.boundsUsable.z = rect.w;
-		info.boundsUsable.w = rect.h;
-		SDL_DisplayMode mode;
-		if (SDL_GetCurrentDisplayMode(i, &mode)) { continue; }
-		info.dims.x = mode.w;
-		info.dims.y = mode.h;
-		info.refreshRate = mode.refresh_rate;
-		info.driverSpecific = mode.driverdata;
-		info.pixelFormat = mode.format;
-		infos.push_back(info);
-	}
-	return infos;
-}
-
-void MainProgram::resizeWindow(const glm::ivec2& newDims, bool save) {
-	m_window.resize(newDims, save);
-	m_roomManager.notifyWindowResized(newDims);
-}
-
-void MainProgram::setRelativeCursorMode(bool relative) {
-	SDL_SetRelativeMouseMode(relative ? SDL_TRUE : SDL_FALSE);
-}
-
-void MainProgram::setDisplaySettingsForCurrentRoom(RoomDisplaySettings displaySettings) {
-	m_roomManager.getCurrentRoom()->setDisplaySettings(displaySettings);
-	adoptRoomSettings(displaySettings);
 }
 
 void MainProgram::step() {
@@ -192,7 +206,7 @@ void MainProgram::processEvent(SDL_Event* evnt) {
 		m_inputManager.press(key, std::abs(evnt->wheel.x));
 		break;
 	case SDL_QUIT:
-		scheduleProgramExit();
+		scheduleExit();
 		break;
 	}
 }
@@ -209,7 +223,7 @@ void MainProgram::doRoomTransitionIfScheduled() {
 
 	m_synchronizer.pauseSteps();
 	auto prev = m_roomManager.getCurrentRoom();
-	auto current = m_roomManager.gotoRoom(m_nextRoomIndex, m_roomTransitionParameters);
+	auto current = m_roomManager.goToRoom(m_nextRoomIndex, m_roomTransitionParameters);
 	if (prev != current) {//If successfully changed the room
 		//Adopt the display settings of the entered room
 		adoptRoomSettings(current->getDisplaySettings());
@@ -242,13 +256,8 @@ void MainProgram::pollEvents() {
 	}
 }
 
-MainProgram::MainProgram() {
-	std = this;
-	Room::s_mainProgram = this;
-	Room::s_inputManager = &m_inputManager;
-	Room::s_synchronizer = &m_synchronizer;
-	Room::s_window = &m_window;
-	Room::s_roomManager = &m_roomManager;
+MainProgram::MainProgram() :
+	m_roomSystemAccess(m_inputManager, m_synchronizer, m_window, m_roomManager) {
 
 	auto spriteShader = RE::RM::getShaderProgram({.vert = sprite_vert, .frag = sprite_frag});
 	spriteShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
@@ -257,6 +266,16 @@ MainProgram::MainProgram() {
 	auto geometryShader = RE::RM::getShaderProgram({.vert = geometry_vetr, .frag = geometry_frag});
 	geometryShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
 	GeometryBatch::std().switchShaderProgram(geometryShader);
+
+	MainProgram::std = this;
+	Room::setRoomSystemAccess(&m_roomSystemAccess);
+	Room::setInputManager(&m_inputManager);
+	Room::setRoomManager(&m_roomManager);
+}
+
+MainProgram& MainProgram::instance() {
+	static MainProgram mainProgram;
+	return mainProgram;
 }
 
 }

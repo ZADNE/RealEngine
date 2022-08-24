@@ -25,9 +25,9 @@ constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
 	.usingImGui = true
 };
 
-MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
-	Room(INITIAL_DISPLAY_SETTINGS),
-	m_texView(window()->getDims()) {
+MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args, size_t roomName) :
+	Room(roomName, INITIAL_DISPLAY_SETTINGS),
+	m_texView(system().getWindowDims()) {
 
 	//Set last visited location to location of this executable
 	m_lastVisitedLoc = args[0];
@@ -47,25 +47,25 @@ void MainMenuRoom::sessionEnd() {
 }
 
 void MainMenuRoom::step() {
-	auto cursorPos = (glm::vec2)input()->getCursorAbs();
+	auto cursorPos = (glm::vec2)input().getCursorAbs();
 
-	if (input()->isDown(RE::Key::MMB) && m_texture) {
+	if (input().isDown(RE::Key::MMB) && m_texture) {
 		m_texView.shiftPosition((glm::vec2{ m_cursorPosPrev - cursorPos } / m_drawScale));
 	}
 
 	if (m_texture) {
-		if (input()->wasPressed(RE::Key::UMW)) {
+		if (input().wasPressed(RE::Key::UMW)) {
 			m_texView.zoom({ 1.5f, 1.5f });
 			m_drawScale *= 1.5f;
 		}
-		if (input()->wasPressed(RE::Key::DMW)) {
+		if (input().wasPressed(RE::Key::DMW)) {
 			m_texView.zoom({ 0.66666666f, 0.66666666f });
 			m_drawScale *= 0.66666666f;
 		}
 	}
 	m_cursorPosPrev = cursorPos;
 
-	if (input()->wasReleased(RE::Key::R)) {
+	if (input().wasReleased(RE::Key::R)) {
 		resetView();
 	}
 }
@@ -102,7 +102,7 @@ void MainMenuRoom::render(double interpolationFactor) {
 					if (ImGui::ColorPicker3("Background color", &m_backgroundColor.x)) {
 						auto displaySettings = getDisplaySettings();
 						displaySettings.clearColor = glm::vec4(m_backgroundColor, 1.0f);
-						program()->setDisplaySettingsForCurrentRoom(displaySettings);
+						//program()->setDisplaySettingsForCurrentRoom(displaySettings); TODO TODO
 					}
 					ImGui::EndTabItem();
 				}
@@ -113,8 +113,8 @@ void MainMenuRoom::render(double interpolationFactor) {
 	ImGui::End();
 }
 
-void MainMenuRoom::windowResized(const glm::ivec2& newDims) {
-	m_texView.resizeView(newDims);
+void MainMenuRoom::windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {
+	m_texView.resizeView(newSize);
 }
 
 void MainMenuRoom::parametersGUI() {
@@ -168,9 +168,9 @@ void MainMenuRoom::selectAndLoad() {
 	ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST | OFN_EXPLORER;
 	ofn.lpstrInitialDir = m_lastVisitedLoc.c_str();
 
-	synchronizer()->pauseSteps();
+	system().pauseSteps();
 	GetOpenFileNameA(&ofn);
-	synchronizer()->resumeSteps();
+	system().resumeSteps();
 	m_lastVisitedLoc = filename;
 
 	load(filename);
@@ -205,7 +205,7 @@ void MainMenuRoom::load(const std::string& loc) {
 }
 
 void MainMenuRoom::drawTexture() {
-	glm::vec2 windowDims = glm::vec2(window()->getDims());
+	glm::vec2 windowDims = glm::vec2(system().getWindowDims());
 	auto texDims = m_texture->getSubimagesSpritesCount() * m_texture->getSubimageDims();
 	auto botLeft = -texDims * 0.5f;
 

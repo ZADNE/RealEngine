@@ -1,18 +1,20 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
-#include <RealEngine/main/program/MainProgram.hpp>
+#include <RealEngine/main/rooms/RoomSystemAccess.hpp>
+#include <RealEngine/main/rooms/RoomDisplaySettings.hpp>
+#include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
 
 namespace RE {
 
-class MainProgram;
+class InputManager;
 
 /**
- * @brief Separates program into logical units, only one unit is active at a time.
+ * @brief Separates program into logical units, only one room is active at a time.
  *
  * Rooms allow separation of program into multiple units where only one unit
  * is active at a time (= receives step and render calls, inactive rooms
@@ -22,16 +24,13 @@ class MainProgram;
  * @see RoomManager
 */
 class Room {
-	friend class MainProgram;
 public:
 
 	/**
-	 * @brief Constructs a room.
-	 *
-	 * You are supposed to do this in the constructor of your program
-	 * and then add them to the room manager.
+	 * @brief Constructs new room
+	 * @param name Unique identifier of the room
 	*/
-	Room(RoomDisplaySettings initialSettings = RoomDisplaySettings{});
+	Room(size_t name, RoomDisplaySettings initialSettings = RoomDisplaySettings{});
 
 	/**
 	 * @brief Destructs a room.
@@ -81,44 +80,44 @@ public:
 
 	/**
 	 * @brief Callback used to notify that the window's size has changed
-	 * 
-	 * This callback is called for all rooms, even those that are not active.
-	 * @param newSize The new size fo the window
 	*/
-	virtual void windowResized(const glm::ivec2& newSize);
+	virtual void windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {}
 
 	/**
-	 * @brief Gets main program.
-	 * @return Main program, guaranteed to be valid.
+	 * @brief Gets a proxy that can be used to read/modify
+	 * many parameters of the program at run-time
 	*/
-	MainProgram* program() const;
+	static RoomSystemAccess& system() { return *s_systemAccess; }
 
 	/**
-	 * @brief Gets input manager which can be used to determine
-	 * user input (keyboard, mouse, etc.).
-	 *
-	 * @return Input manager, guaranteed to be valid.
+	 * @brief Allows access to mouse & keyboard user input
 	*/
-	const InputManager* input() const;
-
-	/**
-	 * @brief Gets synchronizer which can be used to change rate
-	 * of steps or to limit render rates.
-	 *
-	 * @return Synchronizer, guaranteed to be valid.
-	*/
-	Synchronizer* synchronizer() const;
-
-	/**
-	 * @brief Gets window
-	 * @return Window, guaranteed to be valid.
-	*/
-	Window* window() const;
+	static const InputManager& input() { return *s_inputManager; }
 
 	/**
 	 * @brief Gets the settings that should be used for this room
 	*/
 	RoomDisplaySettings getDisplaySettings() const;
+
+	/**
+	 * @brief Gets unique identifier of the room
+	*/
+	size_t getName() const;
+
+	/**
+	 * @brief This is set by the MainProgram at startup
+	*/
+	static void setRoomSystemAccess(RoomSystemAccess* systemAccess) { s_systemAccess = systemAccess; }
+
+	/**
+	 * @brief This is set by the MainProgram at startup
+	*/
+	static void setInputManager(InputManager* inputManager) { s_inputManager = inputManager; }
+
+	/**
+	 * @brief This is set by the MainProgram at startup
+	*/
+	static void setRoomManager(RoomManager* roomManager) { s_roomManager = roomManager; }
 
 private:
 
@@ -128,12 +127,11 @@ private:
 	void setDisplaySettings(RoomDisplaySettings displaySettings);
 
 	RoomDisplaySettings m_displaySettings;
+	size_t m_name;
 
-	inline static MainProgram* s_mainProgram = nullptr;			/**< Pointer set by main program */
-	inline static const InputManager* s_inputManager = nullptr;	/**< Pointer set by main program */
-	inline static Synchronizer* s_synchronizer = nullptr;		/**< Pointer set by main program */
-	inline static Window* s_window = nullptr;					/**< Pointer set by main program */
-	inline static RoomManager* s_roomManager = nullptr;			/**< Pointer set by main program */
+	inline static RoomSystemAccess* s_systemAccess = nullptr;
+	inline static const InputManager* s_inputManager = nullptr;
+	inline static RoomManager* s_roomManager = nullptr;
 };
 
 }

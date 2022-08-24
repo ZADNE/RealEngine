@@ -26,6 +26,7 @@ class MainProgram;
 class Window : public WindowSettings {
 	friend class MainProgram;
 public:
+
 	Window(const Window& other) = delete;
 	void operator=(const Window& other) = delete;
 
@@ -63,12 +64,20 @@ public:
 	const std::string& getTitle() const;
 
 	/**
+	 * @brief Resizes the window.
+	 * @param newDims New dimensions of the window
+	 * @param save Changed settings are saved to file if true.
+	*/
+	void setDims(const glm::ivec2& newDims, bool save);
+
+	/**
 	 * @brief Gets current dimensions of the window
 	 * @return Current dimensions
 	*/
 	glm::ivec2 getDims() const { return m_dims; }
 
 private:
+
 	/**
 	 * @brief Constructs the window and displays it immediately.
 	 *
@@ -81,13 +90,6 @@ private:
 	 * @brief Destroys the window and its OpenGL context.
 	*/
 	~Window();
-
-	/**
-	 * @brief Resizes the window.
-	 * @param newDims New dimensions of the window
-	 * @param save Changed settings are saved to file if true.
-	*/
-	void resize(const glm::ivec2& newDims, bool save);
 
 	/**
 	 * @brief Swaps buffers if using double buffered context (should be).

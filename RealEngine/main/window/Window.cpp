@@ -51,6 +51,19 @@ const std::string& Window::getTitle() const {
 	return m_windowTitle;
 }
 
+void Window::setDims(const glm::ivec2& newDims, bool save) {
+	SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
+	SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+	SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
+
+	Viewport::s_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
+	Viewport::s_windowSize = m_dims;
+	Viewport::setToWholeWindow();
+	Viewport::setWindowMatrixToMatchViewport();
+
+	if (save) this->save();
+}
+
 Window::Window(const WindowSettings& settings, const std::string& title) :
 	WindowSettings(settings), m_subsystems(settings.getRenderer()), m_windowTitle(title) {
 	//Prepare flags
@@ -109,19 +122,6 @@ Window::~Window() {
 
 	//Destroy the viewport's buffer (before its implementation is null)
 	Viewport::s_windowMatrixUniformBuffer.reset();
-}
-
-void Window::resize(const glm::ivec2& newDims, bool save) {
-	SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
-	SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-	SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
-
-	Viewport::s_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
-	Viewport::s_windowSize = m_dims;
-	Viewport::setToWholeWindow();
-	Viewport::setWindowMatrixToMatchViewport();
-
-	if (save) this->save();
 }
 
 void Window::swapBuffer() {

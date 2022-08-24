@@ -1,33 +1,13 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/main/rooms/Room.hpp>
 
 namespace RE {
 
-Room::Room(RoomDisplaySettings initialSettings/* = RoomDisplaySettings{}*/):
-	m_displaySettings(initialSettings) {
-
-}
-
-void Room::windowResized(const glm::ivec2& newSize) {
-
-}
-
-MainProgram* Room::program() const {
-	return s_mainProgram;
-}
-
-const InputManager* Room::input() const {
-	return s_inputManager;
-}
-
-Synchronizer* Room::synchronizer() const {
-	return s_synchronizer;
-}
-
-Window* Room::window() const {
-	return s_window;
+Room::Room(size_t name, RoomDisplaySettings initialSettings/* = RoomDisplaySettings{}*/) :
+	m_displaySettings(initialSettings), m_name(name) {
+	s_roomManager->addRoom(this);
 }
 
 RoomDisplaySettings Room::getDisplaySettings() const {
@@ -36,6 +16,10 @@ RoomDisplaySettings Room::getDisplaySettings() const {
 
 void Room::setDisplaySettings(RoomDisplaySettings displaySettings) {
 	m_displaySettings = displaySettings;
+}
+
+size_t Room::getName() const {
+	return m_name;
 }
 
 }
