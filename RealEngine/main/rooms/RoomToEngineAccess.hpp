@@ -14,15 +14,15 @@ class MainProgram;
 /**
  * @brief Is a proxy-like object to many RealEngine systems
  * @details This class contains everything systems-related that a Room can access.
- * @see Room::system()
+ * @see Room::engine()
 */
-class RoomSystemAccess {
+class RoomToEngineAccess {
 public:
 
 	/**
-	 * @brief This object is created by the MainProgram and accessed via Room::system()
+	 * @brief This object is created by the MainProgram and accessed via Room::engine()
 	*/
-	RoomSystemAccess(MainProgram& mainProgram, InputManager& inputManager, Synchronizer& synchronizer, Window& window, RoomManager& roomManager) :
+	RoomToEngineAccess(MainProgram& mainProgram, InputManager& inputManager, Synchronizer& synchronizer, Window& window, RoomManager& roomManager) :
 		m_mainProgram(mainProgram), m_inputManager(inputManager), m_synchronizer(synchronizer), m_window(window), m_roomManager(roomManager) {}
 
 #pragma region MainProgram
@@ -41,6 +41,35 @@ public:
 	 * @copydoc MainProgram::setRelativeCursorMode
 	*/
 	void setRelativeCursorMode(bool relative);
+
+#pragma endregion
+
+#pragma region InputManager
+
+	/**
+	 * @copydoc InputManager::isDown
+	*/
+	int isKeyDown(RE::Key keyID) const;
+
+	/**
+	 * @copydoc InputManager::wasPressed
+	*/
+	int wasKeyPressed(RE::Key keyID) const;
+
+	/**
+	 * @copydoc InputManager::wasReleased
+	*/
+	int wasKeyReleased(RE::Key keyID) const;
+
+	/**
+	 * @copydoc InputManager::getCursorAbs
+	*/
+	glm::ivec2 getCursorAbs() const;
+
+	/**
+	 * @copydoc InputManager::getCursorRel
+	*/
+	glm::ivec2 getCursorRel() const;
 
 #pragma endregion
 
@@ -71,25 +100,39 @@ public:
 #pragma region Window
 
 	/**
-	 * @copydoc Window::goFullscreen
+	 * @copydoc Window::getFlags 
 	*/
-	void goFullscreen(bool fullscreen, bool save);
-
-	bool isFullscreen() const; 
+	WindowFlags getWindowFlags() const;
 
 	/**
-	 * @copydoc Window::goBorderless
+	 * @copydoc Window::setFullscreen
 	*/
-	void goBorderless(bool borderless, bool save);
+	void setWindowFullscreen(bool fullscreen, bool save);
 
-	bool isBorderless() const;
+	/**
+	 * @copydoc Window::isFullscreen
+	*/
+	bool isWindowFullscreen() const; 
+
+	/**
+	 * @copydoc Window::setBorderless
+	*/
+	void setWindowBorderless(bool borderless, bool save);
+
+	/**
+	 * @copydoc Window::isBorderless
+	*/
+	bool isWindowBorderless() const;
 
 	/**
 	 * @copydoc Window::setVSync
 	*/
-	void setVSync(bool vSync, bool save);
+	void setWindowVSync(bool vSync, bool save);
 
-	bool isVSynced() const;
+	/**
+	 * @copydoc Window::isVSynced
+	*/
+	bool isWindowVSynced() const;
 
 	/**
 	 * @copydoc Window::setTitle

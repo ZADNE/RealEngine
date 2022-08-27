@@ -15,14 +15,14 @@
 
 namespace RE {
 
-void Window::goFullscreen(bool fullscreen, bool save) {
+void Window::setFullscreen(bool fullscreen, bool save) {
 	m_flags.fullscreen = fullscreen;
 	SDL_SetWindowFullscreen(m_SDLwindow, (fullscreen) ? SDL_WINDOW_FULLSCREEN : 0);
 	SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
 	if (save) this->save();
 }
 
-void Window::goBorderless(bool borderless, bool save) {
+void Window::setBorderless(bool borderless, bool save) {
 	m_flags.borderless = borderless;
 	SDL_SetWindowBordered(m_SDLwindow, (borderless) ? SDL_FALSE : SDL_TRUE);
 	if (save) this->save();

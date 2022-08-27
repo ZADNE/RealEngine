@@ -35,14 +35,14 @@ public:
 	 * @param fullscreen True if the window should be fullscreen, false otherwise.
 	 * @param save Changed settings are saved to file if true.
 	*/
-	void goFullscreen(bool fullscreen, bool save);
+	void setFullscreen(bool fullscreen, bool save);
 
 	/**
 	 * @brief Disables and enables window decoration.
 	 * @param borderless True if the window should have no decoration, false otherwise.
 	 * @param save Changed settings are saved to file if true.
 	*/
-	void goBorderless(bool borderless, bool save);
+	void setBorderless(bool borderless, bool save);
 
 	/**
 	 * @brief Sets usage of vertical synchronization.

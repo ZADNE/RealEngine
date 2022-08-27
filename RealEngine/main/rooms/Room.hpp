@@ -5,7 +5,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
-#include <RealEngine/main/rooms/RoomSystemAccess.hpp>
+#include <RealEngine/main/rooms/RoomToEngineAccess.hpp>
 #include <RealEngine/main/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
 
@@ -84,15 +84,20 @@ public:
 	virtual void windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {}
 
 	/**
-	 * @brief Gets a proxy that can be used to read/modify
-	 * many parameters of the program at run-time
+	 * @brief Callback used to notify that the window's title has changed
 	*/
-	static RoomSystemAccess& system() { return *s_systemAccess; }
+	virtual void windowTitleChangedCallback(const std::string& oldTitle, const std::string& newTitle) {}
 
 	/**
-	 * @brief Allows access to mouse & keyboard user input
+	 * @brief Callback used to notify that the window's flags have changed
 	*/
-	static const InputManager& input() { return *s_inputManager; }
+	virtual void windowFlagsChangedCallback(const WindowFlags& oldFlags, const WindowFlags& newFlags) {}
+
+	/**
+	 * @brief Gets a proxy that can be used to read/modify
+	 * many parameters and variables of the RealEngine at run-time
+	*/
+	static RoomToEngineAccess& engine() { return *s_engineAccess; }
 
 	/**
 	 * @brief Gets the settings that should be used for this room
@@ -107,12 +112,7 @@ public:
 	/**
 	 * @brief This is set by the MainProgram at startup
 	*/
-	static void setRoomSystemAccess(RoomSystemAccess* systemAccess) { s_systemAccess = systemAccess; }
-
-	/**
-	 * @brief This is set by the MainProgram at startup
-	*/
-	static void setInputManager(InputManager* inputManager) { s_inputManager = inputManager; }
+	static void setRoomSystemAccess(RoomToEngineAccess* systemAccess) { s_engineAccess = systemAccess; }
 
 	/**
 	 * @brief This is set by the MainProgram at startup
@@ -129,8 +129,7 @@ private:
 	RoomDisplaySettings m_displaySettings;
 	size_t m_name;
 
-	inline static RoomSystemAccess* s_systemAccess = nullptr;
-	inline static const InputManager* s_inputManager = nullptr;
+	inline static RoomToEngineAccess* s_engineAccess = nullptr;
 	inline static RoomManager* s_roomManager = nullptr;
 };
 

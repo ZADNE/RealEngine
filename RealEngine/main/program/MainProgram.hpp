@@ -10,7 +10,7 @@
 #include <glm/vec2.hpp>
 
 #include <RealEngine/utility/error.hpp>
-#include <RealEngine/main/rooms/RoomSystemAccess.hpp>
+#include <RealEngine/main/rooms/RoomToEngineAccess.hpp>
 #include <RealEngine/main/rooms/RoomManager.hpp>
 #include <RealEngine/main/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
@@ -142,7 +142,7 @@ private:
 	RoomManager m_roomManager; /**< Manages rooms - you have to add at least 1 room and enter it in the contructor of your derived class */
 	InputManager m_inputManager; /**< Record key presses/releases, mouse movement etc. */
 	Synchronizer m_synchronizer{50u, 50u}; /**< Maintains constant speed of simulation, can also limit FPS */
-	RoomSystemAccess m_roomSystemAccess;
+	RoomToEngineAccess s_roomToEngineAccess;
 
 	bool m_programShouldRun = false;
 	int m_programExitCode = EXIT_SUCCESS;

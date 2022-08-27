@@ -257,7 +257,7 @@ void MainProgram::pollEvents() {
 }
 
 MainProgram::MainProgram() :
-	m_roomSystemAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
+	s_roomToEngineAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
 
 	auto spriteShader = RE::RM::getShaderProgram({.vert = sprite_vert, .frag = sprite_frag});
 	spriteShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
@@ -268,8 +268,7 @@ MainProgram::MainProgram() :
 	GeometryBatch::std().switchShaderProgram(geometryShader);
 
 	MainProgram::std = this;
-	Room::setRoomSystemAccess(&m_roomSystemAccess);
-	Room::setInputManager(&m_inputManager);
+	Room::setRoomSystemAccess(&s_roomToEngineAccess);
 	Room::setRoomManager(&m_roomManager);
 }
 

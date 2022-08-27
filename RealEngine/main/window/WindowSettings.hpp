@@ -27,6 +27,7 @@ struct WindowFlags {
 */
 class WindowSettings {
 public:
+
 	/**
 	 * @brief Constructs settings from file that was saved before.
 	 *
@@ -38,6 +39,11 @@ public:
 	 * @brief Constructs settings from given parameters
 	*/
 	WindowSettings(const glm::ivec2& dims, WindowFlags flags, Renderer renderer);
+
+	/**
+	 * @brief Gets a copy of the window flags
+	*/
+	WindowFlags getFlags() const { return m_flags; }
 
 	bool isFullscreen() const { return m_flags.fullscreen; }
 	bool isBorderless() const { return m_flags.borderless; }
@@ -53,6 +59,7 @@ public:
 	void save();
 
 protected:
+
 	/**
 	 * @brief Resets settings to default state.
 	*/

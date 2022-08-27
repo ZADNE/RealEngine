@@ -27,9 +27,9 @@ constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
 
 MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args, size_t roomName) :
 	Room(roomName, INITIAL_DISPLAY_SETTINGS),
-	m_texView(system().getWindowDims()) {
+	m_texView(engine().getWindowDims()) {
 
-	system().setWindowTitle("RTICreator v3.0.0");
+	engine().setWindowTitle("RTICreator v3.0.0");
 
 	//Set last visited location to location of this executable
 	m_lastVisitedLoc = args[0];
@@ -49,25 +49,25 @@ void MainMenuRoom::sessionEnd() {
 }
 
 void MainMenuRoom::step() {
-	auto cursorPos = (glm::vec2)input().getCursorAbs();
+	auto cursorPos = (glm::vec2)engine().getCursorAbs();
 
-	if (input().isDown(RE::Key::MMB) && m_texture) {
+	if (engine().isKeyDown(RE::Key::MMB) && m_texture) {
 		m_texView.shiftPosition((glm::vec2{ m_cursorPosPrev - cursorPos } / m_drawScale));
 	}
 
 	if (m_texture) {
-		if (input().wasPressed(RE::Key::UMW)) {
+		if (engine().wasKeyPressed(RE::Key::UMW)) {
 			m_texView.zoom({ 1.5f, 1.5f });
 			m_drawScale *= 1.5f;
 		}
-		if (input().wasPressed(RE::Key::DMW)) {
+		if (engine().wasKeyPressed(RE::Key::DMW)) {
 			m_texView.zoom({ 0.66666666f, 0.66666666f });
 			m_drawScale *= 0.66666666f;
 		}
 	}
 	m_cursorPosPrev = cursorPos;
 
-	if (input().wasReleased(RE::Key::R)) {
+	if (engine().wasKeyReleased(RE::Key::R)) {
 		resetView();
 	}
 }
@@ -170,9 +170,9 @@ void MainMenuRoom::selectAndLoad() {
 	ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST | OFN_EXPLORER;
 	ofn.lpstrInitialDir = m_lastVisitedLoc.c_str();
 
-	system().pauseSteps();
+	engine().pauseSteps();
 	GetOpenFileNameA(&ofn);
-	system().resumeSteps();
+	engine().resumeSteps();
 	m_lastVisitedLoc = filename;
 
 	load(filename);
@@ -207,7 +207,7 @@ void MainMenuRoom::load(const std::string& loc) {
 }
 
 void MainMenuRoom::drawTexture() {
-	glm::vec2 windowDims = glm::vec2(system().getWindowDims());
+	glm::vec2 windowDims = glm::vec2(engine().getWindowDims());
 	auto texDims = m_texture->getSubimagesSpritesCount() * m_texture->getSubimageDims();
 	auto botLeft = -texDims * 0.5f;
 

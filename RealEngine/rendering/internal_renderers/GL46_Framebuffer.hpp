@@ -7,7 +7,9 @@
 namespace RE {
 
 /**
- * @brief Controls transformation from Normalized device coordinates to Window coordinates
+* @brief Is OpenGL 4.6 implementation of Framebuffer
+*
+* Do not use this directly - use Framebuffer class instead.
 */
 class GL46_Framebuffer : public IFramebuffer {
 public:
