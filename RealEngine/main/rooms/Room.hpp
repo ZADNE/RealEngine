@@ -11,8 +11,6 @@
 
 namespace RE {
 
-class InputManager;
-
 /**
  * @brief Separates program into logical units, only one room is active at a time.
  *
@@ -28,6 +26,7 @@ public:
 
 	/**
 	 * @brief Constructs new room
+	 * @note Create new rooms using MainProgram::addRoom
 	 * @param name Unique identifier of the room
 	*/
 	Room(size_t name, RoomDisplaySettings initialSettings = RoomDisplaySettings{});
@@ -95,7 +94,7 @@ public:
 
 	/**
 	 * @brief Gets a proxy that can be used to read/modify
-	 * many parameters and variables of the RealEngine at run-time
+	 * many parameters and variables of the RealEngine
 	*/
 	static RoomToEngineAccess& engine() { return *s_engineAccess; }
 
@@ -117,19 +116,22 @@ public:
 	/**
 	 * @brief This is set by the MainProgram at startup
 	*/
-	static void setRoomManager(RoomManager* roomManager) { s_roomManager = roomManager; }
+	static void setStaticReferences(MainProgram* mainProgram, RoomManager* roomManager);
 
-private:
+protected:
 
 	/**
 	 * @brief Dynamically changes the room's display settings
 	*/
 	void setDisplaySettings(RoomDisplaySettings displaySettings);
 
+private:
+
 	RoomDisplaySettings m_displaySettings;
-	size_t m_name;
+	size_t m_name;							/**< Unique identifier of the room */
 
 	inline static RoomToEngineAccess* s_engineAccess = nullptr;
+	inline static MainProgram* s_mainProgram = nullptr;
 	inline static RoomManager* s_roomManager = nullptr;
 };
 

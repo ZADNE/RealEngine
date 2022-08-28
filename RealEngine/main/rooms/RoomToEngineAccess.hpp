@@ -13,7 +13,8 @@ class MainProgram;
 
 /**
  * @brief Is a proxy-like object to many RealEngine systems
- * @details This class contains everything systems-related that a Room can access.
+ * @details This can be used to read/modify many parameters and
+ * variables of the RealEngine
  * @see Room::engine()
 */
 class RoomToEngineAccess {

@@ -7,8 +7,6 @@
 
 int main(int argc, char* argv[]) {
 	RE::MainProgram::initialize();
-
-	static MainMenuRoom mainMenuRoom{RE::CommandLineArguments(argv, argc), 0};
-
-	return RE::MainProgram::run(mainMenuRoom, {});
+	auto* mainMenuRoom = RE::MainProgram::addRoom<MainMenuRoom>(RE::CommandLineArguments(argv, argc));
+	return RE::MainProgram::run(mainMenuRoom->getName(), {});
 }

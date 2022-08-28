@@ -22,16 +22,14 @@
 
 namespace RE {
 
-MainProgram* MainProgram::std = nullptr;
-
 void MainProgram::initialize() {
 	//Force initialization of the singleton instance
 	instance();
 }
 
-int MainProgram::run(Room& room, const RoomTransitionParameters& params) {
+int MainProgram::run(size_t roomName, const RoomTransitionParameters& params) {
 	try {
-		return instance().doRun(room, params);
+		return instance().doRun(roomName, params);
 	}
 	catch (const std::exception& e) {
 		fatalError(std::string("Exception: ") + e.what());
@@ -52,9 +50,10 @@ void MainProgram::scheduleExit(int exitcode/* = EXIT_SUCCESS*/) {
 	m_programExitCode = exitcode;
 }
 
-void MainProgram::checkForInput(bool check) {
-	m_checkForInput = check;
-	m_inputManager.update();
+void MainProgram::pollEventsInMainThread(bool poll) {
+	auto& mainProgram = instance();
+	mainProgram.m_pollEventsInMainThread = poll;
+	mainProgram.m_inputManager.update();
 }
 
 std::vector<RE::DisplayInfo> MainProgram::getDisplays() const {
@@ -92,15 +91,22 @@ void MainProgram::setRelativeCursorMode(bool relative) {
 	SDL_SetRelativeMouseMode(relative ? SDL_TRUE : SDL_FALSE);
 }
 
-int MainProgram::doRun(Room& room, const RoomTransitionParameters& params) {
-	scheduleRoomTransition(room.getName(), params);
+void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
+	m_clearColor = s.clearColor;
+	m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
+	m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
+	m_usingImGui = s.usingImGui;
+}
+
+int MainProgram::doRun(size_t roomName, const RoomTransitionParameters& params) {
+	scheduleRoomTransition(roomName, params);
 	doRoomTransitionIfScheduled();
 	if (!m_roomManager.getCurrentRoom()) {
 		throw std::runtime_error("Initial room was not set");
 	}
 
 	//Adopt display settings of the first room
-	adoptRoomSettings(m_roomManager.getCurrentRoom()->getDisplaySettings());
+	adoptRoomDisplaySettings(m_roomManager.getCurrentRoom()->getDisplaySettings());
 
 	m_programShouldRun = true;
 	m_synchronizer.resumeSteps();
@@ -114,7 +120,7 @@ int MainProgram::doRun(Room& room, const RoomTransitionParameters& params) {
 		//Perform simulation steps to catch up the time
 		while (m_synchronizer.shouldStepHappen()) {
 			//Check for user input
-			if (m_checkForInput) {
+			if (m_pollEventsInMainThread) {
 				m_inputManager.update();
 				pollEvents();
 			} else {
@@ -211,13 +217,6 @@ void MainProgram::processEvent(SDL_Event* evnt) {
 	}
 }
 
-void MainProgram::adoptRoomSettings(const RoomDisplaySettings& s) {
-	m_clearColor = s.clearColor;
-	m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
-	m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
-	m_usingImGui = s.usingImGui;
-}
-
 void MainProgram::doRoomTransitionIfScheduled() {
 	if (m_nextRoomName == NO_NEXT_ROOM) return;
 
@@ -226,7 +225,7 @@ void MainProgram::doRoomTransitionIfScheduled() {
 	auto current = m_roomManager.goToRoom(m_nextRoomName, m_roomTransitionParameters);
 	if (prev != current) {//If successfully changed the room
 		//Adopt the display settings of the entered room
-		adoptRoomSettings(current->getDisplaySettings());
+		adoptRoomDisplaySettings(current->getDisplaySettings());
 		//Pressed/released events belong to the previous room
 		m_inputManager.update();
 		//Ensure at least one step before the first frame is rendered
@@ -267,9 +266,8 @@ MainProgram::MainProgram() :
 	geometryShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
 	GeometryBatch::std().switchShaderProgram(geometryShader);
 
-	MainProgram::std = this;
 	Room::setRoomSystemAccess(&s_roomToEngineAccess);
-	Room::setRoomManager(&m_roomManager);
+	Room::setStaticReferences(this, &m_roomManager);
 }
 
 MainProgram& MainProgram::instance() {

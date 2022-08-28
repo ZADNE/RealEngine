@@ -2,7 +2,8 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <unordered_map>
+#include <memory>
+#include <utility>
 
 #include <glm/vec2.hpp>
 
@@ -12,10 +13,11 @@ namespace RE {
 
 class Room;
 
+template<class T>
+concept DerivedFromRoom = std::derived_from<T, Room>;
+
 /**
  * @brief Manages rooms and transitions among them.
- *
- * Room manager does not hold ownership of the rooms it manages.
 */
 class RoomManager {
 public:
@@ -26,7 +28,7 @@ public:
 	RoomManager();
 
 	/**
-	 * @brief Gets current room, that is the room which has active session.
+	 * @brief Gets the current room, that is the room which has active session.
 	 * @return Pointer to current room, nullptr before first room is entered.
 	*/
 	Room* getCurrentRoom() const;
@@ -45,29 +47,34 @@ public:
 	/**
 	 * @brief Adds new room to the manager.
 	 *
-	 * The room manager does not hold ownership of the room
-	 * and it is your responsibility that the pointer is valid through
-	 * the lifetime of the room manger.
-	 *
-	 * This is automatically called when a Room is constructed
+	 * Room of the given type (which has to be derived from RE::Room)
+	 * is constructed using the given arguments.
+	 * 
+	 * RoomManager holds ownership of the rooms.
 	*/
-	void addRoom(Room* room);
+	template<DerivedFromRoom RoomType, typename... ConstructorArgs>
+	RoomType* addRoom(ConstructorArgs&&... args) {
+		auto ptr = std::make_unique<RoomType>(std::forward<ConstructorArgs>(args)...);
+		auto* rval = ptr.get();
+		m_rooms.push_back(std::move(ptr));
+		return rval;
+	}
 
 	/**
 	 * @brief Calls given Room-member function on all rooms
 	 * @tparam callback Member function of Room
 	*/
 	template<auto callback, typename... Args>
-	void notifyRooms(Args... args) {
+	void notifyRooms(Args... args) const {
 		for (auto& room : m_rooms) {
-			(room.second->*callback)(args...);
+			((*room).*callback)(args...);
 		}
 	}
 
 protected:
 
-	std::unordered_map<size_t, Room*> m_rooms;				/**< Non-owning vector of all managed rooms */
-	Room* m_currentRoom = nullptr;							/**< Pointer to the current room */
+	std::vector<std::unique_ptr<Room>> m_rooms;	/**< Contains all managed rooms */
+	Room* m_currentRoom = nullptr;				/**< Pointer to the current room */
 };
 
 }

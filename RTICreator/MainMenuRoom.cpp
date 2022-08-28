@@ -25,8 +25,8 @@ constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
 	.usingImGui = true
 };
 
-MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args, size_t roomName) :
-	Room(roomName, INITIAL_DISPLAY_SETTINGS),
+MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
+	Room(0, INITIAL_DISPLAY_SETTINGS),
 	m_texView(engine().getWindowDims()) {
 
 	engine().setWindowTitle("RTICreator v3.0.0");
@@ -104,7 +104,7 @@ void MainMenuRoom::render(double interpolationFactor) {
 					if (ImGui::ColorPicker3("Background color", &m_backgroundColor.x)) {
 						auto displaySettings = getDisplaySettings();
 						displaySettings.clearColor = glm::vec4(m_backgroundColor, 1.0f);
-						//program()->setDisplaySettingsForCurrentRoom(displaySettings); TODO TODO
+						setDisplaySettings(displaySettings);
 					}
 					ImGui::EndTabItem();
 				}

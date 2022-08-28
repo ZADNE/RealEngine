@@ -16,7 +16,7 @@
 class MainMenuRoom : public RE::Room {
 public:
 
-	MainMenuRoom(RE::CommandLineArguments args, size_t roomName);
+	MainMenuRoom(RE::CommandLineArguments args);
 
 	void sessionStart(const RE::RoomTransitionParameters& params) override;
 	void sessionEnd() override;
