@@ -5,6 +5,7 @@
 #include <optional>
 
 #include <RealEngine/main/rooms/Room.hpp>
+#include <RealEngine/main/program/CommandLineArguments.hpp>
 #include <RealEngine/rendering/cameras/View2D.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
@@ -14,13 +15,14 @@
  */
 class MainMenuRoom : public RE::Room {
 public:
+
 	MainMenuRoom(RE::CommandLineArguments args);
 
 	void sessionStart(const RE::RoomTransitionParameters& params) override;
 	void sessionEnd() override;
 	void step() override;
 	void render(double interpolationFactor) override;
-	void windowResized(const glm::ivec2& newDims) override;
+	void windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) override;
 
 private:
 

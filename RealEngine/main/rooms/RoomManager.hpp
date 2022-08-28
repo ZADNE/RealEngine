@@ -2,69 +2,79 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <vector>
+#include <memory>
+#include <utility>
 
 #include <glm/vec2.hpp>
 
-#include <RealEngine/main/program/CommandLineArguments.hpp>
 #include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
 
 namespace RE {
 
 class Room;
 
+template<class T>
+concept DerivedFromRoom = std::derived_from<T, Room>;
+
 /**
  * @brief Manages rooms and transitions among them.
- *
- * Room manager does not hold ownership of the rooms it manages.
 */
 class RoomManager {
 public:
+
 	/**
 	 * @brief Contructs room manager without any rooms to manage.
 	*/
 	RoomManager();
 
 	/**
-	 * @brief Gets current room, that is the room which has active session.
+	 * @brief Gets the current room, that is the room which has active session.
 	 * @return Pointer to current room, nullptr before first room is entered.
 	*/
 	Room* getCurrentRoom() const;
 
 	/**
-	 * @brief Changes current room. That means ends session of current room
-	 * and start session of the room at index.
-	 *
-	 * @param index Index of the room to enter
+	 * @brief Changes the current room.
+	 * @details Session of current room is ended and then session
+	 * of the room with name 'name' is started.
+	 * @param name Identifier of the room
 	 * @param params Parameters to start the room's session with
 	 * @return	Pointer to active room, this can be same as previous room
-	 *			if the index is invalid.
+	 *			if the name is invalid.
 	*/
-	Room* gotoRoom(size_t index, const RoomTransitionParameters& params);
+	Room* goToRoom(size_t name, const RoomTransitionParameters& params);
 
 	/**
 	 * @brief Adds new room to the manager.
 	 *
-	 * The room manager does not hold ownership of the room
-	 * and it is your responsibility that the point is valid through
-	 * lifetime of the room manger.
-	 *
-	 * This is typically called from the constructor of the
-	 * class derived from the MainProgram.
-	 * @param room Room to manage
-	 * @return Index of the room, can be used to enter the room via gotoRoom()
+	 * Room of the given type (which has to be derived from RE::Room)
+	 * is constructed using the given arguments.
+	 * 
+	 * RoomManager holds ownership of the rooms.
 	*/
-	size_t addRoom(Room* room);
+	template<DerivedFromRoom RoomType, typename... ConstructorArgs>
+	RoomType* addRoom(ConstructorArgs&&... args) {
+		auto ptr = std::make_unique<RoomType>(std::forward<ConstructorArgs>(args)...);
+		auto* rval = ptr.get();
+		m_rooms.push_back(std::move(ptr));
+		return rval;
+	}
 
 	/**
-	 * @brief Notifies all rooms that the window has been resized
-	 * @param newSize The new size of the window
+	 * @brief Calls given Room-member function on all rooms
+	 * @tparam callback Member function of Room
 	*/
-	void notifyWindowResized(const glm::ivec2& newSize);
+	template<auto callback, typename... Args>
+	void notifyRooms(Args... args) const {
+		for (auto& room : m_rooms) {
+			((*room).*callback)(args...);
+		}
+	}
 
 protected:
-	std::vector<Room*> m_rooms;								/**< Non-owning vector of all managed rooms */
-	Room* m_currentRoom = nullptr;							/**< Pointer to the current room */
+
+	std::vector<std::unique_ptr<Room>> m_rooms;	/**< Contains all managed rooms */
+	Room* m_currentRoom = nullptr;				/**< Pointer to the current room */
 };
 
 }

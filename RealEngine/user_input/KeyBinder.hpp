@@ -182,7 +182,7 @@ private:
 	static int listenForKey(void* ptr) {
 		SDL_Event evnt;
 		Key newKey = Key::UNKNOWN;
-		MainProgram::std->checkForInput(false);
+		MainProgram::pollEventsInMainThread(false);
 		ListeningInfo<CallbackReceiver>* info = reinterpret_cast<ListeningInfo<CallbackReceiver>*>(ptr);
 		int rval = 0;
 
@@ -216,7 +216,7 @@ private:
 		//Callback
 		(info->callbackReceiver.*func)(newKey);
 
-		MainProgram::std->checkForInput(true);
+		MainProgram::pollEventsInMainThread(true);
 		delete info;
 		return rval;
 	}

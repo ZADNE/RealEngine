@@ -1,18 +1,18 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
-#include <RealEngine/main/program/MainProgram.hpp>
+#include <RealEngine/main/rooms/RoomToEngineAccess.hpp>
+#include <RealEngine/main/rooms/RoomDisplaySettings.hpp>
+#include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
 
 namespace RE {
 
-class MainProgram;
-
 /**
- * @brief Separates program into logical units, only one unit is active at a time.
+ * @brief Separates program into logical units, only one room is active at a time.
  *
  * Rooms allow separation of program into multiple units where only one unit
  * is active at a time (= receives step and render calls, inactive rooms
@@ -22,16 +22,14 @@ class MainProgram;
  * @see RoomManager
 */
 class Room {
-	friend class MainProgram;
 public:
 
 	/**
-	 * @brief Constructs a room.
-	 *
-	 * You are supposed to do this in the constructor of your program
-	 * and then add them to the room manager.
+	 * @brief Constructs new room
+	 * @note Create new rooms using MainProgram::addRoom
+	 * @param name Unique identifier of the room
 	*/
-	Room(RoomDisplaySettings initialSettings = RoomDisplaySettings{});
+	Room(size_t name, RoomDisplaySettings initialSettings = RoomDisplaySettings{});
 
 	/**
 	 * @brief Destructs a room.
@@ -81,59 +79,60 @@ public:
 
 	/**
 	 * @brief Callback used to notify that the window's size has changed
-	 * 
-	 * This callback is called for all rooms, even those that are not active.
-	 * @param newSize The new size fo the window
 	*/
-	virtual void windowResized(const glm::ivec2& newSize);
+	virtual void windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {}
 
 	/**
-	 * @brief Gets main program.
-	 * @return Main program, guaranteed to be valid.
+	 * @brief Callback used to notify that the window's title has changed
 	*/
-	MainProgram* program() const;
+	virtual void windowTitleChangedCallback(const std::string& oldTitle, const std::string& newTitle) {}
 
 	/**
-	 * @brief Gets input manager which can be used to determine
-	 * user input (keyboard, mouse, etc.).
-	 *
-	 * @return Input manager, guaranteed to be valid.
+	 * @brief Callback used to notify that the window's flags have changed
 	*/
-	const InputManager* input() const;
+	virtual void windowFlagsChangedCallback(const WindowFlags& oldFlags, const WindowFlags& newFlags) {}
 
 	/**
-	 * @brief Gets synchronizer which can be used to change rate
-	 * of steps or to limit render rates.
-	 *
-	 * @return Synchronizer, guaranteed to be valid.
+	 * @brief Gets a proxy that can be used to read/modify
+	 * many parameters and variables of the RealEngine
 	*/
-	Synchronizer* synchronizer() const;
-
-	/**
-	 * @brief Gets window
-	 * @return Window, guaranteed to be valid.
-	*/
-	Window* window() const;
+	static RoomToEngineAccess& engine() { return *s_engineAccess; }
 
 	/**
 	 * @brief Gets the settings that should be used for this room
 	*/
 	RoomDisplaySettings getDisplaySettings() const;
 
-private:
+	/**
+	 * @brief Gets unique identifier of the room
+	*/
+	size_t getName() const;
+
+	/**
+	 * @brief This is set by the MainProgram at startup
+	*/
+	static void setRoomSystemAccess(RoomToEngineAccess* systemAccess) { s_engineAccess = systemAccess; }
+
+	/**
+	 * @brief This is set by the MainProgram at startup
+	*/
+	static void setStaticReferences(MainProgram* mainProgram, RoomManager* roomManager);
+
+protected:
 
 	/**
 	 * @brief Dynamically changes the room's display settings
 	*/
 	void setDisplaySettings(RoomDisplaySettings displaySettings);
 
-	RoomDisplaySettings m_displaySettings;
+private:
 
-	inline static MainProgram* s_mainProgram = nullptr;			/**< Pointer set by main program */
-	inline static const InputManager* s_inputManager = nullptr;	/**< Pointer set by main program */
-	inline static Synchronizer* s_synchronizer = nullptr;		/**< Pointer set by main program */
-	inline static Window* s_window = nullptr;					/**< Pointer set by main program */
-	inline static RoomManager* s_roomManager = nullptr;			/**< Pointer set by main program */
+	RoomDisplaySettings m_displaySettings;
+	size_t m_name;							/**< Unique identifier of the room */
+
+	inline static RoomToEngineAccess* s_engineAccess = nullptr;
+	inline static MainProgram* s_mainProgram = nullptr;
+	inline static RoomManager* s_roomManager = nullptr;
 };
 
 }

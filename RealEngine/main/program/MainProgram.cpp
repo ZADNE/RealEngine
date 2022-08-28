@@ -22,64 +22,38 @@
 
 namespace RE {
 
-MainProgram* MainProgram::std = nullptr;
-
-int MainProgram::run() {
-	doRoomTransitionIfScheduled();
-	if (!m_roomManager.getCurrentRoom()) {
-		throw std::runtime_error("Initial room was not set");
-	}
-
-	//Adopt display settings of the first room
-	adoptRoomSettings(m_roomManager.getCurrentRoom()->getDisplaySettings());
-
-	m_programShouldRun = true;
-	m_synchronizer.resumeSteps();
-
-	//MAIN PROGRAM LOOP
-	std::cout << "Entering main loop!" << std::endl;
-	while (m_programShouldRun) {
-		m_synchronizer.beginFrame();
-		DefaultFrameBuffer::clearColor(m_clearColor);
-
-		//Perform simulation steps to catch up the time
-		while (m_synchronizer.shouldStepHappen()) {
-			//Check for user input
-			if (m_checkForInput) {
-				m_inputManager.update();
-				pollEvents();
-			} else {
-				SDL_PumpEvents();
-			}
-			//Do the simulation step
-			step();
-		}
-
-		//Draw frame
-		render(m_synchronizer.getDrawInterpolationFactor());
-
-		m_window.swapBuffer();
-
-		doRoomTransitionIfScheduled();
-
-		m_synchronizer.endFrame();
-	}
-	std::cout << "Leaving main loop!" << std::endl;
-
-	//Exit the program
-	m_roomManager.getCurrentRoom()->sessionEnd();
-
-	return m_programExitCode;
+void MainProgram::initialize() {
+	//Force initialization of the singleton instance
+	instance();
 }
 
-void MainProgram::scheduleProgramExit(int exitcode/* = EXIT_SUCCESS*/) {
+int MainProgram::run(size_t roomName, const RoomTransitionParameters& params) {
+	try {
+		return instance().doRun(roomName, params);
+	}
+	catch (const std::exception& e) {
+		fatalError(std::string("Exception: ") + e.what());
+	}
+	catch (const char* str) {
+		fatalError(std::string("C-string exception: ") + str);
+	}
+	catch (int i) {
+		fatalError(std::string("int exception: ") + std::to_string(i));
+	}
+	catch (...) {
+		fatalError("Unknown exception!");
+	}
+}
+
+void MainProgram::scheduleExit(int exitcode/* = EXIT_SUCCESS*/) {
 	m_programShouldRun = false;
 	m_programExitCode = exitcode;
 }
 
-void MainProgram::checkForInput(bool check) {
-	m_checkForInput = check;
-	m_inputManager.update();
+void MainProgram::pollEventsInMainThread(bool poll) {
+	auto& mainProgram = instance();
+	mainProgram.m_pollEventsInMainThread = poll;
+	mainProgram.m_inputManager.update();
 }
 
 std::vector<RE::DisplayInfo> MainProgram::getDisplays() const {
@@ -113,18 +87,64 @@ std::vector<RE::DisplayInfo> MainProgram::getDisplays() const {
 	return infos;
 }
 
-void MainProgram::resizeWindow(const glm::ivec2& newDims, bool save) {
-	m_window.resize(newDims, save);
-	m_roomManager.notifyWindowResized(newDims);
-}
-
 void MainProgram::setRelativeCursorMode(bool relative) {
 	SDL_SetRelativeMouseMode(relative ? SDL_TRUE : SDL_FALSE);
 }
 
-void MainProgram::setDisplaySettingsForCurrentRoom(RoomDisplaySettings displaySettings) {
-	m_roomManager.getCurrentRoom()->setDisplaySettings(displaySettings);
-	adoptRoomSettings(displaySettings);
+void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
+	m_clearColor = s.clearColor;
+	m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
+	m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
+	m_usingImGui = s.usingImGui;
+}
+
+int MainProgram::doRun(size_t roomName, const RoomTransitionParameters& params) {
+	scheduleRoomTransition(roomName, params);
+	doRoomTransitionIfScheduled();
+	if (!m_roomManager.getCurrentRoom()) {
+		throw std::runtime_error("Initial room was not set");
+	}
+
+	//Adopt display settings of the first room
+	adoptRoomDisplaySettings(m_roomManager.getCurrentRoom()->getDisplaySettings());
+
+	m_programShouldRun = true;
+	m_synchronizer.resumeSteps();
+
+	//MAIN PROGRAM LOOP
+	std::cout << "Entering main loop!" << std::endl;
+	while (m_programShouldRun) {
+		m_synchronizer.beginFrame();
+		DefaultFrameBuffer::clearColor(m_clearColor);
+
+		//Perform simulation steps to catch up the time
+		while (m_synchronizer.shouldStepHappen()) {
+			//Check for user input
+			if (m_pollEventsInMainThread) {
+				m_inputManager.update();
+				pollEvents();
+			} else {
+				SDL_PumpEvents();
+			}
+			//Do the simulation step
+			step();
+		}
+
+		//Draw frame
+		render(m_synchronizer.getDrawInterpolationFactor());
+
+		m_window.swapBuffer();
+
+		doRoomTransitionIfScheduled();
+
+		m_synchronizer.endFrame();
+	}
+	std::cout << "Leaving main loop!" << std::endl;
+
+	//Exit the program
+	m_roomManager.getCurrentRoom()->sessionEnd();
+
+	return m_programExitCode;
 }
 
 void MainProgram::step() {
@@ -192,39 +212,32 @@ void MainProgram::processEvent(SDL_Event* evnt) {
 		m_inputManager.press(key, std::abs(evnt->wheel.x));
 		break;
 	case SDL_QUIT:
-		scheduleProgramExit();
+		scheduleExit();
 		break;
 	}
 }
 
-void MainProgram::adoptRoomSettings(const RoomDisplaySettings& s) {
-	m_clearColor = s.clearColor;
-	m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
-	m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
-	m_usingImGui = s.usingImGui;
-}
-
 void MainProgram::doRoomTransitionIfScheduled() {
-	if (m_nextRoomIndex == NO_NEXT_ROOM) return;
+	if (m_nextRoomName == NO_NEXT_ROOM) return;
 
 	m_synchronizer.pauseSteps();
 	auto prev = m_roomManager.getCurrentRoom();
-	auto current = m_roomManager.gotoRoom(m_nextRoomIndex, m_roomTransitionParameters);
+	auto current = m_roomManager.goToRoom(m_nextRoomName, m_roomTransitionParameters);
 	if (prev != current) {//If successfully changed the room
 		//Adopt the display settings of the entered room
-		adoptRoomSettings(current->getDisplaySettings());
+		adoptRoomDisplaySettings(current->getDisplaySettings());
 		//Pressed/released events belong to the previous room
 		m_inputManager.update();
 		//Ensure at least one step before the first frame is rendered
 		step();
 	}
-	m_nextRoomIndex = NO_NEXT_ROOM;
+	m_nextRoomName = NO_NEXT_ROOM;
 
 	m_synchronizer.resumeSteps();
 }
 
-void MainProgram::scheduleRoomTransition(size_t index, RoomTransitionParameters params) {
-	m_nextRoomIndex = index;
+void MainProgram::scheduleRoomTransition(size_t name, RoomTransitionParameters params) {
+	m_nextRoomName = name;
 	m_roomTransitionParameters = params;
 }
 
@@ -242,13 +255,8 @@ void MainProgram::pollEvents() {
 	}
 }
 
-MainProgram::MainProgram() {
-	std = this;
-	Room::s_mainProgram = this;
-	Room::s_inputManager = &m_inputManager;
-	Room::s_synchronizer = &m_synchronizer;
-	Room::s_window = &m_window;
-	Room::s_roomManager = &m_roomManager;
+MainProgram::MainProgram() :
+	s_roomToEngineAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
 
 	auto spriteShader = RE::RM::getShaderProgram({.vert = sprite_vert, .frag = sprite_frag});
 	spriteShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
@@ -257,6 +265,14 @@ MainProgram::MainProgram() {
 	auto geometryShader = RE::RM::getShaderProgram({.vert = geometry_vetr, .frag = geometry_frag});
 	geometryShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
 	GeometryBatch::std().switchShaderProgram(geometryShader);
+
+	Room::setRoomSystemAccess(&s_roomToEngineAccess);
+	Room::setStaticReferences(this, &m_roomManager);
+}
+
+MainProgram& MainProgram::instance() {
+	static MainProgram mainProgram;
+	return mainProgram;
 }
 
 }

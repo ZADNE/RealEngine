@@ -16,18 +16,31 @@ namespace RE {
 class InputManager {
 	friend class MainProgram;
 public:
+
 	InputManager();
 
 	/**
-	 * @brief Should be called each step
+	 * @brief Should be called each step by the MainProgram
 	*/
 	void update();
 
-	//Returns for how many steps straight it has been down (0 = is not currently down)
+	/**
+	 * @brief Checks whether the key is currently pressed
+	 * @return For how many steps straight it has been down (0 = is not currently down)
+	*/
 	int isDown(RE::Key keyID) const;
-	//Returns how many times it was pressed before this (by how many steps the mouse wheel was rotated)
+
+	/**
+	 * @brief Checks whther the key has just been pressed (= right before this step)
+	 * @return	How many times it has been pressed before this step (by how many steps the mouse wheel was rotated)
+	 *			Usually returns 0 or 1.
+	*/
 	int wasPressed(RE::Key keyID) const;
-	//Returns usually 0 (was not released) or 1 (was released)
+
+	/**
+	 * @brief Checks whther the key has just been released (= right before this step)
+	 * @return 1 if the key has just been released, 0 otherwise
+	*/
 	int wasReleased(RE::Key keyID) const;
 
 	/**
@@ -42,7 +55,9 @@ public:
 
 	//Setters
 	void setCursor(const glm::ivec2& abs, const glm::ivec2& rel);
+
 private:
+
 	void press(RE::Key keyID, int times = 1);
 	void release(RE::Key keyID);
 

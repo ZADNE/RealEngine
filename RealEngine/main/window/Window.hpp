@@ -26,6 +26,7 @@ class MainProgram;
 class Window : public WindowSettings {
 	friend class MainProgram;
 public:
+
 	Window(const Window& other) = delete;
 	void operator=(const Window& other) = delete;
 
@@ -34,14 +35,14 @@ public:
 	 * @param fullscreen True if the window should be fullscreen, false otherwise.
 	 * @param save Changed settings are saved to file if true.
 	*/
-	void goFullscreen(bool fullscreen, bool save);
+	void setFullscreen(bool fullscreen, bool save);
 
 	/**
 	 * @brief Disables and enables window decoration.
 	 * @param borderless True if the window should have no decoration, false otherwise.
 	 * @param save Changed settings are saved to file if true.
 	*/
-	void goBorderless(bool borderless, bool save);
+	void setBorderless(bool borderless, bool save);
 
 	/**
 	 * @brief Sets usage of vertical synchronization.
@@ -63,12 +64,20 @@ public:
 	const std::string& getTitle() const;
 
 	/**
+	 * @brief Resizes the window.
+	 * @param newDims New dimensions of the window
+	 * @param save Changed settings are saved to file if true.
+	*/
+	void setDims(const glm::ivec2& newDims, bool save);
+
+	/**
 	 * @brief Gets current dimensions of the window
 	 * @return Current dimensions
 	*/
 	glm::ivec2 getDims() const { return m_dims; }
 
 private:
+
 	/**
 	 * @brief Constructs the window and displays it immediately.
 	 *
@@ -81,13 +90,6 @@ private:
 	 * @brief Destroys the window and its OpenGL context.
 	*/
 	~Window();
-
-	/**
-	 * @brief Resizes the window.
-	 * @param newDims New dimensions of the window
-	 * @param save Changed settings are saved to file if true.
-	*/
-	void resize(const glm::ivec2& newDims, bool save);
 
 	/**
 	 * @brief Swaps buffers if using double buffered context (should be).

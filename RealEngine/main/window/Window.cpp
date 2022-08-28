@@ -15,14 +15,14 @@
 
 namespace RE {
 
-void Window::goFullscreen(bool fullscreen, bool save) {
+void Window::setFullscreen(bool fullscreen, bool save) {
 	m_flags.fullscreen = fullscreen;
 	SDL_SetWindowFullscreen(m_SDLwindow, (fullscreen) ? SDL_WINDOW_FULLSCREEN : 0);
 	SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
 	if (save) this->save();
 }
 
-void Window::goBorderless(bool borderless, bool save) {
+void Window::setBorderless(bool borderless, bool save) {
 	m_flags.borderless = borderless;
 	SDL_SetWindowBordered(m_SDLwindow, (borderless) ? SDL_FALSE : SDL_TRUE);
 	if (save) this->save();
@@ -49,6 +49,19 @@ void Window::setTitle(const std::string& title) {
 
 const std::string& Window::getTitle() const {
 	return m_windowTitle;
+}
+
+void Window::setDims(const glm::ivec2& newDims, bool save) {
+	SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
+	SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+	SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
+
+	Viewport::s_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
+	Viewport::s_windowSize = m_dims;
+	Viewport::setToWholeWindow();
+	Viewport::setWindowMatrixToMatchViewport();
+
+	if (save) this->save();
 }
 
 Window::Window(const WindowSettings& settings, const std::string& title) :
@@ -109,19 +122,6 @@ Window::~Window() {
 
 	//Destroy the viewport's buffer (before its implementation is null)
 	Viewport::s_windowMatrixUniformBuffer.reset();
-}
-
-void Window::resize(const glm::ivec2& newDims, bool save) {
-	SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
-	SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-	SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
-
-	Viewport::s_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
-	Viewport::s_windowSize = m_dims;
-	Viewport::setToWholeWindow();
-	Viewport::setWindowMatrixToMatchViewport();
-
-	if (save) this->save();
 }
 
 void Window::swapBuffer() {
