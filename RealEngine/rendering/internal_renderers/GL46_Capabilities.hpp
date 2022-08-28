@@ -14,7 +14,7 @@ namespace RE {
 class GL46_Capabilities : public ICapabilities {
 public:
 
-	void set(Capability cap, bool enabled) const override;
+    void set(Capability cap, bool enabled) const override;
 
 };
 

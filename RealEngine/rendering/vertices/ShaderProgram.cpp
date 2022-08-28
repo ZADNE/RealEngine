@@ -8,45 +8,45 @@ namespace RE {
 IShaderProgram* ShaderProgram::s_impl = nullptr;
 
 ShaderProgram::ShaderProgram(const ShaderProgramSources& sources) {
-	s_impl->construct(*this, sources);
+    s_impl->construct(*this, sources);
 }
 
 ShaderProgram::ShaderProgram(ShaderProgram&& other) noexcept :
-	m_ID(other.m_ID) {
-	other.m_ID = 0;
+    m_ID(other.m_ID) {
+    other.m_ID = 0;
 }
 
 ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) noexcept {
-	std::swap(m_ID, other.m_ID);
-	return *this;
+    std::swap(m_ID, other.m_ID);
+    return *this;
 }
 
 ShaderProgram::~ShaderProgram() {
-	s_impl->destruct(*this);
+    s_impl->destruct(*this);
 }
 
 void ShaderProgram::use() const {
-	s_impl->use(*this);
+    s_impl->use(*this);
 }
 
 void ShaderProgram::unuse() const {
-	s_impl->unuse(*this);
+    s_impl->unuse(*this);
 }
 
 void ShaderProgram::dispatchCompute(const glm::uvec3& groupCount, bool use) const {
-	s_impl->dispatchCompute(*this, groupCount, use);
+    s_impl->dispatchCompute(*this, groupCount, use);
 }
 
 void ShaderProgram::dispatchCompute(int indirect, bool use) const {
-	s_impl->dispatchCompute(*this, indirect, use);
+    s_impl->dispatchCompute(*this, indirect, use);
 }
 
 void ShaderProgram::printInfo() const {
-	s_impl->printInfo(*this);
+    s_impl->printInfo(*this);
 }
 
 void ShaderProgram::backInterfaceBlock(unsigned int interfaceBlockIndex, const BufferTypedIndex& index) const {
-	s_impl->backInterfaceBlock(*this, interfaceBlockIndex, index);
+    s_impl->backInterfaceBlock(*this, interfaceBlockIndex, index);
 }
 
 void ShaderProgram::setUniform(int location, float val) const { s_impl->setUniform(*this, location, val); }

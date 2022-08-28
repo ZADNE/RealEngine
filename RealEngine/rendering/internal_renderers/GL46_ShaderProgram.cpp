@@ -18,140 +18,140 @@ namespace RE {
 using enum ShaderType;
 
 const std::array SHADER_STAGES = {
-	ShaderType::VERTEX,
-	ShaderType::TESS_CONTROL,
-	ShaderType::TESS_EVALUATION,
-	ShaderType::GEOMETRY,
-	ShaderType::FRAGMENT,
-	ShaderType::COMPUTE
+    ShaderType::VERTEX,
+    ShaderType::TESS_CONTROL,
+    ShaderType::TESS_EVALUATION,
+    ShaderType::GEOMETRY,
+    ShaderType::FRAGMENT,
+    ShaderType::COMPUTE
 };
 
 GLenum convert(ShaderType st) {
-	switch (st) {
-	case VERTEX:			return GL_VERTEX_SHADER;
-	case TESS_CONTROL:		return GL_TESS_CONTROL_SHADER;
-	case TESS_EVALUATION:	return GL_TESS_EVALUATION_SHADER;
-	case GEOMETRY:			return GL_GEOMETRY_SHADER;
-	case FRAGMENT:			return GL_FRAGMENT_SHADER;
-	case COMPUTE:			return GL_COMPUTE_SHADER;
-	default: throw "Unknown shader type!";
-	}
+    switch (st) {
+    case VERTEX:            return GL_VERTEX_SHADER;
+    case TESS_CONTROL:      return GL_TESS_CONTROL_SHADER;
+    case TESS_EVALUATION:   return GL_TESS_EVALUATION_SHADER;
+    case GEOMETRY:          return GL_GEOMETRY_SHADER;
+    case FRAGMENT:          return GL_FRAGMENT_SHADER;
+    case COMPUTE:           return GL_COMPUTE_SHADER;
+    default: throw "Unknown shader type!";
+    }
 }
 
 void GL46_ShaderProgram::construct(ShaderProgram& sp, const ShaderProgramSources& sources) const {
-	compileProgram(sp, sources);
+    compileProgram(sp, sources);
 #if defined(_DEBUG) && defined(RE_LOG_SHADER_PROGRAM_CREATED)
-	std::cout << "Created shader (ID: " << sp.m_ID << ")\n";
+    std::cout << "Created shader (ID: " << sp.m_ID << ")\n";
 #endif // defined(_DEBUG) && defined(RE_LOG_SHADER_PROGRAM_CREATED)
 }
 
 void GL46_ShaderProgram::destruct(ShaderProgram& sp) const {
-	if (sp.m_ID != 0) {
-	#if defined(_DEBUG) && defined(RE_LOG_SHADER_PROGRAM_DESTROYED)
-		std::cout << "Destroyed shader (ID: " << sp.m_ID << ")\n";
-	#endif // defined(_DEBUG) && defined(RE_LOG_SHADER_PROGRAM_DESTROYED)
-		glDeleteProgram(sp.m_ID);
-	}
+    if (sp.m_ID != 0) {
+    #if defined(_DEBUG) && defined(RE_LOG_SHADER_PROGRAM_DESTROYED)
+        std::cout << "Destroyed shader (ID: " << sp.m_ID << ")\n";
+    #endif // defined(_DEBUG) && defined(RE_LOG_SHADER_PROGRAM_DESTROYED)
+        glDeleteProgram(sp.m_ID);
+    }
 }
 
 void GL46_ShaderProgram::use(const ShaderProgram& sp) const {
 #ifdef _DEBUG
-	if (s_currentlyUsedID != 0) {
-		throw "Overbound shader programs";
-	}
-	s_currentlyUsedID = sp.m_ID;
+    if (s_currentlyUsedID != 0) {
+        throw "Overbound shader programs";
+    }
+    s_currentlyUsedID = sp.m_ID;
 #endif // _DEBUG
-	glUseProgram(sp.m_ID);
+    glUseProgram(sp.m_ID);
 }
 
 void GL46_ShaderProgram::unuse(const ShaderProgram& sp) const {
 #ifdef _DEBUG
-	if (s_currentlyUsedID != sp.m_ID) {
-		throw "Overbound shader programs";
-	}
-	s_currentlyUsedID = 0;
-	glUseProgram(0);
+    if (s_currentlyUsedID != sp.m_ID) {
+        throw "Overbound shader programs";
+    }
+    s_currentlyUsedID = 0;
+    glUseProgram(0);
 #endif // _DEBUG
 }
 
 void GL46_ShaderProgram::dispatchCompute(const ShaderProgram& sp, const glm::uvec3& groupCount, bool use) const {
-	if (use) {
-		this->use(sp);
-	} else {
-	#ifdef _DEBUG
-		if (s_currentlyUsedID != sp.m_ID) {
-			throw "Tried to dispatch compute groups without having the program bound for usage!";
-		}
-	#endif // _DEBUG
-	}
-	glDispatchCompute(groupCount.x, groupCount.y, groupCount.z);
-	if (use) {
-		unuse(sp);
-	}
+    if (use) {
+        this->use(sp);
+    } else {
+    #ifdef _DEBUG
+        if (s_currentlyUsedID != sp.m_ID) {
+            throw "Tried to dispatch compute groups without having the program bound for usage!";
+        }
+    #endif // _DEBUG
+    }
+    glDispatchCompute(groupCount.x, groupCount.y, groupCount.z);
+    if (use) {
+        unuse(sp);
+    }
 }
 
 void GL46_ShaderProgram::dispatchCompute(const ShaderProgram& sp, int indirect, bool use) const {
-	if (use) {
-		this->use(sp);
-	} else {
-	#ifdef _DEBUG
-		if (s_currentlyUsedID != sp.m_ID) {
-			throw "Tried to dispatch compute groups without having the program bound for usage!";
-		}
-	#endif // _DEBUG
-	}
-	glDispatchComputeIndirect(indirect);
-	if (use) {
-		unuse(sp);
-	}
+    if (use) {
+        this->use(sp);
+    } else {
+    #ifdef _DEBUG
+        if (s_currentlyUsedID != sp.m_ID) {
+            throw "Tried to dispatch compute groups without having the program bound for usage!";
+        }
+    #endif // _DEBUG
+    }
+    glDispatchComputeIndirect(indirect);
+    if (use) {
+        unuse(sp);
+    }
 }
 
 void GL46_ShaderProgram::printInfo(const ShaderProgram& sp) const {
-	std::cout << "|SHADER: " << sp.m_ID << '\n';
-	//ATTRIBUTE INFO
-	int numberAttributes;
-	glGetProgramiv(sp.m_ID, GL_ACTIVE_ATTRIBUTES, &numberAttributes);
-	std::cout << "|ATTRIBUTES: " << std::to_string(numberAttributes) << "\n";
-	for (int i = 0; i < numberAttributes; i++) {
-		GLsizei length;
-		int size;
-		GLenum type;
-		GLchar name[32];
-		glGetActiveAttrib(sp.m_ID, i, 32, &length, &size, &type, &name[0]);
-		int loc = glGetAttribLocation(sp.m_ID, &name[0]);
-		std::cout << "|  layout (location = " << std::to_string(loc) << ") in " << GLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
-	}
+    std::cout << "|SHADER: " << sp.m_ID << '\n';
+    //ATTRIBUTE INFO
+    int numberAttributes;
+    glGetProgramiv(sp.m_ID, GL_ACTIVE_ATTRIBUTES, &numberAttributes);
+    std::cout << "|ATTRIBUTES: " << std::to_string(numberAttributes) << "\n";
+    for (int i = 0; i < numberAttributes; i++) {
+        GLsizei length;
+        int size;
+        GLenum type;
+        GLchar name[32];
+        glGetActiveAttrib(sp.m_ID, i, 32, &length, &size, &type, &name[0]);
+        int loc = glGetAttribLocation(sp.m_ID, &name[0]);
+        std::cout << "|  layout (location = " << std::to_string(loc) << ") in " << GLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
+    }
 
-	//UNIFORM INFO
-	int numberUniforms;
-	glGetProgramiv(sp.m_ID, GL_ACTIVE_UNIFORMS, &numberUniforms);
-	std::cout << "|UNIFORMS: " << std::to_string(numberUniforms) << "\n";
-	for (int i = 0; i < numberUniforms; i++) {
-		GLsizei length;
-		int size;
-		GLenum type;
-		GLchar name[32];
-		glGetActiveUniform(sp.m_ID, i, 32, &length, &size, &type, &name[0]);
-		int loc = glGetUniformLocation(sp.m_ID, &name[0]);
-		std::cout << "|  layout (location = " << std::to_string(loc) << ") uniform " << GLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
-	}
+    //UNIFORM INFO
+    int numberUniforms;
+    glGetProgramiv(sp.m_ID, GL_ACTIVE_UNIFORMS, &numberUniforms);
+    std::cout << "|UNIFORMS: " << std::to_string(numberUniforms) << "\n";
+    for (int i = 0; i < numberUniforms; i++) {
+        GLsizei length;
+        int size;
+        GLenum type;
+        GLchar name[32];
+        glGetActiveUniform(sp.m_ID, i, 32, &length, &size, &type, &name[0]);
+        int loc = glGetUniformLocation(sp.m_ID, &name[0]);
+        std::cout << "|  layout (location = " << std::to_string(loc) << ") uniform " << GLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
+    }
 }
 
 void GL46_ShaderProgram::backInterfaceBlock(const ShaderProgram& sp, unsigned int interfaceBlockIndex, const BufferTypedIndex& index) const {
-	if (index.type == RE::BufferType::UNIFORM) {
-		glUniformBlockBinding(sp.m_ID, interfaceBlockIndex, index.bindingIndex);
-	} else if (index.type == RE::BufferType::SHADER_STORAGE) {
-		glShaderStorageBlockBinding(sp.m_ID, interfaceBlockIndex, index.bindingIndex);
-	}
+    if (index.type == RE::BufferType::UNIFORM) {
+        glUniformBlockBinding(sp.m_ID, interfaceBlockIndex, index.bindingIndex);
+    } else if (index.type == RE::BufferType::SHADER_STORAGE) {
+        glShaderStorageBlockBinding(sp.m_ID, interfaceBlockIndex, index.bindingIndex);
+    }
 #ifdef _DEBUG
-	else {
-		throw "Interface blocks must be either UNIFORM or SHADER_STORAGE";
-	}
+    else {
+        throw "Interface blocks must be either UNIFORM or SHADER_STORAGE";
+    }
 #endif // _DEBUG
 }
 
 int GL46_ShaderProgram::getUniformLocation(const ShaderProgram& sp, const std::string& name) const {
-	return glGetUniformLocation(sp.m_ID, name.c_str());
+    return glGetUniformLocation(sp.m_ID, name.c_str());
 }
 
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, float val) const { glProgramUniform1f(sp.m_ID, location, val); }
@@ -196,103 +196,103 @@ void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, Textu
 void GL46_ShaderProgram::setUniform(const ShaderProgram& sp, int location, ImageUnit unit) const { glProgramUniform1i(sp.m_ID, location, unit.m_unit); }
 
 void GL46_ShaderProgram::compileProgram(ShaderProgram& sp, const ShaderProgramSources& source) const {
-	//Create program
-	sp.m_ID = glCreateProgram();
+    //Create program
+    sp.m_ID = glCreateProgram();
 
-	//Create, compile and attach shaders
-	unsigned int shaderID[SHADER_STAGES.size()] = {0};
-	size_t i = 0;
-	for (auto STAGE : SHADER_STAGES) {
-		if (!source[STAGE].m_sources.empty()) {
-			shaderID[i] = glCreateShader(convert(STAGE));
-		#ifdef _DEBUG
-			if (shaderID[i] == 0) {
-				fatalError("Failed to create shader!");
-			}
-		#endif // _DEBUG
-			compileShader(sp, source[STAGE], shaderID[i]);
-		}
-		i++;
-	}
+    //Create, compile and attach shaders
+    unsigned int shaderID[SHADER_STAGES.size()] = {0};
+    size_t i = 0;
+    for (auto STAGE : SHADER_STAGES) {
+        if (!source[STAGE].m_sources.empty()) {
+            shaderID[i] = glCreateShader(convert(STAGE));
+        #ifdef _DEBUG
+            if (shaderID[i] == 0) {
+                fatalError("Failed to create shader!");
+            }
+        #endif // _DEBUG
+            compileShader(sp, source[STAGE], shaderID[i]);
+        }
+        i++;
+    }
 
-	//Link program
-	linkProgram(sp);
+    //Link program
+    linkProgram(sp);
 
-	//Detach and delete shaders
-	for (size_t i = 0; i < 6; i++) {
-		if (shaderID[i] != 0) {
-			glDetachShader(sp.m_ID, shaderID[i]);
-			glDeleteShader(shaderID[i]);
-		}
-	}
+    //Detach and delete shaders
+    for (size_t i = 0; i < 6; i++) {
+        if (shaderID[i] != 0) {
+            glDetachShader(sp.m_ID, shaderID[i]);
+            glDeleteShader(shaderID[i]);
+        }
+    }
 }
 
 void GL46_ShaderProgram::compileShader(ShaderProgram& sp, const ShaderSources& sources, unsigned int shaderID) const {
-	glShaderSource(shaderID, static_cast<GLsizei>(sources.m_sources.size()), sources.m_sources.data(), sources.m_lengths.data());
+    glShaderSource(shaderID, static_cast<GLsizei>(sources.m_sources.size()), sources.m_sources.data(), sources.m_lengths.data());
 
-	glCompileShader(shaderID);
+    glCompileShader(shaderID);
 
-	int compileSuccess = 0;
-	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &compileSuccess);
+    int compileSuccess = 0;
+    glGetShaderiv(shaderID, GL_COMPILE_STATUS, &compileSuccess);
 
-	if (compileSuccess == GL_FALSE) {
-		int maxLength = 0;
-		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &maxLength);
+    if (compileSuccess == GL_FALSE) {
+        int maxLength = 0;
+        glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &maxLength);
 
-		std::vector<GLchar> infoLog(maxLength);
-		glGetShaderInfoLog(shaderID, maxLength, &maxLength, &infoLog[0]);
+        std::vector<GLchar> infoLog(maxLength);
+        glGetShaderInfoLog(shaderID, maxLength, &maxLength, &infoLog[0]);
 
-		glDeleteShader(shaderID);
+        glDeleteShader(shaderID);
 
-		std::printf("%s\n", &infoLog[0]);
+        std::printf("%s\n", &infoLog[0]);
 
-		fatalError("Failed to compile an internal shader!");
-	}
+        fatalError("Failed to compile an internal shader!");
+    }
 
-	glAttachShader(sp.m_ID, shaderID);
+    glAttachShader(sp.m_ID, shaderID);
 }
 
 void GL46_ShaderProgram::linkProgram(ShaderProgram& sp) const {
-	//Link our program
-	glLinkProgram(sp.m_ID);
+    //Link our program
+    glLinkProgram(sp.m_ID);
 
-	int isLinked = 0;
-	glGetProgramiv(sp.m_ID, GL_LINK_STATUS, &isLinked);
-	if (isLinked == GL_FALSE) {
-		int maxLength = 0;
-		glGetProgramiv(sp.m_ID, GL_INFO_LOG_LENGTH, &maxLength);
+    int isLinked = 0;
+    glGetProgramiv(sp.m_ID, GL_LINK_STATUS, &isLinked);
+    if (isLinked == GL_FALSE) {
+        int maxLength = 0;
+        glGetProgramiv(sp.m_ID, GL_INFO_LOG_LENGTH, &maxLength);
 
-		//The maxLength includes the NULL character
-		std::vector<GLchar> infoLog(maxLength);
-		glGetProgramInfoLog(sp.m_ID, maxLength, &maxLength, &infoLog[0]);
+        //The maxLength includes the NULL character
+        std::vector<GLchar> infoLog(maxLength);
+        glGetProgramInfoLog(sp.m_ID, maxLength, &maxLength, &infoLog[0]);
 
-		std::printf("%s\n", &infoLog[0]);
+        std::printf("%s\n", &infoLog[0]);
 
-		//Free shaders if not failing hard
+        //Free shaders if not failing hard
 
-		//Fail hard
-		fatalError("Failed to link shaders!");
-	}
+        //Fail hard
+        fatalError("Failed to link shaders!");
+    }
 
 #ifdef _DEBUG
 #ifdef RE_LOG_SHADER_PROGRAM_INFO
-	printInfo();
+    printInfo();
 #endif // RE_LOG_SHADER_PROGRAM_INFO
-	printProgramInfoLog(sp);
+    printProgramInfoLog(sp);
 #endif // _DEBUG
 }
 
 void GL46_ShaderProgram::printProgramInfoLog(const ShaderProgram& sp) const {
-	int logLength = 0;
-	glGetProgramiv(sp.m_ID, GL_INFO_LOG_LENGTH, &logLength);
+    int logLength = 0;
+    glGetProgramiv(sp.m_ID, GL_INFO_LOG_LENGTH, &logLength);
 
-	if (logLength > 0) {//If there is a log
-		std::vector<GLchar> infoLog(logLength);
-		glGetProgramInfoLog(sp.m_ID, logLength, nullptr, &infoLog[0]);
+    if (logLength > 0) {//If there is a log
+        std::vector<GLchar> infoLog(logLength);
+        glGetProgramInfoLog(sp.m_ID, logLength, nullptr, &infoLog[0]);
 
-		std::cout << "|PROGRAM INFO LOG\n";
-		std::printf("%s\n", &infoLog[0]);
-	}
+        std::cout << "|PROGRAM INFO LOG\n";
+        std::printf("%s\n", &infoLog[0]);
+    }
 }
 
 }

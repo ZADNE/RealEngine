@@ -9,7 +9,7 @@ namespace RE {
  * @brief Lists all capabilities that can be enabled/disabled
 */
 enum class Capability {
-	BLENDING
+    BLENDING
 };
 
 /**
@@ -22,7 +22,7 @@ enum class Capability {
 class ICapabilities {
 public:
 
-	virtual void set(Capability cap, bool enabled) const = 0;
+    virtual void set(Capability cap, bool enabled) const = 0;
 
 };
 

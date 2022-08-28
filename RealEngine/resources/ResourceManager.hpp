@@ -19,19 +19,19 @@ namespace RE {
 class ResourceManager {
 public:
 
-	/**
-	 * @copydoc TextureCache::getTexture
-	*/
-	static TexturePtr getTexture(const std::string& filePath);
+    /**
+     * @copydoc TextureCache::getTexture
+    */
+    static TexturePtr getTexture(const std::string& filePath);
 
-	/**
-	 * @copydoc ShaderProgramCache::getShaderProgram
-	*/
-	static ShaderProgramPtr getShaderProgram(const ShaderProgramSources& sources);
+    /**
+     * @copydoc ShaderProgramCache::getShaderProgram
+    */
+    static ShaderProgramPtr getShaderProgram(const ShaderProgramSources& sources);
 
 private:
-	static TextureCache m_textureCache;
-	static ShaderProgramCache m_shaderProgramCache;
+    static TextureCache m_textureCache;
+    static ShaderProgramCache m_shaderProgramCache;
 };
 
 using RM = class ResourceManager;

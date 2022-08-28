@@ -7,9 +7,9 @@
 namespace RE {
 
 class Capabilities {
-	friend class GL46_Renderer;
+    friend class GL46_Renderer;
 protected:
-	static ICapabilities* s_impl;
+    static ICapabilities* s_impl;
 };
 
 /**
@@ -20,9 +20,9 @@ protected:
 */
 class BlendingCapability : Capabilities {
 public:
-	static void enable();
-	static void disable();
-	static void set(bool enabled);
+    static void enable();
+    static void disable();
+    static void set(bool enabled);
 };
 
 }

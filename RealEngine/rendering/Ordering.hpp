@@ -7,17 +7,17 @@
 namespace RE {
 
 class Ordering {
-	friend class GL46_Renderer;
+    friend class GL46_Renderer;
 public:
 
-	static void flushWork();
-	static void finishWork();
+    static void flushWork();
+    static void finishWork();
 
-	static void issueDrawBarrier();
-	static void issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers);
+    static void issueDrawBarrier();
+    static void issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers);
 
 protected:
-	static IOrdering* s_impl;
+    static IOrdering* s_impl;
 };
 
 }

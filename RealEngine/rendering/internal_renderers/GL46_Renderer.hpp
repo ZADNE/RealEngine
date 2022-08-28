@@ -26,40 +26,40 @@ namespace RE {
 */
 class GL46_Renderer {
 public:
-	/**
-	* @brief Tries to prepare for creation of OpenGL 4.6 context.
-	* @return True if succeeded.
-	* @warning Do not call use() if this fails.
-	*
-	* Requires SDL2 to be initialized.
-	*
-	* @note To be called only once at the start of the program.
-	*/
-	static bool prepare();
+    /**
+    * @brief Tries to prepare for creation of OpenGL 4.6 context.
+    * @return True if succeeded.
+    * @warning Do not call use() if this fails.
+    *
+    * Requires SDL2 to be initialized.
+    *
+    * @note To be called only once at the start of the program.
+    */
+    static bool prepare();
 
-	/**
-	* @brief Initializes the renderer.
-	* @warning Do not call this if prepare() has failed.
-	*/
-	static void initialize();
+    /**
+    * @brief Initializes the renderer.
+    * @warning Do not call this if prepare() has failed.
+    */
+    static void initialize();
 
 private:
-	GL46_Renderer();
-	~GL46_Renderer();
+    GL46_Renderer();
+    ~GL46_Renderer();
 
-	GL46_Renderer(const GL46_Renderer&) = delete;
-	GL46_Renderer& operator=(const GL46_Renderer&) = delete;
+    GL46_Renderer(const GL46_Renderer&) = delete;
+    GL46_Renderer& operator=(const GL46_Renderer&) = delete;
 
-	GL46_Buffer m_bufferImpl;
-	GL46_Capabilities m_capabilitiesImpl;
-	GL46_Framebuffer m_mainFramebufferImpl;
-	GL46_Ordering m_orderingImpl;
-	GL46_ShaderProgram m_shaderProgramImpl;
-	GL46_Texture m_textureImpl;
-	GL46_VertexArray m_vertexArrayImpl;
-	GL46_Viewport m_viewportImpl;
+    GL46_Buffer m_bufferImpl;
+    GL46_Capabilities m_capabilitiesImpl;
+    GL46_Framebuffer m_mainFramebufferImpl;
+    GL46_Ordering m_orderingImpl;
+    GL46_ShaderProgram m_shaderProgramImpl;
+    GL46_Texture m_textureImpl;
+    GL46_VertexArray m_vertexArrayImpl;
+    GL46_Viewport m_viewportImpl;
 
-	std::optional<Framebuffer> m_defaultFramebuffer;
+    std::optional<Framebuffer> m_defaultFramebuffer;
 };
 
 /**

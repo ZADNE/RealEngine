@@ -15,9 +15,9 @@ namespace RE {
  * @brief Specify ancillary parameters of a window
 */
 struct WindowFlags {
-	WindowFlags() : invisible(false), fullscreen(false), borderless(false), vSync(false) {}
+    WindowFlags() : invisible(false), fullscreen(false), borderless(false), vSync(false) {}
 
-	unsigned char invisible : 1, fullscreen : 1, borderless : 1, vSync : 1;
+    unsigned char invisible : 1, fullscreen : 1, borderless : 1, vSync : 1;
 };
 
 /**
@@ -28,46 +28,46 @@ struct WindowFlags {
 class WindowSettings {
 public:
 
-	/**
-	 * @brief Constructs settings from file that was saved before.
-	 *
-	 * If the file cannot be loaded, settings are constructed with most basic options.
-	*/
-	WindowSettings();
+    /**
+     * @brief Constructs settings from file that was saved before.
+     *
+     * If the file cannot be loaded, settings are constructed with most basic options.
+    */
+    WindowSettings();
 
-	/**
-	 * @brief Constructs settings from given parameters
-	*/
-	WindowSettings(const glm::ivec2& dims, WindowFlags flags, Renderer renderer);
+    /**
+     * @brief Constructs settings from given parameters
+    */
+    WindowSettings(const glm::ivec2& dims, WindowFlags flags, Renderer renderer);
 
-	/**
-	 * @brief Gets a copy of the window flags
-	*/
-	WindowFlags getFlags() const { return m_flags; }
+    /**
+     * @brief Gets a copy of the window flags
+    */
+    WindowFlags getFlags() const { return m_flags; }
 
-	bool isFullscreen() const { return m_flags.fullscreen; }
-	bool isBorderless() const { return m_flags.borderless; }
-	bool isVSynced() const { return m_flags.vSync; }
+    bool isFullscreen() const { return m_flags.fullscreen; }
+    bool isBorderless() const { return m_flags.borderless; }
+    bool isVSynced() const { return m_flags.vSync; }
 
-	Renderer getRenderer() const { return m_renderer; }
+    Renderer getRenderer() const { return m_renderer; }
 
-	/**
-	 * @brief Save current settings to a file.
-	 *
-	 * Saved settings can be loaded by default contructor.
-	*/
-	void save();
+    /**
+     * @brief Save current settings to a file.
+     *
+     * Saved settings can be loaded by default contructor.
+    */
+    void save();
 
 protected:
 
-	/**
-	 * @brief Resets settings to default state.
-	*/
-	void reset();
+    /**
+     * @brief Resets settings to default state.
+    */
+    void reset();
 
-	glm::ivec2 m_dims;		/**< dimensions of the window */
-	WindowFlags m_flags;	/**< flags of the window */
-	Renderer m_renderer;	/**< the backing renderer of the window */
+    glm::ivec2 m_dims;      /**< dimensions of the window */
+    WindowFlags m_flags;    /**< flags of the window */
+    Renderer m_renderer;    /**< the backing renderer of the window */
 };
 
 }

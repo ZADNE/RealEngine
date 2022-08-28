@@ -9,8 +9,8 @@
 namespace RE {
 
 enum class BindNow {
-	NO,
-	YES
+    NO,
+    YES
 };
 
 /**
@@ -18,49 +18,49 @@ enum class BindNow {
 */
 class TypedBuffer : public Buffer {
 public:
-	using enum BufferType;
-	using enum BufferStorage;
-	using enum BufferAccessFrequency;
-	using enum BufferAccessNature;
-	using enum BufferUsageFlags;
+    using enum BufferType;
+    using enum BufferStorage;
+    using enum BufferAccessFrequency;
+    using enum BufferAccessNature;
+    using enum BufferUsageFlags;
 
-	template<typename... Args>
-	TypedBuffer(BufferType type, Args... args) :
-		TypedBuffer(BufferTypedIndex{type, std::numeric_limits<unsigned int>::max()}, BindNow::YES, args...) {}
+    template<typename... Args>
+    TypedBuffer(BufferType type, Args... args) :
+        TypedBuffer(BufferTypedIndex{type, std::numeric_limits<unsigned int>::max()}, BindNow::YES, args...) {}
 
-	template<typename... Args>
-	TypedBuffer(BufferTypedIndex index, Args... args) :
-		TypedBuffer(index, BindNow::YES, args...) {}
+    template<typename... Args>
+    TypedBuffer(BufferTypedIndex index, Args... args) :
+        TypedBuffer(index, BindNow::YES, args...) {}
 
-	template<typename... Args>
-	TypedBuffer(BufferTypedIndex index, BindNow bindNow, Args... args) :
-		Buffer(args...),
-		m_index(index) {
-		if (bindNow == BindNow::YES) {
-			if (isIndexedBufferType(m_index.type)) {
-				bindIndexed();
-			} else {
-				bind();
-			}
-		}
-	}
+    template<typename... Args>
+    TypedBuffer(BufferTypedIndex index, BindNow bindNow, Args... args) :
+        Buffer(args...),
+        m_index(index) {
+        if (bindNow == BindNow::YES) {
+            if (isIndexedBufferType(m_index.type)) {
+                bindIndexed();
+            } else {
+                bind();
+            }
+        }
+    }
 
-	void changeType(BufferType type);
+    void changeType(BufferType type);
 
-	void changeType(BufferTypedIndex index);
+    void changeType(BufferTypedIndex index);
 
-	BufferType getType() const { return m_index.type; }
+    BufferType getType() const { return m_index.type; }
 
-	unsigned int getBindingIndex() const { return m_index.bindingIndex; }
+    unsigned int getBindingIndex() const { return m_index.bindingIndex; }
 
-	using Buffer::bind;
-	void bind();
+    using Buffer::bind;
+    void bind();
 
-	using Buffer::bindIndexed;
-	void bindIndexed();
+    using Buffer::bindIndexed;
+    void bindIndexed();
 
 protected:
-	BufferTypedIndex m_index;
+    BufferTypedIndex m_index;
 };
 
 }

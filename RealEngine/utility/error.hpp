@@ -1,6 +1,6 @@
 ﻿/*! 
  *  @author    Dubsky Tomas
- *	@file
+ *  @file
  */
 #pragma once
 #include <stdlib.h>

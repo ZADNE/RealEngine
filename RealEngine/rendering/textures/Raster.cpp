@@ -9,23 +9,23 @@
 
 namespace RE {
 
-	Raster::Raster(const glm::uvec2& dims, TextureChannels channels/* = TextureChannels::RGBA*/) :
-		m_dims(dims), m_channels(channels) {
-		assert(dims.x > 0 && dims.y > 0);
-	}
+Raster::Raster(const glm::uvec2& dims, TextureChannels channels/* = TextureChannels::RGBA*/) :
+    m_dims(dims), m_channels(channels) {
+    assert(dims.x > 0 && dims.y > 0);
+}
 
-	Raster::Raster(const glm::uvec2& dims, TextureChannels channels, const std::vector<unsigned char>& texels) :
-		m_dims(dims), m_texels(texels), m_channels(channels) {
-		assert(dims.x > 0 && dims.y > 0);
-		assert(minimumRequiredMemory() <= texels.size());
-	}
+Raster::Raster(const glm::uvec2& dims, TextureChannels channels, const std::vector<unsigned char>& texels) :
+    m_dims(dims), m_texels(texels), m_channels(channels) {
+    assert(dims.x > 0 && dims.y > 0);
+    assert(minimumRequiredMemory() <= texels.size());
+}
 
-	size_t Raster::minimumRequiredMemory() const {
-		return minimumRequiredMemory(m_dims, m_channels);
-	}
+size_t Raster::minimumRequiredMemory() const {
+    return minimumRequiredMemory(m_dims, m_channels);
+}
 
-	size_t Raster::minimumRequiredMemory(const glm::uvec2& dims, TextureChannels channels) {
-		return static_cast<size_t>(dims.x) * dims.y * (static_cast<size_t>(channels) + 1);
-	}
+size_t Raster::minimumRequiredMemory(const glm::uvec2& dims, TextureChannels channels) {
+    return static_cast<size_t>(dims.x) * dims.y * (static_cast<size_t>(channels) + 1);
+}
 
 }

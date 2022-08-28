@@ -12,13 +12,13 @@ namespace RE {
 */
 template<std::unsigned_integral T>
 constexpr T uintlog2(T arg) {
-	if (arg > 0) {
-		T log = 0;
-		while (arg >>= 1) ++log;
-		return log;
-	} else {
-		return 0;
-	}
+    if (arg > 0) {
+        T log = 0;
+        while (arg >>= 1) ++log;
+        return log;
+    } else {
+        return 0;
+    }
 }
 
 }

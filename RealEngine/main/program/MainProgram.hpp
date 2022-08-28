@@ -1,6 +1,6 @@
 ﻿/*!
  *  @author    Dubsky Tomas
- *	@file
+ *  @file
  */
 #pragma once
 #include <concepts>
@@ -25,13 +25,13 @@ namespace RE {
 class Room;
 
 struct DisplayInfo {
-	std::string name; /**< @brief UTF-8 encoded 'name' */
-	glm::ivec4 bounds; /**< @brief Bounds in pixels; XYWH */
-	glm::ivec4 boundsUsable; /**< @brief Usable bounds in pixels; XYWH; system-reserved parts removed */
-	glm::ivec2 dims; /**< @brief Dimensions */
-	int refreshRate; /**< @brief Refresh rate */
-	Uint32 pixelFormat; /**< @brief Pixel format @see SDL2's SDL_PixelFormatEnum */
-	void* driverSpecific;
+    std::string name; /**< @brief UTF-8 encoded 'name' */
+    glm::ivec4 bounds; /**< @brief Bounds in pixels; XYWH */
+    glm::ivec4 boundsUsable; /**< @brief Usable bounds in pixels; XYWH; system-reserved parts removed */
+    glm::ivec2 dims; /**< @brief Dimensions */
+    int refreshRate; /**< @brief Refresh rate */
+    Uint32 pixelFormat; /**< @brief Pixel format @see SDL2's SDL_PixelFormatEnum */
+    void* driverSpecific;
 };
 
 /**
@@ -50,123 +50,123 @@ struct DisplayInfo {
 class MainProgram final {
 public:
 
-	MainProgram(const MainProgram&) = delete;
-	void operator=(const MainProgram&) = delete;
+    MainProgram(const MainProgram&) = delete;
+    void operator=(const MainProgram&) = delete;
 
-	/**
-	 * @brief Must be called before any Room is added
-	 * @warning Never call this more than once!
-	*/
-	static void initialize();
+    /**
+     * @brief Must be called before any Room is added
+     * @warning Never call this more than once!
+    */
+    static void initialize();
 
-	/**
-	 * @brief Adds a new room to the management
-	 * @tparam RoomType A class derived from Room that will be instantiated.
-	 * @return Raw pointer to the created room
-	 * 
-	 * Single type of room can be added multiple times, the only requirement is that
-	 * each room must have unique name.
-	*/
-	template<DerivedFromRoom RoomType, typename... ConstructorArgs>
-	static RoomType* addRoom(ConstructorArgs&&... args) {
-		switch (instance().m_window.getRenderer()){
-		case Renderer::OPENGL_46:
-			return instance().m_roomManager.addRoom<RoomType>(std::forward<ConstructorArgs>(args)...);
-		default:
-			return nullptr;
-		}
-	}
+    /**
+     * @brief Adds a new room to the management
+     * @tparam RoomType A class derived from Room that will be instantiated.
+     * @return Raw pointer to the created room
+     * 
+     * Single type of room can be added multiple times, the only requirement is that
+     * each room must have unique name.
+    */
+    template<DerivedFromRoom RoomType, typename... ConstructorArgs>
+    static RoomType* addRoom(ConstructorArgs&&... args) {
+        switch (instance().m_window.getRenderer()){
+        case Renderer::OPENGL_46:
+            return instance().m_roomManager.addRoom<RoomType>(std::forward<ConstructorArgs>(args)...);
+        default:
+            return nullptr;
+        }
+    }
 
-	/**
-	 * @brief Runs the program
-	 *
-	 * The return value represent the exit code that this
-	 * RealEngine program should return to the enviroment.
-	 * The exit code can be altered by scheduleExit().
-	 * 
-	 * @warning Never call this more than once!
-	 *
-	 * @param roomName Name of the first room that will be entered
-	 * @param params Parameters that the room will be entered with
-	 * @return The exit code that should be returned to the enviroment.
-	*/
-	static int run(size_t roomName, const RoomTransitionParameters& params);
+    /**
+     * @brief Runs the program
+     *
+     * The return value represent the exit code that this
+     * RealEngine program should return to the enviroment.
+     * The exit code can be altered by scheduleExit().
+     * 
+     * @warning Never call this more than once!
+     *
+     * @param roomName Name of the first room that will be entered
+     * @param params Parameters that the room will be entered with
+     * @return The exit code that should be returned to the enviroment.
+    */
+    static int run(size_t roomName, const RoomTransitionParameters& params);
 
-	/**
-	 * @brief Schedules the program to exit.
-	 *
-	 * The program will end at the end of the current frame.
-	 *
-	 * @param exitcode The exit code that should be returned from run()
-	*/
-	void scheduleExit(int exitcode = EXIT_SUCCESS);
+    /**
+     * @brief Schedules the program to exit.
+     *
+     * The program will end at the end of the current frame.
+     *
+     * @param exitcode The exit code that should be returned from run()
+    */
+    void scheduleExit(int exitcode = EXIT_SUCCESS);
 
-	/**
-	 * @brief Schedules transition to another ('next') room.
-	 *
-	 * The transition, which happens at the end of current frame,
-	 * does following:
-	 * - ends session of current room via sessionEnd()
-	 * - start session of next room via sessionStart(params)
-	 * - ensures that at least one step() happens in the next room before render()
-	 *
-	 * @param name Name of the next room, no transition will happen if there is no room with such name.
-	 * @param params Parameters to start the next room's session with.
-	*/
-	void scheduleRoomTransition(size_t name, RoomTransitionParameters params);
+    /**
+     * @brief Schedules transition to another ('next') room.
+     *
+     * The transition, which happens at the end of current frame,
+     * does following:
+     * - ends session of current room via sessionEnd()
+     * - start session of next room via sessionStart(params)
+     * - ensures that at least one step() happens in the next room before render()
+     *
+     * @param name Name of the next room, no transition will happen if there is no room with such name.
+     * @param params Parameters to start the next room's session with.
+    */
+    void scheduleRoomTransition(size_t name, RoomTransitionParameters params);
 
-	static void pollEventsInMainThread(bool poll);
+    static void pollEventsInMainThread(bool poll);
 
-	/**
-	 * @brief Gets displays that can be drawn to
-	*/
-	std::vector<DisplayInfo> getDisplays() const;
+    /**
+     * @brief Gets displays that can be drawn to
+    */
+    std::vector<DisplayInfo> getDisplays() const;
 
-	void setRelativeCursorMode(bool relative);
+    void setRelativeCursorMode(bool relative);
 
-	void adoptRoomDisplaySettings(const RoomDisplaySettings& rds);
+    void adoptRoomDisplaySettings(const RoomDisplaySettings& rds);
 
 private:
 
-	/**
-	 * @brief Constructs the main program.
-	*/
-	MainProgram();
+    /**
+     * @brief Constructs the main program.
+    */
+    MainProgram();
 
-	/**
-	 * @brief Gets the singleton instance
-	*/
-	static MainProgram& instance();
+    /**
+     * @brief Gets the singleton instance
+    */
+    static MainProgram& instance();
 
-	/**
-	 * @brief Does the actual game loop on the singleton instance
-	*/
-	int doRun(size_t roomName, const RoomTransitionParameters& params);
+    /**
+     * @brief Does the actual game loop on the singleton instance
+    */
+    int doRun(size_t roomName, const RoomTransitionParameters& params);
 
-	void step();
-	void render(double interpolationFactor);
+    void step();
+    void render(double interpolationFactor);
 
-	void pollEvents();
-	void processEvent(SDL_Event* evnt);
+    void pollEvents();
+    void processEvent(SDL_Event* evnt);
 
-	Window m_window{WindowSettings{}, WindowSubsystems::getVersion()};	/**< Window also creates and initializes renderer backends */
-	RoomManager m_roomManager;							/**< Manages rooms - you have to add at least 1 room to run the program */
-	InputManager m_inputManager;						/**< Records key presses/releases, mouse movement etc. */
-	Synchronizer m_synchronizer{50u, 50u};				/**< Maintains constant speed of simulation, can also limit FPS */
-	RoomToEngineAccess s_roomToEngineAccess;			/**< Is a proxy to access RealEngine from within Rooms, see Room::engine */
+    Window m_window{WindowSettings{}, WindowSubsystems::getVersion()};/**< Window also creates and initializes renderer backends */
+    RoomManager m_roomManager;                  /**< Manages rooms - you have to add at least 1 room to run the program */
+    InputManager m_inputManager;                /**< Records key presses/releases, mouse movement etc. */
+    Synchronizer m_synchronizer{50u, 50u};      /**< Maintains constant speed of simulation, can also limit FPS */
+    RoomToEngineAccess s_roomToEngineAccess;    /**< Is a proxy to access RealEngine from within Rooms, see Room::engine */
 
-	bool m_programShouldRun = false;
-	int m_programExitCode = EXIT_SUCCESS;
+    bool m_programShouldRun = false;
+    int m_programExitCode = EXIT_SUCCESS;
 
-	bool m_pollEventsInMainThread = true;
-	bool m_usingImGui = false;
-	glm::vec4 m_clearColor{};
+    bool m_pollEventsInMainThread = true;
+    bool m_usingImGui = false;
+    glm::vec4 m_clearColor{};
 
-	void doRoomTransitionIfScheduled();
+    void doRoomTransitionIfScheduled();
 
-	static constexpr size_t NO_NEXT_ROOM = std::numeric_limits<size_t>::max();
-	size_t m_nextRoomName = NO_NEXT_ROOM;
-	RoomTransitionParameters m_roomTransitionParameters;
+    static constexpr size_t NO_NEXT_ROOM = std::numeric_limits<size_t>::max();
+    size_t m_nextRoomName = NO_NEXT_ROOM;
+    RoomTransitionParameters m_roomTransitionParameters;
 };
 
 }

@@ -20,8 +20,8 @@ constexpr unsigned int ATTR_UV = 2u;
 
 template<typename T>
 consteval T PRIMITIVE_RESTART_INDEX() {
-	static_assert(std::is_unsigned<T>::value, "primitive restart index in defined only for unsigned types");
-	return std::numeric_limits<T>::max();
+    static_assert(std::is_unsigned<T>::value, "primitive restart index in defined only for unsigned types");
+    return std::numeric_limits<T>::max();
 };
 
 #pragma warning(push)
@@ -31,33 +31,33 @@ consteval T PRIMITIVE_RESTART_INDEX() {
 * @brief Is POD vertex with position
 */
 struct VertexPO {
-	VertexPO() {}
-	VertexPO(const glm::vec2& pos) : position(pos) {}
+    VertexPO() {}
+    VertexPO(const glm::vec2& pos) : position(pos) {}
 
-	glm::vec2 position;
+    glm::vec2 position;
 };
 
 /**
 * @brief Is POD vertex with position and color
 */
 struct VertexPOCO {
-	VertexPOCO() {}
-	VertexPOCO(const glm::vec2& pos, Color col) : position(pos), color(col) {}
+    VertexPOCO() {}
+    VertexPOCO(const glm::vec2& pos, Color col) : position(pos), color(col) {}
 
-	glm::vec2 position;
-	Color color;
+    glm::vec2 position;
+    Color color;
 };
 
 /**
 * @brief Is POD vertex with position, color and UVs
 */
 struct VertexPOCOUV {
-	VertexPOCOUV() {}
-	VertexPOCOUV(const glm::vec2& pos, Color col, const glm::vec2& uv) : position(pos), color(col), uv(uv) {}
+    VertexPOCOUV() {}
+    VertexPOCOUV(const glm::vec2& pos, Color col, const glm::vec2& uv) : position(pos), color(col), uv(uv) {}
 
-	glm::vec2 position;
-	Color color;
-	glm::vec2 uv;
+    glm::vec2 position;
+    Color color;
+    glm::vec2 uv;
 };
 
 #pragma warning(pop)

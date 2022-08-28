@@ -14,11 +14,11 @@ namespace RE {
 class GL46_Ordering : public IOrdering {
 public:
 
-	void flushWork() const override;
-	void finishWork() const override;
+    void flushWork() const override;
+    void finishWork() const override;
 
-	void issueDrawBarrier() const override;
-	void issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers) const override;
+    void issueDrawBarrier() const override;
+    void issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers) const override;
 
 };
 
