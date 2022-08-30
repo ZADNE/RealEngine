@@ -25,7 +25,8 @@ constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
     .usingImGui = true
 };
 
-MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
+template<typename R>
+MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
     Room(0, INITIAL_DISPLAY_SETTINGS),
     m_texView(engine().getWindowDims()) {
 
@@ -40,15 +41,18 @@ MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
     }
 }
 
-void MainMenuRoom::sessionStart(const RE::RoomTransitionParameters& params) {
+template<typename R>
+void MainMenuRoom<R>::sessionStart(const RE::RoomTransitionParameters& params) {
 
 }
 
-void MainMenuRoom::sessionEnd() {
+template<typename R>
+void MainMenuRoom<R>::sessionEnd() {
 
 }
 
-void MainMenuRoom::step() {
+template<typename R>
+void MainMenuRoom<R>::step() {
     auto cursorPos = (glm::vec2)engine().getCursorAbs();
 
     if (engine().isKeyDown(RE::Key::MMB) && m_texture) {
@@ -72,7 +76,8 @@ void MainMenuRoom::step() {
     }
 }
 
-void MainMenuRoom::render(double interpolationFactor) {
+template<typename R>
+void MainMenuRoom<R>::render(double interpolationFactor) {
     auto mat = m_texView.getViewMatrix();
     m_texViewUBO.overwrite(0u, mat);
     m_texViewUBO.bindIndexed();
@@ -115,11 +120,13 @@ void MainMenuRoom::render(double interpolationFactor) {
     ImGui::End();
 }
 
-void MainMenuRoom::windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {
+template<typename R>
+void MainMenuRoom<R>::windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {
     m_texView.resizeView(newSize);
 }
 
-void MainMenuRoom::parametersGUI() {
+template<typename R>
+void MainMenuRoom<R>::parametersGUI() {
     if (imguiCombo("Minification filter", m_minFilter, MIN_FILTERS_LABELS)) {
         m_texture->setMinFilter(MIN_FILTERS[m_minFilter]);
     }
@@ -158,7 +165,8 @@ void MainMenuRoom::parametersGUI() {
     }
 }
 
-void MainMenuRoom::selectAndLoad() {
+template<typename R>
+void MainMenuRoom<R>::selectAndLoad() {
     char filename[MAX_PATH] = {};
     OPENFILENAMEA ofn;
     ZeroMemory(&ofn, sizeof(ofn));
@@ -178,12 +186,14 @@ void MainMenuRoom::selectAndLoad() {
     load(filename);
 }
 
-void MainMenuRoom::save(const std::string& loc) {
+template<typename R>
+void MainMenuRoom<R>::save(const std::string& loc) {
     if (loc.empty()) { return; }
     m_texture->saveToFile(loc);
 }
 
-void MainMenuRoom::load(const std::string& loc) {
+template<typename R>
+void MainMenuRoom<R>::load(const std::string& loc) {
     if (loc.empty()) { return; }
     try {
         m_texture = RE::Texture{ loc };
@@ -206,7 +216,8 @@ void MainMenuRoom::load(const std::string& loc) {
     m_borderColor = glm::vec4(m_texture->getBorderColor()) / 255.0f;
 }
 
-void MainMenuRoom::drawTexture() {
+template<typename R>
+void MainMenuRoom<R>::drawTexture() {
     glm::vec2 windowDims = glm::vec2(engine().getWindowDims());
     auto texDims = m_texture->getSubimagesSpritesCount() * m_texture->getSubimageDims();
     auto botLeft = -texDims * 0.5f;
@@ -277,8 +288,11 @@ void MainMenuRoom::drawTexture() {
     RE::GeometryBatch::std().draw();
 }
 
-void MainMenuRoom::resetView() {
+template<typename R>
+void MainMenuRoom<R>::resetView() {
     m_texView.setScale({ 1.0f, 1.0f });
     m_texView.setPosition(glm::vec2{ 0.0f, 0.0f });
     m_drawScale = 1.0f;
 }
+
+template MainMenuRoom<RE::GL46_Renderer>;

@@ -14,7 +14,7 @@ namespace RE {
  * The mutability is determined by the constructor that is used to construct the buffer.
 */
 class Buffer {
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
     friend class GL46_Buffer;
     friend class GL46_VertexArray;
 public:

@@ -12,7 +12,7 @@ namespace RE {
  * A ShaderProgram has to be used in conjunction with this.
 */
 class VertexArray {
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
     friend class GL46_VertexArray;
 public:
 

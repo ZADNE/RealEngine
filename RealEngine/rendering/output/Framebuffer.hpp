@@ -14,7 +14,7 @@ namespace RE {
 * instead of rendering directly to window.
 */
 class Framebuffer {
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
     friend class GL46_Framebuffer;
 public:
 
@@ -91,7 +91,7 @@ private:
  * @brief Allows retargeting to and clearing of the main window canvas
 */
 class DefaultFrameBuffer {
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
 public:
 
     /**

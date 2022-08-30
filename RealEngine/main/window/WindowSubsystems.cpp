@@ -6,7 +6,7 @@
 #include <SDL2/SDL.h>
 
 #include <RealEngine/utility/error.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Renderer.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46_Fixture.hpp>
 
 namespace RE {
 
@@ -30,7 +30,7 @@ void printSDLVersion() {
 
 void WindowSubsystems::initializeRenderer(Renderer renderer) const {
     switch (renderer) {
-    case RE::Renderer::OPENGL_46: GL46_Renderer::initialize(); break;
+    case RE::Renderer::OPENGL_46: GL46_Fixture::initialize(); break;
     }
 }
 
@@ -46,7 +46,7 @@ WindowSubsystems::WindowSubsystems(Renderer renderer) {
     printSDLVersion();
 
     switch (renderer) {
-    case RE::Renderer::OPENGL_46: GL46_Renderer::prepare(); break;
+    case RE::Renderer::OPENGL_46: GL46_Fixture::prepare(); break;
     default: goto quitSDL_fail;
     }
 

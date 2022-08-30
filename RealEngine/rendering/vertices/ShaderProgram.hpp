@@ -10,7 +10,7 @@ namespace RE {
 * @brief Controls how vertices are rendered to screen.
 */
 class ShaderProgram {
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
     friend class GL46_ShaderProgram;
 public:
     /**

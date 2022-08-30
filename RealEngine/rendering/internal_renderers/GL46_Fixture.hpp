@@ -24,8 +24,9 @@ namespace RE {
 *
 * @warning Never use this class directly!
 */
-class GL46_Renderer {
+class GL46_Fixture {
 public:
+
     /**
     * @brief Tries to prepare for creation of OpenGL 4.6 context.
     * @return True if succeeded.
@@ -44,11 +45,12 @@ public:
     static void initialize();
 
 private:
-    GL46_Renderer();
-    ~GL46_Renderer();
 
-    GL46_Renderer(const GL46_Renderer&) = delete;
-    GL46_Renderer& operator=(const GL46_Renderer&) = delete;
+    GL46_Fixture();
+    ~GL46_Fixture();
+
+    GL46_Fixture(const GL46_Fixture&) = delete;
+    GL46_Fixture& operator=(const GL46_Fixture&) = delete;
 
     GL46_Buffer m_bufferImpl;
     GL46_Capabilities m_capabilitiesImpl;

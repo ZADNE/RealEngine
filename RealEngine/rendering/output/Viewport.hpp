@@ -18,7 +18,7 @@ const BufferTypedIndex UNIF_BUF_VIEWPORT_MATRIX = {RE::BufferType::UNIFORM, 0u};
 */
 class Viewport {
     friend class Window;
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
 public:
 
     /**

@@ -11,6 +11,8 @@
 
 namespace RE {
 
+class GL46_Renderer;
+
 /**
  * @brief Separates program into logical units, only one room is active at a time.
  *

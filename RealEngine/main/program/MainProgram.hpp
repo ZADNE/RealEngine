@@ -23,6 +23,7 @@ union SDL_Event;
 namespace RE {
 
 class Room;
+class GL46_Renderer;
 
 struct DisplayInfo {
     std::string name; /**< @brief UTF-8 encoded 'name' */
@@ -60,18 +61,37 @@ public:
     static void initialize();
 
     /**
-     * @brief Adds a new room to the management
+     * @brief Adds a late-bind Room to the management
      * @tparam RoomType A class derived from Room that will be instantiated.
      * @return Raw pointer to the created room
+     * 
+     * Your room will use the default late-bind renderer which polymorphically
+     * calls the real renderer.
      * 
      * Single type of room can be added multiple times, the only requirement is that
      * each room must have unique name.
     */
     template<DerivedFromRoom RoomType, typename... ConstructorArgs>
     static RoomType* addRoom(ConstructorArgs&&... args) {
+        return instance().m_roomManager.addRoom<RoomType>(std::forward<ConstructorArgs>(args)...);
+    }
+
+    /**
+     * @brief Adds an early-bind Room to the management
+     * @tparam RoomType A class template derived from Room that will be instantiated.
+     * @return Raw pointer to the created room
+     * 
+     * Your room template will be instantiated with the highest probability 
+     * available renderer.
+     *
+     * Single type of room can be added multiple times, the only requirement is that
+     * each room must have unique name.
+    */
+    template<template<typename> class RoomType, typename... ConstructorArgs>
+    static Room* addRoom(ConstructorArgs&&... args) {
         switch (instance().m_window.getRenderer()){
         case Renderer::OPENGL_46:
-            return instance().m_roomManager.addRoom<RoomType>(std::forward<ConstructorArgs>(args)...);
+            return instance().m_roomManager.addRoom<RoomType<GL46_Renderer>>(std::forward<ConstructorArgs>(args)...);
         default:
             return nullptr;
         }

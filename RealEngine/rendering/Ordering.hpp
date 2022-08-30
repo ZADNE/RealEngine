@@ -7,7 +7,7 @@
 namespace RE {
 
 class Ordering {
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
 public:
 
     static void flushWork();

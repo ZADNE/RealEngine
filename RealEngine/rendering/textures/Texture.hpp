@@ -20,7 +20,7 @@ class Texture;
 */
 class TextureProxy {
     friend class Texture;
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
     friend class GL46_Texture;
 public:
 
@@ -63,7 +63,7 @@ private:
 */
 class Texture {
     friend class TextureProxy;
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
     friend class GL46_Texture;
     friend class GL46_Framebuffer;
 public:

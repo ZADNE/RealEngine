@@ -13,6 +13,7 @@
  /**
   * @brief Room with the UI
  */
+template<typename R>
 class MainMenuRoom : public RE::Room {
 public:
 

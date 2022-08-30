@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/internal_renderers/GL46_Renderer.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46_Fixture.hpp>
 
 #include <iostream>
 
@@ -50,7 +50,7 @@ void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GL
     std::cerr << "\n----OpenGL Callback End----" << std::endl;
 }
 
-bool GL46_Renderer::prepare() {
+bool GL46_Fixture::prepare() {
     if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)) {
         error("Could not use doublebuffer!"); return false;
     }
@@ -80,7 +80,7 @@ bool GL46_Renderer::prepare() {
     return true;
 }
 
-void GL46_Renderer::initialize() {
+void GL46_Fixture::initialize() {
     //Initialize GLEW
     if (glewInit() != GLEW_OK) {
         fatalError("GLEW failed initialization!");
@@ -118,14 +118,14 @@ void GL46_Renderer::initialize() {
     glEnable(GL_PRIMITIVE_RESTART);
     glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
-    static GL46_Renderer renderer;
+    static GL46_Fixture renderer;
 
     //Use blenbing by default
     BlendingCapability::enable();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-GL46_Renderer::GL46_Renderer() {
+GL46_Fixture::GL46_Fixture() {
     Buffer::s_impl = &m_bufferImpl;
     Capabilities::s_impl = &m_capabilitiesImpl;
     Framebuffer::s_impl = &m_mainFramebufferImpl;
@@ -140,7 +140,7 @@ GL46_Renderer::GL46_Renderer() {
     DefaultFrameBuffer::s_defaultFramebuffer = &(*m_defaultFramebuffer);
 }
 
-GL46_Renderer::~GL46_Renderer() {
+GL46_Fixture::~GL46_Fixture() {
     DefaultFrameBuffer::s_defaultFramebuffer = nullptr;
     m_defaultFramebuffer.reset();
 

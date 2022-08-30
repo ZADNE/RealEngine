@@ -36,7 +36,7 @@ enum class ShaderType {
 * @brief Represents source codes of a shader stage
 */
 class ShaderSources {
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
     friend class GL46_ShaderProgram;
     template<typename T>friend struct std::hash;
 public:
