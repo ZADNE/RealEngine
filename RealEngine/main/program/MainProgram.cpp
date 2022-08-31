@@ -260,11 +260,13 @@ MainProgram::MainProgram() :
 
     auto spriteShader = RE::RM::getShaderProgram({.vert = sprite_vert, .frag = sprite_frag});
     spriteShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
-    SpriteBatch::std().switchShaderProgram(spriteShader);
+    SpriteBatch<RendererLateBind>::std().switchShaderProgram(spriteShader);
+    SpriteBatch<RendererGL46>::std().switchShaderProgram(spriteShader);
 
     auto geometryShader = RE::RM::getShaderProgram({.vert = geometry_vetr, .frag = geometry_frag});
     geometryShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
-    GeometryBatch::std().switchShaderProgram(geometryShader);
+    GeometryBatch<RendererLateBind>::std().switchShaderProgram(geometryShader);
+    GeometryBatch<RendererGL46>::std().switchShaderProgram(geometryShader);
 
     Room::setRoomSystemAccess(&s_roomToEngineAccess);
     Room::setStaticReferences(this, &m_roomManager);

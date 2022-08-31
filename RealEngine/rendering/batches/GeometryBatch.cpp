@@ -10,6 +10,9 @@
 #include <RealEngine/resources/ResourceManager.hpp>
 #include <RealEngine/rendering/internal_interfaces/IVertexArray.hpp>
 
+#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/RendererGL46.hpp>
+
 namespace RE {
 
 Primitive convertPrimEnum(size_t prim_shape) {
@@ -38,7 +41,8 @@ Primitive convertPrimEnum(size_t prim_shape) {
     }
 }
 
-GeometryBatch::GeometryBatch() {
+template<typename R>
+GeometryBatch<R>::GeometryBatch() {
     m_va.setAttribute(ATTR_POSITION, VertexComponentCount::XY, VertexComponentType::FLOAT, offsetof(VertexPOCO, position), false);
     m_va.setAttribute(ATTR_COLOR, VertexComponentCount::RGBA, VertexComponentType::UNSIGNED_BYTE, offsetof(VertexPOCO, color), true);
     m_va.setBindingPoint(0u, m_buf, 0, sizeof(VertexPOCO));
@@ -47,7 +51,8 @@ GeometryBatch::GeometryBatch() {
     m_va.connectAttributeToBindingPoint(ATTR_COLOR, 1u);
 }
 
-void GeometryBatch::begin() {
+template<typename R>
+void GeometryBatch<R>::begin() {
     //Clearing all previous vertices
     for (auto& vector : m_vertices) {
         vector.clear();
@@ -58,7 +63,8 @@ void GeometryBatch::begin() {
     }
 }
 
-void GeometryBatch::end() {
+template<typename R>
+void GeometryBatch<R>::end() {
     //Uploading to VBO
     size_t totalSize = 0;
     for (auto& vector : m_vertices) {
@@ -74,7 +80,8 @@ void GeometryBatch::end() {
     }
 }
 
-void GeometryBatch::draw() {
+template<typename R>
+void GeometryBatch<R>::draw() {
     m_shaderProgram->use();
     m_va.bind();
 
@@ -90,7 +97,8 @@ void GeometryBatch::draw() {
     m_shaderProgram->unuse();
 }
 
-void GeometryBatch::addPrimitives(PRIM prim, size_t first, size_t countVer, const RE::VertexPOCO* data, bool separate/* = true*/) {
+template<typename R>
+void GeometryBatch<R>::addPrimitives(PRIM prim, size_t first, size_t countVer, const RE::VertexPOCO* data, bool separate/* = true*/) {
     unsigned int last = (unsigned int)m_vertices[(size_t)prim].size();
 
     //Vertices
@@ -109,7 +117,8 @@ void GeometryBatch::addPrimitives(PRIM prim, size_t first, size_t countVer, cons
     }
 }
 
-void GeometryBatch::addCircles(size_t first, size_t count, const RE::CirclePOCO* data) {
+template<typename R>
+void GeometryBatch<R>::addCircles(size_t first, size_t count, const RE::CirclePOCO* data) {
     unsigned int last;
     VertexPOCO mid;
     VertexPOCO edge;
@@ -142,8 +151,12 @@ void GeometryBatch::addCircles(size_t first, size_t count, const RE::CirclePOCO*
     }
 }
 
-void GeometryBatch::switchShaderProgram(ShaderProgramPtr shaderProgram) {
+template<typename R>
+void GeometryBatch<R>::switchShaderProgram(ShaderProgramPtr shaderProgram) {
     m_shaderProgram = shaderProgram;
 }
+
+template GeometryBatch<RendererLateBind>;
+template GeometryBatch<RendererGL46>;
 
 }

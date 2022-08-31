@@ -3,20 +3,24 @@
  */
 #pragma once
 #include <RealEngine/rendering/internal_interfaces/IBuffer.hpp>
+#include <RealEngine/rendering/RendererLateBind.hpp>
 
 namespace RE {
 
+template<typename> class VertexArray;
+
 /**
- * @brief Is a continuous block of memory stored in the GPU's memory.
+ * @brief Is a continuous block of memory stored in the GPU's memory
+ * @tparam R The renderer that will perform the commands
  *
  * A buffer can be either mutable or immutable. Mutable buffer can be resized,
  * while immutable buffer cannot change its size upon construction.
  * The mutability is determined by the constructor that is used to construct the buffer.
 */
+template<typename R = RendererLateBind>
 class Buffer {
     friend class GL46_Fixture;
-    friend class GL46_Buffer;
-    friend class GL46_VertexArray;
+    friend class VertexArray<R>;
 public:
 
     /**
@@ -73,11 +77,11 @@ public:
     */
     ~Buffer();
 
-    Buffer(const Buffer&) = delete;
-    Buffer(Buffer&& other) noexcept;
+    Buffer(const Buffer<R>&) = delete;
+    Buffer(Buffer<R>&& other) noexcept;
 
-    Buffer& operator=(const Buffer&) = delete;
-    Buffer& operator=(Buffer&& other) noexcept;
+    Buffer<R>& operator=(const Buffer<R>&) = delete;
+    Buffer<R>& operator=(Buffer<R>&& other) noexcept;
 
     /**
      * @brief Binds the buffer to a generic binding point.
@@ -200,15 +204,9 @@ public:
 
 protected:
 
-    unsigned int m_ID = 0;      /**< Internal name of the buffer */
-    size_t m_sizeInBytes = 0;   /**< Size of the buffer */
-    unsigned int m_access = 0;  /**< Access hints of the buffer; relevant only for mutable buffers */
+    BufferInternals m_internals;
 
-#ifdef _DEBUG
-    BufferStorage m_storage = BufferStorage::IMMUTABLE;
-#endif // _DEBUG
-
-    static IBuffer* s_impl;
+    static inline R::Buffer* s_impl = nullptr;
 };
 
 }

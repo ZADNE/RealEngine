@@ -52,6 +52,12 @@ private:
     GL46_Fixture(const GL46_Fixture&) = delete;
     GL46_Fixture& operator=(const GL46_Fixture&) = delete;
 
+    template<typename R>
+    void assignReferences();
+
+    template<typename R>
+    void clearReferences();
+
     GL46_Buffer m_bufferImpl;
     GL46_Capabilities m_capabilitiesImpl;
     GL46_Framebuffer m_mainFramebufferImpl;

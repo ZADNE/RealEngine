@@ -15,14 +15,11 @@ enum class BindNow {
 
 /**
  * @brief Is buffer that holds its type (and possibly binding index) as a part of its state.
+ * @tparam R The renderer that will perform the commands
 */
-class TypedBuffer : public Buffer {
+template<typename R = RendererLateBind>
+class TypedBuffer : public Buffer<R> {
 public:
-    using enum BufferType;
-    using enum BufferStorage;
-    using enum BufferAccessFrequency;
-    using enum BufferAccessNature;
-    using enum BufferUsageFlags;
 
     template<typename... Args>
     TypedBuffer(BufferType type, Args... args) :
@@ -34,7 +31,7 @@ public:
 
     template<typename... Args>
     TypedBuffer(BufferTypedIndex index, BindNow bindNow, Args... args) :
-        Buffer(args...),
+        Buffer<R>(args...),
         m_index(index) {
         if (bindNow == BindNow::YES) {
             if (isIndexedBufferType(m_index.type)) {
@@ -53,13 +50,14 @@ public:
 
     unsigned int getBindingIndex() const { return m_index.bindingIndex; }
 
-    using Buffer::bind;
+    using Buffer<R>::bind;
     void bind();
 
-    using Buffer::bindIndexed;
+    using Buffer<R>::bindIndexed;
     void bindIndexed();
 
 protected:
+
     BufferTypedIndex m_index;
 };
 

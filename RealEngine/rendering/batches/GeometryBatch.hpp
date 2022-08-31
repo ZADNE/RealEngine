@@ -33,10 +33,13 @@ const size_t PRIMITIVES_COUNT = 7u;
 const size_t SHAPES_COUNT = 2u;
 
 /**
- * @brief Draws lines, circles and other vector shapes.
+ * @brief Draws lines, circles and other vector shapes
+ * @tparam R The renderer that will perform the commands
 */
+template<typename R = RendererLateBind>
 class GeometryBatch {
 public:
+
     GeometryBatch();
 
     void begin();
@@ -56,8 +59,9 @@ public:
     }
 
 private:
-    VertexArray m_va;
-    Buffer m_buf{BufferAccessFrequency::STREAM, BufferAccessNature::DRAW};
+
+    VertexArray<R> m_va;
+    Buffer<R> m_buf{BufferAccessFrequency::STREAM, BufferAccessNature::DRAW};
     ShaderProgramPtr m_shaderProgram;
 
     std::array<std::vector<RE::VertexPOCO>, PRIMITIVES_COUNT + SHAPES_COUNT> m_vertices;

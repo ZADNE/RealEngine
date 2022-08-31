@@ -16,7 +16,7 @@ namespace RE {
 
 /**
  * @brief Is renderer type collection that polymorphically translates call to backing renderer
- * 
+ *
  * This renderer is used as the default renderer if you do not pass
  * the renderer type from your early-bind Room.
 */

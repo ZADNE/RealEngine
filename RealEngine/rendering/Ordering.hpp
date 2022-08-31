@@ -6,6 +6,13 @@
 
 namespace RE {
 
+class RendererLateBind;
+
+/**
+ * @brief Manages ordering of rendering commnads
+ * @tparam R The renderer that will perform the commands
+*/
+template<typename R = RendererLateBind>
 class Ordering {
     friend class GL46_Fixture;
 public:
@@ -17,7 +24,8 @@ public:
     static void issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers);
 
 protected:
-    static IOrdering* s_impl;
+
+    static inline R::Ordering* s_impl = nullptr;
 };
 
 }

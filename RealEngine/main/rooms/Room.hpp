@@ -9,9 +9,9 @@
 #include <RealEngine/main/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
 
-namespace RE {
+#include <RealEngine/rendering/RendererGL46.hpp>
 
-class GL46_Renderer;
+namespace RE {
 
 /**
  * @brief Separates program into logical units, only one room is active at a time.
@@ -20,17 +20,17 @@ class GL46_Renderer;
  * is active at a time (= receives step and render calls, inactive rooms
  * are resident in the memory but do not receive updates).
  * Transitions between rooms are mamaged by RoomManager.
- * 
+ *
  * You use RealEngine by inheriting Room and adding your behavior to step(), render() etc.
- * 
+ *
  * You can 'inherit' this in two ways: the easier way is simply creating a class that inherits from this.
- * This creates a late-bind room which means RE rendering-related objects in it 
+ * This creates a late-bind room which means RE rendering-related objects in it
  * will polymorphically call the backing renderer.
  * The other way to 'inherit' this is to create template class (with one template parameter) that inherits from this.
  * This creates an early-bind room which means that it will be instantiated with highest priority available renderer.
  * The type of the renderer will be the template parameter but to actually use the early-bind,
  * the type has to passed (using templates) to the very RE rendering-objects (such as Buffer or ShaderProgram).
- * 
+ *
  * Both early- and late-bind room are added to RealEngine (instantiated) by MainProgram::addRoom().
 */
 class Room {

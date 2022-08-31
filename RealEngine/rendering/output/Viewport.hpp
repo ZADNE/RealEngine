@@ -28,7 +28,7 @@ public:
      *
      * @return Uniform buffer with view matrix of this window
     */
-    static TypedBuffer& getWindowMatrixUniformBuffer() { return *s_windowMatrixUniformBuffer; }
+    static TypedBuffer<>& getWindowMatrixUniformBuffer() { return *s_windowMatrixUniformBuffer; }
 
     /**
      * @brief Overwrites view matrix uniform buffer to match viewport
@@ -46,8 +46,10 @@ public:
      * @brief Sets viewport rectangle target whole window
     */
     static void setToWholeWindow();
+
 private:
-    static std::optional<TypedBuffer> s_windowMatrixUniformBuffer;/**< Uniform buffer that contains view matrix of the window */
+
+    static std::optional<TypedBuffer<>> s_windowMatrixUniformBuffer;/**< Uniform buffer that contains view matrix of the window */
     static glm::ivec2 s_windowSize;
     static glm::mat4 s_windowMatrix;
     static IViewport* s_impl;

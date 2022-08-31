@@ -14,7 +14,7 @@
 #include <glm/mat4x4.hpp>
 
 #include <RealEngine/utility/error.hpp>
-#include <RealEngine/rendering/buffers/Buffer.hpp>
+#include <RealEngine/rendering/buffers/types.hpp>
 #include <RealEngine/rendering/textures/TextureUnit.hpp>
 #include <RealEngine/rendering/textures/ImageUnit.hpp>
 
@@ -40,6 +40,7 @@ class ShaderSources {
     friend class GL46_ShaderProgram;
     template<typename T>friend struct std::hash;
 public:
+
     /**
      * @brief This string is prepended before the first given shader source
     */
@@ -82,6 +83,7 @@ public:
     auto operator<=>(const ShaderSources&) const = default;
 
 private:
+
     std::vector<const char*> m_sources{};/**< C-strings containing the sources */
     std::vector<int> m_lengths{};/**< Lengths of the sources */
 };
@@ -139,6 +141,7 @@ class ShaderProgram;
 */
 class IShaderProgram {
 public:
+
     virtual void construct(ShaderProgram& sp, const ShaderProgramSources& sources) const = 0;
     virtual void destruct(ShaderProgram& sp) const = 0;
 

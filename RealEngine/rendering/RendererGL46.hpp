@@ -16,7 +16,7 @@ namespace RE {
 
 /**
  * @brief Is renderer type collection that uses OpenGL 4.6
- * 
+ *
  * This is one of the possible types that can be passed as renderer type
  * to your early-bind Room-template
 */

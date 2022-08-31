@@ -1,7 +1,7 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
-#include "MainMenuRoom.hpp"
+#include <RTICreator/MainMenuRoom.hpp>
 
 #include <iostream>
 
@@ -56,16 +56,16 @@ void MainMenuRoom<R>::step() {
     auto cursorPos = (glm::vec2)engine().getCursorAbs();
 
     if (engine().isKeyDown(RE::Key::MMB) && m_texture) {
-        m_texView.shiftPosition((glm::vec2{ m_cursorPosPrev - cursorPos } / m_drawScale));
+        m_texView.shiftPosition((glm::vec2{m_cursorPosPrev - cursorPos} / m_drawScale));
     }
 
     if (m_texture) {
         if (engine().wasKeyPressed(RE::Key::UMW)) {
-            m_texView.zoom({ 1.5f, 1.5f });
+            m_texView.zoom({1.5f, 1.5f});
             m_drawScale *= 1.5f;
         }
         if (engine().wasKeyPressed(RE::Key::DMW)) {
-            m_texView.zoom({ 0.66666666f, 0.66666666f });
+            m_texView.zoom({0.66666666f, 0.66666666f});
             m_drawScale *= 0.66666666f;
         }
     }
@@ -196,7 +196,7 @@ template<typename R>
 void MainMenuRoom<R>::load(const std::string& loc) {
     if (loc.empty()) { return; }
     try {
-        m_texture = RE::Texture{ loc };
+        m_texture = RE::Texture{loc};
     }
     catch (...) {
         return;
@@ -231,17 +231,18 @@ void MainMenuRoom<R>::drawTexture() {
         1.0f + m_overlap * 2.0f
     };
 
-    RE::SpriteBatch::std().begin();
-    RE::SpriteBatch::std().add(posSizeRect, uvRect, *m_texture, 0);
-    RE::SpriteBatch::std().end(RE::GlyphSortType::POS_TOP);
-    RE::SpriteBatch::std().draw();
+    auto& sb = RE::SpriteBatch<R>::std();
+    sb.begin();
+    sb.add(posSizeRect, uvRect, *m_texture, 0);
+    sb.end(RE::GlyphSortType::POS_TOP);
+    sb.draw();
 
-    auto& gb = RE::GeometryBatch::std();
+    auto& gb = RE::GeometryBatch<R>::std();
     gb.begin();
     std::vector<RE::VertexPOCO> vertices;
     glm::vec2 subimageSprite = m_texture->getSubimagesSpritesCount();
     vertices.reserve((size_t)(subimageSprite.x * subimageSprite.y) * 4u);
-    RE::Color color{ 0, 255u, 0u, 255u };
+    RE::Color color{0, 255u, 0u, 255u};
     auto subimageDims = m_texture->getSubimageDims();
     //Subimages
     for (float x = 1.0f; x < subimageSprite.x; ++x) {
@@ -259,7 +260,7 @@ void MainMenuRoom<R>::drawTexture() {
         vertices.clear();
     }
     //Pivots
-    color = { 0u, 0u, 255u, 255u };
+    color = {0u, 0u, 255u, 255u};
     glm::vec2 pivotOffset = m_texture->getPivot();
     float pivotMarkRadius = glm::min(subimageDims.x, subimageDims.y) * 0.5f;
     for (float x = 0.0f; x < m_texture->getSubimagesSpritesCount().x; ++x) {
@@ -275,7 +276,7 @@ void MainMenuRoom<R>::drawTexture() {
     gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
     vertices.clear();
     //Whole image
-    color = { 255u, 0u, 0u, 255u };
+    color = {255u, 0u, 0u, 255u};
     vertices.emplace_back(botLeft, color);
     vertices.emplace_back(botLeft + glm::vec2(texDims.x, 0.0f), color);
     vertices.emplace_back(botLeft + glm::vec2(texDims.x, texDims.y), color);
@@ -283,16 +284,14 @@ void MainMenuRoom<R>::drawTexture() {
     gb.addPrimitives(RE::PRIM::LINE_LOOP, 0u, vertices.size(), vertices.data());
 
     gb.end();
-    gb.end();
-
-    RE::GeometryBatch::std().draw();
+    gb.draw();
 }
 
 template<typename R>
 void MainMenuRoom<R>::resetView() {
-    m_texView.setScale({ 1.0f, 1.0f });
-    m_texView.setPosition(glm::vec2{ 0.0f, 0.0f });
+    m_texView.setScale({1.0f, 1.0f});
+    m_texView.setPosition(glm::vec2{0.0f, 0.0f});
     m_drawScale = 1.0f;
 }
 
-template MainMenuRoom<RE::GL46_Renderer>;
+template MainMenuRoom<RE::RendererGL46>;

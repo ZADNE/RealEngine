@@ -23,7 +23,7 @@ union SDL_Event;
 namespace RE {
 
 class Room;
-class GL46_Renderer;
+class RendererGL46;
 
 struct DisplayInfo {
     std::string name; /**< @brief UTF-8 encoded 'name' */
@@ -40,7 +40,7 @@ struct DisplayInfo {
  *
  * This singleton class is used (via static functions) to initialize RealEngine,
  * add rooms to it and then run the main simulation.
- * 
+ *
  * First you call MainProgram::initialize to start the engine.
  * Then you can add your rooms via MainProgram::addRoom. Rooms contain the main bussiness logic.
  * Once you have added all the room, you call MainProgram::run to start the simulation.
@@ -64,10 +64,10 @@ public:
      * @brief Adds a late-bind Room to the management
      * @tparam RoomType A class derived from Room that will be instantiated.
      * @return Raw pointer to the created room
-     * 
+     *
      * Your room will use the default late-bind renderer which polymorphically
      * calls the real renderer.
-     * 
+     *
      * Single type of room can be added multiple times, the only requirement is that
      * each room must have unique name.
     */
@@ -80,8 +80,8 @@ public:
      * @brief Adds an early-bind Room to the management
      * @tparam RoomType A class template derived from Room that will be instantiated.
      * @return Raw pointer to the created room
-     * 
-     * Your room template will be instantiated with the highest probability 
+     *
+     * Your room template will be instantiated with the highest probability
      * available renderer.
      *
      * Single type of room can be added multiple times, the only requirement is that
@@ -89,9 +89,9 @@ public:
     */
     template<template<typename> class RoomType, typename... ConstructorArgs>
     static Room* addRoom(ConstructorArgs&&... args) {
-        switch (instance().m_window.getRenderer()){
+        switch (instance().m_window.getRenderer()) {
         case Renderer::OPENGL_46:
-            return instance().m_roomManager.addRoom<RoomType<GL46_Renderer>>(std::forward<ConstructorArgs>(args)...);
+            return instance().m_roomManager.addRoom<RoomType<RendererGL46>>(std::forward<ConstructorArgs>(args)...);
         default:
             return nullptr;
         }
@@ -103,7 +103,7 @@ public:
      * The return value represent the exit code that this
      * RealEngine program should return to the enviroment.
      * The exit code can be altered by scheduleExit().
-     * 
+     *
      * @warning Never call this more than once!
      *
      * @param roomName Name of the first room that will be entered

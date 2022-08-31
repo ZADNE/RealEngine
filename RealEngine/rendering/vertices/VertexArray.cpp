@@ -3,78 +3,98 @@
  */
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
 
+#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/RendererGL46.hpp>
+
 namespace RE {
 
-IVertexArray* VertexArray::s_impl = nullptr;
-
-VertexArray::VertexArray() {
-    s_impl->construct(*this);
+template<typename R>
+VertexArray<R>::VertexArray() :
+    m_internals(s_impl->construct()) {
 }
 
-VertexArray::~VertexArray() {
-    s_impl->destruct(*this);
+template<typename R>
+VertexArray<R>::~VertexArray() {
+    s_impl->destruct(m_internals);
 }
 
-VertexArray::VertexArray(VertexArray&& other) noexcept :
-    m_ID(other.m_ID) {
-    other.m_ID = 0;
+template<typename R>
+VertexArray<R>::VertexArray(VertexArray<R>&& other) noexcept :
+    m_internals(std::move(other.m_internals)) {
 }
 
-VertexArray& VertexArray::operator=(VertexArray&& other) noexcept {
-    std::swap(m_ID, other.m_ID);
+template<typename R>
+VertexArray<R>& VertexArray<R>::operator=(VertexArray<R>&& other) noexcept {
+    m_internals = std::move(other.m_internals);
     return *this;
 }
 
-void VertexArray::setAttribute(unsigned int attribute, VertexComponentCount components, VertexComponentType type, unsigned int relativeOffset, bool normalize/* = true*/) {
-    s_impl->setAttribute(*this, attribute, components, type, relativeOffset, normalize);
+template<typename R>
+void VertexArray<R>::setAttribute(unsigned int attribute, VertexComponentCount components, VertexComponentType type, unsigned int relativeOffset, bool normalize/* = true*/) {
+    s_impl->setAttribute(m_internals, attribute, components, type, relativeOffset, normalize);
 }
 
-void VertexArray::unsetAttribute(unsigned int attribute) {
-    s_impl->unsetAttribute(*this, attribute);
+template<typename R>
+void VertexArray<R>::unsetAttribute(unsigned int attribute) {
+    s_impl->unsetAttribute(m_internals, attribute);
 }
 
-void VertexArray::setBindingPoint(unsigned int bindingPoint, const Buffer& buffer, int offset, int stride) {
-    s_impl->setBindingPoint(*this, bindingPoint, buffer, offset, stride);
+template<typename R>
+void VertexArray<R>::setBindingPoint(unsigned int bindingPoint, const Buffer<R>& buffer, int offset, int stride) {
+    s_impl->setBindingPoint(m_internals, bindingPoint, buffer.m_internals, offset, stride);
 }
 
-void VertexArray::unsetBindingPoint(unsigned int bindingPoint) {
-    s_impl->unsetBindingPoint(*this, bindingPoint);
+template<typename R>
+void VertexArray<R>::unsetBindingPoint(unsigned int bindingPoint) {
+    s_impl->unsetBindingPoint(m_internals, bindingPoint);
 }
 
-void VertexArray::connectAttributeToBindingPoint(unsigned int attribute, unsigned int bindingPoint) {
-    s_impl->connectAttributeToBindingPoint(*this, attribute, bindingPoint);
+template<typename R>
+void VertexArray<R>::connectAttributeToBindingPoint(unsigned int attribute, unsigned int bindingPoint) {
+    s_impl->connectAttributeToBindingPoint(m_internals, attribute, bindingPoint);
 }
 
-void VertexArray::bind() const {
-    s_impl->bind(*this);
+template<typename R>
+void VertexArray<R>::bind() const {
+    s_impl->bind(m_internals);
 }
 
-void VertexArray::unbind() const {
-    s_impl->unbind(*this);
+template<typename R>
+void VertexArray<R>::unbind() const {
+    s_impl->unbind(m_internals);
 }
 
-void VertexArray::renderArrays(Primitive prim, int first, size_t count) const {
-    s_impl->renderArrays(*this, prim, first, count);
+template<typename R>
+void VertexArray<R>::renderArrays(Primitive prim, int first, size_t count) const {
+    s_impl->renderArrays(m_internals, prim, first, count);
 }
 
-void VertexArray::renderArrays(Primitive prim, int first, size_t count, int instancecount) const {
-    s_impl->renderArrays(*this, prim, first, count, instancecount);
+template<typename R>
+void VertexArray<R>::renderArrays(Primitive prim, int first, size_t count, int instancecount) const {
+    s_impl->renderArrays(m_internals, prim, first, count, instancecount);
 }
 
-void VertexArray::renderElements(Primitive prim, size_t count, IndexType type, const void* indices) const {
-    s_impl->renderElements(*this, prim, count, type, indices);
+template<typename R>
+void VertexArray<R>::renderElements(Primitive prim, size_t count, IndexType type, const void* indices) const {
+    s_impl->renderElements(m_internals, prim, count, type, indices);
 }
 
-void VertexArray::renderElements(Primitive prim, size_t count, IndexType type, const void* indices, int instancecount) const {
-    s_impl->renderElements(*this, prim, count, type, indices, instancecount);
+template<typename R>
+void VertexArray<R>::renderElements(Primitive prim, size_t count, IndexType type, const void* indices, int instancecount) const {
+    s_impl->renderElements(m_internals, prim, count, type, indices, instancecount);
 }
 
-void VertexArray::renderElementsBaseVertex(Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const {
-    s_impl->renderElementsBaseVertex(*this, prim, count, type, indices, basevertex);
+template<typename R>
+void VertexArray<R>::renderElementsBaseVertex(Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const {
+    s_impl->renderElementsBaseVertex(m_internals, prim, count, type, indices, basevertex);
 }
 
-void VertexArray::renderElementsBaseVertex(Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const {
-    s_impl->renderElementsBaseVertex(*this, prim, count, type, indices, instancecount, basevertex);
+template<typename R>
+void VertexArray<R>::renderElementsBaseVertex(Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const {
+    s_impl->renderElementsBaseVertex(m_internals, prim, count, type, indices, instancecount, basevertex);
 }
+
+template VertexArray<RendererLateBind>;
+template VertexArray<RendererGL46>;
 
 }

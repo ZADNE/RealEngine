@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -14,6 +14,7 @@ namespace RE {
 */
 class Sprite {
 public:
+
     Sprite(TexturePtr texture, float sprite, float subimage = 0.0f);
 
     virtual float getSpeed() const;
@@ -24,7 +25,9 @@ public:
     virtual void step();
 
     const Texture* getTexture() const { return m_texture.get(); };
+
 protected:
+
     glm::vec2 m_subimageSprite;//X = subimage of the sprite, Y = sprite of the texture
     TexturePtr m_texture;
 };
@@ -34,6 +37,7 @@ protected:
 */
 class SpeedSprite : public Sprite {
 public:
+
     SpeedSprite(TexturePtr texture, float sprite, float subimage = 0.0f, float imageSpeed = 1.0f);
 
     void step() override;
@@ -41,7 +45,9 @@ public:
     void setSpeed(float newSpeed);
 
     float getSpeed() const override;
+
 protected:
+
     float m_imageSpeed;//Speed is added each beginStep to the current image position
 };
 
@@ -50,6 +56,7 @@ protected:
 */
 class FullSprite : public SpeedSprite {
 public:
+
     FullSprite(TexturePtr texture, float sprite, float subimage, float imageSpeed, Color color, const glm::vec2& scale);
 
     void setColor(Color color);
@@ -57,7 +64,9 @@ public:
 
     virtual Color getColor() const override;
     virtual glm::vec2 getScale() const override;
+
 protected:
+
     glm::vec2 m_scale;
     Color m_color;
 };
