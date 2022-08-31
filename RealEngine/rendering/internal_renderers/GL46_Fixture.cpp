@@ -17,8 +17,6 @@
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 
-#include <RealEngine/rendering/RendererGL46.hpp>
-
 namespace RE {
 
 void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
@@ -131,12 +129,12 @@ GL46_Fixture::GL46_Fixture() {
     assignReferences<RendererLateBind>();
     assignReferences<RendererGL46>();
 
-    m_defaultFramebuffer = Framebuffer(0u);
-    DefaultFrameBuffer::s_defaultFramebuffer = &(*m_defaultFramebuffer);
+    m_defaultFramebuffer = Framebuffer<RendererGL46>(FramebufferInternals{0u});
+    DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = &(*m_defaultFramebuffer);
 }
 
 GL46_Fixture::~GL46_Fixture() {
-    DefaultFrameBuffer::s_defaultFramebuffer = nullptr;
+    DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = nullptr;
     m_defaultFramebuffer.reset();
 
     clearReferences<RendererLateBind>();
@@ -147,7 +145,7 @@ template<typename R>
 void GL46_Fixture::assignReferences() {
     Buffer<R>::s_impl = &m_bufferImpl;
     Capabilities<R>::s_impl = &m_capabilitiesImpl;
-    Framebuffer::s_impl = &m_mainFramebufferImpl;
+    Framebuffer<R>::s_impl = &m_mainFramebufferImpl;
     Ordering<R>::s_impl = &m_orderingImpl;
     ShaderProgram::s_impl = &m_shaderProgramImpl;
     Texture::s_impl = &m_textureImpl;
@@ -160,7 +158,7 @@ template<typename R>
 void GL46_Fixture::clearReferences() {
     Buffer<R>::s_impl = nullptr;
     Capabilities<R>::s_impl = nullptr;
-    Framebuffer::s_impl = nullptr;
+    Framebuffer<R>::s_impl = nullptr;
     Ordering<R>::s_impl = nullptr;
     ShaderProgram::s_impl = nullptr;
     Texture::s_impl = nullptr;

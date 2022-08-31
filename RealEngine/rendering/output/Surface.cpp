@@ -53,7 +53,7 @@ void Surface<R>::setTarget() const {
 
 template<typename R>
 void Surface<R>::resetTarget() const {
-    DefaultFrameBuffer::targetMe(FramebufferTarget::DRAWING);
+    DefaultFrameBuffer<R>::targetMe(FramebufferTarget::DRAWING);
 
     Viewport::setToWholeWindow();
 

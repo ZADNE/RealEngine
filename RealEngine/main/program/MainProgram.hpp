@@ -89,9 +89,10 @@ public:
     */
     template<template<typename> class RoomType, typename... ConstructorArgs>
     static Room* addRoom(ConstructorArgs&&... args) {
-        switch (instance().m_window.getRenderer()) {
+        auto& inst = instance();
+        switch (inst.m_window.getRenderer()) {
         case Renderer::OPENGL_46:
-            return instance().m_roomManager.addRoom<RoomType<RendererGL46>>(std::forward<ConstructorArgs>(args)...);
+            return inst.m_roomManager.addRoom<RoomType<RendererGL46>>(std::forward<ConstructorArgs>(args)...);
         default:
             return nullptr;
         }
@@ -161,6 +162,7 @@ private:
     /**
      * @brief Does the actual game loop on the singleton instance
     */
+    template<typename R>
     int doRun(size_t roomName, const RoomTransitionParameters& params);
 
     void step();

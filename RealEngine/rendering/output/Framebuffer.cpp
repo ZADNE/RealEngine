@@ -5,106 +5,132 @@
 
 #include <cassert>
 
+#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/RendererGL46.hpp>
+
 
 namespace RE {
 
-IFramebuffer* Framebuffer::s_impl = nullptr;
-
-Framebuffer::Framebuffer() {
-    s_impl->construct(*this);
+template<typename R>
+Framebuffer<R>::Framebuffer() :
+    m_internals(s_impl->construct()) {
 }
 
-Framebuffer::Framebuffer(Framebuffer&& other) noexcept :
-    m_ID(other.m_ID) {
-    other.m_ID = 0;
+template<typename R>
+Framebuffer<R>::Framebuffer(Framebuffer<R>&& other) noexcept :
+    m_internals(std::move(other.m_internals)) {
 }
 
-Framebuffer& Framebuffer::operator=(Framebuffer&& other) noexcept {
-    std::swap(m_ID, other.m_ID);
+template<typename R>
+Framebuffer<R>& Framebuffer<R>::operator=(Framebuffer<R>&& other) noexcept {
+    m_internals = std::move(other.m_internals);
     return *this;
 }
 
-Framebuffer::~Framebuffer() {
-    s_impl->destruct(*this);
+template<typename R>
+Framebuffer<R>::~Framebuffer() {
+    s_impl->destruct(m_internals);
 }
 
-void Framebuffer::attachImage(FramebufferAttachment attachment, const Texture& te, int level) {
-    s_impl->attachImage(*this, attachment, te, level);
+template<typename R>
+void Framebuffer<R>::attachImage(FramebufferAttachment attachment, const Texture& te, int level) {
+    s_impl->attachImage(m_internals, attachment, te, level);
 }
 
-void Framebuffer::associateAttachementsWithOutputs(const std::vector<FramebufferOutput>& outputs) {
-    s_impl->associateAttachementsWithOutputs(*this, outputs);
+template<typename R>
+void Framebuffer<R>::associateAttachementsWithOutputs(const std::vector<FramebufferOutput>& outputs) {
+    s_impl->associateAttachementsWithOutputs(m_internals, outputs);
 }
 
-void Framebuffer::selectAttachmentForColorReading(unsigned int colorAttachmentIndex) {
-    s_impl->selectAttachmentForColorReading(*this, colorAttachmentIndex);
+template<typename R>
+void Framebuffer<R>::selectAttachmentForColorReading(unsigned int colorAttachmentIndex) {
+    s_impl->selectAttachmentForColorReading(m_internals, colorAttachmentIndex);
 }
 
-void Framebuffer::targetMe(FramebufferTarget target) const {
-    s_impl->targetMe(*this, target);
+template<typename R>
+void Framebuffer<R>::targetMe(FramebufferTarget target) const {
+    s_impl->targetMe(m_internals, target);
 }
 
-Framebuffer::Framebuffer(unsigned int ID):
-    m_ID(ID) {
-    assert(m_ID == 0);
+template<typename R>
+Framebuffer<R>::Framebuffer(FramebufferInternals&& internals) :
+    m_internals(std::move(internals)) {
 }
 
-FramebufferTargetability Framebuffer::checkTargetability(FramebufferTarget target) const {
-    return s_impl->checkTargetability(*this, target);
+template<typename R>
+FramebufferTargetability Framebuffer<R>::checkTargetability(FramebufferTarget target) const {
+    return s_impl->checkTargetability(m_internals, target);
 }
 
-void Framebuffer::clearColorAttachment(unsigned int attachmentIndex, const glm::vec4& color) const {
-    s_impl->clearColorAttachment(*this, attachmentIndex, color);
+template<typename R>
+void Framebuffer<R>::clearColorAttachment(unsigned int attachmentIndex, const glm::vec4& color) const {
+    s_impl->clearColorAttachment(m_internals, attachmentIndex, color);
 }
 
-void Framebuffer::clearColorAttachment(unsigned int attachmentIndex, const glm::ivec4& color) const {
-    s_impl->clearColorAttachment(*this, attachmentIndex, color);
+template<typename R>
+void Framebuffer<R>::clearColorAttachment(unsigned int attachmentIndex, const glm::ivec4& color) const {
+    s_impl->clearColorAttachment(m_internals, attachmentIndex, color);
 }
 
-void Framebuffer::clearColorAttachment(unsigned int attachmentIndex, const glm::uvec4& color) const {
-    s_impl->clearColorAttachment(*this, attachmentIndex, color);
+template<typename R>
+void Framebuffer<R>::clearColorAttachment(unsigned int attachmentIndex, const glm::uvec4& color) const {
+    s_impl->clearColorAttachment(m_internals, attachmentIndex, color);
 }
 
-void Framebuffer::clearDepthAttachment(float depth) const {
-    s_impl->clearDepthAttachment(*this, depth);
+template<typename R>
+void Framebuffer<R>::clearDepthAttachment(float depth) const {
+    s_impl->clearDepthAttachment(m_internals, depth);
 }
 
-void Framebuffer::clearStencilAttachment(int stencil) const {
-    s_impl->clearStencilAttachment(*this, stencil);
+template<typename R>
+void Framebuffer<R>::clearStencilAttachment(int stencil) const {
+    s_impl->clearStencilAttachment(m_internals, stencil);
 }
 
-void Framebuffer::clearDepthAndStencilAttachments(float depth, int stencil) const {
-    s_impl->clearDepthAndStencilAttachments(*this, depth, stencil);
+template<typename R>
+void Framebuffer<R>::clearDepthAndStencilAttachments(float depth, int stencil) const {
+    s_impl->clearDepthAndStencilAttachments(m_internals, depth, stencil);
 }
 
-void DefaultFrameBuffer::targetMe(FramebufferTarget target) {
+template<typename R>
+void DefaultFrameBuffer<R>::targetMe(FramebufferTarget target) {
     s_defaultFramebuffer->targetMe(target);
 }
 
-void DefaultFrameBuffer::clearColor(const glm::vec4& color) {
+template<typename R>
+void DefaultFrameBuffer<R>::clearColor(const glm::vec4& color) {
     s_defaultFramebuffer->clearColorAttachment(0u, color);
 }
 
-void DefaultFrameBuffer::clearColor(const glm::ivec4& color) {
+template<typename R>
+void DefaultFrameBuffer<R>::clearColor(const glm::ivec4& color) {
     s_defaultFramebuffer->clearColorAttachment(0u, color);
 }
 
-void DefaultFrameBuffer::clearColor(const glm::uvec4& color) {
+template<typename R>
+void DefaultFrameBuffer<R>::clearColor(const glm::uvec4& color) {
     s_defaultFramebuffer->clearColorAttachment(0u, color);
 }
 
-void DefaultFrameBuffer::clearDepth(float depth) {
+template<typename R>
+void DefaultFrameBuffer<R>::clearDepth(float depth) {
     s_defaultFramebuffer->clearDepthAttachment(depth);
 }
 
-void DefaultFrameBuffer::clearStencil(int stencil) {
+template<typename R>
+void DefaultFrameBuffer<R>::clearStencil(int stencil) {
     s_defaultFramebuffer->clearStencilAttachment(stencil);
 }
 
-void DefaultFrameBuffer::clearDepthAndStencil(float depth, int stencil) {
+template<typename R>
+void DefaultFrameBuffer<R>::clearDepthAndStencil(float depth, int stencil) {
     s_defaultFramebuffer->clearDepthAndStencilAttachments(depth, stencil);
 }
 
-Framebuffer* DefaultFrameBuffer::s_defaultFramebuffer = nullptr;
+template Framebuffer<RendererLateBind>;
+template Framebuffer<RendererGL46>;
+
+template DefaultFrameBuffer<RendererLateBind>;
+template DefaultFrameBuffer<RendererGL46>;
 
 }

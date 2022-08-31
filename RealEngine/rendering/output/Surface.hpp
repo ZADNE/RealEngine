@@ -92,7 +92,7 @@ public:
 private:
 
     std::vector<Texture> m_textures;
-    Framebuffer m_framebuffer;
+    Framebuffer<R> m_framebuffer;
     bool m_disableBlend;
     bool m_updateUniformBuffer;
     TextureParameters m_params;

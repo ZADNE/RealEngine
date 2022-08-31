@@ -14,6 +14,7 @@
 #include <RealEngine/rendering/internal_renderers/GL46_Viewport.hpp>
 
 #include <RealEngine/rendering/output/Framebuffer.hpp>
+#include <RealEngine/rendering/RendererGL46.hpp>
 
 namespace RE {
 
@@ -67,7 +68,7 @@ private:
     GL46_VertexArray m_vertexArrayImpl;
     GL46_Viewport m_viewportImpl;
 
-    std::optional<Framebuffer> m_defaultFramebuffer;
+    std::optional<Framebuffer<RendererGL46>> m_defaultFramebuffer;
 };
 
 /**

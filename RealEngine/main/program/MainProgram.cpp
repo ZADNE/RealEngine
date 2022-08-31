@@ -29,7 +29,13 @@ void MainProgram::initialize() {
 
 int MainProgram::run(size_t roomName, const RoomTransitionParameters& params) {
     try {
-        return instance().doRun(roomName, params);
+        auto& inst = instance();
+        switch (inst.m_window.getRenderer()) {
+        case Renderer::OPENGL_46:
+            return inst.doRun<RendererGL46>(roomName, params);
+        default:
+            return 1;
+        }
     }
     catch (const std::exception& e) {
         fatalError(std::string("Exception: ") + e.what());
@@ -98,6 +104,7 @@ void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
     m_usingImGui = s.usingImGui;
 }
 
+template<typename R>
 int MainProgram::doRun(size_t roomName, const RoomTransitionParameters& params) {
     scheduleRoomTransition(roomName, params);
     doRoomTransitionIfScheduled();
@@ -115,7 +122,7 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionParameters& params) 
     std::cout << "Entering main loop!" << std::endl;
     while (m_programShouldRun) {
         m_synchronizer.beginFrame();
-        DefaultFrameBuffer::clearColor(m_clearColor);
+        DefaultFrameBuffer<R>::clearColor(m_clearColor);
 
         //Perform simulation steps to catch up the time
         while (m_synchronizer.shouldStepHappen()) {
@@ -276,5 +283,7 @@ MainProgram& MainProgram::instance() {
     static MainProgram mainProgram;
     return mainProgram;
 }
+
+template int MainProgram::doRun<RendererGL46>(size_t roomName, const RoomTransitionParameters& params);
 
 }
