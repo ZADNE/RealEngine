@@ -11,7 +11,7 @@ namespace RE {
 *
 * Do not use this directly - use Framebuffer class instead.
 */
-class GL46_Framebuffer : public IFramebuffer {
+class GL46_Framebuffer final : public IFramebuffer {
 public:
 
     void construct(Framebuffer& fb) const override;

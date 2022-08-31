@@ -109,13 +109,13 @@ public:
     void addSubimage(const Texture* texture, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& subImg_Spr, const glm::vec2& scale);//Rotated based on the vector
 
     //UNCOLORED, UNSTRETCHED
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index);//Unrotated
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index, float radAngle);//Rotated based on the angle
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index, const glm::vec2& direction);//Rotated based on the vector
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index);//Unrotated
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, float radAngle);//Rotated based on the angle
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, const glm::vec2& direction);//Rotated based on the vector
     //COLORED, STRETCHED
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
 
     void draw();
     //Draws once with different shader program - the change is not saved (use switchShaderProgram() for that)

@@ -14,10 +14,14 @@
 #include <RealEngine/resources/ResourceManager.hpp>
 #include <RealEngine/rendering/capabilities.hpp>
 
+#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/RendererGL46.hpp>
+
 
 namespace RE {
 
-Surface::Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures/* = 1*/, bool disableBlend/* = false*/, bool updateUniforms/* = true*/) :
+template<typename R>
+Surface<R>::Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures/* = 1*/, bool disableBlend/* = false*/, bool updateUniforms/* = true*/) :
     m_disableBlend(disableBlend),
     m_updateUniformBuffer(updateUniforms),
     m_params(params) {
@@ -30,13 +34,14 @@ Surface::Surface(const Raster& image, const TextureParameters& params, unsigned 
     resize(image, numberOfTextures);
 }
 
-void Surface::setTarget() const {
+template<typename R>
+void Surface<R>::setTarget() const {
     m_framebuffer.targetMe(FramebufferTarget::DRAWING);
 
     Viewport::set(glm::ivec2(0, 0), m_textures[0].getTrueDims());
 
     if (m_disableBlend) {
-        BlendingCapability::disable();
+        BlendingCapability<R>::disable();
     }
 
     if (m_updateUniformBuffer) {
@@ -46,13 +51,14 @@ void Surface::setTarget() const {
     }
 }
 
-void Surface::resetTarget() const {
+template<typename R>
+void Surface<R>::resetTarget() const {
     DefaultFrameBuffer::targetMe(FramebufferTarget::DRAWING);
 
     Viewport::setToWholeWindow();
 
     if (m_disableBlend) {
-        BlendingCapability::enable();
+        BlendingCapability<R>::enable();
     }
 
     if (m_updateUniformBuffer) {
@@ -60,11 +66,13 @@ void Surface::resetTarget() const {
     }
 }
 
-void Surface::associateTexturesWithOutputs(const std::vector<FramebufferOutput>& outputs) {
+template<typename R>
+void Surface<R>::associateTexturesWithOutputs(const std::vector<FramebufferOutput>& outputs) {
     m_framebuffer.associateAttachementsWithOutputs(outputs);
 }
 
-void Surface::resize(const Raster& image, unsigned int numberOfTextures) {
+template<typename R>
+void Surface<R>::resize(const Raster& image, unsigned int numberOfTextures) {
     //Delete framebuffe
     m_textures.clear();
     m_textures.reserve(numberOfTextures);
@@ -76,29 +84,35 @@ void Surface::resize(const Raster& image, unsigned int numberOfTextures) {
     }
 }
 
-void Surface::clear(const glm::vec4& color, int index) {
+template<typename R>
+void Surface<R>::clear(const glm::vec4& color, int index) {
     m_textures[index].clear(color);
 }
 
-void Surface::clear(Color color, int index) {
+template<typename R>
+void Surface<R>::clear(Color color, int index) {
     m_textures[index].clear(color);
 }
 
-const Texture& Surface::getTexture(int index) const {
+template<typename R>
+const Texture& Surface<R>::getTexture(int index) const {
     return m_textures[index];
 }
 
-void Surface::setPivot(const glm::vec2& pivot, int index) {
+template<typename R>
+void Surface<R>::setPivot(const glm::vec2& pivot, int index) {
     m_textures[index].setPivot(pivot);
 }
 
-void Surface::setPivot(const glm::vec2& pivot) {
+template<typename R>
+void Surface<R>::setPivot(const glm::vec2& pivot) {
     for (auto& texture : m_textures) {
         texture.setPivot(pivot);
     }
 }
 
-void Surface::attachTexturesToFramebuffer() {
+template<typename R>
+void Surface<R>::attachTexturesToFramebuffer() {
     std::vector<FramebufferOutput> fbOutputs;
     fbOutputs.reserve(m_textures.size());
 
@@ -111,5 +125,8 @@ void Surface::attachTexturesToFramebuffer() {
         fatalError("Failed to set up frame buffer!");
     }
 }
+
+template Surface<RendererLateBind>;
+template Surface<RendererGL46>;
 
 }

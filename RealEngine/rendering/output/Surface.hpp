@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -14,11 +14,15 @@
 
 namespace RE {
 
+class RendererLateBind;
+
 /**
-* @brief Represents a canvas that can be drawn into.
-* 
-* A single surface can have several layers (= textures).
+ * @brief Represents a canvas that can be drawn into.
+ * @tparam R The renderer that will perform the commands
+ *
+ * A single surface can have several layers (= textures).
 */
+template<typename R = RendererLateBind>
 class Surface {
 public:
 
@@ -84,7 +88,9 @@ public:
     void setPivot(const glm::vec2& pivot, int index);
     //Sets every texture same pivot (but note that every texture may have different pivot)
     void setPivot(const glm::vec2& pivot);
+
 private:
+
     std::vector<Texture> m_textures;
     Framebuffer m_framebuffer;
     bool m_disableBlend;

@@ -12,7 +12,7 @@ namespace RE {
 *
 * Do not use this directly - use ShaderProgram instead.
 */
-class GL46_ShaderProgram : public IShaderProgram {
+class GL46_ShaderProgram final : public IShaderProgram {
 public:
 
     void construct(ShaderProgram& sp, const ShaderProgramSources& sources) const override;

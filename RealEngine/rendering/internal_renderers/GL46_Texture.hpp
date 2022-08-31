@@ -15,7 +15,7 @@ class TextureProxy;
 *
 * Do not use this directly - use Texture instead.
 */
-class GL46_Texture : public ITexture {
+class GL46_Texture final : public ITexture {
 public:
 
     void construct(Texture& te, const Raster& raster) const override;

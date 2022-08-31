@@ -1,22 +1,29 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/rendering/capabilities.hpp>
 
+#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/RendererGL46.hpp>
+
 namespace RE {
 
-ICapabilities* Capabilities::s_impl = nullptr;
-
-void BlendingCapability::enable() {
-    s_impl->set(Capability::BLENDING, true);
+template<typename R>
+void BlendingCapability<R>::enable() {
+    Capabilities<R>::s_impl->set(Capability::BLENDING, true);
 }
 
-void BlendingCapability::disable() {
-    s_impl->set(Capability::BLENDING, false);
+template<typename R>
+void BlendingCapability<R>::disable() {
+    Capabilities<R>::s_impl->set(Capability::BLENDING, false);
 }
 
-void BlendingCapability::set(bool enabled) {
-    s_impl->set(Capability::BLENDING, enabled);
+template<typename R>
+void BlendingCapability<R>::set(bool enabled) {
+    Capabilities<R>::s_impl->set(Capability::BLENDING, enabled);
 }
+
+template BlendingCapability<RendererLateBind>;
+template BlendingCapability<RendererGL46>;
 
 }

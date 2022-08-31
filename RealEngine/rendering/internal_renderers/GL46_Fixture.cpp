@@ -123,7 +123,7 @@ void GL46_Fixture::initialize() {
     static GL46_Fixture renderer;
 
     //Use blenbing by default
-    BlendingCapability::enable();
+    BlendingCapability<RendererGL46>::enable();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
@@ -146,7 +146,7 @@ GL46_Fixture::~GL46_Fixture() {
 template<typename R>
 void GL46_Fixture::assignReferences() {
     Buffer<R>::s_impl = &m_bufferImpl;
-    Capabilities::s_impl = &m_capabilitiesImpl;
+    Capabilities<R>::s_impl = &m_capabilitiesImpl;
     Framebuffer::s_impl = &m_mainFramebufferImpl;
     Ordering<R>::s_impl = &m_orderingImpl;
     ShaderProgram::s_impl = &m_shaderProgramImpl;
@@ -159,7 +159,7 @@ void GL46_Fixture::assignReferences() {
 template<typename R>
 void GL46_Fixture::clearReferences() {
     Buffer<R>::s_impl = nullptr;
-    Capabilities::s_impl = nullptr;
+    Capabilities<R>::s_impl = nullptr;
     Framebuffer::s_impl = nullptr;
     Ordering<R>::s_impl = nullptr;
     ShaderProgram::s_impl = nullptr;
