@@ -231,14 +231,12 @@ void MainMenuRoom<R>::drawTexture() {
         1.0f + m_overlap * 2.0f
     };
 
-    auto& sb = RE::SpriteBatch<R>::std();
-    sb.begin();
-    sb.add(posSizeRect, uvRect, *m_texture, 0);
-    sb.end(RE::GlyphSortType::POS_TOP);
-    sb.draw();
+    m_sb.begin();
+    m_sb.add(posSizeRect, uvRect, *m_texture, 0);
+    m_sb.end(RE::GlyphSortType::POS_TOP);
+    m_sb.draw();
 
-    auto& gb = RE::GeometryBatch<R>::std();
-    gb.begin();
+    m_gb.begin();
     std::vector<RE::VertexPOCO> vertices;
     glm::vec2 subimageSprite = m_texture->getSubimagesSpritesCount();
     vertices.reserve((size_t)(subimageSprite.x * subimageSprite.y) * 4u);
@@ -256,7 +254,7 @@ void MainMenuRoom<R>::drawTexture() {
         vertices.emplace_back(coord + glm::vec2(texDims.x, 0.0f), color);
     }
     if (vertices.size() > 0u) {
-        gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
+        m_gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
         vertices.clear();
     }
     //Pivots
@@ -273,7 +271,7 @@ void MainMenuRoom<R>::drawTexture() {
         }
     }
 
-    gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
+    m_gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
     vertices.clear();
     //Whole image
     color = {255u, 0u, 0u, 255u};
@@ -281,10 +279,10 @@ void MainMenuRoom<R>::drawTexture() {
     vertices.emplace_back(botLeft + glm::vec2(texDims.x, 0.0f), color);
     vertices.emplace_back(botLeft + glm::vec2(texDims.x, texDims.y), color);
     vertices.emplace_back(botLeft + glm::vec2(0.0f, texDims.y), color);
-    gb.addPrimitives(RE::PRIM::LINE_LOOP, 0u, vertices.size(), vertices.data());
+    m_gb.addPrimitives(RE::PRIM::LINE_LOOP, 0u, vertices.size(), vertices.data());
 
-    gb.end();
-    gb.draw();
+    m_gb.end();
+    m_gb.draw();
 }
 
 template<typename R>

@@ -45,7 +45,7 @@ template <> struct hash<RE::ShaderProgramSources> {
 
 namespace RE {
 
-using ShaderProgramPtr = std::shared_ptr<const ShaderProgram>;
+using ShaderProgramPtr = std::shared_ptr<const ShaderProgram<RendererLateBind>>;
 
 class ShaderProgramCache {
 public:
@@ -58,7 +58,7 @@ public:
     */
     ShaderProgramPtr getShaderProgram(const ShaderProgramSources& sources);
 private:
-    std::unordered_map<ShaderProgramSources, std::weak_ptr<ShaderProgram>> m_shaderMap;
+    std::unordered_map<ShaderProgramSources, std::weak_ptr<ShaderProgram<RendererLateBind>>> m_shaderMap;
 };
 
 }

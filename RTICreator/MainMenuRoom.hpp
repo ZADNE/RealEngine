@@ -6,6 +6,9 @@
 
 #include <RealEngine/main/rooms/Room.hpp>
 #include <RealEngine/main/program/CommandLineArguments.hpp>
+#include <RealEngine/rendering/basic_shaders.hpp>
+#include <RealEngine/rendering/batches/SpriteBatch.hpp>
+#include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/cameras/View2D.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
@@ -32,6 +35,9 @@ private:
     void selectAndLoad();
     void save(const std::string& loc);
     void load(const std::string& filePath);
+
+    RE::SpriteBatch<R> m_sb{{.vert = RE::sprite_vert, .frag = RE::sprite_frag}};
+    RE::GeometryBatch<R> m_gb{{.vert = RE::geometry_vetr, .frag = RE::geometry_frag}};
 
     //Texture
     std::optional<RE::Texture> m_texture;

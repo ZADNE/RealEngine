@@ -27,11 +27,6 @@ Buffer<R>::Buffer(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAc
 }
 
 template <typename R>
-Buffer<R>::~Buffer() {
-    s_impl->destruct(m_internals);
-}
-
-template <typename R>
 Buffer<R>::Buffer(Buffer<R>&& other) noexcept :
     m_internals(std::move(other.m_internals)) {
 }
@@ -40,6 +35,11 @@ template <typename R>
 Buffer<R>& Buffer<R>::operator=(Buffer<R>&& other) noexcept {
     m_internals = std::move(other.m_internals);
     return *this;
+}
+
+template <typename R>
+Buffer<R>::~Buffer() {
+    s_impl->destruct(m_internals);
 }
 
 template <typename R>

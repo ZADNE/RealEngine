@@ -40,29 +40,34 @@ template<typename R = RendererLateBind>
 class GeometryBatch {
 public:
 
-    GeometryBatch();
+    /**
+     * @brief Constructs new GeometryBatch
+     * @param sources Sources used to construct the shader program that will be used for drawing
+    */
+    GeometryBatch(const ShaderProgramSources& sources);
 
     void begin();
     void end();
 
-    void draw();
-
     void addPrimitives(PRIM prim, size_t first, size_t count, const RE::VertexPOCO* data, bool separate = true);
 
     void addCircles(size_t first, size_t count, const RE::CirclePOCO* data);
-
-    void switchShaderProgram(ShaderProgramPtr shaderProgram);
-
-    static GeometryBatch& std() {
-        static GeometryBatch std{};
-        return std;
-    }
+    
+    /**
+     * @brief Draws the batch with stored shader program
+    */
+    void draw();
+    
+    /**
+     * @brief Switches to a different program that will be used for drawing
+    */
+    void switchShaderProgram(const ShaderProgramSources& sources);
 
 private:
 
     VertexArray<R> m_va;
     Buffer<R> m_buf{BufferAccessFrequency::STREAM, BufferAccessNature::DRAW};
-    ShaderProgramPtr m_shaderProgram;
+    ShaderProgram<R> m_shaderProgram;
 
     std::array<std::vector<RE::VertexPOCO>, PRIMITIVES_COUNT + SHAPES_COUNT> m_vertices;
     std::array<std::vector<unsigned int>, PRIMITIVES_COUNT + SHAPES_COUNT> m_indices;

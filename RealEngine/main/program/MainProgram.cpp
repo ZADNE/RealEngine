@@ -13,10 +13,6 @@
 #include <ImGui/imgui_impl_opengl3.h>
 
 #include <RealEngine/main/rooms/Room.hpp>
-#include <RealEngine/resources/ResourceManager.hpp>
-#include <RealEngine/rendering/batches/SpriteBatch.hpp>
-#include <RealEngine/rendering/batches/GeometryBatch.hpp>
-#include <RealEngine/rendering/vertices/default_shaders.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/output/Framebuffer.hpp>
 
@@ -264,16 +260,6 @@ void MainProgram::pollEvents() {
 
 MainProgram::MainProgram() :
     s_roomToEngineAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
-
-    auto spriteShader = RE::RM::getShaderProgram({.vert = sprite_vert, .frag = sprite_frag});
-    spriteShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
-    SpriteBatch<RendererLateBind>::std().switchShaderProgram(spriteShader);
-    SpriteBatch<RendererGL46>::std().switchShaderProgram(spriteShader);
-
-    auto geometryShader = RE::RM::getShaderProgram({.vert = geometry_vetr, .frag = geometry_frag});
-    geometryShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
-    GeometryBatch<RendererLateBind>::std().switchShaderProgram(geometryShader);
-    GeometryBatch<RendererGL46>::std().switchShaderProgram(geometryShader);
 
     Room::setRoomSystemAccess(&s_roomToEngineAccess);
     Room::setStaticReferences(this, &m_roomManager);

@@ -72,16 +72,16 @@ public:
     Buffer(BufferAccessFrequency accessFreq, BufferAccessNature accessNature) :
         Buffer(0u, accessFreq, accessNature, nullptr) {}
 
-    /**
-     * @brief Frees the backing memory block on the GPU and destructs the buffer.
-    */
-    ~Buffer();
-
     Buffer(const Buffer<R>&) = delete;
     Buffer(Buffer<R>&& other) noexcept;
 
     Buffer<R>& operator=(const Buffer<R>&) = delete;
     Buffer<R>& operator=(Buffer<R>&& other) noexcept;
+
+    /**
+     * @brief Frees the backing memory block on the GPU and destructs the buffer.
+    */
+    ~Buffer();
 
     /**
      * @brief Binds the buffer to a generic binding point.

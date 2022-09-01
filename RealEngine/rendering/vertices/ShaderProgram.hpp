@@ -3,27 +3,30 @@
  */
 #pragma once
 #include <RealEngine/rendering/internal_interfaces/IShaderProgram.hpp>
+#include <RealEngine/rendering/RendererLateBind.hpp>
 
 namespace RE {
 
 /**
-* @brief Controls how vertices are rendered to screen.
+ * @brief Controls how vertices are rendered to screen.
+ * @tparam R The renderer that will perform the commands
 */
+template<typename R = RendererLateBind>
 class ShaderProgram {
     friend class GL46_Fixture;
-    friend class GL46_ShaderProgram;
 public:
+
     /**
      * @brief Constructs shader program from given source codes
      * @param sources Source codes of the program
     */
     ShaderProgram(const ShaderProgramSources& sources);
 
-    ShaderProgram(const ShaderProgram&) = delete;
-    ShaderProgram(ShaderProgram&& other) noexcept;
+    ShaderProgram(const ShaderProgram<R>&) = delete;
+    ShaderProgram(ShaderProgram<R>&& other) noexcept;
 
-    ShaderProgram& operator=(const ShaderProgram&) = delete;
-    ShaderProgram& operator=(ShaderProgram&& other) noexcept;
+    ShaderProgram<R>& operator=(const ShaderProgram<R>&) = delete;
+    ShaderProgram<R>& operator=(ShaderProgram<R>&& other) noexcept;
 
     /**
      * @brief Destructs shader program
@@ -80,7 +83,7 @@ public:
     void setUniform(const std::string& name, Args... args) const {
         auto loc = s_impl->getUniformLocation(*this, name);
     #ifdef _DEBUG
-        if (loc < 0) error(std::string{"Uniform \""} + name + "\" does not exist in program " + std::to_string(m_ID) + "!");
+        if (loc < 0) error(std::string{"Uniform \""} + name + "\" does not exist in the shader program!");
     #endif // _DEBUG
         s_impl->setUniform(*this, loc, args...);
     }
@@ -129,14 +132,9 @@ public:
 
 private:
 
-    unsigned int m_ID = 0;/**< Internal identifier of the program */
+    ShaderProgramInternals m_internals;
 
-    /**
-     * @brief The backing implementation of the program.
-     *
-     * This is set up at RealEngine initialization.
-    */
-    static IShaderProgram* s_impl;
+    static inline R::ShaderProgram* s_impl = nullptr;
 };
 
 }

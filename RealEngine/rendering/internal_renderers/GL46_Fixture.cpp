@@ -147,7 +147,7 @@ void GL46_Fixture::assignReferences() {
     Capabilities<R>::s_impl = &m_capabilitiesImpl;
     Framebuffer<R>::s_impl = &m_mainFramebufferImpl;
     Ordering<R>::s_impl = &m_orderingImpl;
-    ShaderProgram::s_impl = &m_shaderProgramImpl;
+    ShaderProgram<R>::s_impl = &m_shaderProgramImpl;
     Texture::s_impl = &m_textureImpl;
     TextureProxy::s_impl = &m_textureImpl;
     VertexArray<R>::s_impl = &m_vertexArrayImpl;
@@ -160,7 +160,7 @@ void GL46_Fixture::clearReferences() {
     Capabilities<R>::s_impl = nullptr;
     Framebuffer<R>::s_impl = nullptr;
     Ordering<R>::s_impl = nullptr;
-    ShaderProgram::s_impl = nullptr;
+    ShaderProgram<R>::s_impl = nullptr;
     Texture::s_impl = nullptr;
     TextureProxy::s_impl = nullptr;
     VertexArray<R>::s_impl = nullptr;

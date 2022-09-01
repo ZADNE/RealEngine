@@ -9,7 +9,6 @@
 
 #include <RealEngine/utility/error.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
-#include <RealEngine/rendering/vertices/default_shaders.hpp>
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
 #include <RealEngine/resources/ResourceManager.hpp>
 #include <RealEngine/rendering/capabilities.hpp>

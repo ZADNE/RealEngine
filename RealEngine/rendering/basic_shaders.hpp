@@ -25,7 +25,7 @@ static std::string_view sprite_vert = {
     "}"
 };
 
-static int LOC_BASE_TEXTURE = 0;
+static constexpr int LOC_BASE_TEXTURE = 0;
 
 static std::string_view sprite_frag = {
     "in vec4 fragColor;"

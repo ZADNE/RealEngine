@@ -9,10 +9,9 @@
 
 #include <RealEngine/rendering/output/Surface.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
-#include <RealEngine/rendering/vertices/vertices.hpp>
+#include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 #include <RealEngine/rendering/batches/Sprite.hpp>
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
-#include <RealEngine/resources/ShaderProgramCache.hpp>
 
 namespace RE {
 
@@ -53,12 +52,11 @@ template<typename R = RendererLateBind>
 class SpriteBatch {
 public:
 
-    using enum BufferType;
-    using enum BufferStorage;
-    using enum BufferAccessFrequency;
-    using enum BufferAccessNature;
-
-    SpriteBatch();
+    /**
+     * @brief Constructs new SpriteBatch
+     * @param sources Sources used to construct the shader program that will be used for drawing
+    */
+    SpriteBatch(const ShaderProgramSources& sources);
 
     void begin();
     void end(GlyphSortType sortType);
@@ -117,16 +115,21 @@ public:
     void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
     void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
 
+    /**
+     * @brief Draws the batch with stored shader program
+    */
     void draw();
-    //Draws once with different shader program - the change is not saved (use switchShaderProgram() for that)
-    void draw(const ShaderProgram& program);
 
-    void switchShaderProgram(ShaderProgramPtr shaderProgram);
+    /**
+     * @brief Draws once with different shader program  (the shader is not stored)
+     * @param program 
+    */
+    void draw(const ShaderProgram<R>& program);
 
-    static SpriteBatch& std() {
-        static SpriteBatch std{};
-        return std;
-    }
+    /**
+     * @brief Switches to a different program that will be used for drawing
+    */
+    void switchShaderProgram(const ShaderProgramSources& sources);
 
 private:
 
@@ -134,7 +137,7 @@ private:
     void createDrawBatches();
 
     VertexArray<R> m_vao;
-    Buffer<R> m_vbo{0, STREAM, DRAW};
+    Buffer<R> m_vbo{0, BufferAccessFrequency::STREAM, BufferAccessNature::DRAW};
 
     std::vector<Glyph*> m_glyphPointers;
     std::vector<Glyph> m_glyphs;
@@ -145,11 +148,11 @@ private:
     static bool comparePosToNeg(Glyph* a, Glyph* b);
     static bool compareTexture(Glyph* a, Glyph* b);
 
-    ShaderProgramPtr m_shaderProgram;
+    ShaderProgram<R> m_shaderProgram;
 
-    const glm::vec4 m_UVRectangle = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-    const glm::vec4 m_SUVRectangle = glm::vec4(0.0f, 1.0f, 1.0f, -1.0f);//Used for drawing surfaces
-    static inline const Color WHITE{255, 255, 255, 255};
+    static inline constexpr glm::vec4 UV_RECT = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+    static inline constexpr glm::vec4 SUV_RECT = glm::vec4(0.0f, 1.0f, 1.0f, -1.0f);//Used for drawing surfaces
+    static inline constexpr Color WHITE{255, 255, 255, 255};
 };
 
 }

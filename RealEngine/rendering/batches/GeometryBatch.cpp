@@ -42,7 +42,8 @@ Primitive convertPrimEnum(size_t prim_shape) {
 }
 
 template<typename R>
-GeometryBatch<R>::GeometryBatch() {
+GeometryBatch<R>::GeometryBatch(const ShaderProgramSources& sources) :
+    m_shaderProgram(sources) {
     m_va.setAttribute(ATTR_POSITION, VertexComponentCount::XY, VertexComponentType::FLOAT, offsetof(VertexPOCO, position), false);
     m_va.setAttribute(ATTR_COLOR, VertexComponentCount::RGBA, VertexComponentType::UNSIGNED_BYTE, offsetof(VertexPOCO, color), true);
     m_va.setBindingPoint(0u, m_buf, 0, sizeof(VertexPOCO));
@@ -78,23 +79,6 @@ void GeometryBatch<R>::end() {
         m_buf.overwrite(offset, m_vertices[i]);
         offset += m_vertices[i].size() * sizeof(VertexPOCO);
     }
-}
-
-template<typename R>
-void GeometryBatch<R>::draw() {
-    m_shaderProgram->use();
-    m_va.bind();
-
-    int offset = 0u;
-
-    for (size_t i = 0u; i < PRIMITIVES_COUNT + SHAPES_COUNT; ++i) {
-        if (m_vertices[i].empty()) continue;
-        m_va.renderElementsBaseVertex(convertPrimEnum(i), m_indices[i].size(), IndexType::UNSIGNED_INT, m_indices[i].data(), offset);
-        offset += static_cast<int>(m_vertices[i].size());
-    }
-
-    m_va.unbind();
-    m_shaderProgram->unuse();
 }
 
 template<typename R>
@@ -152,8 +136,25 @@ void GeometryBatch<R>::addCircles(size_t first, size_t count, const RE::CirclePO
 }
 
 template<typename R>
-void GeometryBatch<R>::switchShaderProgram(ShaderProgramPtr shaderProgram) {
-    m_shaderProgram = shaderProgram;
+void GeometryBatch<R>::draw() {
+    m_shaderProgram.use();
+    m_va.bind();
+
+    int offset = 0u;
+
+    for (size_t i = 0u; i < PRIMITIVES_COUNT + SHAPES_COUNT; ++i) {
+        if (m_vertices[i].empty()) continue;
+        m_va.renderElementsBaseVertex(convertPrimEnum(i), m_indices[i].size(), IndexType::UNSIGNED_INT, m_indices[i].data(), offset);
+        offset += static_cast<int>(m_vertices[i].size());
+    }
+
+    m_va.unbind();
+    m_shaderProgram.unuse();
+}
+
+template<typename R>
+void GeometryBatch<R>::switchShaderProgram(const ShaderProgramSources& sources) {
+    m_shaderProgram = ShaderProgram<R>{sources};
 }
 
 template GeometryBatch<RendererLateBind>;
