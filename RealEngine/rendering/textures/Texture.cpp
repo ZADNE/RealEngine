@@ -8,10 +8,10 @@
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
 #include <RealEngine/utility/error.hpp>
 
-namespace RE {
+#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/RendererGL46.hpp>
 
-ITexture* Texture::s_impl = nullptr;
-ITexture* TextureProxy::s_impl = nullptr;
+namespace RE {
 
 LodePNGColorType toLodePNGColorType(TextureChannels channels) {
     static_assert(TEX_CHANNELS_BITS == 0b0000'0000'0000'0011, "TextureFlags - channel bits reaaranged");
@@ -42,41 +42,37 @@ glm::vec4 colorToFloatColor(Color color, TextureFormat type) {
     return borderRGBA;
 }
 
-TextureProxy::TextureProxy(const Texture& texture) :
-    m_ID(texture.m_ID) {
-
+template <typename R>
+TextureProxy<R>::TextureProxy(const Texture<R>& texture) :
+    m_internals(texture.m_internals) {
 }
 
-void TextureProxy::bind() const {
-    s_impl->bind(*this);
+template <typename R>
+void TextureProxy<R>::bind() const {
+    s_impl->bind(m_internals);
 }
 
-void TextureProxy::bind(TextureUnit unit) const {
-    s_impl->bind(*this, unit);
+template <typename R>
+void TextureProxy<R>::bind(TextureUnit unit) const {
+    s_impl->bind(m_internals, unit);
 }
 
-Texture::Texture(Texture&& other) noexcept :
-    m_ID(other.m_ID),
+template <typename R>
+Texture<R>::Texture(Texture<R>&& other) noexcept :
+    m_internals(std::move(other.m_internals)),
     m_flags(other.m_flags),
     m_subimageDims(other.m_subimageDims),
     m_pivot(other.m_pivot),
     m_subimagesSpritesCount(other.m_subimagesSpritesCount),
     m_trueDims(other.m_trueDims),
     m_borderColor(other.m_borderColor) {
-    other.m_ID = 0u;
 }
 
-Texture& Texture::operator=(Texture&& other) noexcept {
-    std::swap(m_ID, other.m_ID);
-#ifdef _DEBUG
-    //Swap flags and dims to correctly construct identificationString() in destructor
-    std::swap(m_flags, other.m_flags);
-    std::swap(m_trueDims, other.m_trueDims);
-#else
-    //identificationString() is only in debug destructor
+template <typename R>
+Texture<R>& Texture<R>::operator=(Texture<R>&& other) noexcept {
+    m_internals = std::move(other.m_internals);
     m_flags = other.m_flags;
     m_trueDims = other.m_trueDims;
-#endif // _DEBUG
     m_subimageDims = other.m_subimageDims;
     m_pivot = other.m_pivot;
     m_subimagesSpritesCount = other.m_subimagesSpritesCount;
@@ -84,7 +80,8 @@ Texture& Texture::operator=(Texture&& other) noexcept {
     return *this;
 }
 
-Texture::Texture(const std::string& filePathPNG) {
+template <typename R>
+Texture<R>::Texture(const std::string& filePathPNG) {
     //Prepare variables
     lodepng::State state{};
     state.decoder.remember_unknown_chunks = 1;
@@ -124,102 +121,125 @@ paramsLoaded:
     init(Raster{dims, toTextureChannels(state.info_raw.colortype), pixels}, params);
 }
 
-Texture::Texture(const Raster& raster, const TextureParameters& params/* = DEFAULT_PARAMETERS*/) {
+template <typename R>
+Texture<R>::Texture(const Raster& raster, const TextureParameters& params/* = DEFAULT_PARAMETERS*/) {
     init(raster, params);
 }
 
-Texture::~Texture() {
-    s_impl->destruct(*this);
+template <typename R>
+Texture<R>::~Texture() {
+    s_impl->destruct(m_internals);
 }
 
-TextureParameters Texture::getParameters() const {
+template <typename R>
+TextureParameters Texture<R>::getParameters() const {
     return TextureParameters{TextureGeometry{m_subimageDims, m_pivot, m_subimagesSpritesCount}, m_flags, m_borderColor};
 }
 
-void Texture::setMinFilter(TextureMinFilter minFilter) {
+template <typename R>
+void Texture<R>::setMinFilter(TextureMinFilter minFilter) {
     m_flags.setMinFilter(minFilter);
-    s_impl->setMinFilter(*this, minFilter);
+    s_impl->setMinFilter(m_internals, minFilter);
 }
 
-void Texture::setMagFilter(TextureMagFilter magFilter) {
+template <typename R>
+void Texture<R>::setMagFilter(TextureMagFilter magFilter) {
     m_flags.setMagFilter(magFilter);
-    s_impl->setMagFilter(*this, magFilter);
+    s_impl->setMagFilter(m_internals, magFilter);
 }
 
-void Texture::setWrapStyleX(TextureWrapStyle wrapStyleX) {
+template <typename R>
+void Texture<R>::setWrapStyleX(TextureWrapStyle wrapStyleX) {
     m_flags.setWrapStyleX(wrapStyleX);
-    s_impl->setWrapStyleX(*this, wrapStyleX);
+    s_impl->setWrapStyleX(m_internals, wrapStyleX);
 }
 
-void Texture::setWrapStyleY(TextureWrapStyle wrapStyleY) {
+template <typename R>
+void Texture<R>::setWrapStyleY(TextureWrapStyle wrapStyleY) {
     m_flags.setWrapStyleY(wrapStyleY);
-    s_impl->setWrapStyleY(*this, wrapStyleY);
+    s_impl->setWrapStyleY(m_internals, wrapStyleY);
 }
 
-void Texture::setBorderColor(Color col) {
+template <typename R>
+void Texture<R>::setBorderColor(Color col) {
     m_borderColor = col;
     glm::vec4 borderRGBA = colorToFloatColor(col, getFormat());
-    s_impl->setBorderColor(*this, m_borderColor);
+    s_impl->setBorderColor(m_internals, m_borderColor);
 }
 
-void Texture::setBorderColor(const glm::vec4& col) {
+template <typename R>
+void Texture<R>::setBorderColor(const glm::vec4& col) {
     m_borderColor = Color{col * 255.0f};
-    s_impl->setBorderColor(*this, col);
+    s_impl->setBorderColor(m_internals, col);
 }
 
-void Texture::bind() const {
-    s_impl->bind(*this);
+template <typename R>
+void Texture<R>::bind() const {
+    s_impl->bind(m_internals);
 }
 
-void Texture::bind(TextureUnit unit) const {
-    s_impl->bind(*this, unit);
+template <typename R>
+void Texture<R>::bind(TextureUnit unit) const {
+    s_impl->bind(m_internals, unit);
 }
 
-void Texture::bindImage(ImageUnit unit, int level, ImageAccess access) const {
-    s_impl->bindImage(*this, unit, level, access);
+template <typename R>
+void Texture<R>::bindImage(ImageUnit unit, int level, ImageAccess access) const {
+    s_impl->bindImage(m_internals, unit, level, access, m_flags);
 }
 
-void Texture::setTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
-    s_impl->setTexels(*this, level, offset, size, raster);
+template <typename R>
+void Texture<R>::setTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
+    s_impl->setTexels(m_internals, level, offset, size, raster);
 }
 
-void Texture::setTexels(const void* raster) const {
-    s_impl->setTexels(*this, 0, glm::ivec2(0, 0), glm::ivec2(getTrueDims()), raster);
+template <typename R>
+void Texture<R>::setTexels(const void* raster) const {
+    s_impl->setTexels(m_internals, 0, glm::ivec2(0, 0), glm::ivec2(getTrueDims()), raster);
 }
 
-void Texture::copyTexels(int srcLevel, const glm::ivec2& srcPos, const Texture& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
-    s_impl->copyTexels(*this, srcLevel, srcPos, destination, dstLevel, dstPos, size);
+template <typename R>
+void Texture<R>::copyTexels(int srcLevel, const glm::ivec2& srcPos, const Texture<R>& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
+    s_impl->copyTexels(m_internals, srcLevel, srcPos, destination.m_internals, dstLevel, dstPos, size);
 }
 
-void Texture::getTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* buffer) {
-    s_impl->getTexels(*this, level, offset, size, bufSize, buffer);
+template <typename R>
+void Texture<R>::getTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* buffer) {
+    s_impl->getTexels(m_internals, level, offset, size, bufSize, buffer);
 }
 
-void Texture::getTexels(size_t bufSize, void* buffer) {
-    s_impl->getTexels(*this, 0, glm::ivec2(0, 0), glm::ivec2(getTrueDims()), bufSize, buffer);
+template <typename R>
+void Texture<R>::getTexels(size_t bufSize, void* buffer) {
+    s_impl->getTexels(m_internals, 0, glm::ivec2(0, 0), glm::ivec2(getTrueDims()), bufSize, buffer);
 }
 
-void Texture::clear(const glm::vec4& color) const {
-    s_impl->clear(*this, 0, color);
+template <typename R>
+void Texture<R>::clear(const glm::vec4& color) const {
+    s_impl->clear(m_internals, 0, color);
 }
 
-void Texture::clear(const glm::ivec4& color) const {
-    s_impl->clear(*this, 0, color);
+template <typename R>
+void Texture<R>::clear(const glm::ivec4& color) const {
+    s_impl->clear(m_internals, 0, color);
 }
 
-void Texture::clear(const glm::uvec4& color) const {
-    s_impl->clear(*this, 0, color);
+template <typename R>
+void Texture<R>::clear(const glm::uvec4& color) const {
+    s_impl->clear(m_internals, 0, color);
 }
 
-void Texture::clear(Color color) const {
-    s_impl->clear(*this, 0, color);
+template <typename R>
+void Texture<R>::clear(Color color) const {
+    s_impl->clear(m_internals, 0, color);
 }
 
-bool Texture::saveToFile(const std::string& filePathPNG) {
+template <typename R>
+bool Texture<R>::saveToFile(const std::string& filePathPNG) {
     return saveToFile(filePathPNG, getParameters());
 }
 
-bool Texture::saveToFile(const std::string& filePathPNG, const TextureParameters& params) {
+template <typename R>
+bool Texture<R>::saveToFile(const std::string& filePathPNG, const TextureParameters& params) {
     auto channels = params.getChannels();
     //Download pixels
     std::vector<unsigned char> pixels;
@@ -247,7 +267,8 @@ bool Texture::saveToFile(const std::string& filePathPNG, const TextureParameters
     return true;
 }
 
-void Texture::init(const Raster& raster, const TextureParameters& params) {
+template <typename R>
+void Texture<R>::init(const Raster& raster, const TextureParameters& params) {
     if (params.isGeometryDefinedByImage()) {//Geometry defined by image
         m_subimageDims = raster.getDims();
         m_pivot = glm::vec2{0.0f, 0.0f};
@@ -261,7 +282,7 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
     m_trueDims = raster.getDims();
     m_borderColor = params.getBorderColor();
 
-    s_impl->construct(*this, raster);
+    m_internals = s_impl->construct(m_flags, raster);
 
     //Set parameters of the texture
     setMinFilter(getMinFilter());
@@ -270,5 +291,10 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
     setWrapStyleY(getWrapStyleY());
     setBorderColor(getBorderColor());
 }
+
+template TextureProxy<RendererLateBind>;
+template TextureProxy<RendererGL46>;
+template Texture<RendererLateBind>;
+template Texture<RendererGL46>;
 
 }

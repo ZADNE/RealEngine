@@ -118,7 +118,8 @@ void GL46_Fixture::initialize() {
     glEnable(GL_PRIMITIVE_RESTART);
     glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
-    static GL46_Fixture renderer;
+    //THE singleton instance
+    static GL46_Fixture renderer{};
 
     //Use blenbing by default
     BlendingCapability<RendererGL46>::enable();
@@ -148,8 +149,8 @@ void GL46_Fixture::assignReferences() {
     Framebuffer<R>::s_impl = &m_mainFramebufferImpl;
     Ordering<R>::s_impl = &m_orderingImpl;
     ShaderProgram<R>::s_impl = &m_shaderProgramImpl;
-    Texture::s_impl = &m_textureImpl;
-    TextureProxy::s_impl = &m_textureImpl;
+    Texture<R>::s_impl = &m_textureImpl;
+    TextureProxy<R>::s_impl = &m_textureImpl;
     VertexArray<R>::s_impl = &m_vertexArrayImpl;
     Viewport::s_impl = &m_viewportImpl;
 }
@@ -161,8 +162,8 @@ void GL46_Fixture::clearReferences() {
     Framebuffer<R>::s_impl = nullptr;
     Ordering<R>::s_impl = nullptr;
     ShaderProgram<R>::s_impl = nullptr;
-    Texture::s_impl = nullptr;
-    TextureProxy::s_impl = nullptr;
+    Texture<R>::s_impl = nullptr;
+    TextureProxy<R>::s_impl = nullptr;
     VertexArray<R>::s_impl = nullptr;
     Viewport::s_impl = nullptr;
 }

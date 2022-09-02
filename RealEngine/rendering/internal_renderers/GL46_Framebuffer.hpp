@@ -17,7 +17,7 @@ public:
     FramebufferInternals construct() const override;
     void destruct(FramebufferInternals& fb) const override;
 
-    void attachImage(FramebufferInternals& fb, FramebufferAttachment attachment, const Texture& te, int level) const override;
+    void attachImage(FramebufferInternals& fb, FramebufferAttachment attachment, const TextureInternals& te, int level) const override;
 
     void associateAttachementsWithOutputs(FramebufferInternals& fb, const std::vector<FramebufferOutput>& outputs) const override;
     void selectAttachmentForColorReading(FramebufferInternals& fb, unsigned int colorAttachmentIndex) const override;
@@ -31,7 +31,6 @@ public:
     void clearDepthAttachment(const FramebufferInternals& fb, float depth) const override;
     void clearStencilAttachment(const FramebufferInternals& fb, int stencil) const override;
     void clearDepthAndStencilAttachments(const FramebufferInternals& fb, float depth, int stencil) const override;
-
 };
 
 }

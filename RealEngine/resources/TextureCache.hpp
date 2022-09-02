@@ -9,10 +9,11 @@
 
 namespace RE {
 
-using TexturePtr = std::shared_ptr<const Texture>;
+using TexturePtr = std::shared_ptr<const Texture<RendererLateBind>>;
 
 class TextureCache {
 public:
+
     TextureCache() {}
 
     /**
@@ -21,8 +22,10 @@ public:
      * @return Texture as a shared resource
     */
     TexturePtr getTexture(const std::string& filePathNoExt);
+
 private:
-    std::unordered_map<std::string, std::weak_ptr<Texture>> m_textureMap;
+
+    std::unordered_map<std::string, std::weak_ptr<Texture<RendererLateBind>>> m_textureMap;
     std::string m_textureFolder = "textures/";
 };
 

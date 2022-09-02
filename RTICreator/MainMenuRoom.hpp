@@ -40,7 +40,7 @@ private:
     RE::GeometryBatch<R> m_gb{{.vert = RE::geometry_vetr, .frag = RE::geometry_frag}};
 
     //Texture
-    std::optional<RE::Texture> m_texture;
+    std::optional<RE::Texture<R>> m_texture;
     std::string m_textureLoc;
     std::string m_lastVisitedLoc;
 
@@ -48,7 +48,7 @@ private:
 
     //View
     RE::View2D m_texView;
-    RE::TypedBuffer<R> m_texViewUBO{RE::UNIF_BUF_VIEWPORT_MATRIX, static_cast<int>(sizeof(glm::mat4)), RE::BufferUsageFlags::DYNAMIC_STORAGE};
+    RE::BufferTyped<R> m_texViewUBO{RE::UNIF_BUF_VIEWPORT_MATRIX, static_cast<int>(sizeof(glm::mat4)), RE::BufferUsageFlags::DYNAMIC_STORAGE};
     glm::vec2 m_overlap = glm::vec2(0.2f, 0.2f);
     glm::vec3 m_backgroundColor = glm::vec3(0.1f, 0.1f, 0.1f);
 

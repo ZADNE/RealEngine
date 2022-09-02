@@ -15,7 +15,6 @@ class GL46_Capabilities final : public ICapabilities {
 public:
 
     void set(Capability cap, bool enabled) const override;
-
 };
 
 }

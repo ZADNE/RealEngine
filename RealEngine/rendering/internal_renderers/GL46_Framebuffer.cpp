@@ -30,7 +30,7 @@ void GL46_Framebuffer::destruct(FramebufferInternals& fb) const {
     glDeleteFramebuffers(1, &fb.m_id);
 }
 
-void GL46_Framebuffer::attachImage(FramebufferInternals& fb, FramebufferAttachment attachment, const Texture& te, int level) const {
+void GL46_Framebuffer::attachImage(FramebufferInternals& fb, FramebufferAttachment attachment, const TextureInternals& te, int level) const {
     GLenum attachment_gl;
     switch (attachment) {
     case FramebufferAttachment::DEPTH: attachment_gl = GL_DEPTH_ATTACHMENT; break;
@@ -38,7 +38,7 @@ void GL46_Framebuffer::attachImage(FramebufferInternals& fb, FramebufferAttachme
     case FramebufferAttachment::DEPTH_AND_STENCIL: attachment_gl = GL_DEPTH_STENCIL_ATTACHMENT; break;
     default: attachment_gl = GL_COLOR_ATTACHMENT0 + static_cast<GLenum>(attachment); break;
     }
-    glNamedFramebufferTexture(fb.m_id, attachment_gl, te.m_ID, level);
+    glNamedFramebufferTexture(fb.m_id, attachment_gl, te.m_id, level);
 }
 
 void GL46_Framebuffer::associateAttachementsWithOutputs(FramebufferInternals& fb, const std::vector<FramebufferOutput>& outputs) const {

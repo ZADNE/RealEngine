@@ -75,9 +75,9 @@ public:
     void clear(Color color, int index);
 
     //Getters
-    TextureProxy getTextureProxy(int index = 0) const { return TextureProxy{m_textures[index]}; }
+    TextureProxy<R> getTextureProxy(int index = 0) const { return TextureProxy<R>{m_textures[index]}; }
 
-    const Texture& getTexture(int index = 0) const;
+    const Texture<R>& getTexture(int index = 0) const;
 
     //All textures in the surface have same dimensions
     glm::uvec2 getDims() const { return m_textures[0].getTrueDims(); }
@@ -91,7 +91,7 @@ public:
 
 private:
 
-    std::vector<Texture> m_textures;
+    std::vector<Texture<R>> m_textures;
     Framebuffer<R> m_framebuffer;
     bool m_disableBlend;
     bool m_updateUniformBuffer;

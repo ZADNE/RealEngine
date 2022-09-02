@@ -6,7 +6,7 @@
 
 #include <glm/mat4x4.hpp>
 
-#include <RealEngine/rendering/buffers/TypedBuffer.hpp>
+#include <RealEngine/rendering/buffers/BufferTyped.hpp>
 #include <RealEngine/rendering/internal_interfaces/IViewport.hpp>
 
 namespace RE {
@@ -28,7 +28,7 @@ public:
      *
      * @return Uniform buffer with view matrix of this window
     */
-    static TypedBuffer<>& getWindowMatrixUniformBuffer() { return *s_windowMatrixUniformBuffer; }
+    static BufferTyped<>& getWindowMatrixUniformBuffer() { return *s_windowMatrixUniformBuffer; }
 
     /**
      * @brief Overwrites view matrix uniform buffer to match viewport
@@ -49,7 +49,7 @@ public:
 
 private:
 
-    static std::optional<TypedBuffer<>> s_windowMatrixUniformBuffer;/**< Uniform buffer that contains view matrix of the window */
+    static std::optional<BufferTyped<>> s_windowMatrixUniformBuffer;/**< Uniform buffer that contains view matrix of the window */
     static glm::ivec2 s_windowSize;
     static glm::mat4 s_windowMatrix;
     static IViewport* s_impl;

@@ -225,7 +225,6 @@ public:
 
     virtual void setUniform(const ShaderProgramInternals& sp, int location, TextureUnit unit) const = 0;
     virtual void setUniform(const ShaderProgramInternals& sp, int location, ImageUnit unit) const = 0;
-
 };
 
 }

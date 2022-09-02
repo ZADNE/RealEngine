@@ -7,6 +7,8 @@
 
 #include <glm/vec4.hpp>
 
+#include <RealEngine/rendering/internal_interfaces/ITexture.hpp>
+
 namespace RE {
 
 /**
@@ -73,8 +75,6 @@ enum class FramebufferTargetability {
     NOT_COMPLETE
 };
 
-class Texture;
-
 /**
  * @brief Contains all members of Framebuffer
  * @note For internal usage in RealEngine.
@@ -119,7 +119,7 @@ public:
     virtual FramebufferInternals construct() const = 0;
     virtual void destruct(FramebufferInternals& fb) const = 0;
 
-    virtual void attachImage(FramebufferInternals& fb, FramebufferAttachment attachment, const Texture& te, int level) const = 0;
+    virtual void attachImage(FramebufferInternals& fb, FramebufferAttachment attachment, const TextureInternals& te, int level) const = 0;
 
     virtual void associateAttachementsWithOutputs(FramebufferInternals& fb, const std::vector<FramebufferOutput>& outputs) const = 0;
     virtual void selectAttachmentForColorReading(FramebufferInternals& fb, unsigned int colorAttachmentIndex) const = 0;

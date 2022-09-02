@@ -23,7 +23,6 @@ class ICapabilities {
 public:
 
     virtual void set(Capability cap, bool enabled) const = 0;
-
 };
 
 }

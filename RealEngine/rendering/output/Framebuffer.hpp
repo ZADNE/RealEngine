@@ -43,7 +43,7 @@ public:
     /**
      * @brief Attaches an image to the framebuffer so that it can be used as target.
     */
-    void attachImage(FramebufferAttachment attachment, const Texture& te, int level);
+    void attachImage(FramebufferAttachment attachment, const Texture<R>& te, int level);
 
     /**
      * @brief Associates indexed shader color outputs with attachments.

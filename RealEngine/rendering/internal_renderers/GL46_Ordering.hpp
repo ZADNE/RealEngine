@@ -19,7 +19,6 @@ public:
 
     void issueDrawBarrier() const override;
     void issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers) const override;
-
 };
 
 }

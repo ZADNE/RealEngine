@@ -47,7 +47,6 @@ public:
 
     virtual void issueDrawBarrier() const = 0;
     virtual void issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers) const = 0;
-
 };
 
 }

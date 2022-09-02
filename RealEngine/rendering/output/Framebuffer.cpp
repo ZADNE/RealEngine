@@ -5,6 +5,8 @@
 
 #include <cassert>
 
+#include <RealEngine/rendering/textures/Texture.hpp>
+
 #include <RealEngine/rendering/RendererLateBind.hpp>
 #include <RealEngine/rendering/RendererGL46.hpp>
 
@@ -33,8 +35,8 @@ Framebuffer<R>::~Framebuffer() {
 }
 
 template<typename R>
-void Framebuffer<R>::attachImage(FramebufferAttachment attachment, const Texture& te, int level) {
-    s_impl->attachImage(m_internals, attachment, te, level);
+void Framebuffer<R>::attachImage(FramebufferAttachment attachment, const Texture<R>& te, int level) {
+    s_impl->attachImage(m_internals, attachment, te.m_internals, level);
 }
 
 template<typename R>

@@ -149,7 +149,6 @@ public:
     virtual void* map(const BufferInternals& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const = 0;
     virtual void flushMapped(const BufferInternals& bf, size_t offsetInBytes, size_t lengthInBytes) const = 0;
     virtual bool unmap(const BufferInternals& bf) const = 0;
-
 };
 
 }

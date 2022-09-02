@@ -94,7 +94,7 @@ void Surface<R>::clear(Color color, int index) {
 }
 
 template<typename R>
-const Texture& Surface<R>::getTexture(int index) const {
+const Texture<R>& Surface<R>::getTexture(int index) const {
     return m_textures[index];
 }
 

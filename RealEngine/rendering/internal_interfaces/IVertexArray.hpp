@@ -121,7 +121,6 @@ public:
 
     virtual void renderElementsBaseVertex(const VertexArrayInternals& va, Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const = 0;
     virtual void renderElementsBaseVertex(const VertexArrayInternals& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const = 0;
-
 };
 
 }

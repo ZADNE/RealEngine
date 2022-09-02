@@ -31,7 +31,6 @@ public:
     void* map(const BufferInternals& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const override;
     void flushMapped(const BufferInternals& bf, size_t offsetInBytes, size_t lengthInBytes) const override;
     bool unmap(const BufferInternals& bf) const override;
-
 };
 
 }

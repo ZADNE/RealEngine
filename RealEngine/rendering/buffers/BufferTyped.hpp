@@ -18,19 +18,19 @@ enum class BindNow {
  * @tparam R The renderer that will perform the commands
 */
 template<typename R = RendererLateBind>
-class TypedBuffer : public Buffer<R> {
+class BufferTyped : public Buffer<R> {
 public:
 
     template<typename... Args>
-    TypedBuffer(BufferType type, Args... args) :
-        TypedBuffer(BufferTypedIndex{type, std::numeric_limits<unsigned int>::max()}, BindNow::YES, args...) {}
+    BufferTyped(BufferType type, Args... args) :
+        BufferTyped(BufferTypedIndex{type, std::numeric_limits<unsigned int>::max()}, BindNow::YES, args...) {}
 
     template<typename... Args>
-    TypedBuffer(BufferTypedIndex index, Args... args) :
-        TypedBuffer(index, BindNow::YES, args...) {}
+    BufferTyped(BufferTypedIndex index, Args... args) :
+        BufferTyped(index, BindNow::YES, args...) {}
 
     template<typename... Args>
-    TypedBuffer(BufferTypedIndex index, BindNow bindNow, Args... args) :
+    BufferTyped(BufferTypedIndex index, BindNow bindNow, Args... args) :
         Buffer<R>(args...),
         m_index(index) {
         if (bindNow == BindNow::YES) {

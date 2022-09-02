@@ -72,6 +72,7 @@ public:
     void setUniform(const ShaderProgramInternals& sp, int location, ImageUnit unit) const override;
 
 private:
+
     //Used to compile from scratch
     ShaderProgramInternals compileProgram(const ShaderProgramSources& source) const;
 
