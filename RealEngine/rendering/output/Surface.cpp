@@ -20,9 +20,8 @@
 namespace RE {
 
 template<typename R>
-Surface<R>::Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures/* = 1*/, bool disableBlend/* = false*/, bool updateUniforms/* = true*/) :
+Surface<R>::Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures/* = 1*/, bool disableBlend/* = false*/) :
     m_disableBlend(disableBlend),
-    m_updateUniformBuffer(updateUniforms),
     m_params(params) {
 
     if (m_params.getMinFilterMipmapsUsage() == TextureMinFilterMipmapsUsage::YES) {
@@ -37,16 +36,10 @@ template<typename R>
 void Surface<R>::setTarget() const {
     m_framebuffer.targetMe(FramebufferTarget::DRAWING);
 
-    Viewport::set(glm::ivec2(0, 0), m_textures[0].getTrueDims());
+    Viewport<R>::set(glm::ivec2(0, 0), m_textures[0].getTrueDims());
 
     if (m_disableBlend) {
         BlendingCapability<R>::disable();
-    }
-
-    if (m_updateUniformBuffer) {
-        glm::vec2 trueDims = m_textures[0].getTrueDims();
-        glm::mat4 matrix = glm::ortho(0.0f, trueDims.x, 0.0f, trueDims.y);
-        Viewport::getWindowMatrixUniformBuffer().overwrite(0u, matrix);
     }
 }
 
@@ -54,14 +47,10 @@ template<typename R>
 void Surface<R>::resetTarget() const {
     DefaultFrameBuffer<R>::targetMe(FramebufferTarget::DRAWING);
 
-    Viewport::setToWholeWindow();
+    Viewport<R>::setToWholeWindow();
 
     if (m_disableBlend) {
         BlendingCapability<R>::enable();
-    }
-
-    if (m_updateUniformBuffer) {
-        Viewport::setWindowMatrixToMatchViewport();
     }
 }
 
@@ -72,12 +61,13 @@ void Surface<R>::associateTexturesWithOutputs(const std::vector<FramebufferOutpu
 
 template<typename R>
 void Surface<R>::resize(const Raster& image, unsigned int numberOfTextures) {
-    //Delete framebuffe
     m_textures.clear();
     m_textures.reserve(numberOfTextures);
+
     for (size_t i = 0; i < numberOfTextures; i++) {
         m_textures.emplace_back(image, m_params);
     }
+
     if (numberOfTextures > 0) {
         attachTexturesToFramebuffer();
     }

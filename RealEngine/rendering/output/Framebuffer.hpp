@@ -3,6 +3,7 @@
  */
 #pragma once
 #include <RealEngine/rendering/internal_interfaces/IFramebuffer.hpp>
+#include <RealEngine/rendering/RendererLateBind.hpp>
 
 
 namespace RE {

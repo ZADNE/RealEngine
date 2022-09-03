@@ -44,7 +44,7 @@ inline bool isIndexedBufferType(BufferType type) {
  * @brief Is a POD struct with buffer type and binding index
 */
 struct BufferTypedIndex {
-    BufferTypedIndex(BufferType type, unsigned int bindingIndex) :
+    constexpr BufferTypedIndex(BufferType type, unsigned int bindingIndex) :
         type(type), bindingIndex(bindingIndex) {
 
     }

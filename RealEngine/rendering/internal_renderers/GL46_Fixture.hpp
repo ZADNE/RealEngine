@@ -2,8 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <optional>
-
 #include <RealEngine/rendering/internal_renderers/GL46_Buffer.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Capabilities.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Framebuffer.hpp>
@@ -45,35 +43,59 @@ public:
     */
     static void initialize();
 
+    GL46_Fixture(const GL46_Fixture&) = delete;
+    GL46_Fixture& operator=(const GL46_Fixture&) = delete;
+
 private:
 
     GL46_Fixture();
     ~GL46_Fixture();
 
-    GL46_Fixture(const GL46_Fixture&) = delete;
-    GL46_Fixture& operator=(const GL46_Fixture&) = delete;
+    class Implementations {
+    public:
 
-    template<typename R>
-    void assignReferences();
+        Implementations() {
+            assignReferences<RendererLateBind>();
+            assignReferences<RendererGL46>();
+        }
 
-    template<typename R>
-    void clearReferences();
+        ~Implementations() {
+            clearReferences<RendererLateBind>();
+            clearReferences<RendererGL46>();
+        }
 
-    GL46_Buffer m_bufferImpl;
-    GL46_Capabilities m_capabilitiesImpl;
-    GL46_Framebuffer m_mainFramebufferImpl;
-    GL46_Ordering m_orderingImpl;
-    GL46_ShaderProgram m_shaderProgramImpl;
-    GL46_Texture m_textureImpl;
-    GL46_VertexArray m_vertexArrayImpl;
-    GL46_Viewport m_viewportImpl;
+        Implementations(const Implementations&) = delete;
+        Implementations& operator=(const Implementations&) = delete;
 
-    std::optional<Framebuffer<RendererGL46>> m_defaultFramebuffer;
+    private:
+
+        template<typename R>
+        void assignReferences();
+
+        template<typename R>
+        void clearReferences();
+
+        GL46_Buffer m_bufferImpl;
+        GL46_Capabilities m_capabilitiesImpl;
+        GL46_Framebuffer m_mainFramebufferImpl;
+        GL46_Ordering m_orderingImpl;
+        GL46_ShaderProgram m_shaderProgramImpl;
+        GL46_Texture m_textureImpl;
+        GL46_VertexArray m_vertexArrayImpl;
+        GL46_Viewport m_viewportImpl;
+
+        ViewportState m_viewportState;
+    };
+
+    Implementations s_impls;
+
+    Framebuffer<RendererLateBind> m_defaultFramebufferLateBind;
+    Framebuffer<RendererGL46> m_defaultFramebufferGL46;
 };
 
 /**
-* @brief Polls all OpenGL errors and logs them as errors.
+* @brief Polls all OpenGL errors and logs them as RealEngine errors.
 */
-void checkForGraphicsErrors();
+void checkForOpenGLErrors();
 
 }

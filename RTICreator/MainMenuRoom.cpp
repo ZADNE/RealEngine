@@ -12,6 +12,8 @@
 #define NOMINMAX 1
 #include <Windows.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <ImGui/imgui.h>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
@@ -39,6 +41,9 @@ MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
         //We have a second argument which should be the texture that should be loaded on start-up
         load(args[1]);
     }
+
+    glm::vec2 window = engine().getWindowDims();
+    m_windowViewBuf.overwrite(0u, glm::ortho(0.0f, window.x, 0.0f, window.y));
 }
 
 template<typename R>
@@ -79,15 +84,15 @@ void MainMenuRoom<R>::step() {
 template<typename R>
 void MainMenuRoom<R>::render(double interpolationFactor) {
     auto mat = m_texView.getViewMatrix();
-    m_texViewUBO.overwrite(0u, mat);
-    m_texViewUBO.bindIndexed();
+    m_texViewBuf.overwrite(0u, mat);
+    m_texViewBuf.bindIndexed();
 
     //Texture
     if (m_texture) {
         drawTexture();
     }
 
-    RE::Viewport::getWindowMatrixUniformBuffer().bindIndexed();
+    m_windowViewBuf.bindIndexed();
 
     //Menu
     if (ImGui::Begin("RTICreator v3.0.0")) {

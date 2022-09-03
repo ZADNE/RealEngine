@@ -14,7 +14,7 @@ enum class BindNow {
 };
 
 /**
- * @brief Is buffer that holds its type (and possibly binding index) as a part of its state.
+ * @brief Is a buffer that holds its type (and possibly binding index) as a part of its state
  * @tparam R The renderer that will perform the commands
 */
 template<typename R = RendererLateBind>

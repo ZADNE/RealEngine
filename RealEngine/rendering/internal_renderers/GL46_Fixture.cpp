@@ -126,24 +126,21 @@ void GL46_Fixture::initialize() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-GL46_Fixture::GL46_Fixture() {
-    assignReferences<RendererLateBind>();
-    assignReferences<RendererGL46>();
+GL46_Fixture::GL46_Fixture() :
+    m_defaultFramebufferLateBind(FramebufferInternals{0u}),
+    m_defaultFramebufferGL46(FramebufferInternals{0u}) {
 
-    m_defaultFramebuffer = Framebuffer<RendererGL46>(FramebufferInternals{0u});
-    DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = &(*m_defaultFramebuffer);
+    DefaultFrameBuffer<RendererLateBind>::s_defaultFramebuffer = &m_defaultFramebufferLateBind;
+    DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = &m_defaultFramebufferGL46;
 }
 
 GL46_Fixture::~GL46_Fixture() {
+    DefaultFrameBuffer<RendererLateBind>::s_defaultFramebuffer = nullptr;
     DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = nullptr;
-    m_defaultFramebuffer.reset();
-
-    clearReferences<RendererLateBind>();
-    clearReferences<RendererGL46>();
 }
 
 template<typename R>
-void GL46_Fixture::assignReferences() {
+void GL46_Fixture::Implementations::assignReferences() {
     Buffer<R>::s_impl = &m_bufferImpl;
     Capabilities<R>::s_impl = &m_capabilitiesImpl;
     Framebuffer<R>::s_impl = &m_mainFramebufferImpl;
@@ -152,11 +149,12 @@ void GL46_Fixture::assignReferences() {
     Texture<R>::s_impl = &m_textureImpl;
     TextureProxy<R>::s_impl = &m_textureImpl;
     VertexArray<R>::s_impl = &m_vertexArrayImpl;
-    Viewport::s_impl = &m_viewportImpl;
+    Viewport<R>::s_impl = &m_viewportImpl;
+    Viewport<R>::s_state = &m_viewportState;
 }
 
 template<typename R>
-void GL46_Fixture::clearReferences() {
+void GL46_Fixture::Implementations::clearReferences() {
     Buffer<R>::s_impl = nullptr;
     Capabilities<R>::s_impl = nullptr;
     Framebuffer<R>::s_impl = nullptr;
@@ -165,10 +163,11 @@ void GL46_Fixture::clearReferences() {
     Texture<R>::s_impl = nullptr;
     TextureProxy<R>::s_impl = nullptr;
     VertexArray<R>::s_impl = nullptr;
-    Viewport::s_impl = nullptr;
+    Viewport<R>::s_impl = nullptr;
+    Viewport<R>::s_state = nullptr;
 }
 
-void checkForGraphicsErrors() {
+void checkForOpenGLErrors() {
     GLenum err;
     do {
         err = glGetError();

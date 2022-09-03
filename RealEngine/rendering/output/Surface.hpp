@@ -29,8 +29,8 @@ public:
     /**
      * @brief Constructs surface without any textures (these can be later added via resize())
     */
-    Surface(const TextureParameters& params, bool disableBlend = false, bool updateUniforms = true) :
-        Surface(Raster{{1, 1}}, params, 0, disableBlend, updateUniforms) {};
+    Surface(const TextureParameters& params, bool disableBlend = false) :
+        Surface(Raster{{1, 1}}, params, 0, disableBlend) {};
 
     /**
      * @brief Constructs surface
@@ -39,9 +39,8 @@ public:
      * @param params Parameters of all the textures, note that mipmaps are not allowed for surface textures
      * @param numberOfTextures Number of textures of the surface
      * @param disableBlend If true, blending will be disabled when drawing to the surface.
-     * @param updateUniforms If true, standard GlobalMatrices uniform will be updated when drawing to the surface.
     */
-    Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures = 1, bool disableBlend = false, bool updateUniforms = true);
+    Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures = 1, bool disableBlend = false);
 
     /**
      * @brief Sets further drawing to be done to this surface
@@ -94,7 +93,6 @@ private:
     std::vector<Texture<R>> m_textures;
     Framebuffer<R> m_framebuffer;
     bool m_disableBlend;
-    bool m_updateUniformBuffer;
     TextureParameters m_params;
 
     void attachTexturesToFramebuffer();
