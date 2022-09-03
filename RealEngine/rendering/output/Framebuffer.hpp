@@ -8,8 +8,6 @@
 
 namespace RE {
 
-class RendererLateBind;
-
 /**
  * @brief Controls where output of rendering is stored
  * @tparam R The renderer that will perform the commands

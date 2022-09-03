@@ -9,6 +9,8 @@
 
 #include <SDL2/SDL_events.h>
 
+#include <glm/common.hpp>
+
 #include <ImGui/imgui_impl_sdl.h>
 #include <ImGui/imgui_impl_opengl3.h>
 

@@ -3,7 +3,6 @@
  */
 #pragma once
 #include <utility>
-#include <vector>
 
 #include <RealEngine/rendering/buffers/types.hpp>
 

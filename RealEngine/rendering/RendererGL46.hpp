@@ -3,16 +3,16 @@
  */
 #pragma once
 
-#include <RealEngine/rendering/internal_renderers/GL46_Buffer.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Capabilities.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Framebuffer.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Ordering.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_ShaderProgram.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Texture.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_VertexArray.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Viewport.hpp>
-
 namespace RE {
+
+class GL46_Buffer;
+class GL46_Capabilities;
+class GL46_Framebuffer;
+class GL46_Ordering;
+class GL46_ShaderProgram;
+class GL46_Texture;
+class GL46_VertexArray;
+class GL46_Viewport;
 
 /**
  * @brief Is renderer type collection that uses OpenGL 4.6
@@ -31,7 +31,6 @@ public:
     using Texture = GL46_Texture;
     using VertexArray = GL46_VertexArray;
     using Viewport = GL46_Viewport;
-
 };
 
 }

@@ -2,8 +2,11 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <vector>
+
 #include <RealEngine/rendering/internal_interfaces/IBuffer.hpp>
 #include <RealEngine/rendering/RendererLateBind.hpp>
+
 
 namespace RE {
 

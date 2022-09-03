@@ -3,12 +3,10 @@
  */
 #include <RealEngine/rendering/output/Framebuffer.hpp>
 
-#include <cassert>
-
 #include <RealEngine/rendering/textures/Texture.hpp>
 
-#include <RealEngine/rendering/RendererLateBind.hpp>
-#include <RealEngine/rendering/RendererGL46.hpp>
+#include <RealEngine/rendering/all_renderers.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46_Framebuffer.hpp>
 
 
 namespace RE {

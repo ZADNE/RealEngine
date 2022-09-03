@@ -3,16 +3,16 @@
  */
 #pragma once
 
-#include <RealEngine/rendering/internal_interfaces/IBuffer.hpp>
-#include <RealEngine/rendering/internal_interfaces/ICapabilities.hpp>
-#include <RealEngine/rendering/internal_interfaces/IFramebuffer.hpp>
-#include <RealEngine/rendering/internal_interfaces/IOrdering.hpp>
-#include <RealEngine/rendering/internal_interfaces/IShaderProgram.hpp>
-#include <RealEngine/rendering/internal_interfaces/ITexture.hpp>
-#include <RealEngine/rendering/internal_interfaces/IVertexArray.hpp>
-#include <RealEngine/rendering/internal_interfaces/IViewport.hpp>
-
 namespace RE {
+
+class IBuffer;
+class ICapabilities;
+class IFramebuffer;
+class IOrdering;
+class IShaderProgram;
+class ITexture;
+class IVertexArray;
+class IViewport;
 
 /**
  * @brief Is renderer type collection that polymorphically translates call to backing renderer
@@ -31,7 +31,6 @@ public:
     using Texture = ITexture;
     using VertexArray = IVertexArray;
     using Viewport = IViewport;
-
 };
 
 }

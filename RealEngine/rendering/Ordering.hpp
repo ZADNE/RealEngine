@@ -3,10 +3,10 @@
  */
 #pragma once
 #include <RealEngine/rendering/internal_interfaces/IOrdering.hpp>
+#include <RealEngine/rendering/RendererLateBind.hpp>
+
 
 namespace RE {
-
-class RendererLateBind;
 
 /**
  * @brief Manages ordering of rendering commnads

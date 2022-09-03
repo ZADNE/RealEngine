@@ -3,8 +3,8 @@
  */
 #include <RealEngine/rendering/Ordering.hpp>
 
-#include <RealEngine/rendering/RendererLateBind.hpp>
-#include <RealEngine/rendering/RendererGL46.hpp>
+#include <RealEngine/rendering/all_renderers.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46_Ordering.hpp>
 
 namespace RE {
 

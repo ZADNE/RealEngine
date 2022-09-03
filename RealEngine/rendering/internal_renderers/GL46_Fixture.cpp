@@ -9,7 +9,7 @@
 #include <GL/glew.h>
 
 #include <RealEngine/rendering/buffers/Buffer.hpp>
-#include <RealEngine/rendering/capabilities.hpp>
+#include <RealEngine/rendering/Capabilities.hpp>
 #include <RealEngine/rendering/output/Framebuffer.hpp>
 #include <RealEngine/rendering/Ordering.hpp>
 #include <RealEngine/rendering/vertices/ShaderProgram.hpp>

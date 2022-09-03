@@ -11,7 +11,7 @@
 #include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
 #include <RealEngine/resources/ResourceManager.hpp>
-#include <RealEngine/rendering/capabilities.hpp>
+#include <RealEngine/rendering/Capabilities.hpp>
 
 #include <RealEngine/rendering/RendererLateBind.hpp>
 #include <RealEngine/rendering/RendererGL46.hpp>

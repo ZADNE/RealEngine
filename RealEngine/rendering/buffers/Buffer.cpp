@@ -3,10 +3,9 @@
  */
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 
-#include <RealEngine/rendering/internal_interfaces/IBuffer.hpp>
+#include <RealEngine/rendering/all_renderers.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46_Buffer.hpp>
 
-#include <RealEngine/rendering/RendererLateBind.hpp>
-#include <RealEngine/rendering/RendererGL46.hpp>
 
 namespace RE {
 

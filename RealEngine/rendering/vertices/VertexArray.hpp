@@ -2,9 +2,10 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/rendering/internal_interfaces/IVertexArray.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
+#include <RealEngine/rendering/internal_interfaces/IVertexArray.hpp>
 #include <RealEngine/rendering/RendererLateBind.hpp>
+
 
 namespace RE {
 
