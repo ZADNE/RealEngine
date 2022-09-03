@@ -14,23 +14,23 @@ namespace RE {
 class GL46_Framebuffer final : public IFramebuffer {
 public:
 
-    FramebufferInternals construct() const override;
-    void destruct(FramebufferInternals& fb) const override;
+    FramebufferID construct() const override;
+    void destruct(FramebufferID& fb) const override;
 
-    void attachImage(FramebufferInternals& fb, FramebufferAttachment attachment, const TextureInternals& te, int level) const override;
+    void attachImage(FramebufferID& fb, FramebufferAttachment attachment, const TextureID& te, int level) const override;
 
-    void associateAttachementsWithOutputs(FramebufferInternals& fb, const std::vector<FramebufferOutput>& outputs) const override;
-    void selectAttachmentForColorReading(FramebufferInternals& fb, unsigned int colorAttachmentIndex) const override;
+    void associateAttachementsWithOutputs(FramebufferID& fb, const std::vector<FramebufferOutput>& outputs) const override;
+    void selectAttachmentForColorReading(FramebufferID& fb, unsigned int colorAttachmentIndex) const override;
 
-    void targetMe(const FramebufferInternals& fb, FramebufferTarget target) const override;
-    FramebufferTargetability checkTargetability(const FramebufferInternals& fb, FramebufferTarget target) const override;
+    void targetMe(const FramebufferID& fb, FramebufferTarget target) const override;
+    FramebufferTargetability checkTargetability(const FramebufferID& fb, FramebufferTarget target) const override;
 
-    void clearColorAttachment(const FramebufferInternals& fb, unsigned int attachmentIndex, const glm::vec4& color) const override;
-    void clearColorAttachment(const FramebufferInternals& fb, unsigned int attachmentIndex, const glm::ivec4& color) const override;
-    void clearColorAttachment(const FramebufferInternals& fb, unsigned int attachmentIndex, const glm::uvec4& color) const override;
-    void clearDepthAttachment(const FramebufferInternals& fb, float depth) const override;
-    void clearStencilAttachment(const FramebufferInternals& fb, int stencil) const override;
-    void clearDepthAndStencilAttachments(const FramebufferInternals& fb, float depth, int stencil) const override;
+    void clearColorAttachment(const FramebufferID& fb, unsigned int attachmentIndex, const glm::vec4& color) const override;
+    void clearColorAttachment(const FramebufferID& fb, unsigned int attachmentIndex, const glm::ivec4& color) const override;
+    void clearColorAttachment(const FramebufferID& fb, unsigned int attachmentIndex, const glm::uvec4& color) const override;
+    void clearDepthAttachment(const FramebufferID& fb, float depth) const override;
+    void clearStencilAttachment(const FramebufferID& fb, int stencil) const override;
+    void clearDepthAndStencilAttachments(const FramebufferID& fb, float depth, int stencil) const override;
 };
 
 }

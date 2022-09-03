@@ -134,27 +134,27 @@ struct ShaderProgramSources {
  * @brief Contains all members of ShaderProgram
  * @note For internal usage in RealEngine.
 */
-class ShaderProgramInternals {
+class ShaderProgramID {
     friend class GL46_ShaderProgram;
 public:
 
-    ~ShaderProgramInternals() = default;
+    ~ShaderProgramID() = default;
 
-    ShaderProgramInternals(const ShaderProgramInternals&) = delete;
-    ShaderProgramInternals(ShaderProgramInternals&& other) noexcept :
+    ShaderProgramID(const ShaderProgramID&) = delete;
+    ShaderProgramID(ShaderProgramID&& other) noexcept :
         m_id(other.m_id) {
         other.m_id = 0;
     }
 
-    ShaderProgramInternals& operator=(const ShaderProgramInternals&) = delete;
-    ShaderProgramInternals& operator=(ShaderProgramInternals&& other) noexcept {
+    ShaderProgramID& operator=(const ShaderProgramID&) = delete;
+    ShaderProgramID& operator=(ShaderProgramID&& other) noexcept {
         std::swap(m_id, other.m_id);
         return *this;
     }
 
 private:
 
-    ShaderProgramInternals(unsigned int id) :
+    ShaderProgramID(unsigned int id) :
         m_id(id) {}
 
     unsigned int m_id = 0;      /**< Internal identifier */
@@ -170,61 +170,61 @@ private:
 class IShaderProgram {
 public:
 
-    virtual ShaderProgramInternals construct(const ShaderProgramSources& sources) const = 0;
-    virtual void destruct(ShaderProgramInternals& sp) const = 0;
+    virtual ShaderProgramID construct(const ShaderProgramSources& sources) const = 0;
+    virtual void destruct(ShaderProgramID& sp) const = 0;
 
 
-    virtual void use(const ShaderProgramInternals& sp) const = 0;
-    virtual void unuse(const ShaderProgramInternals& sp) const = 0;
+    virtual void use(const ShaderProgramID& sp) const = 0;
+    virtual void unuse(const ShaderProgramID& sp) const = 0;
 
-    virtual void dispatchCompute(const ShaderProgramInternals& sp, const glm::uvec3& groupCount, bool use) const = 0;
-    virtual void dispatchCompute(const ShaderProgramInternals& sp, int indirect, bool use) const = 0;
+    virtual void dispatchCompute(const ShaderProgramID& sp, const glm::uvec3& groupCount, bool use) const = 0;
+    virtual void dispatchCompute(const ShaderProgramID& sp, int indirect, bool use) const = 0;
 
-    virtual void printInfo(const ShaderProgramInternals& sp) const = 0;
-    virtual void backInterfaceBlock(const ShaderProgramInternals& sp, unsigned int interfaceBlockIndex, const BufferTypedIndex& index) const = 0;
+    virtual void printInfo(const ShaderProgramID& sp) const = 0;
+    virtual void backInterfaceBlock(const ShaderProgramID& sp, unsigned int interfaceBlockIndex, const BufferTypedIndex& index) const = 0;
 
-    virtual int getUniformLocation(const ShaderProgramInternals& sp, const std::string& name) const = 0;
+    virtual int getUniformLocation(const ShaderProgramID& sp, const std::string& name) const = 0;
 
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, float val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, float val0, float val1) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, const glm::vec2& val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, float val0, float val1, float val2) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, const glm::vec3& val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, float val0, float val1, float val2, float val3) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, const glm::vec4& val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const float* val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const glm::vec2* val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const glm::vec3* val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const glm::vec4* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, float val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, float val0, float val1) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, const glm::vec2& val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, float val0, float val1, float val2) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, const glm::vec3& val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, float val0, float val1, float val2, float val3) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, const glm::vec4& val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const float* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const glm::vec2* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const glm::vec3* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const glm::vec4* val) const = 0;
 
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int val0, int val1) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, const glm::ivec2& val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int val0, int val1, int val2) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, const glm::ivec3& val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int val0, int val1, int val2, int val3) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, const glm::ivec4& val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const int* val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const glm::ivec2* val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const glm::ivec3* val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const glm::ivec4* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int val0, int val1) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, const glm::ivec2& val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int val0, int val1, int val2) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, const glm::ivec3& val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int val0, int val1, int val2, int val3) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, const glm::ivec4& val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const int* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const glm::ivec2* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const glm::ivec3* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const glm::ivec4* val) const = 0;
 
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, unsigned int val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, unsigned int val0, unsigned int val1) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, const glm::uvec2& val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, unsigned int val0, unsigned int val1, unsigned int val2) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, const glm::uvec3& val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, unsigned int val0, unsigned int val1, unsigned int val2, unsigned int val3) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, const glm::uvec4& val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const unsigned int* val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const glm::uvec2* val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const glm::uvec3* val) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const glm::uvec4* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, unsigned int val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, unsigned int val0, unsigned int val1) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, const glm::uvec2& val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, unsigned int val0, unsigned int val1, unsigned int val2) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, const glm::uvec3& val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, unsigned int val0, unsigned int val1, unsigned int val2, unsigned int val3) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, const glm::uvec4& val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const unsigned int* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const glm::uvec2* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const glm::uvec3* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const glm::uvec4* val) const = 0;
 
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, int count, const glm::mat4* val) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, int count, const glm::mat4* val) const = 0;
 
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, TextureUnit unit) const = 0;
-    virtual void setUniform(const ShaderProgramInternals& sp, int location, ImageUnit unit) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, TextureUnit unit) const = 0;
+    virtual void setUniform(const ShaderProgramID& sp, int location, ImageUnit unit) const = 0;
 };
 
 }

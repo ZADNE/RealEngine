@@ -55,7 +55,7 @@ public:
 
 private:
 
-    VertexArrayInternals m_internals;
+    VertexArrayID m_id;
 
     static inline R::VertexArray* s_impl = nullptr;
 };

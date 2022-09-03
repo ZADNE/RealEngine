@@ -52,7 +52,7 @@ public:
 
 private:
 
-    TextureInternals m_internals;
+    TextureID m_id;
 
     static inline R::Texture* s_impl = nullptr;
 };
@@ -241,7 +241,7 @@ private:
 
     void init(const Raster& raster, const TextureParameters& params);
 
-    TextureInternals m_internals;
+    TextureID m_id;
     TextureFlags m_flags{};     /**< Flags associated with the texture */
 
     glm::vec2 m_subimageDims{}; /**< Dimensions of the texture */

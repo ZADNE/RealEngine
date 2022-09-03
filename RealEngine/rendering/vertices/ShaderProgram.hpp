@@ -133,7 +133,7 @@ public:
 
 private:
 
-    ShaderProgramInternals m_internals;
+    ShaderProgramID m_id;
 
     static inline R::ShaderProgram* s_impl = nullptr;
 };

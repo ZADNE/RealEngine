@@ -14,23 +14,23 @@ namespace RE {
 class GL46_Buffer final : public IBuffer {
 public:
 
-    BufferInternals constructImmutable(size_t sizeInBytes, BufferUsageFlags flags, const void* data) const override;
-    BufferInternals constructMutable(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const override;
-    void destruct(BufferInternals& bf) const override;
+    BufferID constructImmutable(size_t sizeInBytes, BufferUsageFlags flags, const void* data) const override;
+    BufferID constructMutable(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const override;
+    void destruct(BufferID& bf) const override;
 
-    void bind(const BufferInternals& bf, BufferType bindType) const override;
-    void bindIndexed(const BufferInternals& bf, const BufferTypedIndex& index) const override;
+    void bind(const BufferID& bf, BufferType bindType) const override;
+    void bindIndexed(const BufferID& bf, const BufferTypedIndex& index) const override;
 
-    void overwrite(const BufferInternals& bf, size_t offsetInBytes, size_t countBytes, const void* data) const override;
+    void overwrite(const BufferID& bf, size_t offsetInBytes, size_t countBytes, const void* data) const override;
 
-    void redefine(BufferInternals& bf, size_t sizeInBytes, const void* data) const override;
+    void redefine(BufferID& bf, size_t sizeInBytes, const void* data) const override;
 
-    void invalidate(const BufferInternals& bf) const override;
-    void invalidate(const BufferInternals& bf, size_t lengthInBytes) const override;
+    void invalidate(const BufferID& bf) const override;
+    void invalidate(const BufferID& bf, size_t lengthInBytes) const override;
 
-    void* map(const BufferInternals& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const override;
-    void flushMapped(const BufferInternals& bf, size_t offsetInBytes, size_t lengthInBytes) const override;
-    bool unmap(const BufferInternals& bf) const override;
+    void* map(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const override;
+    void flushMapped(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes) const override;
+    bool unmap(const BufferID& bf) const override;
 };
 
 }

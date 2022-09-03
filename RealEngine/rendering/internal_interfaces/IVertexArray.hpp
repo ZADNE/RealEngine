@@ -63,27 +63,27 @@ enum class IndexType : unsigned int {
  * @brief Contains all members of VertexArray
  * @note For internal usage in RealEngine.
 */
-class VertexArrayInternals {
+class VertexArrayID {
     friend class GL46_VertexArray;
 public:
 
-    ~VertexArrayInternals() = default;
+    ~VertexArrayID() = default;
 
-    VertexArrayInternals(const VertexArrayInternals&) = delete;
-    VertexArrayInternals(VertexArrayInternals&& other) noexcept :
+    VertexArrayID(const VertexArrayID&) = delete;
+    VertexArrayID(VertexArrayID&& other) noexcept :
         m_id(other.m_id) {
         other.m_id = 0;
     }
 
-    VertexArrayInternals& operator=(const VertexArrayInternals&) = delete;
-    VertexArrayInternals& operator=(VertexArrayInternals&& other) noexcept {
+    VertexArrayID& operator=(const VertexArrayID&) = delete;
+    VertexArrayID& operator=(VertexArrayID&& other) noexcept {
         std::swap(m_id, other.m_id);
         return *this;
     }
 
 private:
 
-    VertexArrayInternals(unsigned int id) :
+    VertexArrayID(unsigned int id) :
         m_id(id) {}
 
     unsigned int m_id = 0;      /**< Internal identifier */
@@ -99,28 +99,28 @@ private:
 class IVertexArray {
 public:
 
-    virtual VertexArrayInternals construct() const = 0;
-    virtual void destruct(VertexArrayInternals& va) const = 0;
+    virtual VertexArrayID construct() const = 0;
+    virtual void destruct(VertexArrayID& va) const = 0;
 
-    virtual void setAttribute(VertexArrayInternals& va, unsigned int attribute, VertexComponentCount components, VertexComponentType type, unsigned int relativeOffset, bool normalize = true) const = 0;
-    virtual void unsetAttribute(VertexArrayInternals& va, unsigned int attribute) const = 0;
+    virtual void setAttribute(VertexArrayID& va, unsigned int attribute, VertexComponentCount components, VertexComponentType type, unsigned int relativeOffset, bool normalize = true) const = 0;
+    virtual void unsetAttribute(VertexArrayID& va, unsigned int attribute) const = 0;
 
-    virtual void setBindingPoint(VertexArrayInternals& va, unsigned int bindingPoint, const BufferInternals& bf, int offset, int stride) const = 0;
-    virtual void unsetBindingPoint(VertexArrayInternals& va, unsigned int bindingPoint) const = 0;
+    virtual void setBindingPoint(VertexArrayID& va, unsigned int bindingPoint, const BufferID& bf, int offset, int stride) const = 0;
+    virtual void unsetBindingPoint(VertexArrayID& va, unsigned int bindingPoint) const = 0;
 
-    virtual void connectAttributeToBindingPoint(VertexArrayInternals& va, unsigned int attribute, unsigned int bindingPoint) const = 0;
+    virtual void connectAttributeToBindingPoint(VertexArrayID& va, unsigned int attribute, unsigned int bindingPoint) const = 0;
 
-    virtual void bind(const VertexArrayInternals& va) const = 0;
-    virtual void unbind(const VertexArrayInternals& va) const = 0;
+    virtual void bind(const VertexArrayID& va) const = 0;
+    virtual void unbind(const VertexArrayID& va) const = 0;
 
-    virtual void renderArrays(const VertexArrayInternals& va, Primitive prim, int first, size_t count) const = 0;
-    virtual void renderArrays(const VertexArrayInternals& va, Primitive prim, int first, size_t count, int instancecount) const = 0;
+    virtual void renderArrays(const VertexArrayID& va, Primitive prim, int first, size_t count) const = 0;
+    virtual void renderArrays(const VertexArrayID& va, Primitive prim, int first, size_t count, int instancecount) const = 0;
 
-    virtual void renderElements(const VertexArrayInternals& va, Primitive prim, size_t count, IndexType type, const void* offset) const = 0;
-    virtual void renderElements(const VertexArrayInternals& va, Primitive prim, size_t count, IndexType type, const void* offset, int instancecount) const = 0;
+    virtual void renderElements(const VertexArrayID& va, Primitive prim, size_t count, IndexType type, const void* offset) const = 0;
+    virtual void renderElements(const VertexArrayID& va, Primitive prim, size_t count, IndexType type, const void* offset, int instancecount) const = 0;
 
-    virtual void renderElementsBaseVertex(const VertexArrayInternals& va, Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const = 0;
-    virtual void renderElementsBaseVertex(const VertexArrayInternals& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const = 0;
+    virtual void renderElementsBaseVertex(const VertexArrayID& va, Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const = 0;
+    virtual void renderElementsBaseVertex(const VertexArrayID& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const = 0;
 };
 
 }

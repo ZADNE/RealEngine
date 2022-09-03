@@ -57,17 +57,17 @@ GLenum convert(IndexType type) {
     }
 }
 
-VertexArrayInternals GL46_VertexArray::construct() const {
+VertexArrayID GL46_VertexArray::construct() const {
     unsigned int id;
     glCreateVertexArrays(1, &id);
-    return VertexArrayInternals{id};
+    return VertexArrayID{id};
 }
 
-void GL46_VertexArray::destruct(VertexArrayInternals& va) const {
+void GL46_VertexArray::destruct(VertexArrayID& va) const {
     glDeleteVertexArrays(1, &va.m_id);
 }
 
-void GL46_VertexArray::setAttribute(VertexArrayInternals& va, unsigned int attribute, VertexComponentCount components, VertexComponentType type, unsigned int relativeOffset, bool normalize/* = true*/) const {
+void GL46_VertexArray::setAttribute(VertexArrayID& va, unsigned int attribute, VertexComponentCount components, VertexComponentType type, unsigned int relativeOffset, bool normalize/* = true*/) const {
     glEnableVertexArrayAttrib(va.m_id, attribute);
 
     switch (type) {
@@ -96,23 +96,23 @@ void GL46_VertexArray::setAttribute(VertexArrayInternals& va, unsigned int attri
     }
 }
 
-void GL46_VertexArray::unsetAttribute(VertexArrayInternals& va, unsigned int attribute) const {
+void GL46_VertexArray::unsetAttribute(VertexArrayID& va, unsigned int attribute) const {
     glDisableVertexArrayAttrib(va.m_id, attribute);
 }
 
-void GL46_VertexArray::setBindingPoint(VertexArrayInternals& va, unsigned int bindingPoint, const BufferInternals& bf, int offset, int stride) const {
+void GL46_VertexArray::setBindingPoint(VertexArrayID& va, unsigned int bindingPoint, const BufferID& bf, int offset, int stride) const {
     glVertexArrayVertexBuffer(va.m_id, bindingPoint, bf.m_id, offset, stride);
 }
 
-void GL46_VertexArray::unsetBindingPoint(VertexArrayInternals& va, unsigned int bindingPoint) const {
+void GL46_VertexArray::unsetBindingPoint(VertexArrayID& va, unsigned int bindingPoint) const {
     glVertexArrayVertexBuffer(va.m_id, bindingPoint, 0, 0, 0);
 }
 
-void GL46_VertexArray::connectAttributeToBindingPoint(VertexArrayInternals& va, unsigned int attribute, unsigned int bindingPoint) const {
+void GL46_VertexArray::connectAttributeToBindingPoint(VertexArrayID& va, unsigned int attribute, unsigned int bindingPoint) const {
     glVertexArrayAttribBinding(va.m_id, attribute, bindingPoint);
 }
 
-void GL46_VertexArray::bind(const VertexArrayInternals& va) const {
+void GL46_VertexArray::bind(const VertexArrayID& va) const {
 #ifdef _DEBUG
     if (s_currentlyBoundID != 0) {
         throw "Overbound vertex arrays";
@@ -122,7 +122,7 @@ void GL46_VertexArray::bind(const VertexArrayInternals& va) const {
     glBindVertexArray(va.m_id);
 }
 
-void GL46_VertexArray::unbind(const VertexArrayInternals& va) const {
+void GL46_VertexArray::unbind(const VertexArrayID& va) const {
 #ifdef _DEBUG
     if (s_currentlyBoundID != va.m_id) {
         throw "Overbound vertex arrays";
@@ -132,37 +132,37 @@ void GL46_VertexArray::unbind(const VertexArrayInternals& va) const {
 #endif // _DEBUG
 }
 
-void GL46_VertexArray::renderArrays(const VertexArrayInternals& va, Primitive prim, int first, size_t count) const {
+void GL46_VertexArray::renderArrays(const VertexArrayID& va, Primitive prim, int first, size_t count) const {
     throwIfNotCurrentlyBound(va);
     glDrawArrays(convert(prim), static_cast<GLint>(first), static_cast<GLsizei>(count));
 }
 
-void GL46_VertexArray::renderArrays(const VertexArrayInternals& va, Primitive prim, int first, size_t count, int instancecount) const {
+void GL46_VertexArray::renderArrays(const VertexArrayID& va, Primitive prim, int first, size_t count, int instancecount) const {
     throwIfNotCurrentlyBound(va);
     glDrawArraysInstanced(convert(prim), static_cast<GLint>(first), static_cast<GLsizei>(count), instancecount);
 }
 
-void GL46_VertexArray::renderElements(const VertexArrayInternals& va, Primitive prim, size_t count, IndexType type, const void* indices) const {
+void GL46_VertexArray::renderElements(const VertexArrayID& va, Primitive prim, size_t count, IndexType type, const void* indices) const {
     throwIfNotCurrentlyBound(va);
     glDrawElements(convert(prim), static_cast<GLsizei>(count), convert(type), indices);
 }
 
-void GL46_VertexArray::renderElements(const VertexArrayInternals& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount) const {
+void GL46_VertexArray::renderElements(const VertexArrayID& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount) const {
     throwIfNotCurrentlyBound(va);
     glDrawElementsInstanced(convert(prim), static_cast<GLsizei>(count), convert(type), indices, instancecount);
 }
 
-void GL46_VertexArray::renderElementsBaseVertex(const VertexArrayInternals& va, Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const {
+void GL46_VertexArray::renderElementsBaseVertex(const VertexArrayID& va, Primitive prim, size_t count, IndexType type, const void* indices, int basevertex) const {
     throwIfNotCurrentlyBound(va);
     glDrawElementsBaseVertex(convert(prim), static_cast<GLsizei>(count), convert(type), const_cast<void*>(indices), basevertex);
 }
 
-void GL46_VertexArray::renderElementsBaseVertex(const VertexArrayInternals& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const {
+void GL46_VertexArray::renderElementsBaseVertex(const VertexArrayID& va, Primitive prim, size_t count, IndexType type, const void* indices, int instancecount, int basevertex) const {
     throwIfNotCurrentlyBound(va);
     glDrawElementsInstancedBaseVertex(convert(prim), static_cast<GLsizei>(count), convert(type), indices, instancecount, basevertex);
 }
 
-void GL46_VertexArray::throwIfNotCurrentlyBound(const VertexArrayInternals& va) const {
+void GL46_VertexArray::throwIfNotCurrentlyBound(const VertexArrayID& va) const {
 #ifdef _DEBUG
     if (s_currentlyBoundID != va.m_id) {
         throw "Rendered with vertex array that is not bound";

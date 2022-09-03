@@ -69,56 +69,36 @@ inline bool operator&(BufferMapUsageFlags a, BufferMapUsageFlags b) {
  * @brief Contains all members of Buffer
  * @note For internal usage in RealEngine.
 */
-class BufferInternals {
+class BufferID {
     friend class GL46_Buffer;
     friend class GL46_VertexArray;
 public:
 
-    ~BufferInternals() = default;
+    ~BufferID() = default;
 
-    BufferInternals(const BufferInternals&) = delete;
-    BufferInternals(BufferInternals&& other) noexcept :
+    BufferID(const BufferID&) = delete;
+    BufferID(BufferID&& other) noexcept :
         m_id(other.m_id),
-        m_sizeInBytes(other.m_sizeInBytes),
-        m_access(other.m_access)
-    #ifndef _DEBUG
-    {
-    #else
-        , m_storage(other.m_storage) {
-    #endif // _DEBUG
+        m_access(other.m_access) {
         other.m_id = 0;
     }
 
-    BufferInternals& operator=(const BufferInternals&) = delete;
-    BufferInternals& operator=(BufferInternals && other) noexcept {
+    BufferID& operator=(const BufferID&) = delete;
+    BufferID& operator=(BufferID && other) noexcept {
         std::swap(m_id, other.m_id);
-        m_sizeInBytes = other.m_sizeInBytes;
         m_access = other.m_access;
-    #ifdef _DEBUG
-        m_storage = other.m_storage;
-    #endif // _DEBUG
         return *this;
     }
 
-    size_t size() const { return m_sizeInBytes; }
-
 private:
 
-#ifndef _DEBUG
-    BufferInternals(unsigned int id, size_t sizeInBytes, unsigned int access) :
-        m_id(id), m_sizeInBytes(sizeInBytes), m_access(access) {}
-#else
-    BufferInternals(unsigned int id, size_t sizeInBytes, unsigned int access, BufferStorage storage) :
-        m_id(id), m_sizeInBytes(sizeInBytes), m_access(access), m_storage(storage) {}
-#endif
+    BufferID(unsigned int id, unsigned int access) :
+        m_id(id),
+        m_access(access) {
+    }
 
     unsigned int m_id = 0;      /**< Internal identifier */
-    size_t m_sizeInBytes = 0;   /**< Size of the buffer */
     unsigned int m_access = 0;  /**< Access hints of the buffer; relevant only for mutable buffers */
-
-#ifdef _DEBUG
-    BufferStorage m_storage = BufferStorage::IMMUTABLE;
-#endif // _DEBUG
 };
 
 /**
@@ -131,23 +111,23 @@ private:
 class IBuffer {
 public:
 
-    virtual BufferInternals constructImmutable(size_t sizeInBytes, BufferUsageFlags flags, const void* data) const = 0;
-    virtual BufferInternals constructMutable(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const = 0;
-    virtual void destruct(BufferInternals& bf) const = 0;
+    virtual BufferID constructImmutable(size_t sizeInBytes, BufferUsageFlags flags, const void* data) const = 0;
+    virtual BufferID constructMutable(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const = 0;
+    virtual void destruct(BufferID& bf) const = 0;
 
-    virtual void bind(const BufferInternals& bf, BufferType bindType) const = 0;
-    virtual void bindIndexed(const BufferInternals& bf, const BufferTypedIndex& index) const = 0;
+    virtual void bind(const BufferID& bf, BufferType bindType) const = 0;
+    virtual void bindIndexed(const BufferID& bf, const BufferTypedIndex& index) const = 0;
 
-    virtual void overwrite(const BufferInternals& bf, size_t offsetInBytes, size_t countBytes, const void* data) const = 0;
+    virtual void overwrite(const BufferID& bf, size_t offsetInBytes, size_t countBytes, const void* data) const = 0;
 
-    virtual void redefine(BufferInternals& bf, size_t sizeInBytes, const void* data) const = 0;
+    virtual void redefine(BufferID& bf, size_t sizeInBytes, const void* data) const = 0;
 
-    virtual void invalidate(const BufferInternals& bf) const = 0;
-    virtual void invalidate(const BufferInternals& bf, size_t lengthInBytes) const = 0;
+    virtual void invalidate(const BufferID& bf) const = 0;
+    virtual void invalidate(const BufferID& bf, size_t lengthInBytes) const = 0;
 
-    virtual void* map(const BufferInternals& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const = 0;
-    virtual void flushMapped(const BufferInternals& bf, size_t offsetInBytes, size_t lengthInBytes) const = 0;
-    virtual bool unmap(const BufferInternals& bf) const = 0;
+    virtual void* map(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const = 0;
+    virtual void flushMapped(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes) const = 0;
+    virtual bool unmap(const BufferID& bf) const = 0;
 };
 
 }

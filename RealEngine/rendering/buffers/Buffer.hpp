@@ -207,7 +207,12 @@ public:
 
 protected:
 
-    BufferInternals m_internals;
+    BufferID m_id;
+    size_t m_sizeInBytes = 0;   /**< Size of the buffer */
+
+#ifdef _DEBUG
+    BufferStorage m_storage = BufferStorage::IMMUTABLE;
+#endif // _DEBUG
 
     static inline R::Buffer* s_impl = nullptr;
 };

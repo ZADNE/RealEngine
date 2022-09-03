@@ -127,8 +127,8 @@ void GL46_Fixture::initialize() {
 }
 
 GL46_Fixture::GL46_Fixture() :
-    m_defaultFramebufferLateBind(FramebufferInternals{0u}),
-    m_defaultFramebufferGL46(FramebufferInternals{0u}) {
+    m_defaultFramebufferLateBind(FramebufferID{0u}),
+    m_defaultFramebufferGL46(FramebufferID{0u}) {
 
     DefaultFrameBuffer<RendererLateBind>::s_defaultFramebuffer = &m_defaultFramebufferLateBind;
     DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = &m_defaultFramebufferGL46;

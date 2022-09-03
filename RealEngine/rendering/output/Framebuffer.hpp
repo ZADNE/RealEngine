@@ -83,9 +83,9 @@ private:
     /**
      * @brief Used only to contruct the default framebuffer
     */
-    Framebuffer(FramebufferInternals&& internals);
+    Framebuffer(FramebufferID&& id);
 
-    FramebufferInternals m_internals;
+    FramebufferID m_id;
 
     static inline R::Framebuffer* s_impl = nullptr;
 };

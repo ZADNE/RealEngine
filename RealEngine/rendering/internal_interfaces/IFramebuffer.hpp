@@ -79,28 +79,28 @@ enum class FramebufferTargetability {
  * @brief Contains all members of Framebuffer
  * @note For internal usage in RealEngine.
 */
-class FramebufferInternals {
+class FramebufferID {
     friend class GL46_Framebuffer;
     friend class GL46_Fixture;
 public:
 
-    ~FramebufferInternals() = default;
+    ~FramebufferID() = default;
 
-    FramebufferInternals(const FramebufferInternals&) = delete;
-    FramebufferInternals(FramebufferInternals&& other) noexcept :
+    FramebufferID(const FramebufferID&) = delete;
+    FramebufferID(FramebufferID&& other) noexcept :
         m_id(other.m_id) {
         other.m_id = 0;
     }
 
-    FramebufferInternals& operator=(const FramebufferInternals&) = delete;
-    FramebufferInternals& operator=(FramebufferInternals&& other) noexcept {
+    FramebufferID& operator=(const FramebufferID&) = delete;
+    FramebufferID& operator=(FramebufferID&& other) noexcept {
         std::swap(m_id, other.m_id);
         return *this;
     }
 
 private:
 
-    FramebufferInternals(unsigned int id) :
+    FramebufferID(unsigned int id) :
         m_id(id) {}
 
     unsigned int m_id = 0;      /**< Internal identifier */
@@ -116,23 +116,23 @@ private:
 class IFramebuffer {
 public:
 
-    virtual FramebufferInternals construct() const = 0;
-    virtual void destruct(FramebufferInternals& fb) const = 0;
+    virtual FramebufferID construct() const = 0;
+    virtual void destruct(FramebufferID& fb) const = 0;
 
-    virtual void attachImage(FramebufferInternals& fb, FramebufferAttachment attachment, const TextureInternals& te, int level) const = 0;
+    virtual void attachImage(FramebufferID& fb, FramebufferAttachment attachment, const TextureID& te, int level) const = 0;
 
-    virtual void associateAttachementsWithOutputs(FramebufferInternals& fb, const std::vector<FramebufferOutput>& outputs) const = 0;
-    virtual void selectAttachmentForColorReading(FramebufferInternals& fb, unsigned int colorAttachmentIndex) const = 0;
+    virtual void associateAttachementsWithOutputs(FramebufferID& fb, const std::vector<FramebufferOutput>& outputs) const = 0;
+    virtual void selectAttachmentForColorReading(FramebufferID& fb, unsigned int colorAttachmentIndex) const = 0;
 
-    virtual void targetMe(const FramebufferInternals& fb, FramebufferTarget target) const = 0;
-    virtual FramebufferTargetability checkTargetability(const FramebufferInternals& fb, FramebufferTarget target) const = 0;
+    virtual void targetMe(const FramebufferID& fb, FramebufferTarget target) const = 0;
+    virtual FramebufferTargetability checkTargetability(const FramebufferID& fb, FramebufferTarget target) const = 0;
 
-    virtual void clearColorAttachment(const FramebufferInternals& fb, unsigned int attachmentIndex, const glm::vec4& color) const = 0;
-    virtual void clearColorAttachment(const FramebufferInternals& fb, unsigned int attachmentIndex, const glm::ivec4& color) const = 0;
-    virtual void clearColorAttachment(const FramebufferInternals& fb, unsigned int attachmentIndex, const glm::uvec4& color) const = 0;
-    virtual void clearDepthAttachment(const FramebufferInternals& fb, float depth) const = 0;
-    virtual void clearStencilAttachment(const FramebufferInternals& fb, int stencil) const = 0;
-    virtual void clearDepthAndStencilAttachments(const FramebufferInternals& fb, float depth, int stencil) const = 0;
+    virtual void clearColorAttachment(const FramebufferID& fb, unsigned int attachmentIndex, const glm::vec4& color) const = 0;
+    virtual void clearColorAttachment(const FramebufferID& fb, unsigned int attachmentIndex, const glm::ivec4& color) const = 0;
+    virtual void clearColorAttachment(const FramebufferID& fb, unsigned int attachmentIndex, const glm::uvec4& color) const = 0;
+    virtual void clearDepthAttachment(const FramebufferID& fb, float depth) const = 0;
+    virtual void clearStencilAttachment(const FramebufferID& fb, int stencil) const = 0;
+    virtual void clearDepthAndStencilAttachments(const FramebufferID& fb, float depth, int stencil) const = 0;
 
 };
 

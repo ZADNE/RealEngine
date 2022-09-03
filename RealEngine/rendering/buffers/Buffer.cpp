@@ -3,6 +3,8 @@
  */
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 
+#include <cassert>
+
 #include <RealEngine/rendering/all_renderers.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Buffer.hpp>
 
@@ -17,73 +19,101 @@ using enum BufferUsageFlags;
 
 template <typename R>
 Buffer<R>::Buffer(size_t sizeInBytes, BufferUsageFlags flags, const void* data/* = nullptr*/) :
-    m_internals(s_impl->constructImmutable(sizeInBytes, flags, data)) {
+    m_id(s_impl->constructImmutable(sizeInBytes, flags, data)),
+    m_sizeInBytes(sizeInBytes)
+#ifndef _DEBUG
+{
+#else
+    , m_storage(IMMUTABLE) {
+#endif // _DEBUG
 }
 
 template <typename R>
 Buffer<R>::Buffer(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data/* = nullptr*/) :
-    m_internals(s_impl->constructMutable(sizeInBytes, accessFreq, accessNature, data)) {
+    m_id(s_impl->constructMutable(sizeInBytes, accessFreq, accessNature, data)),
+    m_sizeInBytes(sizeInBytes)
+#ifndef _DEBUG
+{
+#else
+    , m_storage(MUTABLE) {
+#endif // _DEBUG
 }
 
 template <typename R>
 Buffer<R>::Buffer(Buffer<R>&& other) noexcept :
-    m_internals(std::move(other.m_internals)) {
+    m_id(std::move(other.m_id)),
+    m_sizeInBytes(other.m_sizeInBytes)
+#ifndef _DEBUG
+{
+#else
+    , m_storage(other.m_storage) {
+#endif // _DEBUG
 }
 
 template <typename R>
 Buffer<R>& Buffer<R>::operator=(Buffer<R>&& other) noexcept {
-    m_internals = std::move(other.m_internals);
+    m_id = std::move(other.m_id);
+    m_sizeInBytes = other.m_sizeInBytes;
+#ifdef _DEBUG
+    m_storage = other.m_storage;
+#endif // _DEBUG
     return *this;
 }
 
 template <typename R>
 Buffer<R>::~Buffer() {
-    s_impl->destruct(m_internals);
+    s_impl->destruct(m_id);
 }
 
 template <typename R>
 void Buffer<R>::bind(BufferType bindType) const {
-    s_impl->bind(m_internals, bindType);
+    s_impl->bind(m_id, bindType);
 }
 
 template <typename R>
 void Buffer<R>::bindIndexed(const BufferTypedIndex& index) const {
-    s_impl->bindIndexed(m_internals, index);
+    s_impl->bindIndexed(m_id, index);
 }
 
 template <typename R>
 void Buffer<R>::overwrite(size_t offsetInBytes, size_t countBytes, const void* data) const {
-    s_impl->overwrite(m_internals, offsetInBytes, countBytes, data);
+    s_impl->overwrite(m_id, offsetInBytes, countBytes, data);
 }
 
 template <typename R>
 void Buffer<R>::redefine(size_t sizeInBytes, const void* data) {
-    s_impl->redefine(m_internals, sizeInBytes, data);
+    assert(m_storage == MUTABLE);
+    if (sizeInBytes > m_sizeInBytes) {
+        m_sizeInBytes = sizeInBytes;
+        s_impl->redefine(m_id, sizeInBytes, data);
+    } else {
+        s_impl->overwrite(m_id, 0, sizeInBytes, data);
+    }
 }
 
 template <typename R>
 void Buffer<R>::invalidate() const {
-    s_impl->invalidate(m_internals);
+    s_impl->invalidate(m_id);
 }
 
 template <typename R>
 void Buffer<R>::invalidate(size_t lengthInBytes) const {
-    s_impl->invalidate(m_internals, lengthInBytes);
+    s_impl->invalidate(m_id, lengthInBytes);
 }
 
 template <typename R>
 void Buffer<R>::flushMapped(size_t offsetInBytes, size_t lengthInBytes) const {
-    s_impl->flushMapped(m_internals, offsetInBytes, lengthInBytes);
+    s_impl->flushMapped(m_id, offsetInBytes, lengthInBytes);
 }
 
 template <typename R>
 bool Buffer<R>::unmap() const {
-    return s_impl->unmap(m_internals);
+    return s_impl->unmap(m_id);
 }
 
 template <typename R>
 size_t Buffer<R>::size() const {
-    return m_internals.size();
+    return m_sizeInBytes;
 }
 
 template Buffer<RendererLateBind>;
