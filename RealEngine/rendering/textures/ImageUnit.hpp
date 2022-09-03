@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <RealEngine/rendering/Renderer.hpp>
 
 namespace RE {
 
@@ -14,15 +15,15 @@ enum class ImageAccess : unsigned int {
     READ_WRITE
 };
 
-template<typename> class Texture;
-template<typename> class TextureProxy;
+template<Renderer> class Texture;
+template<Renderer> class TextureProxy;
 
 /**
  * @brief Represents a binding point that an image from a texture can be bound to
 */
 class ImageUnit {
-    template<typename R>friend class Texture;
-    template<typename R>friend class TextureProxy;
+    template<Renderer> friend class Texture;
+    template<Renderer> friend class TextureProxy;
     friend class GL46_ShaderProgram;
     friend class GL46_Texture;
 public:

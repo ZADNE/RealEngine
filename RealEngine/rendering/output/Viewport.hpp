@@ -3,7 +3,7 @@
  */
 #pragma once
 #include <RealEngine/rendering/internal_interfaces/IViewport.hpp>
-#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
 
 namespace RE {
 
@@ -11,7 +11,7 @@ namespace RE {
  * @brief Controls transformation from Normalized device coordinates to Window coordinates
  * @tparam R The renderer that will perform the commands
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class Viewport {
     friend class Window;
     friend class GL46_Fixture;

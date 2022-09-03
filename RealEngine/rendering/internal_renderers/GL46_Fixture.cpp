@@ -139,7 +139,7 @@ GL46_Fixture::~GL46_Fixture() {
     DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = nullptr;
 }
 
-template<typename R>
+template<Renderer R>
 void GL46_Fixture::Implementations::assignReferences() {
     Buffer<R>::s_impl = &m_bufferImpl;
     Capabilities<R>::s_impl = &m_capabilitiesImpl;
@@ -153,7 +153,7 @@ void GL46_Fixture::Implementations::assignReferences() {
     Viewport<R>::s_state = &m_viewportState;
 }
 
-template<typename R>
+template<Renderer R>
 void GL46_Fixture::Implementations::clearReferences() {
     Buffer<R>::s_impl = nullptr;
     Capabilities<R>::s_impl = nullptr;

@@ -87,12 +87,12 @@ public:
      * Single type of room can be added multiple times, the only requirement is that
      * each room must have unique name.
     */
-    template<template<typename> class RoomType, typename... ConstructorArgs>
+    template<template<Renderer> class RoomTemplate, typename... ConstructorArgs> requires DerivedFromRoom<RoomTemplate<RendererGL46>>
     static Room* addRoom(ConstructorArgs&&... args) {
         auto& inst = instance();
         switch (inst.m_window.getRenderer()) {
-        case Renderer::OPENGL_46:
-            return inst.m_roomManager.addRoom<RoomType<RendererGL46>>(std::forward<ConstructorArgs>(args)...);
+        case RendererID::OPENGL_46:
+            return inst.m_roomManager.addRoom<RoomTemplate<RendererGL46>>(std::forward<ConstructorArgs>(args)...);
         default:
             return nullptr;
         }
@@ -162,7 +162,7 @@ private:
     /**
      * @brief Does the actual game loop on the singleton instance
     */
-    template<typename R>
+    template<Renderer R>
     int doRun(size_t roomName, const RoomTransitionParameters& params);
 
     void step();

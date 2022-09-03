@@ -8,7 +8,6 @@
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
 #include <RealEngine/utility/error.hpp>
 
-#include <RealEngine/rendering/all_renderers.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46_Texture.hpp>
 
 namespace RE {
@@ -42,22 +41,22 @@ glm::vec4 colorToFloatColor(Color color, TextureFormat type) {
     return borderRGBA;
 }
 
-template <typename R>
+template<Renderer R>
 TextureProxy<R>::TextureProxy(const Texture<R>& texture) :
     m_id(texture.m_id) {
 }
 
-template <typename R>
+template<Renderer R>
 void TextureProxy<R>::bind() const {
     s_impl->bind(m_id);
 }
 
-template <typename R>
+template<Renderer R>
 void TextureProxy<R>::bind(TextureUnit unit) const {
     s_impl->bind(m_id, unit);
 }
 
-template <typename R>
+template<Renderer R>
 Texture<R>::Texture(Texture<R>&& other) noexcept :
     m_id(std::move(other.m_id)),
     m_flags(other.m_flags),
@@ -68,7 +67,7 @@ Texture<R>::Texture(Texture<R>&& other) noexcept :
     m_borderColor(other.m_borderColor) {
 }
 
-template <typename R>
+template<Renderer R>
 Texture<R>& Texture<R>::operator=(Texture<R>&& other) noexcept {
     m_id = std::move(other.m_id);
     m_flags = other.m_flags;
@@ -80,7 +79,7 @@ Texture<R>& Texture<R>::operator=(Texture<R>&& other) noexcept {
     return *this;
 }
 
-template <typename R>
+template<Renderer R>
 Texture<R>::Texture(const std::string& filePathPNG) {
     //Prepare variables
     lodepng::State state{};
@@ -121,124 +120,124 @@ paramsLoaded:
     init(Raster{dims, toTextureChannels(state.info_raw.colortype), pixels}, params);
 }
 
-template <typename R>
+template<Renderer R>
 Texture<R>::Texture(const Raster& raster, const TextureParameters& params/* = DEFAULT_PARAMETERS*/) {
     init(raster, params);
 }
 
-template <typename R>
+template<Renderer R>
 Texture<R>::~Texture() {
     s_impl->destruct(m_id);
 }
 
-template <typename R>
+template<Renderer R>
 TextureParameters Texture<R>::getParameters() const {
     return TextureParameters{TextureGeometry{m_subimageDims, m_pivot, m_subimagesSpritesCount}, m_flags, m_borderColor};
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::setMinFilter(TextureMinFilter minFilter) {
     m_flags.setMinFilter(minFilter);
     s_impl->setMinFilter(m_id, minFilter);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::setMagFilter(TextureMagFilter magFilter) {
     m_flags.setMagFilter(magFilter);
     s_impl->setMagFilter(m_id, magFilter);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::setWrapStyleX(TextureWrapStyle wrapStyleX) {
     m_flags.setWrapStyleX(wrapStyleX);
     s_impl->setWrapStyleX(m_id, wrapStyleX);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::setWrapStyleY(TextureWrapStyle wrapStyleY) {
     m_flags.setWrapStyleY(wrapStyleY);
     s_impl->setWrapStyleY(m_id, wrapStyleY);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::setBorderColor(Color col) {
     m_borderColor = col;
     glm::vec4 borderRGBA = colorToFloatColor(col, getFormat());
     s_impl->setBorderColor(m_id, m_borderColor);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::setBorderColor(const glm::vec4& col) {
     m_borderColor = Color{col * 255.0f};
     s_impl->setBorderColor(m_id, col);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::bind() const {
     s_impl->bind(m_id);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::bind(TextureUnit unit) const {
     s_impl->bind(m_id, unit);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::bindImage(ImageUnit unit, int level, ImageAccess access) const {
     s_impl->bindImage(m_id, unit, level, access, m_flags);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::setTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
     s_impl->setTexels(m_id, level, offset, size, raster);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::setTexels(const void* raster) const {
     s_impl->setTexels(m_id, 0, glm::ivec2(0, 0), glm::ivec2(getTrueDims()), raster);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::copyTexels(int srcLevel, const glm::ivec2& srcPos, const Texture<R>& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
     s_impl->copyTexels(m_id, srcLevel, srcPos, destination.m_id, dstLevel, dstPos, size);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::getTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* buffer) {
     s_impl->getTexels(m_id, level, offset, size, bufSize, buffer);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::getTexels(size_t bufSize, void* buffer) {
     s_impl->getTexels(m_id, 0, glm::ivec2(0, 0), glm::ivec2(getTrueDims()), bufSize, buffer);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::clear(const glm::vec4& color) const {
     s_impl->clear(m_id, 0, color);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::clear(const glm::ivec4& color) const {
     s_impl->clear(m_id, 0, color);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::clear(const glm::uvec4& color) const {
     s_impl->clear(m_id, 0, color);
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::clear(Color color) const {
     s_impl->clear(m_id, 0, color);
 }
 
-template <typename R>
+template<Renderer R>
 bool Texture<R>::saveToFile(const std::string& filePathPNG) {
     return saveToFile(filePathPNG, getParameters());
 }
 
-template <typename R>
+template<Renderer R>
 bool Texture<R>::saveToFile(const std::string& filePathPNG, const TextureParameters& params) {
     auto channels = params.getChannels();
     //Download pixels
@@ -267,7 +266,7 @@ bool Texture<R>::saveToFile(const std::string& filePathPNG, const TextureParamet
     return true;
 }
 
-template <typename R>
+template<Renderer R>
 void Texture<R>::init(const Raster& raster, const TextureParameters& params) {
     if (params.isGeometryDefinedByImage()) {//Geometry defined by image
         m_subimageDims = raster.getDims();

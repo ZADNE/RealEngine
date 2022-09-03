@@ -4,7 +4,7 @@
 #pragma once
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/internal_interfaces/IVertexArray.hpp>
-#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
 
 
 namespace RE {
@@ -15,7 +15,7 @@ namespace RE {
  *
  * A ShaderProgram has to be used in conjunction with this.
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class VertexArray {
     friend class GL46_Fixture;
 public:

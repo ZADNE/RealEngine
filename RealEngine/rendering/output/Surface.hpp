@@ -22,7 +22,7 @@ class RendererLateBind;
  *
  * A single surface can have several layers (= textures).
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class Surface {
 public:
 

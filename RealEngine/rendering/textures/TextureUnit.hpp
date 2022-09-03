@@ -2,18 +2,19 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <RealEngine/rendering/Renderer.hpp>
 
 namespace RE {
 
-template<typename> class Texture;
-template<typename> class TextureProxy;
+template<Renderer> class Texture;
+template<Renderer> class TextureProxy;
 
 /**
  * @brief Represents a binding point that a texture can be bound to
 */
 class TextureUnit {
-    template<typename R>friend class Texture;
-    template<typename R>friend class TextureProxy;
+    template<Renderer> friend class Texture;
+    template<Renderer> friend class TextureProxy;
     friend class GL46_ShaderProgram;
     friend class GL46_Texture;
 public:

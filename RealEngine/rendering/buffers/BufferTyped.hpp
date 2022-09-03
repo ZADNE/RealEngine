@@ -17,7 +17,7 @@ enum class BindNow {
  * @brief Is a buffer that holds its type (and possibly binding index) as a part of its state
  * @tparam R The renderer that will perform the commands
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class BufferTyped : public Buffer<R> {
 public:
 

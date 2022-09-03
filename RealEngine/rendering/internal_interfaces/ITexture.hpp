@@ -11,15 +11,15 @@
 
 namespace RE {
 
-template<typename> class TextureProxy;
+template<Renderer> class TextureProxy;
 
 /**
  * @brief Contains all members of Texture
  * @note For internal usage in RealEngine.
 */
 class TextureID {
-    template<typename> friend class Texture;
-    template<typename> friend class TextureProxy;
+    template<Renderer> friend class Texture;
+    template<Renderer> friend class TextureProxy;
     friend class GL46_Texture;
     friend class GL46_Framebuffer;
 public:

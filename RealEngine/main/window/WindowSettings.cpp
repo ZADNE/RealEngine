@@ -25,8 +25,8 @@ WindowSettings::WindowSettings() {
         m_flags.borderless = j["window"]["borderless"].get<bool>();
         m_flags.vSync = j["window"]["vsync"].get<bool>();
         auto renderer = j["window"]["renderer"].get<std::string>();
-        if (renderer == to_string(Renderer::OPENGL_46)) {
-            m_renderer = Renderer::OPENGL_46;
+        if (renderer == to_string(RendererID::OPENGL_46)) {
+            m_renderer = RendererID::OPENGL_46;
         } else {
             throw std::exception("Unknown renderer");
         }
@@ -43,7 +43,7 @@ WindowSettings::WindowSettings() {
     }
 }
 
-WindowSettings::WindowSettings(const glm::ivec2& dims, WindowFlags flags, Renderer renderer) :
+WindowSettings::WindowSettings(const glm::ivec2& dims, WindowFlags flags, RendererID renderer) :
     m_dims(dims), m_flags(flags), m_renderer(renderer) {
 
 }
@@ -51,7 +51,7 @@ WindowSettings::WindowSettings(const glm::ivec2& dims, WindowFlags flags, Render
 void WindowSettings::reset() {
     m_dims = glm::vec2(1280.0f, 1000.0f);
     m_flags = WindowFlags{};
-    m_renderer = Renderer::OPENGL_46;
+    m_renderer = RendererID::OPENGL_46;
 }
 
 void WindowSettings::save() {

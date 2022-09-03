@@ -22,7 +22,7 @@ enum class GlyphSortType {
     TEXTURE
 };
 
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class Glyph {
 public:
     Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy<R> tex, int depth, Color color);
@@ -37,7 +37,7 @@ public:
     VertexPOCOUV botRight;
 };
 
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 struct DrawBatch {
     DrawBatch(int offset, unsigned int count, TextureProxy<R> tex) : offset(offset), count(count), tex(tex) {};
 
@@ -50,7 +50,7 @@ struct DrawBatch {
  * @brief Draws sprites, surfaces and other textures
  * @tparam R The renderer that will perform the commands
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class SpriteBatch {
 public:
 

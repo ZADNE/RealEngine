@@ -3,23 +3,17 @@
  */
 #include <RealEngine/rendering/output/Surface.hpp>
 
-#include <iostream>
-
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <RealEngine/utility/error.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
-#include <RealEngine/resources/ResourceManager.hpp>
 #include <RealEngine/rendering/Capabilities.hpp>
-
-#include <RealEngine/rendering/RendererLateBind.hpp>
-#include <RealEngine/rendering/RendererGL46.hpp>
 
 
 namespace RE {
 
-template<typename R>
+template<Renderer R>
 Surface<R>::Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures/* = 1*/, bool disableBlend/* = false*/) :
     m_disableBlend(disableBlend),
     m_params(params) {
@@ -32,7 +26,7 @@ Surface<R>::Surface(const Raster& image, const TextureParameters& params, unsign
     resize(image, numberOfTextures);
 }
 
-template<typename R>
+template<Renderer R>
 void Surface<R>::setTarget() const {
     m_framebuffer.targetMe(FramebufferTarget::DRAWING);
 
@@ -43,7 +37,7 @@ void Surface<R>::setTarget() const {
     }
 }
 
-template<typename R>
+template<Renderer R>
 void Surface<R>::resetTarget() const {
     DefaultFrameBuffer<R>::targetMe(FramebufferTarget::DRAWING);
 
@@ -54,12 +48,12 @@ void Surface<R>::resetTarget() const {
     }
 }
 
-template<typename R>
+template<Renderer R>
 void Surface<R>::associateTexturesWithOutputs(const std::vector<FramebufferOutput>& outputs) {
     m_framebuffer.associateAttachementsWithOutputs(outputs);
 }
 
-template<typename R>
+template<Renderer R>
 void Surface<R>::resize(const Raster& image, unsigned int numberOfTextures) {
     m_textures.clear();
     m_textures.reserve(numberOfTextures);
@@ -73,34 +67,34 @@ void Surface<R>::resize(const Raster& image, unsigned int numberOfTextures) {
     }
 }
 
-template<typename R>
+template<Renderer R>
 void Surface<R>::clear(const glm::vec4& color, int index) {
     m_textures[index].clear(color);
 }
 
-template<typename R>
+template<Renderer R>
 void Surface<R>::clear(Color color, int index) {
     m_textures[index].clear(color);
 }
 
-template<typename R>
+template<Renderer R>
 const Texture<R>& Surface<R>::getTexture(int index) const {
     return m_textures[index];
 }
 
-template<typename R>
+template<Renderer R>
 void Surface<R>::setPivot(const glm::vec2& pivot, int index) {
     m_textures[index].setPivot(pivot);
 }
 
-template<typename R>
+template<Renderer R>
 void Surface<R>::setPivot(const glm::vec2& pivot) {
     for (auto& texture : m_textures) {
         texture.setPivot(pivot);
     }
 }
 
-template<typename R>
+template<Renderer R>
 void Surface<R>::attachTexturesToFramebuffer() {
     std::vector<FramebufferOutput> fbOutputs;
     fbOutputs.reserve(m_textures.size());

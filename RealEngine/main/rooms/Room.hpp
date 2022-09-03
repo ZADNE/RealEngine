@@ -9,7 +9,7 @@
 #include <RealEngine/main/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
 
-#include <RealEngine/rendering/RendererGL46.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
 
 namespace RE {
 

@@ -36,7 +36,7 @@ const size_t SHAPES_COUNT = 2u;
  * @brief Draws lines, circles and other vector shapes
  * @tparam R The renderer that will perform the commands
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class GeometryBatch {
 public:
 

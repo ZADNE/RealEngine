@@ -34,7 +34,8 @@ bool isSystemBigEndian() {
  * @param val Value to be reversed
  * @return Value with reversed bytes
 */
-template <typename T>constexpr  T reverseByteOrder(const T& val) {
+template<typename T>
+constexpr T reverseByteOrder(const T& val) {
     union U {
         U(): raw(){}
         T val;
@@ -54,7 +55,8 @@ template <typename T>constexpr  T reverseByteOrder(const T& val) {
  * @param net Value in network byte order
  * @return Value in host byte order
 */
-template<typename T>constexpr T ntoh(const T& net) {
+template<typename T>
+constexpr T ntoh(const T& net) {
     if (isSystemBigEndian()) {//Big endian
         return net;
     } else {//Little endian
@@ -68,7 +70,8 @@ template<typename T>constexpr T ntoh(const T& net) {
  * @param net Value in host byte order
  * @return Value in network byte order
 */
-template<typename T>constexpr T hton(const T& host) {
+template<typename T>
+constexpr T hton(const T& host) {
     if (isSystemBigEndian()) {//Big endian
         return host;
     } else {//Little endian
@@ -84,7 +87,8 @@ template<typename T>constexpr T hton(const T& host) {
  * @tparam ...Args Any types
  * @param ...net Values in network byte order
 */
-template<typename... Args>constexpr void ntohBulk(Args&... net) {
+template<typename... Args>
+constexpr void ntohBulk(Args&... net) {
     if (!isSystemBigEndian()) {//Little endian
         (reverseByteOrder(net), ...);
     }
@@ -98,7 +102,8 @@ template<typename... Args>constexpr void ntohBulk(Args&... net) {
  * @tparam ...Args Any types
  * @param ...host Values in host byte order
 */
-template<typename... Args>constexpr void htonBulk(Args&... host) {
+template<typename... Args>
+constexpr void htonBulk(Args&... host) {
     if (!isSystemBigEndian()) {//Little endian
         (reverseByteOrder(host), ...);
     }

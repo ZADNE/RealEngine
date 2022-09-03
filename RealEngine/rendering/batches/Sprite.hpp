@@ -13,7 +13,7 @@ namespace RE {
  * @brief Represents a static subimage within a texture.
  * @tparam R The renderer that will perform the commands
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class SpriteStatic {
 public:
 
@@ -41,7 +41,7 @@ protected:
  * @brief Represents an animated subimage within a texture.
  * @tparam R The renderer that will perform the commands
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class SpriteAnimated : public SpriteStatic<R> {
 public:
 
@@ -62,7 +62,7 @@ protected:
  * @brief Represents an animated subimage within a texture that can be tinted or scaled.
  * @tparam R The renderer that will perform the commands
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class SpriteComplex : public SpriteAnimated<R> {
 public:
 

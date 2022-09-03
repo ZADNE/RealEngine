@@ -5,12 +5,12 @@
 #include <vector>
 
 #include <RealEngine/rendering/internal_interfaces/IBuffer.hpp>
-#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
 
 
 namespace RE {
 
-template<typename> class VertexArray;
+template<Renderer> class VertexArray;
 
 /**
  * @brief Is a continuous block of memory stored in the GPU's memory
@@ -20,7 +20,7 @@ template<typename> class VertexArray;
  * while immutable buffer cannot change its size upon construction.
  * The mutability is determined by the constructor that is used to construct the buffer.
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class Buffer {
     friend class GL46_Fixture;
     friend class VertexArray<R>;

@@ -3,7 +3,7 @@
  */
 #pragma once
 #include <RealEngine/rendering/internal_interfaces/IShaderProgram.hpp>
-#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
 
 
 namespace RE {
@@ -12,7 +12,7 @@ namespace RE {
  * @brief Controls how vertices are rendered to screen.
  * @tparam R The renderer that will perform the commands
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class ShaderProgram {
     friend class GL46_Fixture;
 public:

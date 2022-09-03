@@ -3,7 +3,7 @@
  */
 #pragma once
 #include <RealEngine/rendering/internal_interfaces/IOrdering.hpp>
-#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
 
 
 namespace RE {
@@ -12,7 +12,7 @@ namespace RE {
  * @brief Manages ordering of rendering commnads
  * @tparam R The renderer that will perform the commands
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class Ordering {
     friend class GL46_Fixture;
 public:

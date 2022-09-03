@@ -12,7 +12,7 @@
 #include <RealEngine/rendering/internal_renderers/GL46_Viewport.hpp>
 
 #include <RealEngine/rendering/output/Framebuffer.hpp>
-#include <RealEngine/rendering/RendererGL46.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
 
 namespace RE {
 
@@ -69,10 +69,10 @@ private:
 
     private:
 
-        template<typename R>
+        template<Renderer R>
         void assignReferences();
 
-        template<typename R>
+        template<Renderer R>
         void clearReferences();
 
         GL46_Buffer m_bufferImpl;

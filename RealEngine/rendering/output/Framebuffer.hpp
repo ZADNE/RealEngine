@@ -3,7 +3,7 @@
  */
 #pragma once
 #include <RealEngine/rendering/internal_interfaces/IFramebuffer.hpp>
-#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
 
 
 namespace RE {
@@ -15,7 +15,7 @@ namespace RE {
  * Framebuffers can be used to render to textures,
  * instead of rendering directly to window.
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class Framebuffer {
     friend class GL46_Fixture;
     friend class GL46_Framebuffer;
@@ -94,7 +94,7 @@ private:
  * @brief Allows retargeting to and clearing of the main window canvas
  * @tparam R The renderer that will perform the commands
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class DefaultFrameBuffer {
     friend class GL46_Fixture;
 public:

@@ -3,11 +3,11 @@
  */
 #pragma once
 #include <RealEngine/rendering/internal_interfaces/ICapabilities.hpp>
-#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
 
 namespace RE {
 
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class Capabilities {
     friend class GL46_Fixture;
 protected:
@@ -22,7 +22,7 @@ protected:
  * Enabled means that the incoming color is mixed with the previous based on incoming's alpha.
  * Disabled means that the incoming color simply replaces the previous color.
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class BlendingCapability : Capabilities<R> {
 public:
 

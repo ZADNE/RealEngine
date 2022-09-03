@@ -5,13 +5,13 @@
 #include <string>
 
 #include <RealEngine/rendering/internal_interfaces/ITexture.hpp>
-#include <RealEngine/rendering/RendererLateBind.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
 
 
 namespace RE {
 
-template<typename> class Texture;
-template<typename> class Framebuffer;
+template<Renderer> class Texture;
+template<Renderer> class Framebuffer;
 
 /**
  * @brief Holds a non-owning handle to a Texture
@@ -20,7 +20,7 @@ template<typename> class Framebuffer;
  * @warning Once the texture that it represents is destroyed, the proxy
  * becomes invalid and should not be used!
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class TextureProxy {
     friend class GL46_Fixture;
     friend class GL46_Texture;
@@ -66,7 +66,7 @@ private:
  * @see Raster
  * @see TextureParameters
 */
-template<typename R = RendererLateBind>
+template<Renderer R = RendererLateBind>
 class Texture {
     friend class TextureProxy<R>;
     friend class GL46_Fixture;

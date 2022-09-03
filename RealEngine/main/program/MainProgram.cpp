@@ -29,7 +29,7 @@ int MainProgram::run(size_t roomName, const RoomTransitionParameters& params) {
     try {
         auto& inst = instance();
         switch (inst.m_window.getRenderer()) {
-        case Renderer::OPENGL_46:
+        case RendererID::OPENGL_46:
             return inst.doRun<RendererGL46>(roomName, params);
         default:
             return 1;
@@ -102,7 +102,7 @@ void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
     m_usingImGui = s.usingImGui;
 }
 
-template<typename R>
+template<Renderer R>
 int MainProgram::doRun(size_t roomName, const RoomTransitionParameters& params) {
     scheduleRoomTransition(roomName, params);
     doRoomTransitionIfScheduled();

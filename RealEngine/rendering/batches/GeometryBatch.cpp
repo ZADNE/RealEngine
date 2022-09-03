@@ -10,9 +10,6 @@
 #include <RealEngine/resources/ResourceManager.hpp>
 #include <RealEngine/rendering/internal_interfaces/IVertexArray.hpp>
 
-#include <RealEngine/rendering/RendererLateBind.hpp>
-#include <RealEngine/rendering/RendererGL46.hpp>
-
 namespace RE {
 
 Primitive convertPrimEnum(size_t prim_shape) {
@@ -41,7 +38,7 @@ Primitive convertPrimEnum(size_t prim_shape) {
     }
 }
 
-template<typename R>
+template<Renderer R>
 GeometryBatch<R>::GeometryBatch(const ShaderProgramSources& sources) :
     m_shaderProgram(sources) {
     m_va.setAttribute(ATTR_POSITION, VertexComponentCount::XY, VertexComponentType::FLOAT, offsetof(VertexPOCO, position), false);
@@ -52,7 +49,7 @@ GeometryBatch<R>::GeometryBatch(const ShaderProgramSources& sources) :
     m_va.connectAttributeToBindingPoint(ATTR_COLOR, 1u);
 }
 
-template<typename R>
+template<Renderer R>
 void GeometryBatch<R>::begin() {
     //Clearing all previous vertices
     for (auto& vector : m_vertices) {
@@ -64,7 +61,7 @@ void GeometryBatch<R>::begin() {
     }
 }
 
-template<typename R>
+template<Renderer R>
 void GeometryBatch<R>::end() {
     //Uploading to VBO
     size_t totalSize = 0;
@@ -81,7 +78,7 @@ void GeometryBatch<R>::end() {
     }
 }
 
-template<typename R>
+template<Renderer R>
 void GeometryBatch<R>::addPrimitives(PRIM prim, size_t first, size_t countVer, const RE::VertexPOCO* data, bool separate/* = true*/) {
     unsigned int last = (unsigned int)m_vertices[(size_t)prim].size();
 
@@ -101,7 +98,7 @@ void GeometryBatch<R>::addPrimitives(PRIM prim, size_t first, size_t countVer, c
     }
 }
 
-template<typename R>
+template<Renderer R>
 void GeometryBatch<R>::addCircles(size_t first, size_t count, const RE::CirclePOCO* data) {
     unsigned int last;
     VertexPOCO mid;
@@ -135,7 +132,7 @@ void GeometryBatch<R>::addCircles(size_t first, size_t count, const RE::CirclePO
     }
 }
 
-template<typename R>
+template<Renderer R>
 void GeometryBatch<R>::draw() {
     m_shaderProgram.use();
     m_va.bind();
@@ -152,7 +149,7 @@ void GeometryBatch<R>::draw() {
     m_shaderProgram.unuse();
 }
 
-template<typename R>
+template<Renderer R>
 void GeometryBatch<R>::switchShaderProgram(const ShaderProgramSources& sources) {
     m_shaderProgram = ShaderProgram<R>{sources};
 }
