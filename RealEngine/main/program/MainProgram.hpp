@@ -134,7 +134,7 @@ public:
      * @param name Name of the next room, no transition will happen if there is no room with such name.
      * @param params Parameters to start the next room's session with.
     */
-    void scheduleRoomTransition(size_t name, RoomTransitionParameters params);
+    void scheduleRoomTransition(size_t name, const RoomTransitionParameters& params);
 
     static void pollEventsInMainThread(bool poll);
 

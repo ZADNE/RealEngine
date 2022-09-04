@@ -9,7 +9,7 @@ namespace RE {
 
 template<Renderer R>
 SpriteStatic<R>::SpriteStatic(const Texture<R>& tex, float sprite, float subimage/* = 0.0f*/) :
-    m_tex(tex), m_subimageSprite(subimage, sprite) {
+    m_tex(&tex), m_subimageSprite(subimage, sprite) {
 }
 
 template<Renderer R>
@@ -45,10 +45,10 @@ SpriteAnimated<R>::SpriteAnimated(const Texture<R>& tex, float sprite, float sub
 template<Renderer R>
 void SpriteAnimated<R>::step() {
     this->m_subimageSprite.x += getSpeed();
-    if ((this->m_subimageSprite.x) >= this->m_tex.getSubimagesSpritesCount().x) {//Positive image speed
+    if ((this->m_subimageSprite.x) >= this->m_tex->getSubimagesSpritesCount().x) {//Positive image speed
         this->m_subimageSprite.x = 0.0f;
     } else if (this->m_subimageSprite.x < 0.0f) {//Negative image speed
-        this->m_subimageSprite.x = this->m_tex.getSubimagesSpritesCount().x + getSpeed();
+        this->m_subimageSprite.x = this->m_tex->getSubimagesSpritesCount().x + getSpeed();
     }
 }
 

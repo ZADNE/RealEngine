@@ -28,7 +28,7 @@ class ImageUnit {
     friend class GL46_Texture;
 public:
 
-    ImageUnit(unsigned int unit) : m_unit(unit) {}
+    constexpr ImageUnit(unsigned int unit) : m_unit(unit) {}
 
 private:
 

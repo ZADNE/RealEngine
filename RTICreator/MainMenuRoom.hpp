@@ -19,7 +19,7 @@ constexpr RE::BufferTypedIndex UNIF_BUF_VIEWPORT_MATRIX = {RE::BufferType::UNIFO
  /**
   * @brief Room with the UI
  */
-template<typename R>
+template<RE::Renderer R>
 class MainMenuRoom : public RE::Room {
 public:
 

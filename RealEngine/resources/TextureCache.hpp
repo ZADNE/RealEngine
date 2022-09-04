@@ -9,8 +9,11 @@
 
 namespace RE {
 
-using TexturePtr = std::shared_ptr<const Texture<RendererLateBind>>;
 
+template<RE::Renderer R>
+using ShaderTexture = std::shared_ptr<const Texture<R>>;
+
+template<RE::Renderer R>
 class TextureCache {
 public:
 
@@ -21,7 +24,7 @@ public:
      * @param filePathNoExt Path to the texture (without extension)
      * @return Texture as a shared resource
     */
-    TexturePtr getTexture(const std::string& filePathNoExt);
+    ShaderTexture<R> texture(const std::string& filePathNoExt);
 
 private:
 

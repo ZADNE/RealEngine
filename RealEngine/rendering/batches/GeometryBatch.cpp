@@ -7,7 +7,6 @@
 
 #include <glm/gtc/constants.hpp>
 
-#include <RealEngine/resources/ResourceManager.hpp>
 #include <RealEngine/rendering/internal_interfaces/IVertexArray.hpp>
 
 namespace RE {

@@ -87,7 +87,7 @@ public:
      *
      * Parameters are either loaded from reAl chunk of PNG,
      * or if that cannot be done (reAl chunk is missing or it has bad format),
-     * default parameters are used.
+     * default parameters are used instead.
      *
      * @see DEFAULT_PARAMETERS
      *

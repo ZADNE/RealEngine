@@ -241,7 +241,7 @@ void MainProgram::doRoomTransitionIfScheduled() {
     m_synchronizer.resumeSteps();
 }
 
-void MainProgram::scheduleRoomTransition(size_t name, RoomTransitionParameters params) {
+void MainProgram::scheduleRoomTransition(size_t name, const RoomTransitionParameters& params) {
     m_nextRoomName = name;
     m_roomTransitionParameters = params;
 }

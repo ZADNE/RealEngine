@@ -29,12 +29,12 @@ public:
 
     virtual void step();
 
-    const Texture<R>& getTexture() const { return m_tex; };
+    const Texture<R>& getTexture() const { return *m_tex; };
 
 protected:
 
     glm::vec2 m_subimageSprite;//X = subimage of the sprite, Y = sprite of the texture
-    const Texture<R>& m_tex;
+    const Texture<R>* m_tex;
 };
 
 /**

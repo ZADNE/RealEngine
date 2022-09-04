@@ -5,15 +5,12 @@
 
 namespace RE {
 
-TextureCache ResourceManager::m_textureCache{};
-ShaderProgramCache ResourceManager::m_shaderProgramCache{};
-
-TexturePtr ResourceManager::getTexture(const std::string& filePath) {
-    return m_textureCache.getTexture(filePath);
+template<RE::Renderer R>
+TexturePtr ResourceManager<R>::texture(const std::string& filePath) {
+    return s_textureCache.texture(filePath);
 }
 
-ShaderProgramPtr ResourceManager::getShaderProgram(const ShaderProgramSources& sources) {
-    return m_shaderProgramCache.getShaderProgram(sources);
-}
+template ResourceManager<RendererLateBind>;
+template ResourceManager<RendererGL46>;
 
 }

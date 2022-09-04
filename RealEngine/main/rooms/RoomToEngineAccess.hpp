@@ -36,7 +36,7 @@ public:
     /**
      * @copydoc MainProgram::scheduleRoomTransition
     */
-    void scheduleRoomTransition(size_t name, RoomTransitionParameters params);
+    void scheduleRoomTransition(size_t name, const RoomTransitionParameters& params);
 
     /**
      * @copydoc MainProgram::setRelativeCursorMode

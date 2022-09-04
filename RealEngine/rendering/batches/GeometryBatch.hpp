@@ -5,11 +5,9 @@
 #include <array>
 #include <vector>
 
-#include <RealEngine/rendering/vertices/vertices.hpp>
 #include <RealEngine/rendering/batches/circles.hpp>
+#include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
-#include <RealEngine/rendering/buffers/Buffer.hpp>
-#include <RealEngine/resources/ShaderProgramCache.hpp>
 
 namespace RE {
 
@@ -28,9 +26,9 @@ enum class SHAPE {
     DISC
 };
 
-const size_t PRIMITIVES_COUNT = 7u;
+constexpr size_t PRIMITIVES_COUNT = 7u;
 
-const size_t SHAPES_COUNT = 2u;
+constexpr size_t SHAPES_COUNT = 2u;
 
 /**
  * @brief Draws lines, circles and other vector shapes

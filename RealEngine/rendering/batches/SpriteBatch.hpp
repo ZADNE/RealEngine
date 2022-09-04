@@ -73,13 +73,13 @@ public:
     void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy<R> tex, int depth, Color color, const glm::vec2& direction, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));//Rotated based on the vector
 
     //UNCOLORED, UNSTRETCHED
-    void addTexture(const Texture<R>* tex, const glm::vec2& position, int depth);//Unrotated
-    void addTexture(const Texture<R>* tex, const glm::vec2& position, int depth, float radAngle);//Rotated based on the angle
-    void addTexture(const Texture<R>* tex, const glm::vec2& position, int depth, const glm::vec2& direction);//Rotated based on the vector
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth);//Unrotated
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth, float radAngle);//Rotated based on the angle
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth, const glm::vec2& direction);//Rotated based on the vector
     //COLORED, STRETCHED
-    void addTexture(const Texture<R>* tex, const glm::vec2& position, int depth, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
-    void addTexture(const Texture<R>* tex, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
-    void addTexture(const Texture<R>* tex, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
 
     //UNCOLORED, UNSTRETCHED
     void addSprite(const SpriteStatic<R>& sprite, const glm::vec2& position, int depth);//Unrotated
@@ -100,13 +100,13 @@ public:
     void addSprite(const SpriteComplex<R>& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
 
     //UNCOLORED, UNSTRETCHED
-    void addSubimage(const Texture<R>* tex, const glm::vec2& position, int depth, const glm::vec2& subImg_Spr);//Unrotated
-    void addSubimage(const Texture<R>* tex, const glm::vec2& position, int depth, float radAngle, const glm::vec2& subImg_Spr);//Rotated based on the angle
-    void addSubimage(const Texture<R>* tex, const glm::vec2& position, int depth, const glm::vec2& direction, const glm::vec2& subImg_Spr);//Rotated based on the vector
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, const glm::vec2& subImg_Spr);//Unrotated
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, float radAngle, const glm::vec2& subImg_Spr);//Rotated based on the angle
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, const glm::vec2& direction, const glm::vec2& subImg_Spr);//Rotated based on the vector
     //COLORED, STRETCHED
-    void addSubimage(const Texture<R>* tex, const glm::vec2& position, int depth, Color color, const glm::vec2& subImg_Spr, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
-    void addSubimage(const Texture<R>* tex, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& subImg_Spr, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
-    void addSubimage(const Texture<R>* tex, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& subImg_Spr, const glm::vec2& scale);//Rotated based on the vector
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& subImg_Spr, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& subImg_Spr, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& subImg_Spr, const glm::vec2& scale);//Rotated based on the vector
 
     //UNCOLORED, UNSTRETCHED
     void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index);//Unrotated

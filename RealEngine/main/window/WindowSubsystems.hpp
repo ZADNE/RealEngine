@@ -5,10 +5,6 @@
 
 #include <string>
 
-constexpr int RE_VERSION_MAJOR = 1;
-constexpr int RE_VERSION_MINOR = 9;
-constexpr int RE_VERSION_PATCH = 0;
-
 /*! \mainpage RealEngine
  *
  * \section overview Overview
@@ -26,6 +22,10 @@ constexpr int RE_VERSION_PATCH = 0;
 
 
 namespace RE {
+
+constexpr int RE_VERSION_MAJOR = 1;
+constexpr int RE_VERSION_MINOR = 9;
+constexpr int RE_VERSION_PATCH = 1;
 
 /**
  * @brief Lists renderers known to RealEngine

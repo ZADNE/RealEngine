@@ -27,7 +27,7 @@ constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
     .usingImGui = true
 };
 
-template<typename R>
+template<RE::Renderer R>
 MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
     Room(0, INITIAL_DISPLAY_SETTINGS),
     m_texView(engine().getWindowDims()) {
@@ -46,17 +46,17 @@ MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
     m_windowViewBuf.overwrite(0u, glm::ortho(0.0f, window.x, 0.0f, window.y));
 }
 
-template<typename R>
+template<RE::Renderer R>
 void MainMenuRoom<R>::sessionStart(const RE::RoomTransitionParameters& params) {
 
 }
 
-template<typename R>
+template<RE::Renderer R>
 void MainMenuRoom<R>::sessionEnd() {
 
 }
 
-template<typename R>
+template<RE::Renderer R>
 void MainMenuRoom<R>::step() {
     auto cursorPos = (glm::vec2)engine().getCursorAbs();
 
@@ -81,7 +81,7 @@ void MainMenuRoom<R>::step() {
     }
 }
 
-template<typename R>
+template<RE::Renderer R>
 void MainMenuRoom<R>::render(double interpolationFactor) {
     auto mat = m_texView.getViewMatrix();
     m_texViewBuf.overwrite(0u, mat);
@@ -125,12 +125,12 @@ void MainMenuRoom<R>::render(double interpolationFactor) {
     ImGui::End();
 }
 
-template<typename R>
+template<RE::Renderer R>
 void MainMenuRoom<R>::windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {
     m_texView.resizeView(newSize);
 }
 
-template<typename R>
+template<RE::Renderer R>
 void MainMenuRoom<R>::parametersGUI() {
     if (imguiCombo("Minification filter", m_minFilter, MIN_FILTERS_LABELS)) {
         m_texture->setMinFilter(MIN_FILTERS[m_minFilter]);
@@ -142,7 +142,7 @@ void MainMenuRoom<R>::parametersGUI() {
         m_texture->setWrapStyleX(WRAP_STYLES[m_wrapStyleX]);
     }
     if (imguiCombo("Wrap style of Y axis", m_wrapStyleY, WRAP_STYLES_LABELS)) {
-        m_texture->setWrapStyleX(WRAP_STYLES[m_wrapStyleY]);
+        m_texture->setWrapStyleY(WRAP_STYLES[m_wrapStyleY]);
     }
     if (ImGui::InputInt("Number of subimages", &m_subimagesSprites.x)) {
         m_texture->setSubimagesSpritesCount(m_subimagesSprites);
@@ -170,7 +170,7 @@ void MainMenuRoom<R>::parametersGUI() {
     }
 }
 
-template<typename R>
+template<RE::Renderer R>
 void MainMenuRoom<R>::selectAndLoad() {
     char filename[MAX_PATH] = {};
     OPENFILENAMEA ofn;
@@ -191,13 +191,13 @@ void MainMenuRoom<R>::selectAndLoad() {
     load(filename);
 }
 
-template<typename R>
+template<RE::Renderer R>
 void MainMenuRoom<R>::save(const std::string& loc) {
     if (loc.empty()) { return; }
     m_texture->saveToFile(loc);
 }
 
-template<typename R>
+template<RE::Renderer R>
 void MainMenuRoom<R>::load(const std::string& loc) {
     if (loc.empty()) { return; }
     try {
@@ -221,7 +221,7 @@ void MainMenuRoom<R>::load(const std::string& loc) {
     m_borderColor = glm::vec4(m_texture->getBorderColor()) / 255.0f;
 }
 
-template<typename R>
+template<RE::Renderer R>
 void MainMenuRoom<R>::drawTexture() {
     glm::vec2 windowDims = glm::vec2(engine().getWindowDims());
     auto texDims = m_texture->getSubimagesSpritesCount() * m_texture->getSubimageDims();
@@ -290,7 +290,7 @@ void MainMenuRoom<R>::drawTexture() {
     m_gb.draw();
 }
 
-template<typename R>
+template<RE::Renderer R>
 void MainMenuRoom<R>::resetView() {
     m_texView.setScale({1.0f, 1.0f});
     m_texView.setPosition(glm::vec2{0.0f, 0.0f});

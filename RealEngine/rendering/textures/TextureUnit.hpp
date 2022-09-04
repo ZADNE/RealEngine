@@ -19,7 +19,7 @@ class TextureUnit {
     friend class GL46_Texture;
 public:
 
-    TextureUnit(unsigned int unit) : m_unit(unit) {}
+    constexpr TextureUnit(unsigned int unit) : m_unit(unit) {}
 
 private:
 
