@@ -115,6 +115,11 @@ size_t Buffer<R>::size() const {
     return m_sizeInBytes;
 }
 
+template<Renderer R>
+void* Buffer<R>::map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const {
+    return s_impl->map(m_id, offsetInBytes, lengthInBytes, mappingUsage);
+}
+
 template Buffer<RendererLateBind>;
 template Buffer<RendererGL46>;
 

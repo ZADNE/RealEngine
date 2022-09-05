@@ -58,6 +58,23 @@ private:
 };
 
 /**
+ * @brief Manages conversion from filename to full path to texture
+*/
+struct TextureSeed {
+
+    std::string toFullPath() const {
+        return s_folder + file + s_extension;
+    }
+
+    const std::string& file; /**< Filepath without extension */
+
+private:
+
+    static inline std::string s_folder = "textures/";
+    static inline std::string s_extension = ".png";
+};
+
+/**
  * @brief Represents one (or more) images
  * @tparam R The renderer that will perform the commands
  *
@@ -84,16 +101,22 @@ public:
 
     /**
      * @brief Constructs texture from PNG
+     * @param filePathPNG Path to the PNG
      *
      * Parameters are either loaded from reAl chunk of PNG,
      * or if that cannot be done (reAl chunk is missing or it has bad format),
      * default parameters are used instead.
      *
      * @see DEFAULT_PARAMETERS
-     *
-     * @param filePathPNG Path to the PNG
     */
     Texture(const std::string& filePathPNG);
+
+    /**
+     * @brief Constructs texture from seed
+     * 
+     * TextureSeed is converted to full path which is used to load the texture
+    */
+    Texture(const TextureSeed& seed);
 
     /**
      * @brief Contructs texture from raster and parameters

@@ -82,11 +82,11 @@ public:
     */
     template<typename... Args>
     void setUniform(const std::string& name, Args... args) const {
-        auto loc = s_impl->getUniformLocation(*this, name);
+        auto loc = -1;//s_impl->getUniformLocation(*this, name);
     #ifdef _DEBUG
         if (loc < 0) error(std::string{"Uniform \""} + name + "\" does not exist in the shader program!");
     #endif // _DEBUG
-        s_impl->setUniform(*this, loc, args...);
+        setUniform(loc, args...);
     }
 
     void setUniform(int location, float val) const;                                     /**< Sets float uniform at given location */

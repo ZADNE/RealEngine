@@ -121,6 +121,11 @@ paramsLoaded:
 }
 
 template<Renderer R>
+Texture<R>::Texture(const TextureSeed& seed) :
+    Texture<R>(seed.toFullPath()) {
+}
+
+template<Renderer R>
 Texture<R>::Texture(const Raster& raster, const TextureParameters& params/* = DEFAULT_PARAMETERS*/) {
     init(raster, params);
 }

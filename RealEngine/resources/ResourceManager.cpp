@@ -5,12 +5,8 @@
 
 namespace RE {
 
-template<RE::Renderer R>
-TexturePtr ResourceManager<R>::texture(const std::string& filePath) {
-    return s_textureCache.texture(filePath);
+SharedTexture ResourceManager::texture(const std::string& filePathNoExt) {
+    return s_textureCache.texture(filePathNoExt);
 }
-
-template ResourceManager<RendererLateBind>;
-template ResourceManager<RendererGL46>;
 
 }

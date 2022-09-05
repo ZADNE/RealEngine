@@ -15,24 +15,22 @@ namespace RE {
  * 
  * Also accessible through "RM" abbreviation.
 */
-template<RE::Renderer R>
 class ResourceManager {
 public:
 
     /**
      * @copydoc TextureCache::texture
     */
-    static TexturePtr texture(const std::string& filePath);
+    static SharedTexture texture(const std::string& filePathNoExt);
 
 private:
 
-    static inline TextureCache<R> s_textureCache;
+    static inline TextureCache s_textureCache;
 };
 
 /**
  * @brief Is abbreviation for ResourceManager
 */
-template<RE::Renderer R>
-using RM = class ResourceManager<R>;
+using RM = class ResourceManager;
 
 }

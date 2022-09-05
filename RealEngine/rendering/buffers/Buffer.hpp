@@ -186,7 +186,7 @@ public:
     */
     template<typename T>
     T* map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const {
-        return reinterpret_cast<T*>(s_impl->map(*this, offsetInBytes, lengthInBytes, mappingUsage));
+        return reinterpret_cast<T*>(map(offsetInBytes, lengthInBytes, mappingUsage));
     }
 
     /**
@@ -206,6 +206,8 @@ public:
     size_t size() const;
 
 protected:
+
+    void* map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const;
 
     BufferID m_id;
     size_t m_sizeInBytes = 0;   /**< Size of the buffer */
