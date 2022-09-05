@@ -14,27 +14,24 @@ enum class BindNow {
 };
 
 /**
- * @brief Is buffer that holds its type (and possibly binding index) as a part of its state.
+ * @brief Is a buffer that holds its type (and possibly binding index) as a part of its state
+ * @tparam R The renderer that will perform the commands
 */
-class TypedBuffer : public Buffer {
+template<Renderer R = RendererLateBind>
+class BufferTyped : public Buffer<R> {
 public:
-    using enum BufferType;
-    using enum BufferStorage;
-    using enum BufferAccessFrequency;
-    using enum BufferAccessNature;
-    using enum BufferUsageFlags;
 
     template<typename... Args>
-    TypedBuffer(BufferType type, Args... args) :
-        TypedBuffer(BufferTypedIndex{type, std::numeric_limits<unsigned int>::max()}, BindNow::YES, args...) {}
+    BufferTyped(BufferType type, Args... args) :
+        BufferTyped(BufferTypedIndex{type, std::numeric_limits<unsigned int>::max()}, BindNow::YES, args...) {}
 
     template<typename... Args>
-    TypedBuffer(BufferTypedIndex index, Args... args) :
-        TypedBuffer(index, BindNow::YES, args...) {}
+    BufferTyped(BufferTypedIndex index, Args... args) :
+        BufferTyped(index, BindNow::YES, args...) {}
 
     template<typename... Args>
-    TypedBuffer(BufferTypedIndex index, BindNow bindNow, Args... args) :
-        Buffer(args...),
+    BufferTyped(BufferTypedIndex index, BindNow bindNow, Args... args) :
+        Buffer<R>(args...),
         m_index(index) {
         if (bindNow == BindNow::YES) {
             if (isIndexedBufferType(m_index.type)) {
@@ -53,13 +50,14 @@ public:
 
     unsigned int getBindingIndex() const { return m_index.bindingIndex; }
 
-    using Buffer::bind;
+    using Buffer<R>::bind;
     void bind();
 
-    using Buffer::bindIndexed;
+    using Buffer<R>::bindIndexed;
     void bindIndexed();
 
 protected:
+
     BufferTypedIndex m_index;
 };
 

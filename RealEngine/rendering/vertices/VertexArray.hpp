@@ -2,18 +2,22 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/internal_interfaces/IVertexArray.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
+
 
 namespace RE {
 
 /**
- * @brief Controls how & where vertices are pulled.
+ * @brief Controls how & where vertices are pulled
+ * @tparam R The renderer that will perform the commands
  *
  * A ShaderProgram has to be used in conjunction with this.
 */
+template<Renderer R = RendererLateBind>
 class VertexArray {
-    friend class GL46_Renderer;
-    friend class GL46_VertexArray;
+    friend class GL46_Fixture;
 public:
 
     /**
@@ -22,17 +26,17 @@ public:
     VertexArray();
     ~VertexArray();
 
-    VertexArray(const VertexArray&) = delete;
-    VertexArray(VertexArray&& other) noexcept;
+    VertexArray(const VertexArray<R>&) = delete;
+    VertexArray(VertexArray<R>&& other) noexcept;
 
-    VertexArray& operator=(const VertexArray&) = delete;
-    VertexArray& operator=(VertexArray&& other) noexcept;
+    VertexArray<R>& operator=(const VertexArray<R>&) = delete;
+    VertexArray<R>& operator=(VertexArray<R>&& other) noexcept;
 
 
     void setAttribute(unsigned int attribute, VertexComponentCount components, VertexComponentType type, unsigned int relativeOffset, bool normalize = true);
     void unsetAttribute(unsigned int attribute);
 
-    void setBindingPoint(unsigned int bindingPoint, const Buffer& buffer, int offset, int stride);
+    void setBindingPoint(unsigned int bindingPoint, const Buffer<R>& buffer, int offset, int stride);
     void unsetBindingPoint(unsigned int bindingPoint);
 
     void connectAttributeToBindingPoint(unsigned int attribute, unsigned int bindingPoint);
@@ -51,9 +55,9 @@ public:
 
 private:
 
-    unsigned int m_ID = 0;      /**< Internal identifier*/
+    VertexArrayID m_id;
 
-    static IVertexArray* s_impl;
+    static inline R::VertexArray* s_impl = nullptr;
 };
 
 }

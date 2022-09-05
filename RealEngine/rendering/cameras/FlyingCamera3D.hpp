@@ -9,8 +9,12 @@
 
 namespace RE {
 
+/**
+ * @brief Is a moving 3D camera with pitch/yaw/roll rotations
+*/
 class FlyingCamera3D {
 public:
+
     FlyingCamera3D(const glm::vec3& pos, const glm::vec3& yawPitchRoll);
 
     /**
@@ -26,6 +30,7 @@ public:
     const glm::mat4& getViewMat() const;
 
 private:
+
     void recalculateViewMat();
     glm::mat4 m_viewMat;
 

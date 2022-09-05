@@ -3,8 +3,6 @@
  */
 #include <RealEngine/rendering/internal_renderers/GL46_Buffer.hpp>
 
-#include <cassert>
-
 #include <GL/glew.h>
 
 #include <RealEngine/rendering/buffers/Buffer.hpp>
@@ -73,77 +71,64 @@ GLbitfield convert(BufferMapUsageFlags flags) {
     return flags_gl;
 }
 
-void GL46_Buffer::constructImmutable(Buffer& bf, size_t sizeInBytes, BufferUsageFlags flags, const void* data) const {
-    bf.m_sizeInBytes = sizeInBytes;
-    glCreateBuffers(1, &bf.m_ID);
-    glNamedBufferStorage(bf.m_ID, bf.m_sizeInBytes, data, convert(flags));
-#ifdef _DEBUG
-    bf.m_storage = IMMUTABLE;
-#endif // _DEBUG
+BufferID GL46_Buffer::constructImmutable(size_t sizeInBytes, BufferUsageFlags flags, const void* data) const {
+    unsigned int id;
+    glCreateBuffers(1, &id);
+    glNamedBufferStorage(id, sizeInBytes, data, convert(flags));
+    return BufferID{id, 0};
 }
 
-void GL46_Buffer::constructMutable(Buffer& bf, size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const {
-    bf.m_sizeInBytes = sizeInBytes;
-    bf.m_access = convert(accessFreq, accessNature);
-    glCreateBuffers(1, &bf.m_ID);
-    glNamedBufferData(bf.m_ID, bf.m_sizeInBytes, data, bf.m_access);
-#ifdef _DEBUG
-    bf.m_storage = MUTABLE;
-#endif // _DEBUG
+BufferID GL46_Buffer::constructMutable(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const {
+    unsigned int id;
+    glCreateBuffers(1, &id);
+    auto access = convert(accessFreq, accessNature);
+    glNamedBufferData(id, sizeInBytes, data, access);
+    return BufferID{id, access};
 }
 
-void GL46_Buffer::destruct(Buffer& bf) const {
-    glDeleteBuffers(1, &bf.m_ID);
+void GL46_Buffer::destruct(BufferID& bf) const {
+    glDeleteBuffers(1, &bf.m_id);
 }
 
-void GL46_Buffer::bind(const Buffer& bf, BufferType bindType) const {
-    glBindBuffer(convert(bindType), bf.m_ID);
+void GL46_Buffer::bind(const BufferID& bf, BufferType bindType) const {
+    glBindBuffer(convert(bindType), bf.m_id);
 }
 
-void GL46_Buffer::bindIndexed(const Buffer& bf, const BufferTypedIndex& index) const {
+void GL46_Buffer::bindIndexed(const BufferID& bf, const BufferTypedIndex& index) const {
 #ifdef _DEBUG
     if (!isIndexedBufferType(index.type)) {
         throw "Indexed binding used on type that does not use it";
     }
 #endif // _DEBUG
-    glBindBufferBase(convert(index.type), index.bindingIndex, bf.m_ID);
+    glBindBufferBase(convert(index.type), index.bindingIndex, bf.m_id);
 }
 
-void GL46_Buffer::overwrite(const Buffer& bf, size_t offsetInBytes, size_t countBytes, const void* data) const {
-    glInvalidateBufferSubData(bf.m_ID, offsetInBytes, countBytes);
-    glNamedBufferSubData(bf.m_ID, offsetInBytes, countBytes, data);
+void GL46_Buffer::overwrite(const BufferID& bf, size_t offsetInBytes, size_t countBytes, const void* data) const {
+    glNamedBufferSubData(bf.m_id, offsetInBytes, countBytes, data);
 }
 
-void GL46_Buffer::redefine(Buffer& bf, size_t sizeInBytes, const void* data) const {
-    assert(bf.m_storage == MUTABLE);
-    if (sizeInBytes > bf.m_sizeInBytes) {
-        bf.m_sizeInBytes = sizeInBytes;
-        invalidate(bf);
-        glNamedBufferData(bf.m_ID, sizeInBytes, data, bf.m_access);
-    } else {
-        invalidate(bf, sizeInBytes);
-        glNamedBufferSubData(bf.m_ID, 0, sizeInBytes, data);
-    }
+void GL46_Buffer::redefine(BufferID& bf, size_t sizeInBytes, const void* data) const {
+    glNamedBufferData(bf.m_id, sizeInBytes, data, bf.m_access);
 }
 
-void GL46_Buffer::invalidate(const Buffer& bf) const {
-    glInvalidateBufferData(bf.m_ID);
+void GL46_Buffer::invalidate(const BufferID& bf) const {
+    glInvalidateBufferData(bf.m_id);
 }
 
-void GL46_Buffer::invalidate(const Buffer& bf, size_t lengthInBytes) const {
-    glInvalidateBufferSubData(bf.m_ID, 0, lengthInBytes);
+void GL46_Buffer::invalidate(const BufferID& bf, size_t lengthInBytes) const {
+    glInvalidateBufferSubData(bf.m_id, 0, lengthInBytes);
 }
 
-void* GL46_Buffer::map(const Buffer& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const {
-    return glMapNamedBufferRange(bf.m_ID, offsetInBytes, lengthInBytes, convert(mappingUsage));
+void* GL46_Buffer::map(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const {
+    return glMapNamedBufferRange(bf.m_id, offsetInBytes, lengthInBytes, convert(mappingUsage));
 }
 
-void GL46_Buffer::flushMapped(const Buffer& bf, size_t offsetInBytes, size_t lengthInBytes) const {
-    glFlushMappedNamedBufferRange(bf.m_ID, offsetInBytes, lengthInBytes);
+void GL46_Buffer::flushMapped(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes) const {
+    glFlushMappedNamedBufferRange(bf.m_id, offsetInBytes, lengthInBytes);
 }
 
-bool GL46_Buffer::unmap(const Buffer& bf) const {
-    auto rval = glUnmapNamedBuffer(bf.m_ID);
+bool GL46_Buffer::unmap(const BufferID& bf) const {
+    auto rval = glUnmapNamedBuffer(bf.m_id);
 #ifdef _DEBUG
     if (rval == GL_FALSE) {
         std::cerr << "Buffer unmapping failed!\n";

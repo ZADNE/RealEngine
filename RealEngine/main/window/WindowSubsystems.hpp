@@ -5,10 +5,6 @@
 
 #include <string>
 
-constexpr int RE_VERSION_MAJOR = 1;
-constexpr int RE_VERSION_MINOR = 9;
-constexpr int RE_VERSION_PATCH = 0;
-
 /*! \mainpage RealEngine
  *
  * \section overview Overview
@@ -27,14 +23,18 @@ constexpr int RE_VERSION_PATCH = 0;
 
 namespace RE {
 
+constexpr int RE_VERSION_MAJOR = 1;
+constexpr int RE_VERSION_MINOR = 9;
+constexpr int RE_VERSION_PATCH = 1;
+
 /**
  * @brief Lists renderers known to RealEngine
 */
-enum class Renderer {
+enum class RendererID {
     OPENGL_46        /**< Open Graphics Library 4.6 renderer */
 };
 
-std::string to_string(Renderer r);
+std::string to_string(RendererID r);
 
 /**
  * @brief Represents RealEngine's subsystems
@@ -61,14 +61,14 @@ public:
 
 private:
 
-    void initializeRenderer(Renderer renderer) const;
+    void initializeRenderer(RendererID renderer) const;
 
     /**
      * @brief Initializes RealEngine's subsystems
      *
      * @throws int when a system failed to initialize
     */
-    WindowSubsystems(Renderer renderer);
+    WindowSubsystems(RendererID renderer);
 
     /**
      * @brief De-initializes all RealEngine's subsystems

@@ -9,14 +9,12 @@
 
 #include <SDL2/SDL_events.h>
 
+#include <glm/common.hpp>
+
 #include <ImGui/imgui_impl_sdl.h>
 #include <ImGui/imgui_impl_opengl3.h>
 
 #include <RealEngine/main/rooms/Room.hpp>
-#include <RealEngine/resources/ResourceManager.hpp>
-#include <RealEngine/rendering/batches/SpriteBatch.hpp>
-#include <RealEngine/rendering/batches/GeometryBatch.hpp>
-#include <RealEngine/rendering/vertices/default_shaders.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/output/Framebuffer.hpp>
 
@@ -29,7 +27,13 @@ void MainProgram::initialize() {
 
 int MainProgram::run(size_t roomName, const RoomTransitionParameters& params) {
     try {
-        return instance().doRun(roomName, params);
+        auto& inst = instance();
+        switch (inst.m_window.getRenderer()) {
+        case RendererID::OPENGL_46:
+            return inst.doRun<RendererGL46>(roomName, params);
+        default:
+            return 1;
+        }
     }
     catch (const std::exception& e) {
         fatalError(std::string("Exception: ") + e.what());
@@ -98,6 +102,7 @@ void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
     m_usingImGui = s.usingImGui;
 }
 
+template<Renderer R>
 int MainProgram::doRun(size_t roomName, const RoomTransitionParameters& params) {
     scheduleRoomTransition(roomName, params);
     doRoomTransitionIfScheduled();
@@ -115,7 +120,7 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionParameters& params) 
     std::cout << "Entering main loop!" << std::endl;
     while (m_programShouldRun) {
         m_synchronizer.beginFrame();
-        DefaultFrameBuffer::clearColor(m_clearColor);
+        DefaultFrameBuffer<R>::clearColor(m_clearColor);
 
         //Perform simulation steps to catch up the time
         while (m_synchronizer.shouldStepHappen()) {
@@ -236,7 +241,7 @@ void MainProgram::doRoomTransitionIfScheduled() {
     m_synchronizer.resumeSteps();
 }
 
-void MainProgram::scheduleRoomTransition(size_t name, RoomTransitionParameters params) {
+void MainProgram::scheduleRoomTransition(size_t name, const RoomTransitionParameters& params) {
     m_nextRoomName = name;
     m_roomTransitionParameters = params;
 }
@@ -258,14 +263,6 @@ void MainProgram::pollEvents() {
 MainProgram::MainProgram() :
     s_roomToEngineAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
 
-    auto spriteShader = RE::RM::getShaderProgram({.vert = sprite_vert, .frag = sprite_frag});
-    spriteShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
-    SpriteBatch::std().switchShaderProgram(spriteShader);
-
-    auto geometryShader = RE::RM::getShaderProgram({.vert = geometry_vetr, .frag = geometry_frag});
-    geometryShader->backInterfaceBlock(0u, UNIF_BUF_VIEWPORT_MATRIX);
-    GeometryBatch::std().switchShaderProgram(geometryShader);
-
     Room::setRoomSystemAccess(&s_roomToEngineAccess);
     Room::setStaticReferences(this, &m_roomManager);
 }
@@ -274,5 +271,7 @@ MainProgram& MainProgram::instance() {
     static MainProgram mainProgram;
     return mainProgram;
 }
+
+template int MainProgram::doRun<RendererGL46>(size_t roomName, const RoomTransitionParameters& params);
 
 }

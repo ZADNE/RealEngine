@@ -173,6 +173,7 @@ constexpr TextureFlagsType ft_cast(T val) {
 */
 class TextureFlags {
 private:
+
     using enum TextureChannels;
     using enum TextureFormatSign;
     using enum TextureFormatType;
@@ -245,7 +246,9 @@ public:
     void setWrapStyleX(TextureWrapStyle wrapStyle);
     void setWrapStyleY(TextureWrapStyle wrapStyle);
     void setBitdepthPerChannel(TextureBitdepthPerChannel bitdepth);
+
 protected:
+
     TextureFlagsType m_flags;/**< Raw integer type storing the flags */
 };
 

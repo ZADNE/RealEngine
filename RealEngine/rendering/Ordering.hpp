@@ -3,11 +3,18 @@
  */
 #pragma once
 #include <RealEngine/rendering/internal_interfaces/IOrdering.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
+
 
 namespace RE {
 
+/**
+ * @brief Manages ordering of rendering commnads
+ * @tparam R The renderer that will perform the commands
+*/
+template<Renderer R = RendererLateBind>
 class Ordering {
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
 public:
 
     static void flushWork();
@@ -17,7 +24,8 @@ public:
     static void issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers);
 
 protected:
-    static IOrdering* s_impl;
+
+    static inline R::Ordering* s_impl = nullptr;
 };
 
 }

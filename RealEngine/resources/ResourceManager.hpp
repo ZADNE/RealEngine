@@ -3,7 +3,6 @@
  */
 #pragma once
 #include <RealEngine/resources/TextureCache.hpp>
-#include <RealEngine/resources/ShaderProgramCache.hpp>
 
 
 namespace RE {
@@ -20,20 +19,23 @@ class ResourceManager {
 public:
 
     /**
-     * @copydoc TextureCache::getTexture
+     * @copydoc TextureCache::texture
     */
-    static TexturePtr getTexture(const std::string& filePath);
+    static SharedTexture texture(const TextureSeed& seed);
 
     /**
-     * @copydoc ShaderProgramCache::getShaderProgram
+     * @copydoc TextureCache::texture
     */
-    static ShaderProgramPtr getShaderProgram(const ShaderProgramSources& sources);
+    static SharedTexture texture(const std::string& filePathPNG);
 
 private:
-    static TextureCache m_textureCache;
-    static ShaderProgramCache m_shaderProgramCache;
+
+    static inline TextureCache s_textureCache{};
 };
 
+/**
+ * @brief Is abbreviation for ResourceManager
+*/
 using RM = class ResourceManager;
 
 }

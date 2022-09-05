@@ -1,7 +1,7 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
-#include "MainMenuRoom.hpp"
+#include <RTICreator/MainMenuRoom.hpp>
 
 #include <iostream>
 
@@ -11,6 +11,8 @@
 
 #define NOMINMAX 1
 #include <Windows.h>
+
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <ImGui/imgui.h>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
@@ -25,7 +27,8 @@ constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
     .usingImGui = true
 };
 
-MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
+template<RE::Renderer R>
+MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
     Room(0, INITIAL_DISPLAY_SETTINGS),
     m_texView(engine().getWindowDims()) {
 
@@ -38,30 +41,36 @@ MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
         //We have a second argument which should be the texture that should be loaded on start-up
         load(args[1]);
     }
+
+    glm::vec2 window = engine().getWindowDims();
+    m_windowViewBuf.overwrite(0u, glm::ortho(0.0f, window.x, 0.0f, window.y));
 }
 
-void MainMenuRoom::sessionStart(const RE::RoomTransitionParameters& params) {
+template<RE::Renderer R>
+void MainMenuRoom<R>::sessionStart(const RE::RoomTransitionParameters& params) {
 
 }
 
-void MainMenuRoom::sessionEnd() {
+template<RE::Renderer R>
+void MainMenuRoom<R>::sessionEnd() {
 
 }
 
-void MainMenuRoom::step() {
+template<RE::Renderer R>
+void MainMenuRoom<R>::step() {
     auto cursorPos = (glm::vec2)engine().getCursorAbs();
 
     if (engine().isKeyDown(RE::Key::MMB) && m_texture) {
-        m_texView.shiftPosition((glm::vec2{ m_cursorPosPrev - cursorPos } / m_drawScale));
+        m_texView.shiftPosition((glm::vec2{m_cursorPosPrev - cursorPos} / m_drawScale));
     }
 
     if (m_texture) {
         if (engine().wasKeyPressed(RE::Key::UMW)) {
-            m_texView.zoom({ 1.5f, 1.5f });
+            m_texView.zoom({1.5f, 1.5f});
             m_drawScale *= 1.5f;
         }
         if (engine().wasKeyPressed(RE::Key::DMW)) {
-            m_texView.zoom({ 0.66666666f, 0.66666666f });
+            m_texView.zoom({0.66666666f, 0.66666666f});
             m_drawScale *= 0.66666666f;
         }
     }
@@ -72,17 +81,18 @@ void MainMenuRoom::step() {
     }
 }
 
-void MainMenuRoom::render(double interpolationFactor) {
+template<RE::Renderer R>
+void MainMenuRoom<R>::render(double interpolationFactor) {
     auto mat = m_texView.getViewMatrix();
-    m_texViewUBO.overwrite(0u, mat);
-    m_texViewUBO.bindIndexed();
+    m_texViewBuf.overwrite(0u, mat);
+    m_texViewBuf.bindIndexed();
 
     //Texture
     if (m_texture) {
         drawTexture();
     }
 
-    RE::Viewport::getWindowMatrixUniformBuffer().bindIndexed();
+    m_windowViewBuf.bindIndexed();
 
     //Menu
     if (ImGui::Begin("RTICreator v3.0.0")) {
@@ -115,11 +125,13 @@ void MainMenuRoom::render(double interpolationFactor) {
     ImGui::End();
 }
 
-void MainMenuRoom::windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {
+template<RE::Renderer R>
+void MainMenuRoom<R>::windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {
     m_texView.resizeView(newSize);
 }
 
-void MainMenuRoom::parametersGUI() {
+template<RE::Renderer R>
+void MainMenuRoom<R>::parametersGUI() {
     if (imguiCombo("Minification filter", m_minFilter, MIN_FILTERS_LABELS)) {
         m_texture->setMinFilter(MIN_FILTERS[m_minFilter]);
     }
@@ -130,7 +142,7 @@ void MainMenuRoom::parametersGUI() {
         m_texture->setWrapStyleX(WRAP_STYLES[m_wrapStyleX]);
     }
     if (imguiCombo("Wrap style of Y axis", m_wrapStyleY, WRAP_STYLES_LABELS)) {
-        m_texture->setWrapStyleX(WRAP_STYLES[m_wrapStyleY]);
+        m_texture->setWrapStyleY(WRAP_STYLES[m_wrapStyleY]);
     }
     if (ImGui::InputInt("Number of subimages", &m_subimagesSprites.x)) {
         m_texture->setSubimagesSpritesCount(m_subimagesSprites);
@@ -158,7 +170,8 @@ void MainMenuRoom::parametersGUI() {
     }
 }
 
-void MainMenuRoom::selectAndLoad() {
+template<RE::Renderer R>
+void MainMenuRoom<R>::selectAndLoad() {
     char filename[MAX_PATH] = {};
     OPENFILENAMEA ofn;
     ZeroMemory(&ofn, sizeof(ofn));
@@ -178,15 +191,17 @@ void MainMenuRoom::selectAndLoad() {
     load(filename);
 }
 
-void MainMenuRoom::save(const std::string& loc) {
+template<RE::Renderer R>
+void MainMenuRoom<R>::save(const std::string& loc) {
     if (loc.empty()) { return; }
     m_texture->saveToFile(loc);
 }
 
-void MainMenuRoom::load(const std::string& loc) {
+template<RE::Renderer R>
+void MainMenuRoom<R>::load(const std::string& loc) {
     if (loc.empty()) { return; }
     try {
-        m_texture = RE::Texture{ loc };
+        m_texture = RE::Texture<R>{loc};
     }
     catch (...) {
         return;
@@ -206,7 +221,8 @@ void MainMenuRoom::load(const std::string& loc) {
     m_borderColor = glm::vec4(m_texture->getBorderColor()) / 255.0f;
 }
 
-void MainMenuRoom::drawTexture() {
+template<RE::Renderer R>
+void MainMenuRoom<R>::drawTexture() {
     glm::vec2 windowDims = glm::vec2(engine().getWindowDims());
     auto texDims = m_texture->getSubimagesSpritesCount() * m_texture->getSubimageDims();
     auto botLeft = -texDims * 0.5f;
@@ -220,17 +236,16 @@ void MainMenuRoom::drawTexture() {
         1.0f + m_overlap * 2.0f
     };
 
-    RE::SpriteBatch::std().begin();
-    RE::SpriteBatch::std().add(posSizeRect, uvRect, *m_texture, 0);
-    RE::SpriteBatch::std().end(RE::GlyphSortType::POS_TOP);
-    RE::SpriteBatch::std().draw();
+    m_sb.begin();
+    m_sb.add(posSizeRect, uvRect, *m_texture, 0);
+    m_sb.end(RE::GlyphSortType::POS_TOP);
+    m_sb.draw();
 
-    auto& gb = RE::GeometryBatch::std();
-    gb.begin();
+    m_gb.begin();
     std::vector<RE::VertexPOCO> vertices;
     glm::vec2 subimageSprite = m_texture->getSubimagesSpritesCount();
     vertices.reserve((size_t)(subimageSprite.x * subimageSprite.y) * 4u);
-    RE::Color color{ 0, 255u, 0u, 255u };
+    RE::Color color{0, 255u, 0u, 255u};
     auto subimageDims = m_texture->getSubimageDims();
     //Subimages
     for (float x = 1.0f; x < subimageSprite.x; ++x) {
@@ -244,13 +259,13 @@ void MainMenuRoom::drawTexture() {
         vertices.emplace_back(coord + glm::vec2(texDims.x, 0.0f), color);
     }
     if (vertices.size() > 0u) {
-        gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
+        m_gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
         vertices.clear();
     }
     //Pivots
-    color = { 0u, 0u, 255u, 255u };
+    color = {0u, 0u, 255u, 255u};
     glm::vec2 pivotOffset = m_texture->getPivot();
-    float pivotMarkRadius = glm::min(subimageDims.x, subimageDims.y) * 0.5f;
+    float pivotMarkRadius = glm::min(subimageDims.x, subimageDims.y) * 0.45f;
     for (float x = 0.0f; x < m_texture->getSubimagesSpritesCount().x; ++x) {
         for (float y = 0.0f; y < m_texture->getSubimagesSpritesCount().y; ++y) {
             glm::vec2 pivotPos = botLeft + glm::vec2(x, y) * subimageDims + pivotOffset;
@@ -261,24 +276,25 @@ void MainMenuRoom::drawTexture() {
         }
     }
 
-    gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
+    m_gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
     vertices.clear();
     //Whole image
-    color = { 255u, 0u, 0u, 255u };
+    color = {255u, 0u, 0u, 255u};
     vertices.emplace_back(botLeft, color);
     vertices.emplace_back(botLeft + glm::vec2(texDims.x, 0.0f), color);
     vertices.emplace_back(botLeft + glm::vec2(texDims.x, texDims.y), color);
     vertices.emplace_back(botLeft + glm::vec2(0.0f, texDims.y), color);
-    gb.addPrimitives(RE::PRIM::LINE_LOOP, 0u, vertices.size(), vertices.data());
+    m_gb.addPrimitives(RE::PRIM::LINE_LOOP, 0u, vertices.size(), vertices.data());
 
-    gb.end();
-    gb.end();
-
-    RE::GeometryBatch::std().draw();
+    m_gb.end();
+    m_gb.draw();
 }
 
-void MainMenuRoom::resetView() {
-    m_texView.setScale({ 1.0f, 1.0f });
-    m_texView.setPosition(glm::vec2{ 0.0f, 0.0f });
+template<RE::Renderer R>
+void MainMenuRoom<R>::resetView() {
+    m_texView.setScale({1.0f, 1.0f});
+    m_texView.setPosition(glm::vec2{0.0f, 0.0f});
     m_drawScale = 1.0f;
 }
+
+template MainMenuRoom<RE::RendererGL46>;

@@ -23,6 +23,7 @@ union SDL_Event;
 namespace RE {
 
 class Room;
+class RendererGL46;
 
 struct DisplayInfo {
     std::string name; /**< @brief UTF-8 encoded 'name' */
@@ -39,7 +40,7 @@ struct DisplayInfo {
  *
  * This singleton class is used (via static functions) to initialize RealEngine,
  * add rooms to it and then run the main simulation.
- * 
+ *
  * First you call MainProgram::initialize to start the engine.
  * Then you can add your rooms via MainProgram::addRoom. Rooms contain the main bussiness logic.
  * Once you have added all the room, you call MainProgram::run to start the simulation.
@@ -60,18 +61,38 @@ public:
     static void initialize();
 
     /**
-     * @brief Adds a new room to the management
+     * @brief Adds a late-bind Room to the management
      * @tparam RoomType A class derived from Room that will be instantiated.
      * @return Raw pointer to the created room
-     * 
+     *
+     * Your room will use the default late-bind renderer which polymorphically
+     * calls the real renderer.
+     *
      * Single type of room can be added multiple times, the only requirement is that
      * each room must have unique name.
     */
     template<DerivedFromRoom RoomType, typename... ConstructorArgs>
     static RoomType* addRoom(ConstructorArgs&&... args) {
-        switch (instance().m_window.getRenderer()){
-        case Renderer::OPENGL_46:
-            return instance().m_roomManager.addRoom<RoomType>(std::forward<ConstructorArgs>(args)...);
+        return instance().m_roomManager.addRoom<RoomType>(std::forward<ConstructorArgs>(args)...);
+    }
+
+    /**
+     * @brief Adds an early-bind Room to the management
+     * @tparam RoomType A class template derived from Room that will be instantiated.
+     * @return Raw pointer to the created room
+     *
+     * Your room template will be instantiated with the highest probability
+     * available renderer.
+     *
+     * Single type of room can be added multiple times, the only requirement is that
+     * each room must have unique name.
+    */
+    template<template<Renderer> class RoomTemplate, typename... ConstructorArgs> requires DerivedFromRoom<RoomTemplate<RendererGL46>>
+    static Room* addRoom(ConstructorArgs&&... args) {
+        auto& inst = instance();
+        switch (inst.m_window.getRenderer()) {
+        case RendererID::OPENGL_46:
+            return inst.m_roomManager.addRoom<RoomTemplate<RendererGL46>>(std::forward<ConstructorArgs>(args)...);
         default:
             return nullptr;
         }
@@ -83,7 +104,7 @@ public:
      * The return value represent the exit code that this
      * RealEngine program should return to the enviroment.
      * The exit code can be altered by scheduleExit().
-     * 
+     *
      * @warning Never call this more than once!
      *
      * @param roomName Name of the first room that will be entered
@@ -113,7 +134,7 @@ public:
      * @param name Name of the next room, no transition will happen if there is no room with such name.
      * @param params Parameters to start the next room's session with.
     */
-    void scheduleRoomTransition(size_t name, RoomTransitionParameters params);
+    void scheduleRoomTransition(size_t name, const RoomTransitionParameters& params);
 
     static void pollEventsInMainThread(bool poll);
 
@@ -141,6 +162,7 @@ private:
     /**
      * @brief Does the actual game loop on the singleton instance
     */
+    template<Renderer R>
     int doRun(size_t roomName, const RoomTransitionParameters& params);
 
     void step();

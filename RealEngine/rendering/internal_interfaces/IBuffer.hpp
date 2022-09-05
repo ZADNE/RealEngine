@@ -3,7 +3,6 @@
  */
 #pragma once
 #include <utility>
-#include <vector>
 
 #include <RealEngine/rendering/buffers/types.hpp>
 
@@ -45,7 +44,7 @@ inline bool operator&(BufferUsageFlags a, BufferUsageFlags b) {
 }
 
 /**
-    * @brief Restricts the usage of a buffer mapping
+ * @brief Restricts the usage of a buffer mapping
 */
 enum class BufferMapUsageFlags : unsigned int {
     READ = 1,                   /**< Indicates that the mapping may be used to read buffer's data */
@@ -66,7 +65,41 @@ inline bool operator&(BufferMapUsageFlags a, BufferMapUsageFlags b) {
     return static_cast<unsigned int>(a) & static_cast<unsigned int>(b);
 }
 
-class Buffer;
+/**
+ * @brief Contains all members of Buffer
+ * @note For internal usage in RealEngine.
+*/
+class BufferID {
+    friend class GL46_Buffer;
+    friend class GL46_VertexArray;
+public:
+
+    ~BufferID() = default;
+
+    BufferID(const BufferID&) = delete;
+    BufferID(BufferID&& other) noexcept :
+        m_id(other.m_id),
+        m_access(other.m_access) {
+        other.m_id = 0;
+    }
+
+    BufferID& operator=(const BufferID&) = delete;
+    BufferID& operator=(BufferID && other) noexcept {
+        std::swap(m_id, other.m_id);
+        m_access = other.m_access;
+        return *this;
+    }
+
+private:
+
+    BufferID(unsigned int id, unsigned int access) :
+        m_id(id),
+        m_access(access) {
+    }
+
+    unsigned int m_id = 0;      /**< Internal identifier */
+    unsigned int m_access = 0;  /**< Access hints of the buffer; relevant only for mutable buffers */
+};
 
 /**
 * @brief Is a renderer-agnostic interface to Buffer's implementation.
@@ -78,24 +111,23 @@ class Buffer;
 class IBuffer {
 public:
 
-    virtual void constructImmutable(Buffer& bf, size_t sizeInBytes, BufferUsageFlags flags, const void* data) const = 0;
-    virtual void constructMutable(Buffer& bf, size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const = 0;
-    virtual void destruct(Buffer& bf) const = 0;
+    virtual BufferID constructImmutable(size_t sizeInBytes, BufferUsageFlags flags, const void* data) const = 0;
+    virtual BufferID constructMutable(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data) const = 0;
+    virtual void destruct(BufferID& bf) const = 0;
 
-    virtual void bind(const Buffer& bf, BufferType bindType) const = 0;
-    virtual void bindIndexed(const Buffer& bf, const BufferTypedIndex& index) const = 0;
+    virtual void bind(const BufferID& bf, BufferType bindType) const = 0;
+    virtual void bindIndexed(const BufferID& bf, const BufferTypedIndex& index) const = 0;
 
-    virtual void overwrite(const Buffer& bf, size_t offsetInBytes, size_t countBytes, const void* data) const = 0;
+    virtual void overwrite(const BufferID& bf, size_t offsetInBytes, size_t countBytes, const void* data) const = 0;
 
-    virtual void redefine(Buffer& bf, size_t sizeInBytes, const void* data) const = 0;
+    virtual void redefine(BufferID& bf, size_t sizeInBytes, const void* data) const = 0;
 
-    virtual void invalidate(const Buffer& bf) const = 0;
-    virtual void invalidate(const Buffer& bf, size_t lengthInBytes) const = 0;
+    virtual void invalidate(const BufferID& bf) const = 0;
+    virtual void invalidate(const BufferID& bf, size_t lengthInBytes) const = 0;
 
-    virtual void* map(const Buffer& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const = 0;
-    virtual void flushMapped(const Buffer& bf, size_t offsetInBytes, size_t lengthInBytes) const = 0;
-    virtual bool unmap(const Buffer& bf) const = 0;
-
+    virtual void* map(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const = 0;
+    virtual void flushMapped(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes) const = 0;
+    virtual bool unmap(const BufferID& bf) const = 0;
 };
 
 }

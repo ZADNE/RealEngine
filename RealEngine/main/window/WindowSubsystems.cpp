@@ -6,13 +6,13 @@
 #include <SDL2/SDL.h>
 
 #include <RealEngine/utility/error.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Renderer.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46_Fixture.hpp>
 
 namespace RE {
 
-std::string to_string(Renderer r) {
+std::string to_string(RendererID r) {
     switch (r) {
-    case RE::Renderer::OPENGL_46: return "OPENGL_46";
+    case RendererID::OPENGL_46: return "OPENGL_46";
     default: return "Unknown renderer";
     }
 }
@@ -28,13 +28,13 @@ void printSDLVersion() {
     std::printf("SDL linked:   %u.%u.%u\n", linked.major, linked.minor, linked.patch);
 }
 
-void WindowSubsystems::initializeRenderer(Renderer renderer) const {
+void WindowSubsystems::initializeRenderer(RendererID renderer) const {
     switch (renderer) {
-    case RE::Renderer::OPENGL_46: GL46_Renderer::initialize(); break;
+    case RendererID::OPENGL_46: GL46_Fixture::initialize(); break;
     }
 }
 
-WindowSubsystems::WindowSubsystems(Renderer renderer) {
+WindowSubsystems::WindowSubsystems(RendererID renderer) {
     log(getVersion());
     int err = 0;
 
@@ -46,7 +46,7 @@ WindowSubsystems::WindowSubsystems(Renderer renderer) {
     printSDLVersion();
 
     switch (renderer) {
-    case RE::Renderer::OPENGL_46: GL46_Renderer::prepare(); break;
+    case RendererID::OPENGL_46: GL46_Fixture::prepare(); break;
     default: goto quitSDL_fail;
     }
 

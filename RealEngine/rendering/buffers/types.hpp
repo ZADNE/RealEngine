@@ -30,10 +30,10 @@ enum class BufferType : unsigned int {
 */
 inline bool isIndexedBufferType(BufferType type) {
     switch (type) {
-    case RE::BufferType::ATOMIC_COUNTER:
-    case RE::BufferType::SHADER_STORAGE:
-    case RE::BufferType::TRANSFORM_FEEDBACK:
-    case RE::BufferType::UNIFORM:
+    case BufferType::ATOMIC_COUNTER:
+    case BufferType::SHADER_STORAGE:
+    case BufferType::TRANSFORM_FEEDBACK:
+    case BufferType::UNIFORM:
         return true;
     default:
         return false;
@@ -44,7 +44,7 @@ inline bool isIndexedBufferType(BufferType type) {
  * @brief Is a POD struct with buffer type and binding index
 */
 struct BufferTypedIndex {
-    BufferTypedIndex(BufferType type, unsigned int bindingIndex) :
+    constexpr BufferTypedIndex(BufferType type, unsigned int bindingIndex) :
         type(type), bindingIndex(bindingIndex) {
 
     }

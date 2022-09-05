@@ -11,7 +11,7 @@ namespace RE {
 *
 * Do not use this directly - use Ordering class instead.
 */
-class GL46_Ordering : public IOrdering {
+class GL46_Ordering final : public IOrdering {
 public:
 
     void flushWork() const override;
@@ -19,7 +19,6 @@ public:
 
     void issueDrawBarrier() const override;
     void issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers) const override;
-
 };
 
 }

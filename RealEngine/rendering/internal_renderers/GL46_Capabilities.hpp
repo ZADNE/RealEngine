@@ -11,11 +11,10 @@ namespace RE {
 *
 * Do not use this directly - use *Capability classes instead.
 */
-class GL46_Capabilities : public ICapabilities {
+class GL46_Capabilities final : public ICapabilities {
 public:
 
     void set(Capability cap, bool enabled) const override;
-
 };
 
 }

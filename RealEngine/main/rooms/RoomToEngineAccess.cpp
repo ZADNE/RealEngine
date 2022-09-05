@@ -14,7 +14,7 @@ void RoomToEngineAccess::scheduleExit(int exitcode) {
     m_mainProgram.scheduleExit(exitcode);
 }
 
-void RoomToEngineAccess::scheduleRoomTransition(size_t name, RoomTransitionParameters params) {
+void RoomToEngineAccess::scheduleRoomTransition(size_t name, const RoomTransitionParameters& params) {
     m_mainProgram.scheduleRoomTransition(name, params);
 }
 

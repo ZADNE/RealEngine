@@ -3,9 +3,6 @@
  */
 #include <RealEngine/main/window/Window.hpp>
 
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_sdl.h>
 #include <ImGui/imgui_impl_opengl3.h>
@@ -56,11 +53,10 @@ void Window::setDims(const glm::ivec2& newDims, bool save) {
     SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
 
-    Viewport::s_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
-    Viewport::s_windowSize = m_dims;
-    Viewport::setToWholeWindow();
-    Viewport::setWindowMatrixToMatchViewport();
-
+    Viewport<>::s_state->windowSize = m_dims;
+    if (Viewport<>::s_state->trackingWindow) {
+        Viewport<>::setToWholeWindow();
+    }
     if (save) this->save();
 }
 
@@ -94,11 +90,8 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
     //Set vertical synchronisation
     setVSync(m_flags.vSync, false);
 
-    //Create window matrix uniform buffer
-    Viewport::s_windowMatrix = glm::ortho(0.0f, static_cast<float>(m_dims.x), 0.0f, static_cast<float>(m_dims.y));
-    Viewport::s_windowSize = m_dims;
-    Viewport::s_windowMatrixUniformBuffer.emplace(UNIF_BUF_VIEWPORT_MATRIX,
-        static_cast<int>(sizeof(Viewport::s_windowMatrix)), BufferUsageFlags::DYNAMIC_STORAGE, &Viewport::s_windowMatrix);
+    Viewport<>::s_state->windowSize = m_dims;
+    Viewport<>::s_state->trackingWindow = true;
 
     //Initialize ImGui
     IMGUI_CHECKVERSION();
@@ -119,9 +112,6 @@ Window::~Window() {
 
     //Destroy the SDL window
     SDL_DestroyWindow(m_SDLwindow);
-
-    //Destroy the viewport's buffer (before its implementation is null)
-    Viewport::s_windowMatrixUniformBuffer.reset();
 }
 
 void Window::swapBuffer() {

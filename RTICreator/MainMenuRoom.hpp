@@ -6,13 +6,20 @@
 
 #include <RealEngine/main/rooms/Room.hpp>
 #include <RealEngine/main/program/CommandLineArguments.hpp>
+#include <RealEngine/rendering/basic_shaders.hpp>
+#include <RealEngine/rendering/buffers/BufferTyped.hpp>
+#include <RealEngine/rendering/batches/SpriteBatch.hpp>
+#include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/cameras/View2D.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 
+constexpr RE::BufferTypedIndex UNIF_BUF_VIEWPORT_MATRIX = {RE::BufferType::UNIFORM, 0u};
+
  /**
   * @brief Room with the UI
  */
+template<RE::Renderer R>
 class MainMenuRoom : public RE::Room {
 public:
 
@@ -32,8 +39,11 @@ private:
     void save(const std::string& loc);
     void load(const std::string& filePath);
 
+    RE::SpriteBatch<R> m_sb{{.vert = RE::sprite_vert, .frag = RE::sprite_frag}};
+    RE::GeometryBatch<R> m_gb{{.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
+
     //Texture
-    std::optional<RE::Texture> m_texture;
+    std::optional<RE::Texture<R>> m_texture;
     std::string m_textureLoc;
     std::string m_lastVisitedLoc;
 
@@ -41,7 +51,8 @@ private:
 
     //View
     RE::View2D m_texView;
-    RE::TypedBuffer m_texViewUBO{RE::UNIF_BUF_VIEWPORT_MATRIX, static_cast<int>(sizeof(glm::mat4)), RE::BufferUsageFlags::DYNAMIC_STORAGE};
+    RE::BufferTyped<R> m_texViewBuf{UNIF_BUF_VIEWPORT_MATRIX, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE};
+    RE::BufferTyped<R> m_windowViewBuf{UNIF_BUF_VIEWPORT_MATRIX, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE};
     glm::vec2 m_overlap = glm::vec2(0.2f, 0.2f);
     glm::vec3 m_backgroundColor = glm::vec3(0.1f, 0.1f, 0.1f);
 

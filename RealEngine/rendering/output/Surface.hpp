@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -14,19 +14,23 @@
 
 namespace RE {
 
+class RendererLateBind;
+
 /**
-* @brief Represents a canvas that can be drawn into.
-* 
-* A single surface can have several layers (= textures).
+ * @brief Represents a canvas that can be drawn into.
+ * @tparam R The renderer that will perform the commands
+ *
+ * A single surface can have several layers (= textures).
 */
+template<Renderer R = RendererLateBind>
 class Surface {
 public:
 
     /**
      * @brief Constructs surface without any textures (these can be later added via resize())
     */
-    Surface(const TextureParameters& params, bool disableBlend = false, bool updateUniforms = true) :
-        Surface(Raster{{1, 1}}, params, 0, disableBlend, updateUniforms) {};
+    Surface(const TextureParameters& params, bool disableBlend = false) :
+        Surface(Raster{{1, 1}}, params, 0, disableBlend) {};
 
     /**
      * @brief Constructs surface
@@ -35,9 +39,8 @@ public:
      * @param params Parameters of all the textures, note that mipmaps are not allowed for surface textures
      * @param numberOfTextures Number of textures of the surface
      * @param disableBlend If true, blending will be disabled when drawing to the surface.
-     * @param updateUniforms If true, standard GlobalMatrices uniform will be updated when drawing to the surface.
     */
-    Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures = 1, bool disableBlend = false, bool updateUniforms = true);
+    Surface(const Raster& image, const TextureParameters& params, unsigned int numberOfTextures = 1, bool disableBlend = false);
 
     /**
      * @brief Sets further drawing to be done to this surface
@@ -71,9 +74,9 @@ public:
     void clear(Color color, int index);
 
     //Getters
-    TextureProxy getTextureProxy(int index = 0) const { return TextureProxy{m_textures[index]}; }
+    TextureProxy<R> getTextureProxy(int index = 0) const { return TextureProxy<R>{m_textures[index]}; }
 
-    const Texture& getTexture(int index = 0) const;
+    const Texture<R>& getTexture(int index = 0) const;
 
     //All textures in the surface have same dimensions
     glm::uvec2 getDims() const { return m_textures[0].getTrueDims(); }
@@ -84,11 +87,12 @@ public:
     void setPivot(const glm::vec2& pivot, int index);
     //Sets every texture same pivot (but note that every texture may have different pivot)
     void setPivot(const glm::vec2& pivot);
+
 private:
-    std::vector<Texture> m_textures;
-    Framebuffer m_framebuffer;
+
+    std::vector<Texture<R>> m_textures;
+    Framebuffer<R> m_framebuffer;
     bool m_disableBlend;
-    bool m_updateUniformBuffer;
     TextureParameters m_params;
 
     void attachTexturesToFramebuffer();

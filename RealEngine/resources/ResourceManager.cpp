@@ -5,15 +5,12 @@
 
 namespace RE {
 
-TextureCache ResourceManager::m_textureCache{};
-ShaderProgramCache ResourceManager::m_shaderProgramCache{};
-
-TexturePtr ResourceManager::getTexture(const std::string& filePath) {
-    return m_textureCache.getTexture(filePath);
+SharedTexture ResourceManager::texture(const TextureSeed& seed) {
+    return s_textureCache.texture(seed.toFullPath());
 }
 
-ShaderProgramPtr ResourceManager::getShaderProgram(const ShaderProgramSources& sources) {
-    return m_shaderProgramCache.getShaderProgram(sources);
+SharedTexture ResourceManager::texture(const std::string& filePathPNG) {
+    return s_textureCache.texture(filePathPNG);
 }
 
 }

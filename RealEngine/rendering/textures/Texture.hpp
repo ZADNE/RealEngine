@@ -3,24 +3,26 @@
  */
 #pragma once
 #include <string>
-#include <compare>
 
 #include <RealEngine/rendering/internal_interfaces/ITexture.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
 
 
 namespace RE {
 
-class Texture;
+template<Renderer> class Texture;
+template<Renderer> class Framebuffer;
 
 /**
- * @brief Holds a non-owning handle to a Texture.
+ * @brief Holds a non-owning handle to a Texture
+ * @tparam R The renderer that will perform the commands
  *
  * @warning Once the texture that it represents is destroyed, the proxy
  * becomes invalid and should not be used!
 */
+template<Renderer R = RendererLateBind>
 class TextureProxy {
-    friend class Texture;
-    friend class GL46_Renderer;
+    friend class GL46_Fixture;
     friend class GL46_Texture;
 public:
 
@@ -28,7 +30,7 @@ public:
      * @brief Contructs proxy that represents the given texture
      * @param texture Texture to present
     */
-    TextureProxy(const Texture& texture);
+    TextureProxy(const Texture<R>& texture);
 
     /**
      * @brief Binds the texture that this proxy represents.
@@ -46,27 +48,48 @@ public:
     */
     void bind(TextureUnit unit) const;
 
-    auto operator<=>(const TextureProxy&) const = default;
-private:
-    unsigned int m_ID; /**< OpenGL name of the texture */
+    auto operator<=>(const TextureProxy<R>&) const = default;
 
-    static ITexture* s_impl;
+private:
+
+    TextureID m_id;
+
+    static inline R::Texture* s_impl = nullptr;
 };
 
 /**
- * @brief Represents one (or more) images.
+ * @brief Manages conversion from filename to full path to texture
+*/
+struct TextureSeed {
+
+    std::string toFullPath() const {
+        return s_folder + file + s_extension;
+    }
+
+    const std::string& file; /**< Filepath without extension */
+
+private:
+
+    static inline std::string s_folder = "textures/";
+    static inline std::string s_extension = ".png";
+};
+
+/**
+ * @brief Represents one (or more) images
+ * @tparam R The renderer that will perform the commands
  *
  * Textures are always stored in GPU memory.
  *
  * @see Raster
  * @see TextureParameters
 */
+template<Renderer R = RendererLateBind>
 class Texture {
-    friend class TextureProxy;
-    friend class GL46_Renderer;
-    friend class GL46_Texture;
-    friend class GL46_Framebuffer;
+    friend class TextureProxy<R>;
+    friend class GL46_Fixture;
+    friend class Framebuffer<R>;
 public:
+
     static inline constexpr TextureFlags DEFAULT_FLAGS{TextureFlags::RGBA8_NU_NEAR_NEAR_EDGE};
     static inline constexpr Color DEFAULT_BORDER_COLOR{255, 20, 147, 255};
 
@@ -78,16 +101,22 @@ public:
 
     /**
      * @brief Constructs texture from PNG
+     * @param filePathPNG Path to the PNG
      *
      * Parameters are either loaded from reAl chunk of PNG,
      * or if that cannot be done (reAl chunk is missing or it has bad format),
-     * default parameters are used.
+     * default parameters are used instead.
      *
      * @see DEFAULT_PARAMETERS
-     *
-     * @param filePathPNG Path to the PNG
     */
     Texture(const std::string& filePathPNG);
+
+    /**
+     * @brief Constructs texture from seed
+     * 
+     * TextureSeed is converted to full path which is used to load the texture
+    */
+    Texture(const TextureSeed& seed);
 
     /**
      * @brief Contructs texture from raster and parameters
@@ -100,11 +129,11 @@ public:
     */
     Texture(const Raster& raster, const TextureParameters& params = DEFAULT_PARAMETERS);
 
-    Texture(const Texture&) = delete;
-    Texture(Texture&& other) noexcept;
+    Texture(const Texture<R>&) = delete;
+    Texture(Texture<R>&& other) noexcept;
 
-    Texture& operator=(const Texture&) = delete;
-    Texture& operator=(Texture&& other) noexcept;
+    Texture<R>& operator=(const Texture<R>&) = delete;
+    Texture<R>& operator=(Texture<R>&& other) noexcept;
 
     /**
      * @brief Destroys the texture
@@ -191,7 +220,7 @@ public:
      * @param dstPos Position within the destination the destination level (image) to copy to
      * @param size Size of the area that is to be copied
     */
-    void copyTexels(int srcLevel, const glm::ivec2& srcPos, const Texture& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const;
+    void copyTexels(int srcLevel, const glm::ivec2& srcPos, const Texture<R>& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const;
 
     /**
      * @brief Reads back a portion of a level of the texture
@@ -235,18 +264,18 @@ private:
 
     void init(const Raster& raster, const TextureParameters& params);
 
-    unsigned int m_ID = 0u;     /**< Unique identifier of the texture */
+    TextureID m_id;
     TextureFlags m_flags{};     /**< Flags associated with the texture */
 
     glm::vec2 m_subimageDims{}; /**< Dimensions of the texture */
     glm::vec2 m_pivot{};        /**< Pivot of the texture */
     glm::vec2 m_subimagesSpritesCount{};/**< Number of subimages and sprites of the texture */
 
-    glm::uvec2 m_trueDims{};    /**< True dimensions of the OpenGL texture */
+    glm::uvec2 m_trueDims{};    /**< True dimensions of the texture */
 
     Color m_borderColor{};      /**< Border color of the texture */
 
-    static ITexture* s_impl;
+    static inline R::Texture* s_impl = nullptr;
 };
 
 }

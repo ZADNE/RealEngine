@@ -87,7 +87,7 @@ private:
     Window(const WindowSettings& settings, const std::string& title);
 
     /**
-     * @brief Destroys the window and its OpenGL context.
+     * @brief Destroys the window
     */
     ~Window();
 

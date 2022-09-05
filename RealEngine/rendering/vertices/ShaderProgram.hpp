@@ -3,27 +3,31 @@
  */
 #pragma once
 #include <RealEngine/rendering/internal_interfaces/IShaderProgram.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
+
 
 namespace RE {
 
 /**
-* @brief Controls how vertices are rendered to screen.
+ * @brief Controls how vertices are rendered to screen.
+ * @tparam R The renderer that will perform the commands
 */
+template<Renderer R = RendererLateBind>
 class ShaderProgram {
-    friend class GL46_Renderer;
-    friend class GL46_ShaderProgram;
+    friend class GL46_Fixture;
 public:
+
     /**
      * @brief Constructs shader program from given source codes
      * @param sources Source codes of the program
     */
     ShaderProgram(const ShaderProgramSources& sources);
 
-    ShaderProgram(const ShaderProgram&) = delete;
-    ShaderProgram(ShaderProgram&& other) noexcept;
+    ShaderProgram(const ShaderProgram<R>&) = delete;
+    ShaderProgram(ShaderProgram<R>&& other) noexcept;
 
-    ShaderProgram& operator=(const ShaderProgram&) = delete;
-    ShaderProgram& operator=(ShaderProgram&& other) noexcept;
+    ShaderProgram<R>& operator=(const ShaderProgram<R>&) = delete;
+    ShaderProgram<R>& operator=(ShaderProgram<R>&& other) noexcept;
 
     /**
      * @brief Destructs shader program
@@ -70,6 +74,13 @@ public:
     void backInterfaceBlock(unsigned int interfaceBlockIndex, const BufferTypedIndex& index) const;
 
     /**
+     * @brief Resolves location of uniform "name"
+     * @param name Name of the uniform
+     * @return Location of the uniform, negative if there is no such uniform
+    */
+    int getUniformLocation(const std::string& name) const;
+
+    /**
      * @brief Resolves location of uniform "name" and sets its value
      * @param name Name of the uniform
      * 
@@ -78,11 +89,11 @@ public:
     */
     template<typename... Args>
     void setUniform(const std::string& name, Args... args) const {
-        auto loc = s_impl->getUniformLocation(*this, name);
+        auto loc = getUniformLocation(name);
     #ifdef _DEBUG
-        if (loc < 0) error(std::string{"Uniform \""} + name + "\" does not exist in program " + std::to_string(m_ID) + "!");
+        if (loc < 0) error(std::string{"Uniform \""} + name + "\" does not exist in the shader program!");
     #endif // _DEBUG
-        s_impl->setUniform(*this, loc, args...);
+        setUniform(loc, args...);
     }
 
     void setUniform(int location, float val) const;                                     /**< Sets float uniform at given location */
@@ -129,14 +140,9 @@ public:
 
 private:
 
-    unsigned int m_ID = 0;/**< Internal identifier of the program */
+    ShaderProgramID m_id;
 
-    /**
-     * @brief The backing implementation of the program.
-     *
-     * This is set up at RealEngine initialization.
-    */
-    static IShaderProgram* s_impl;
+    static inline R::ShaderProgram* s_impl = nullptr;
 };
 
 }

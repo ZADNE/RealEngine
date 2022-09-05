@@ -2,21 +2,28 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <vector>
+
 #include <RealEngine/rendering/internal_interfaces/IBuffer.hpp>
+#include <RealEngine/rendering/Renderer.hpp>
+
 
 namespace RE {
 
+template<Renderer> class VertexArray;
+
 /**
- * @brief Is a continuous block of memory stored in the GPU's memory.
+ * @brief Is a continuous block of memory stored in the GPU's memory
+ * @tparam R The renderer that will perform the commands
  *
  * A buffer can be either mutable or immutable. Mutable buffer can be resized,
  * while immutable buffer cannot change its size upon construction.
  * The mutability is determined by the constructor that is used to construct the buffer.
 */
+template<Renderer R = RendererLateBind>
 class Buffer {
-    friend class GL46_Renderer;
-    friend class GL46_Buffer;
-    friend class GL46_VertexArray;
+    friend class GL46_Fixture;
+    friend class VertexArray<R>;
 public:
 
     /**
@@ -68,16 +75,16 @@ public:
     Buffer(BufferAccessFrequency accessFreq, BufferAccessNature accessNature) :
         Buffer(0u, accessFreq, accessNature, nullptr) {}
 
+    Buffer(const Buffer<R>&) = delete;
+    Buffer(Buffer<R>&& other) noexcept;
+
+    Buffer<R>& operator=(const Buffer<R>&) = delete;
+    Buffer<R>& operator=(Buffer<R>&& other) noexcept;
+
     /**
      * @brief Frees the backing memory block on the GPU and destructs the buffer.
     */
     ~Buffer();
-
-    Buffer(const Buffer&) = delete;
-    Buffer(Buffer&& other) noexcept;
-
-    Buffer& operator=(const Buffer&) = delete;
-    Buffer& operator=(Buffer&& other) noexcept;
 
     /**
      * @brief Binds the buffer to a generic binding point.
@@ -179,7 +186,7 @@ public:
     */
     template<typename T>
     T* map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const {
-        return reinterpret_cast<T*>(s_impl->map(*this, offsetInBytes, lengthInBytes, mappingUsage));
+        return reinterpret_cast<T*>(map(offsetInBytes, lengthInBytes, mappingUsage));
     }
 
     /**
@@ -200,15 +207,16 @@ public:
 
 protected:
 
-    unsigned int m_ID = 0;      /**< Internal name of the buffer */
+    void* map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const;
+
+    BufferID m_id;
     size_t m_sizeInBytes = 0;   /**< Size of the buffer */
-    unsigned int m_access = 0;  /**< Access hints of the buffer; relevant only for mutable buffers */
 
 #ifdef _DEBUG
     BufferStorage m_storage = BufferStorage::IMMUTABLE;
 #endif // _DEBUG
 
-    static IBuffer* s_impl;
+    static inline R::Buffer* s_impl = nullptr;
 };
 
 }

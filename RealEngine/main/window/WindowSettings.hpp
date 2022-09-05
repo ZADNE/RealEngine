@@ -38,7 +38,7 @@ public:
     /**
      * @brief Constructs settings from given parameters
     */
-    WindowSettings(const glm::ivec2& dims, WindowFlags flags, Renderer renderer);
+    WindowSettings(const glm::ivec2& dims, WindowFlags flags, RendererID renderer);
 
     /**
      * @brief Gets a copy of the window flags
@@ -49,7 +49,7 @@ public:
     bool isBorderless() const { return m_flags.borderless; }
     bool isVSynced() const { return m_flags.vSync; }
 
-    Renderer getRenderer() const { return m_renderer; }
+    RendererID getRenderer() const { return m_renderer; }
 
     /**
      * @brief Save current settings to a file.
@@ -67,7 +67,7 @@ protected:
 
     glm::ivec2 m_dims;      /**< dimensions of the window */
     WindowFlags m_flags;    /**< flags of the window */
-    Renderer m_renderer;    /**< the backing renderer of the window */
+    RendererID m_renderer;  /**< the backing renderer of the window */
 };
 
 }

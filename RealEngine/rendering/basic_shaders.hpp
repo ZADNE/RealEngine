@@ -25,8 +25,6 @@ static std::string_view sprite_vert = {
     "}"
 };
 
-static int LOC_BASE_TEXTURE = 0;
-
 static std::string_view sprite_frag = {
     "in vec4 fragColor;"
     "in vec2 fragUV;"
@@ -40,7 +38,7 @@ static std::string_view sprite_frag = {
     "}"
 };
 
-static std::string_view geometry_vetr = {
+static std::string_view geometry_vert = {
     "layout(location = 0) in vec2 position;"
     "layout(location = 1) in vec4 color;"
 

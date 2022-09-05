@@ -9,10 +9,9 @@
 
 #include <RealEngine/rendering/output/Surface.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
-#include <RealEngine/rendering/vertices/vertices.hpp>
+#include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 #include <RealEngine/rendering/batches/Sprite.hpp>
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
-#include <RealEngine/resources/ShaderProgramCache.hpp>
 
 namespace RE {
 
@@ -23,12 +22,13 @@ enum class GlyphSortType {
     TEXTURE
 };
 
+template<Renderer R = RendererLateBind>
 class Glyph {
 public:
-    Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy texture, int depth, Color color);
-    Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy texture, int depth, Color color, float radAngle, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));
+    Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy<R> tex, int depth, Color color);
+    Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy<R> tex, int depth, Color color, float radAngle, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));
 
-    TextureProxy texture;
+    TextureProxy<R> tex;
     int depth;
 
     VertexPOCOUV topLeft;
@@ -37,114 +37,124 @@ public:
     VertexPOCOUV botRight;
 };
 
+template<Renderer R = RendererLateBind>
 struct DrawBatch {
-    DrawBatch(int offset, unsigned int count, TextureProxy texture) : offset(offset), count(count), texture(texture) {};
+    DrawBatch(int offset, unsigned int count, TextureProxy<R> tex) : offset(offset), count(count), tex(tex) {};
 
     int offset;
     int count;
-    TextureProxy texture;
+    TextureProxy<R> tex;
 };
 
 /**
-* @brief Draws sprites, surfaces and other textures.
+ * @brief Draws sprites, surfaces and other textures
+ * @tparam R The renderer that will perform the commands
 */
+template<Renderer R = RendererLateBind>
 class SpriteBatch {
 public:
-    using enum BufferType;
-    using enum BufferStorage;
-    using enum BufferAccessFrequency;
-    using enum BufferAccessNature;
 
-    SpriteBatch();
+    /**
+     * @brief Constructs new SpriteBatch
+     * @param sources Sources used to construct the shader program that will be used for drawing
+    */
+    SpriteBatch(const ShaderProgramSources& sources);
 
     void begin();
     void end(GlyphSortType sortType);
 
     //UNCOLORED
-    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy texture, int depth);//Rotated to the right
-    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy texture, int depth, float radAngle, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));//Rotated based on the angle
-    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy texture, int depth, const glm::vec2& direction, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));//Rotated based on the vector
+    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy<R> tex, int depth);//Rotated to the right
+    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy<R> tex, int depth, float radAngle, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));//Rotated based on the angle
+    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy<R> tex, int depth, const glm::vec2& direction, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));//Rotated based on the vector
     //COLORED
-    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy texture, int depth, Color color);//Rotated to the right
-    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy texture, int depth, Color color, float radAngle, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));//Rotated based on the angle
-    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy texture, int depth, Color color, const glm::vec2& direction, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));//Rotated based on the vector
+    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy<R> tex, int depth, Color color);//Rotated to the right
+    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy<R> tex, int depth, Color color, float radAngle, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));//Rotated based on the angle
+    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy<R> tex, int depth, Color color, const glm::vec2& direction, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));//Rotated based on the vector
 
     //UNCOLORED, UNSTRETCHED
-    void addTexture(const Texture* texture, const glm::vec2& position, int depth);//Unrotated
-    void addTexture(const Texture* texture, const glm::vec2& position, int depth, float radAngle);//Rotated based on the angle
-    void addTexture(const Texture* texture, const glm::vec2& position, int depth, const glm::vec2& direction);//Rotated based on the vector
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth);//Unrotated
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth, float radAngle);//Rotated based on the angle
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth, const glm::vec2& direction);//Rotated based on the vector
     //COLORED, STRETCHED
-    void addTexture(const Texture* texture, const glm::vec2& position, int depth, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
-    void addTexture(const Texture* texture, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
-    void addTexture(const Texture* texture, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
+    void addTexture(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
 
     //UNCOLORED, UNSTRETCHED
-    void addSprite(const Sprite& sprite, const glm::vec2& position, int depth);//Unrotated
-    void addSprite(const Sprite& sprite, const glm::vec2& position, int depth, float radAngle);//Rotated based on the angle
-    void addSprite(const Sprite& sprite, const glm::vec2& position, int depth, const glm::vec2& direction);//Rotated based on the vector
+    void addSprite(const SpriteStatic<R>& sprite, const glm::vec2& position, int depth);//Unrotated
+    void addSprite(const SpriteStatic<R>& sprite, const glm::vec2& position, int depth, float radAngle);//Rotated based on the angle
+    void addSprite(const SpriteStatic<R>& sprite, const glm::vec2& position, int depth, const glm::vec2& direction);//Rotated based on the vector
     //COLORED, STRETCHED
-    void addSprite(const Sprite& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
-    void addSprite(const Sprite& sprite, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
-    void addSprite(const Sprite& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
+    void addSprite(const SpriteStatic<R>& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
+    void addSprite(const SpriteStatic<R>& sprite, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
+    void addSprite(const SpriteStatic<R>& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
 
     //COLORED, STRETCHED BY FULLSPRITE
-    void addSprite(const FullSprite& sprite, const glm::vec2& position, int depth);//Unrotated
-    void addSprite(const FullSprite& sprite, const glm::vec2& position, int depth, float radAngle);//Rotated based on the angle
-    void addSprite(const FullSprite& sprite, const glm::vec2& position, int depth, const glm::vec2& direction);//Rotated based on the vector
+    void addSprite(const SpriteComplex<R>& sprite, const glm::vec2& position, int depth);//Unrotated
+    void addSprite(const SpriteComplex<R>& sprite, const glm::vec2& position, int depth, float radAngle);//Rotated based on the angle
+    void addSprite(const SpriteComplex<R>& sprite, const glm::vec2& position, int depth, const glm::vec2& direction);//Rotated based on the vector
     //COLORED, STRETCHED BY USER
-    void addSprite(const FullSprite& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
-    void addSprite(const FullSprite& sprite, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
-    void addSprite(const FullSprite& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
+    void addSprite(const SpriteComplex<R>& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
+    void addSprite(const SpriteComplex<R>& sprite, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
+    void addSprite(const SpriteComplex<R>& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
 
     //UNCOLORED, UNSTRETCHED
-    void addSubimage(const Texture* texture, const glm::vec2& position, int depth, const glm::vec2& subImg_Spr);//Unrotated
-    void addSubimage(const Texture* texture, const glm::vec2& position, int depth, float radAngle, const glm::vec2& subImg_Spr);//Rotated based on the angle
-    void addSubimage(const Texture* texture, const glm::vec2& position, int depth, const glm::vec2& direction, const glm::vec2& subImg_Spr);//Rotated based on the vector
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, const glm::vec2& subImg_Spr);//Unrotated
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, float radAngle, const glm::vec2& subImg_Spr);//Rotated based on the angle
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, const glm::vec2& direction, const glm::vec2& subImg_Spr);//Rotated based on the vector
     //COLORED, STRETCHED
-    void addSubimage(const Texture* texture, const glm::vec2& position, int depth, Color color, const glm::vec2& subImg_Spr, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
-    void addSubimage(const Texture* texture, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& subImg_Spr, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
-    void addSubimage(const Texture* texture, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& subImg_Spr, const glm::vec2& scale);//Rotated based on the vector
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& subImg_Spr, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& subImg_Spr, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
+    void addSubimage(const Texture<R>& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& subImg_Spr, const glm::vec2& scale);//Rotated based on the vector
 
     //UNCOLORED, UNSTRETCHED
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index);//Unrotated
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index, float radAngle);//Rotated based on the angle
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index, const glm::vec2& direction);//Rotated based on the vector
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index);//Unrotated
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, float radAngle);//Rotated based on the angle
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, const glm::vec2& direction);//Rotated based on the vector
     //COLORED, STRETCHED
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
-    void addSurface(const Surface& surface, const glm::vec2& position, int depth, int index, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, Color color, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Unrotated
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, Color color, float radAngle, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
+    void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
 
+    /**
+     * @brief Draws the batch with stored shader program
+    */
     void draw();
-    //Draws once with different shader program - the change is not saved (use switchShaderProgram() for that)
-    void draw(const ShaderProgram& program);
 
-    void switchShaderProgram(ShaderProgramPtr shaderProgram);
+    /**
+     * @brief Draws once with different shader program  (the shader is not stored)
+     * @param program 
+    */
+    void draw(const ShaderProgram<R>& program);
 
-    static SpriteBatch& std() {
-        static SpriteBatch std{};
-        return std;
-    }
+    /**
+     * @brief Switches to a different program that will be used for drawing
+    */
+    void switchShaderProgram(const ShaderProgramSources& sources);
+
 private:
+
     void sortGlyphs(GlyphSortType sortType);
     void createDrawBatches();
 
-    VertexArray m_vao;
-    Buffer m_vbo{0, STREAM, DRAW};
+    VertexArray<R> m_vao;
+    Buffer<R> m_vbo{0, BufferAccessFrequency::STREAM, BufferAccessNature::DRAW};
 
-    std::vector<Glyph*> m_glyphPointers;
-    std::vector<Glyph> m_glyphs;
-    std::vector<DrawBatch> m_drawBatches;
+    std::vector<Glyph<R>*> m_glyphPointers;
+    std::vector<Glyph<R>> m_glyphs;
+    std::vector<DrawBatch<R>> m_drawBatches;
     std::vector<VertexPOCOUV> m_vertices;
 
-    static bool compareNegToPos(Glyph* a, Glyph* b);
-    static bool comparePosToNeg(Glyph* a, Glyph* b);
-    static bool compareTexture(Glyph* a, Glyph* b);
+    static constexpr bool compareNegToPos(Glyph<R>* a, Glyph<R>* b) { return (a->depth > b->depth); }
+    static constexpr bool comparePosToNeg(Glyph<R>* a, Glyph<R>* b) { return (a->depth < b->depth); }
+    static constexpr bool compareTexture(Glyph<R>* a, Glyph<R>* b) { return (a->tex > b->tex); }
 
-    ShaderProgramPtr m_shaderProgram;
+    ShaderProgram<R> m_shaderProgram;
 
-    const glm::vec4 m_UVRectangle = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-    const glm::vec4 m_SUVRectangle = glm::vec4(0.0f, 1.0f, 1.0f, -1.0f);//Used for drawing surfaces
-    static inline const Color WHITE{255, 255, 255, 255};
+    static inline constexpr glm::vec4 UV_RECT = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+    static inline constexpr glm::vec4 SUV_RECT = glm::vec4(0.0f, 1.0f, 1.0f, -1.0f);//Used for drawing surfaces
+    static inline constexpr Color WHITE{255, 255, 255, 255};
 };
 
 }

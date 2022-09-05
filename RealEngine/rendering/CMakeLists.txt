@@ -8,6 +8,8 @@ add_subdirectory(textures)
 add_subdirectory(vertices)
 
 target_sources(${PROJECT_NAME} PUBLIC
-    capabilities.hpp            capabilities.cpp
+    basic_shaders.hpp           
+    Capabilities.hpp            Capabilities.cpp
     Ordering.hpp                Ordering.cpp
+    Renderer.hpp                
 )
