@@ -265,7 +265,7 @@ void MainMenuRoom<R>::drawTexture() {
     //Pivots
     color = {0u, 0u, 255u, 255u};
     glm::vec2 pivotOffset = m_texture->getPivot();
-    float pivotMarkRadius = glm::min(subimageDims.x, subimageDims.y) * 0.5f;
+    float pivotMarkRadius = glm::min(subimageDims.x, subimageDims.y) * 0.45f;
     for (float x = 0.0f; x < m_texture->getSubimagesSpritesCount().x; ++x) {
         for (float y = 0.0f; y < m_texture->getSubimagesSpritesCount().y; ++y) {
             glm::vec2 pivotPos = botLeft + glm::vec2(x, y) * subimageDims + pivotOffset;

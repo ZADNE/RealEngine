@@ -52,15 +52,14 @@ public:
 
     /**
      * @brief Gets texture as a shared resource.
-     * @param filePathNoExt Path to the texture (without extension)
+     * @param filePathPNG Path to the PNG
      * @return Texture as a shared resource
     */
-    SharedTexture texture(const std::string& filePathNoExt);
+    SharedTexture texture(const std::string& filePathPNG);
 
 private:
 
     std::unordered_map<std::string, std::weak_ptr<TextureUnion>> m_textureMap;
-    std::string m_textureFolder = "textures/";
 };
 
 }

@@ -74,6 +74,13 @@ public:
     void backInterfaceBlock(unsigned int interfaceBlockIndex, const BufferTypedIndex& index) const;
 
     /**
+     * @brief Resolves location of uniform "name"
+     * @param name Name of the uniform
+     * @return Location of the uniform, negative if there is no such uniform
+    */
+    int getUniformLocation(const std::string& name) const;
+
+    /**
      * @brief Resolves location of uniform "name" and sets its value
      * @param name Name of the uniform
      * 
@@ -82,7 +89,7 @@ public:
     */
     template<typename... Args>
     void setUniform(const std::string& name, Args... args) const {
-        auto loc = -1;//s_impl->getUniformLocation(*this, name);
+        auto loc = getUniformLocation(name);
     #ifdef _DEBUG
         if (loc < 0) error(std::string{"Uniform \""} + name + "\" does not exist in the shader program!");
     #endif // _DEBUG

@@ -58,6 +58,11 @@ void ShaderProgram<R>::backInterfaceBlock(unsigned int interfaceBlockIndex, cons
     s_impl->backInterfaceBlock(m_id, interfaceBlockIndex, index);
 }
 
+template<Renderer R>
+int ShaderProgram<R>::getUniformLocation(const std::string& name) const {
+    return s_impl->getUniformLocation(m_id, name);
+}
+
 template<Renderer R> void ShaderProgram<R>::setUniform(int location, float val) const { s_impl->setUniform(m_id, location, val); }
 template<Renderer R> void ShaderProgram<R>::setUniform(int location, float val0, float val1) const { s_impl->setUniform(m_id, location, val0, val1); }
 template<Renderer R> void ShaderProgram<R>::setUniform(int location, const glm::vec2& val) const { setUniform(location, val.x, val.y); }

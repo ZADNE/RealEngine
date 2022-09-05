@@ -5,8 +5,12 @@
 
 namespace RE {
 
-SharedTexture ResourceManager::texture(const std::string& filePathNoExt) {
-    return s_textureCache.texture(filePathNoExt);
+SharedTexture ResourceManager::texture(const TextureSeed& seed) {
+    return s_textureCache.texture(seed.toFullPath());
+}
+
+SharedTexture ResourceManager::texture(const std::string& filePathPNG) {
+    return s_textureCache.texture(filePathPNG);
 }
 
 }

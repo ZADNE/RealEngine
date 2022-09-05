@@ -21,11 +21,16 @@ public:
     /**
      * @copydoc TextureCache::texture
     */
-    static SharedTexture texture(const std::string& filePathNoExt);
+    static SharedTexture texture(const TextureSeed& seed);
+
+    /**
+     * @copydoc TextureCache::texture
+    */
+    static SharedTexture texture(const std::string& filePathPNG);
 
 private:
 
-    static inline TextureCache s_textureCache;
+    static inline TextureCache s_textureCache{};
 };
 
 /**
