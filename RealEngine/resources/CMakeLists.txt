@@ -1,4 +1,4 @@
-﻿target_sources(${PROJECT_NAME} PUBLIC
-    ResourceManager.hpp         ResourceManager.cpp
-    TextureCache.hpp            TextureCache.cpp
+﻿target_sources(RealEngine PRIVATE
+    ResourceManager.ixx         ResourceManager.cxx
+    TextureCache.ixx            TextureCache.cxx
 )

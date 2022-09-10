@@ -1,6 +1,6 @@
-﻿target_sources(${PROJECT_NAME} PUBLIC
-    circles.hpp                 
-    GeometryBatch.hpp           GeometryBatch.cpp
-    Sprite.hpp                  Sprite.cpp
-    SpriteBatch.hpp             SpriteBatch.cpp
+﻿target_sources(RealEngine PRIVATE
+    Circle.ixx                 
+    GeometryBatch.ixx           GeometryBatch.cxx
+    Sprite.ixx                  Sprite.cxx
+    SpriteBatch.ixx             SpriteBatch.cxx
 )

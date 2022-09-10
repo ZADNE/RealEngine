@@ -1,5 +1,5 @@
-﻿target_sources(${PROJECT_NAME} PUBLIC
-    InputManager.hpp            InputManager.cpp
-    Key.hpp                     Key.cpp
-    KeyBinder.hpp               
+﻿target_sources(RealEngine PRIVATE
+    InputManager.ixx            InputManager.cxx
+    Key.ixx                     Key.cxx
+    KeyBinder.ixx               
 )

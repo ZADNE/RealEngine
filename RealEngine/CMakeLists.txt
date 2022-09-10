@@ -1,5 +1,7 @@
-﻿add_subdirectory(main)
+﻿add_subdirectory(program)
 add_subdirectory(rendering)
 add_subdirectory(resources)
+add_subdirectory(rooms)
 add_subdirectory(user_input)
 add_subdirectory(utility)
+add_subdirectory(window)

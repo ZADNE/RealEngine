@@ -1,0 +1,35 @@
+﻿/*!
+ *  @author    Dubsky Tomas
+ */
+export module RealEngine.rendering.Capabilities;
+export import RealEngine.rendering.internal_interfaces.ICapabilities;
+export import RealEngine.rendering.Renderer;
+
+
+export namespace RE {
+
+template<Renderer R = RendererLateBind>
+class Capabilities {
+    friend class GL46Fixture;
+protected:
+
+    static inline R::Capabilities* s_impl = nullptr;
+};
+
+/**
+ * @brief Controls mixing of new and old pixels in framebuffer
+ * @tparam R The renderer that will perform the commands
+ *
+ * Enabled means that the incoming color is mixed with the previous based on incoming's alpha.
+ * Disabled means that the incoming color simply replaces the previous color.
+*/
+template<Renderer R = RendererLateBind>
+class BlendingCapability : Capabilities<R> {
+public:
+
+    static void enable();
+    static void disable();
+    static void set(bool enabled);
+};
+
+}

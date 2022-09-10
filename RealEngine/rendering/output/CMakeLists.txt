@@ -1,5 +1,5 @@
-﻿target_sources(${PROJECT_NAME} PUBLIC
-    Framebuffer.hpp             Framebuffer.cpp
-    Surface.hpp                 Surface.cpp
-    Viewport.hpp                Viewport.cpp
+﻿target_sources(RealEngine PRIVATE
+    Framebuffer.ixx             Framebuffer.cxx
+    Surface.ixx                 Surface.cxx
+    Viewport.ixx                Viewport.cxx
 )

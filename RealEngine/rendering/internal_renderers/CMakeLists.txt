@@ -1,11 +1,11 @@
-﻿target_sources(${PROJECT_NAME} PUBLIC
-    GL46_Buffer.hpp             GL46_Buffer.cpp
-    GL46_Capabilities.hpp       GL46_Capabilities.cpp
-    GL46_Fixture.hpp            GL46_Fixture.cpp
-    GL46_Framebuffer.hpp        GL46_Framebuffer.cpp
-    GL46_Ordering.hpp           GL46_Ordering.cpp
-    GL46_ShaderProgram.hpp      GL46_ShaderProgram.cpp
-    GL46_Texture.hpp            GL46_Texture.cpp
-    GL46_VertexArray.hpp        GL46_VertexArray.cpp
-    GL46_Viewport.hpp           GL46_Viewport.cpp
+﻿target_sources(RealEngine PRIVATE
+    GL46Buffer.ixx              GL46Buffer.cxx
+    GL46Capabilities.ixx        GL46Capabilities.cxx
+    GL46Fixture.ixx             GL46Fixture.cxx
+    GL46Framebuffer.ixx         GL46Framebuffer.cxx
+    GL46Ordering.ixx            GL46Ordering.cxx
+    GL46ShaderProgram.ixx       GL46ShaderProgram.cxx
+    GL46Texture.ixx             GL46Texture.cxx
+    GL46VertexArray.ixx         GL46VertexArray.cxx
+    GL46Viewport.ixx            GL46Viewport.cxx
 )

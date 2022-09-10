@@ -7,9 +7,9 @@ add_subdirectory(output)
 add_subdirectory(textures)
 add_subdirectory(vertices)
 
-target_sources(${PROJECT_NAME} PUBLIC
-    basic_shaders.hpp           
-    Capabilities.hpp            Capabilities.cpp
-    Ordering.hpp                Ordering.cpp
-    Renderer.hpp                
+target_sources(RealEngine PRIVATE
+    BasicShaders.ixx            
+    Capabilities.ixx            Capabilities.cxx
+    Ordering.ixx                Ordering.cxx
+    Renderer.ixx                
 )
