@@ -20,8 +20,8 @@ template<Renderer> class TextureProxy;
 class TextureID {
     template<Renderer> friend class Texture;
     template<Renderer> friend class TextureProxy;
-    friend class GL46_Texture;
-    friend class GL46_Framebuffer;
+    friend class GL46Texture;
+    friend class GL46Framebuffer;
 public:
 
     TextureID() : m_id(0) {}

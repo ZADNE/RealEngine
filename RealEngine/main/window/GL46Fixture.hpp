@@ -2,14 +2,14 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/rendering/internal_renderers/GL46_Buffer.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Capabilities.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Framebuffer.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Ordering.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_ShaderProgram.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Texture.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_VertexArray.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46_Viewport.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Buffer.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Capabilities.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Framebuffer.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Ordering.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46ShaderProgram.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Texture.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46VertexArray.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Viewport.hpp>
 
 #include <RealEngine/rendering/output/Framebuffer.hpp>
 #include <RealEngine/rendering/Renderer.hpp>
@@ -23,7 +23,7 @@ namespace RE {
 *
 * @warning Never use this class directly!
 */
-class GL46_Fixture {
+class GL46Fixture {
 public:
 
     /**
@@ -43,13 +43,13 @@ public:
     */
     static void initialize();
 
-    GL46_Fixture(const GL46_Fixture&) = delete;
-    GL46_Fixture& operator=(const GL46_Fixture&) = delete;
+    GL46Fixture(const GL46Fixture&) = delete;
+    GL46Fixture& operator=(const GL46Fixture&) = delete;
 
 private:
 
-    GL46_Fixture();
-    ~GL46_Fixture();
+    GL46Fixture();
+    ~GL46Fixture();
 
     class Implementations {
     public:
@@ -75,14 +75,14 @@ private:
         template<Renderer R>
         void clearReferences();
 
-        GL46_Buffer m_bufferImpl;
-        GL46_Capabilities m_capabilitiesImpl;
-        GL46_Framebuffer m_mainFramebufferImpl;
-        GL46_Ordering m_orderingImpl;
-        GL46_ShaderProgram m_shaderProgramImpl;
-        GL46_Texture m_textureImpl;
-        GL46_VertexArray m_vertexArrayImpl;
-        GL46_Viewport m_viewportImpl;
+        GL46Buffer m_bufferImpl;
+        GL46Capabilities m_capabilitiesImpl;
+        GL46Framebuffer m_mainFramebufferImpl;
+        GL46Ordering m_orderingImpl;
+        GL46ShaderProgram m_shaderProgramImpl;
+        GL46Texture m_textureImpl;
+        GL46VertexArray m_vertexArrayImpl;
+        GL46Viewport m_viewportImpl;
 
         ViewportState m_viewportState;
     };

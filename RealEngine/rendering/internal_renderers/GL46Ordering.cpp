@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/internal_renderers/GL46_Ordering.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Ordering.hpp>
 
 #include <string>
 
@@ -30,19 +30,19 @@ GLbitfield convert(IncoherentAccessBarrierFlags barriers) {
     return barriers_gl;
 }
 
-void GL46_Ordering::flushWork() const {
+void GL46Ordering::flushWork() const {
     glFlush();
 }
 
-void GL46_Ordering::finishWork() const {
+void GL46Ordering::finishWork() const {
     glFinish();
 }
 
-void GL46_Ordering::issueDrawBarrier() const {
+void GL46Ordering::issueDrawBarrier() const {
     glTextureBarrier();
 }
 
-void GL46_Ordering::issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers) const {
+void GL46Ordering::issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barriers) const {
     auto barriers_gl = convert(barriers);
     glMemoryBarrier(barriers_gl);
 }

@@ -11,7 +11,7 @@ namespace RE {
 *
 * Do not use this directly - use Buffer class instead.
 */
-class GL46_Buffer final : public IBuffer {
+class GL46Buffer final : public IBuffer {
 public:
 
     BufferID constructImmutable(size_t sizeInBytes, BufferUsageFlags flags, const void* data) const override;

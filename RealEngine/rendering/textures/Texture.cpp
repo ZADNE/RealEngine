@@ -8,7 +8,7 @@
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
 #include <RealEngine/utility/error.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46_Texture.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Texture.hpp>
 
 namespace RE {
 

@@ -4,7 +4,7 @@
 #pragma once
 #include <utility>
 
-#include <RealEngine/rendering/buffers/types.hpp>
+#include <RealEngine/rendering/buffers/BufferTypedIndex.hpp>
 
 namespace RE {
 
@@ -70,8 +70,8 @@ inline bool operator&(BufferMapUsageFlags a, BufferMapUsageFlags b) {
  * @note For internal usage in RealEngine.
 */
 class BufferID {
-    friend class GL46_Buffer;
-    friend class GL46_VertexArray;
+    friend class GL46Buffer;
+    friend class GL46VertexArray;
 public:
 
     ~BufferID() = default;

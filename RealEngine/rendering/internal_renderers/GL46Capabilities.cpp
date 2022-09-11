@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/internal_renderers/GL46_Capabilities.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Capabilities.hpp>
 
 #include <string>
 
@@ -18,7 +18,7 @@ GLenum convert(Capability cap) {
     }
 }
 
-void GL46_Capabilities::set(Capability cap, bool enabled) const {
+void GL46Capabilities::set(Capability cap, bool enabled) const {
     auto cap_gl = convert(cap);
     if (enabled) {
         glEnable(cap_gl);

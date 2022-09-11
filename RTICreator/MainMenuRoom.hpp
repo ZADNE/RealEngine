@@ -6,7 +6,7 @@
 
 #include <RealEngine/main/rooms/Room.hpp>
 #include <RealEngine/main/program/CommandLineArguments.hpp>
-#include <RealEngine/rendering/basic_shaders.hpp>
+#include <RealEngine/rendering/BasicShaders.hpp>
 #include <RealEngine/rendering/buffers/BufferTyped.hpp>
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>

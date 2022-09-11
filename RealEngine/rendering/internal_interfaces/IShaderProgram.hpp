@@ -14,7 +14,7 @@
 #include <glm/mat4x4.hpp>
 
 #include <RealEngine/utility/error.hpp>
-#include <RealEngine/rendering/buffers/types.hpp>
+#include <RealEngine/rendering/buffers/BufferTypedIndex.hpp>
 #include <RealEngine/rendering/textures/TextureUnit.hpp>
 #include <RealEngine/rendering/textures/ImageUnit.hpp>
 
@@ -36,8 +36,8 @@ enum class ShaderType {
 * @brief Represents source codes of a shader stage
 */
 class ShaderSources {
-    friend class GL46_Fixture;
-    friend class GL46_ShaderProgram;
+    friend class GL46Fixture;
+    friend class GL46ShaderProgram;
     template<typename T>friend struct std::hash;
 public:
 
@@ -135,7 +135,7 @@ struct ShaderProgramSources {
  * @note For internal usage in RealEngine.
 */
 class ShaderProgramID {
-    friend class GL46_ShaderProgram;
+    friend class GL46ShaderProgram;
 public:
 
     ~ShaderProgramID() = default;

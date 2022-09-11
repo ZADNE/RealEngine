@@ -1,4 +1,4 @@
-﻿target_sources(${PROJECT_NAME} PUBLIC
+﻿target_sources(RealEngine PRIVATE
     Room.hpp                Room.cpp
     RoomDisplaySettings.hpp    
     RoomManager.hpp            RoomManager.cpp

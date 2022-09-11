@@ -3,7 +3,7 @@
  */
 #include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46_ShaderProgram.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46ShaderProgram.hpp>
 
 namespace RE {
 

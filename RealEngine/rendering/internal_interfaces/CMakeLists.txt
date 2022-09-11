@@ -1,4 +1,4 @@
-﻿target_sources(${PROJECT_NAME} PUBLIC
+﻿target_sources(RealEngine PRIVATE
     IBuffer.hpp                 
     ICapabilities.hpp           
     IFramebuffer.hpp            

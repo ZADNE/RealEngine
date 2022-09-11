@@ -3,7 +3,7 @@
  */
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46_VertexArray.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46VertexArray.hpp>
 
 namespace RE {
 

@@ -64,7 +64,7 @@ enum class IndexType : unsigned int {
  * @note For internal usage in RealEngine.
 */
 class VertexArrayID {
-    friend class GL46_VertexArray;
+    friend class GL46VertexArray;
 public:
 
     ~VertexArrayID() = default;

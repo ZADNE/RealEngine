@@ -11,7 +11,7 @@ namespace RE {
 *
 * Do not use this directly - use VertexArray instead.
 */
-class GL46_VertexArray final : public IVertexArray {
+class GL46VertexArray final : public IVertexArray {
 public:
 
     VertexArrayID construct() const override;

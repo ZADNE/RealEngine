@@ -12,7 +12,7 @@ namespace RE {
 *
 * Do not use this directly - use Texture instead.
 */
-class GL46_Texture final : public ITexture {
+class GL46Texture final : public ITexture {
 public:
 
     TextureID construct(TextureFlags flags, const Raster& raster) const override;

@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/internal_renderers/GL46_Fixture.hpp>
+#include <RealEngine/main/window/GL46Fixture.hpp>
 
 #include <iostream>
 
@@ -50,7 +50,7 @@ void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GL
     std::cerr << "\n----OpenGL Callback End----" << std::endl;
 }
 
-bool GL46_Fixture::prepare() {
+bool GL46Fixture::prepare() {
     if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)) {
         error("Could not use doublebuffer!"); return false;
     }
@@ -80,7 +80,7 @@ bool GL46_Fixture::prepare() {
     return true;
 }
 
-void GL46_Fixture::initialize() {
+void GL46Fixture::initialize() {
     //Initialize GLEW
     if (glewInit() != GLEW_OK) {
         fatalError("GLEW failed initialization!");
@@ -119,14 +119,14 @@ void GL46_Fixture::initialize() {
     glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
     //THE singleton instance
-    static GL46_Fixture renderer{};
+    static GL46Fixture renderer{};
 
     //Use blenbing by default
     BlendingCapability<RendererGL46>::enable();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-GL46_Fixture::GL46_Fixture() :
+GL46Fixture::GL46Fixture() :
     m_defaultFramebufferLateBind(FramebufferID{0u}),
     m_defaultFramebufferGL46(FramebufferID{0u}) {
 
@@ -134,13 +134,13 @@ GL46_Fixture::GL46_Fixture() :
     DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = &m_defaultFramebufferGL46;
 }
 
-GL46_Fixture::~GL46_Fixture() {
+GL46Fixture::~GL46Fixture() {
     DefaultFrameBuffer<RendererLateBind>::s_defaultFramebuffer = nullptr;
     DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = nullptr;
 }
 
 template<Renderer R>
-void GL46_Fixture::Implementations::assignReferences() {
+void GL46Fixture::Implementations::assignReferences() {
     Buffer<R>::s_impl = &m_bufferImpl;
     Capabilities<R>::s_impl = &m_capabilitiesImpl;
     Framebuffer<R>::s_impl = &m_mainFramebufferImpl;
@@ -154,7 +154,7 @@ void GL46_Fixture::Implementations::assignReferences() {
 }
 
 template<Renderer R>
-void GL46_Fixture::Implementations::clearReferences() {
+void GL46Fixture::Implementations::clearReferences() {
     Buffer<R>::s_impl = nullptr;
     Capabilities<R>::s_impl = nullptr;
     Framebuffer<R>::s_impl = nullptr;

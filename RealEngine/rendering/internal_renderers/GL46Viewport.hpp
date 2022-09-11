@@ -11,7 +11,7 @@ namespace RE {
 *
 * Do not use this directly - use Viewport instead.
 */
-class GL46_Viewport final : public IViewport {
+class GL46Viewport final : public IViewport {
 public:
 
     void set(const glm::ivec2& pos, const glm::ivec2& size) const override;

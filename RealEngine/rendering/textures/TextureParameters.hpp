@@ -9,7 +9,7 @@
 
 #include <RealEngine/rendering/textures/TextureGeometry.hpp>
 #include <RealEngine/rendering/textures/TextureFlags.hpp>
-#include <RealEngine/rendering/vertices/vertices.hpp>
+#include <RealEngine/rendering/vertices/Vertex.hpp>
 
 namespace RE {
 
@@ -76,7 +76,9 @@ public:
     * @return Raw bytes of RTI that represent these parameters
     */
     std::vector<unsigned char> convertToRTI() const;
+
 private:
+
     Color m_borderColor;/**< Border color of the texture*/
 };
 

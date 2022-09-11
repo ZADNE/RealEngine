@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/internal_renderers/GL46_Texture.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Texture.hpp>
 
 #include <GL/glew.h>
 
@@ -73,7 +73,7 @@ int minFilterToGLEnum(TextureMinFilter filter) {
     }
 }
 
-TextureID GL46_Texture::construct(TextureFlags flags, const Raster& raster) const {
+TextureID GL46Texture::construct(TextureFlags flags, const Raster& raster) const {
     //Create texture
     unsigned int id;
     glCreateTextures(GL_TEXTURE_2D, 1, &id);
@@ -97,53 +97,53 @@ TextureID GL46_Texture::construct(TextureFlags flags, const Raster& raster) cons
     return TextureID{id};
 }
 
-void GL46_Texture::destruct(TextureID& te) const {
+void GL46Texture::destruct(TextureID& te) const {
     glDeleteTextures(1, &te.m_id);
 }
 
-void GL46_Texture::setMinFilter(TextureID& te, TextureMinFilter minFilter) const {
+void GL46Texture::setMinFilter(TextureID& te, TextureMinFilter minFilter) const {
     glTextureParameteri(te.m_id, GL_TEXTURE_MIN_FILTER, minFilterToGLEnum(minFilter));
 }
 
-void GL46_Texture::setMagFilter(TextureID& te, TextureMagFilter magFilter) const {
+void GL46Texture::setMagFilter(TextureID& te, TextureMagFilter magFilter) const {
     glTextureParameteri(te.m_id, GL_TEXTURE_MAG_FILTER, (magFilter == TextureMagFilter::LINEAR) ? GL_LINEAR : GL_NEAREST);
 }
 
-void GL46_Texture::setWrapStyleX(TextureID& te, TextureWrapStyle wrapStyleX) const {
+void GL46Texture::setWrapStyleX(TextureID& te, TextureWrapStyle wrapStyleX) const {
     glTextureParameteri(te.m_id, GL_TEXTURE_WRAP_S, wrapStyleToGLEnum(wrapStyleX));
 }
 
-void GL46_Texture::setWrapStyleY(TextureID& te, TextureWrapStyle wrapStyleY) const {
+void GL46Texture::setWrapStyleY(TextureID& te, TextureWrapStyle wrapStyleY) const {
     glTextureParameteri(te.m_id, GL_TEXTURE_WRAP_T, wrapStyleToGLEnum(wrapStyleY));
 }
 
-void GL46_Texture::setBorderColor(TextureID& te, const glm::vec4& col) const {
+void GL46Texture::setBorderColor(TextureID& te, const glm::vec4& col) const {
     glTextureParameterfv(te.m_id, GL_TEXTURE_BORDER_COLOR, &col.r);
 }
 
-void GL46_Texture::bind(const TextureID& te) const {
+void GL46Texture::bind(const TextureID& te) const {
     glBindTexture(GL_TEXTURE_2D, te.m_id);
 }
 
-void GL46_Texture::bind(const TextureID& te, TextureUnit unit) const {
+void GL46Texture::bind(const TextureID& te, TextureUnit unit) const {
     glBindTextureUnit(unit.m_unit, te.m_id);
 }
 
-void GL46_Texture::bindImage(const TextureID& te, ImageUnit unit, int level, ImageAccess access, TextureFlags flags) const {
+void GL46Texture::bindImage(const TextureID& te, ImageUnit unit, int level, ImageAccess access, TextureFlags flags) const {
     glBindImageTexture(unit.m_unit, te.m_id, level, GL_FALSE, 0, convert(access), convert(flags.getChannels(), flags.getFormat(), flags.getBitdepthPerChannel()));
 }
 
-void GL46_Texture::setTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
+void GL46Texture::setTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
     glTextureSubImage2D(te.m_id, level, offset.x, offset.y,
         size.x, size.y, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, raster);
 }
 
-void GL46_Texture::copyTexels(const TextureID& te, int srcLevel, const glm::ivec2& srcPos, const TextureID& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
+void GL46Texture::copyTexels(const TextureID& te, int srcLevel, const glm::ivec2& srcPos, const TextureID& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
     glCopyImageSubData(te.m_id, GL_TEXTURE_2D, srcLevel, srcPos.x, srcPos.y, 0,
         destination.m_id, GL_TEXTURE_2D, dstLevel, dstPos.x, dstPos.y, 0, size.x, size.y, 1);
 }
 
-void GL46_Texture::getTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* pixels) const {
+void GL46Texture::getTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* pixels) const {
     glGetTextureSubImage(
         te.m_id, 0,
         offset.x, offset.y, 0,
@@ -151,19 +151,19 @@ void GL46_Texture::getTexels(const TextureID& te, int level, const glm::ivec2& o
         GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, static_cast<GLsizei>(bufSize), pixels);
 }
 
-void GL46_Texture::clear(const TextureID& te, int level, const glm::vec4& color) const {
+void GL46Texture::clear(const TextureID& te, int level, const glm::vec4& color) const {
     glClearTexImage(te.m_id, level, GL_RGBA, GL_FLOAT, &color);
 }
 
-void GL46_Texture::clear(const TextureID& te, int level, const glm::ivec4& color) const {
+void GL46Texture::clear(const TextureID& te, int level, const glm::ivec4& color) const {
     glClearTexImage(te.m_id, level, GL_RGBA_INTEGER, GL_INT, &color);
 }
 
-void GL46_Texture::clear(const TextureID& te, int level, const glm::uvec4& color) const {
+void GL46Texture::clear(const TextureID& te, int level, const glm::uvec4& color) const {
     glClearTexImage(te.m_id, level, GL_RGBA_INTEGER, GL_UNSIGNED_INT, &color);
 }
 
-void GL46_Texture::clear(const TextureID& te, int level, const Color& color) const {
+void GL46Texture::clear(const TextureID& te, int level, const Color& color) const {
     glClearTexImage(te.m_id, level, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, &color);
 }
 

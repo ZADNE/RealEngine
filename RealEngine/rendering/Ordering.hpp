@@ -14,7 +14,7 @@ namespace RE {
 */
 template<Renderer R = RendererLateBind>
 class Ordering {
-    friend class GL46_Fixture;
+    friend class GL46Fixture;
 public:
 
     static void flushWork();
