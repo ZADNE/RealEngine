@@ -134,9 +134,10 @@ void GL46Texture::bindImage(const TextureID& te, ImageUnit unit, int level, Imag
     glBindImageTexture(unit.m_unit, te.m_id, level, GL_FALSE, 0, convert(access), convert(flags.getChannels(), flags.getFormat(), flags.getBitdepthPerChannel()));
 }
 
-void GL46Texture::setTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
+void GL46Texture::setTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, TextureFlags flags, const void* raster) const {
+    auto integer = flags.getFormatType() == TextureFormatType::INTEGRAL;
     glTextureSubImage2D(te.m_id, level, offset.x, offset.y,
-        size.x, size.y, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, raster);
+        size.x, size.y, integer ? GL_RGBA_INTEGER : GL_RGBA, GL_UNSIGNED_BYTE, raster);
 }
 
 void GL46Texture::copyTexels(const TextureID& te, int srcLevel, const glm::ivec2& srcPos, const TextureID& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const {
@@ -144,12 +145,13 @@ void GL46Texture::copyTexels(const TextureID& te, int srcLevel, const glm::ivec2
         destination.m_id, GL_TEXTURE_2D, dstLevel, dstPos.x, dstPos.y, 0, size.x, size.y, 1);
 }
 
-void GL46Texture::getTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* pixels) const {
+void GL46Texture::getTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, TextureFlags flags, size_t bufSize, void* pixels) const {
+    auto integer = flags.getFormatType() == TextureFormatType::INTEGRAL;
     glGetTextureSubImage(
         te.m_id, 0,
         offset.x, offset.y, 0,
         size.x, size.y, 1,
-        GL_RGBA, GL_UNSIGNED_BYTE, static_cast<GLsizei>(bufSize), pixels);
+        integer ? GL_RGBA_INTEGER : GL_RGBA, GL_UNSIGNED_BYTE, static_cast<GLsizei>(bufSize), pixels);
 }
 
 void GL46Texture::clear(const TextureID& te, int level, const glm::vec4& color) const {

@@ -145,12 +145,12 @@ void Texture<R>::bindImage(ImageUnit unit, int level, ImageAccess access) const 
 
 template<Renderer R>
 void Texture<R>::setTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const {
-    s_impl->setTexels(m_id, level, offset, size, raster);
+    s_impl->setTexels(m_id, level, offset, size, m_flags, raster);
 }
 
 template<Renderer R>
 void Texture<R>::setTexels(const void* raster) const {
-    s_impl->setTexels(m_id, 0, glm::ivec2(0, 0), glm::ivec2(getTrueDims()), raster);
+    s_impl->setTexels(m_id, 0, glm::ivec2(0, 0), glm::ivec2(getTrueDims()), m_flags, raster);
 }
 
 template<Renderer R>
@@ -160,12 +160,12 @@ void Texture<R>::copyTexels(int srcLevel, const glm::ivec2& srcPos, const Textur
 
 template<Renderer R>
 void Texture<R>::getTexels(int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* buffer) {
-    s_impl->getTexels(m_id, level, offset, size, bufSize, buffer);
+    s_impl->getTexels(m_id, level, offset, size, m_flags, bufSize, buffer);
 }
 
 template<Renderer R>
 void Texture<R>::getTexels(size_t bufSize, void* buffer) {
-    s_impl->getTexels(m_id, 0, glm::ivec2(0, 0), glm::ivec2(getTrueDims()), bufSize, buffer);
+    s_impl->getTexels(m_id, 0, glm::ivec2(0, 0), glm::ivec2(getTrueDims()), m_flags, bufSize, buffer);
 }
 
 template<Renderer R>

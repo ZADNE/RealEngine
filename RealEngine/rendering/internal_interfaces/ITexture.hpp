@@ -78,9 +78,9 @@ public:
     virtual void bind(const TextureID& te, TextureUnit unit) const = 0;
     virtual void bindImage(const TextureID& te, ImageUnit unit, int level, ImageAccess access, TextureFlags flags) const = 0;
 
-    virtual void setTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, const void* raster) const = 0;
+    virtual void setTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, TextureFlags flags, const void* raster) const = 0;
     virtual void copyTexels(const TextureID& te, int srcLevel, const glm::ivec2& srcPos, const TextureID& destination, int dstLevel, const glm::ivec2& dstPos, const glm::ivec2& size) const = 0;
-    virtual void getTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, size_t bufSize, void* pixels) const = 0;
+    virtual void getTexels(const TextureID& te, int level, const glm::ivec2& offset, const glm::ivec2& size, TextureFlags flags, size_t bufSize, void* pixels) const = 0;
 
     virtual void clear(const TextureID& te, int level, const glm::vec4& color) const = 0;
     virtual void clear(const TextureID& te, int level, const glm::ivec4& color) const = 0;
