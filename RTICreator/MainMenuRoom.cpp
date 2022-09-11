@@ -17,7 +17,7 @@
 #include <ImGui/imgui.h>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 
 #include <RTICreator/ComboConstants.hpp>
 

@@ -5,7 +5,7 @@
 
 #include <SDL2/SDL.h>
 
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 #include <RealEngine/main/window/GL46Fixture.hpp>
 
 namespace RE {

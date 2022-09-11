@@ -6,7 +6,7 @@
 #include <lodepng/lodepng.hpp>
 
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 
 #include <RealEngine/rendering/internal_renderers/GL46Texture.hpp>
 

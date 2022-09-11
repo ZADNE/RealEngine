@@ -13,7 +13,7 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 #include <RealEngine/rendering/buffers/BufferTypedIndex.hpp>
 #include <RealEngine/rendering/textures/TextureUnit.hpp>
 #include <RealEngine/rendering/textures/ImageUnit.hpp>

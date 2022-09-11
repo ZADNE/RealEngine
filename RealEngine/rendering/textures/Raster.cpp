@@ -5,7 +5,7 @@
 
 #include <lodepng/lodepng.hpp>
 
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 
 namespace RE {
 

@@ -7,7 +7,7 @@
 
 #include <GL/glew.h>
 
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 
 namespace RE {
 

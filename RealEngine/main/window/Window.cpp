@@ -7,7 +7,7 @@
 #include <ImGui/imgui_impl_sdl.h>
 #include <ImGui/imgui_impl_opengl3.h>
 
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 
 namespace RE {

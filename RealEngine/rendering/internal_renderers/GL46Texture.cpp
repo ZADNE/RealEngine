@@ -5,9 +5,10 @@
 
 #include <GL/glew.h>
 
+#include <glm/gtx/texture.hpp>
+
 #include <RealEngine/rendering/textures/Texture.hpp>
-#include <RealEngine/utility/math.hpp>
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 
 namespace RE {
 
@@ -80,7 +81,7 @@ TextureID GL46Texture::construct(TextureFlags flags, const Raster& raster) const
 
     //Create storage for the texture
     auto dims = raster.getDims();
-    GLsizei levels = flags.getMinFilterMipmapsUsage() == TextureMinFilterMipmapsUsage::YES ? uintlog2(std::max(dims.x, dims.y)) + 1 : 1;
+    GLsizei levels = flags.getMinFilterMipmapsUsage() == TextureMinFilterMipmapsUsage::YES ? glm::levels(dims) : 1;
     auto internalFormat = convert(flags.getChannels(), flags.getFormat(), flags.getBitdepthPerChannel());
     glTextureStorage2D(id, levels, internalFormat, dims.x, dims.y);
 

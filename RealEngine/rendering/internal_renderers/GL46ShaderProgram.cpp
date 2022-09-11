@@ -10,7 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <RealEngine/rendering/internal_renderers/GL46TypeToString.hpp>
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 
 namespace RE {
 
@@ -112,7 +112,7 @@ void GL46ShaderProgram::printInfo(const ShaderProgramID& sp) const {
         GLchar name[32];
         glGetActiveAttrib(sp.m_id, i, 32, &length, &size, &type, &name[0]);
         int loc = glGetAttribLocation(sp.m_id, &name[0]);
-        std::cout << "|  layout (location = " << std::to_string(loc) << ") in " << GLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
+        std::cout << "|  layout (location = " << std::to_string(loc) << ") in " << GL46TypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
     }
 
     //UNIFORM INFO
@@ -126,7 +126,7 @@ void GL46ShaderProgram::printInfo(const ShaderProgramID& sp) const {
         GLchar name[32];
         glGetActiveUniform(sp.m_id, i, 32, &length, &size, &type, &name[0]);
         int loc = glGetUniformLocation(sp.m_id, &name[0]);
-        std::cout << "|  layout (location = " << std::to_string(loc) << ") uniform " << GLTypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
+        std::cout << "|  layout (location = " << std::to_string(loc) << ") uniform " << GL46TypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
     }
 }
 

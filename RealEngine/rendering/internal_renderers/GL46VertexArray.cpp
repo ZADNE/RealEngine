@@ -5,7 +5,7 @@
 
 #include <GL/glew.h>
 
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
 
 namespace RE {

@@ -1,7 +1,7 @@
 ﻿/*! 
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/utility/GLTypeToString.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46TypeToString.hpp>
 
 #include <GL/glew.h>
 

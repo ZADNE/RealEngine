@@ -9,7 +9,7 @@
 
 #include <glm/vec2.hpp>
 
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 #include <RealEngine/main/rooms/RoomToEngineAccess.hpp>
 #include <RealEngine/main/rooms/RoomManager.hpp>
 #include <RealEngine/main/rooms/RoomDisplaySettings.hpp>
