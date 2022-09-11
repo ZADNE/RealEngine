@@ -3,32 +3,13 @@
  */
 #include <RealEngine/rendering/textures/Texture.hpp>
 
-#include <lodepng/lodepng.hpp>
-
 #include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
+#include <RealEngine/resources/PNGLoader.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 #include <RealEngine/rendering/internal_renderers/GL46Texture.hpp>
 
 namespace RE {
-
-LodePNGColorType toLodePNGColorType(TextureChannels channels) {
-    static_assert(TEX_CHANNELS_BITS == 0b0000'0000'0000'0011, "TextureFlags - channel bits reaaranged");
-    static const LodePNGColorType colorTypes[] = {
-        LodePNGColorType::LCT_GREY, LodePNGColorType::LCT_GREY_ALPHA, LodePNGColorType::LCT_RGB, LodePNGColorType::LCT_RGBA
-    };
-    return colorTypes[ft_cast(channels)];
-}
-
-TextureChannels toTextureChannels(LodePNGColorType colorType) {
-    switch (colorType) {
-    case LCT_GREY: return TextureChannels::R;
-    case LCT_RGB: return TextureChannels::RGB;
-    case LCT_GREY_ALPHA: return TextureChannels::RG;
-    case LCT_RGBA: return TextureChannels::RGBA;
-    default: return TextureChannels::RGBA;
-    }
-}
 
 glm::vec4 colorToFloatColor(Color color, TextureFormat type) {
     glm::vec4 borderRGBA = glm::vec4{color.r, color.g, color.b, color.a};
@@ -81,43 +62,13 @@ Texture<R>& Texture<R>::operator=(Texture<R>&& other) noexcept {
 
 template<Renderer R>
 Texture<R>::Texture(const std::string& filePathPNG) {
-    //Prepare variables
-    lodepng::State state{};
-    state.decoder.remember_unknown_chunks = 1;
-    std::vector<unsigned char> png, pixels;
-    glm::uvec2 dims;
-    unsigned int code;
+    PNGLoader::PNGData pngData{
+        .params = DEFAULT_PARAMETERS
+    };
 
-    //Decode PNG
-    if ((code = lodepng::load_file(png, filePathPNG)) || (code = lodepng::decode(pixels, dims.x, dims.y, state, png))) {
-        //Loading or decoding failed
-        error(filePathPNG + ": " + lodepng_error_text(code));
-        return;//Texture will be empty
+    if (PNGLoader::load(filePathPNG, pngData) == 0) {
+        init(Raster{pngData.dims, pngData.params.getChannels(), pngData.pixels}, pngData.params);
     }
-
-    //Load parameters
-    TextureParameters params = DEFAULT_PARAMETERS;
-    for (size_t unknownChunkPos = 0; unknownChunkPos < 3; unknownChunkPos++) {
-        const auto& unknownData = state.info_png.unknown_chunks_data[0];
-        const auto& unknownDataEnd = &unknownData[state.info_png.unknown_chunks_size[0]];
-        for (auto chunk = unknownData; chunk != unknownDataEnd; chunk = lodepng_chunk_next(chunk, unknownDataEnd)) {
-            char type[5];
-            lodepng_chunk_type(type, chunk);
-            if (std::string{"reAl"} == type) {
-                try {
-                    params = TextureParameters{lodepng_chunk_data(chunk), lodepng_chunk_length(chunk)};
-                    goto paramsLoaded;
-                }
-                catch (const char* e) {
-                    error(std::string{"RTI decode fail: "} + e);
-                }
-            }
-        }
-    }
-
-paramsLoaded:
-    //Initialize texture
-    init(Raster{dims, toTextureChannels(state.info_raw.colortype), pixels}, params);
 }
 
 template<Renderer R>
@@ -244,31 +195,14 @@ bool Texture<R>::saveToFile(const std::string& filePathPNG) {
 
 template<Renderer R>
 bool Texture<R>::saveToFile(const std::string& filePathPNG, const TextureParameters& params) {
-    auto channels = params.getChannels();
+    PNGLoader::PNGData pngData{
+        .dims = m_trueDims,
+        .params = params
+    };
+    pngData.pixels.resize(Raster::minimumRequiredMemory(m_trueDims, params.getChannels()));
     //Download pixels
-    std::vector<unsigned char> pixels;
-    pixels.resize(Raster::minimumRequiredMemory(m_trueDims, channels));
-    getTexels(pixels.size(), pixels.data());
-
-    //Insert rti chunk
-    lodepng::State state{};
-    auto rti = params.convertToRTI();
-    if (lodepng_chunk_create(&state.info_png.unknown_chunks_data[0], &state.info_png.unknown_chunks_size[0], static_cast<unsigned int>(rti.size()), "reAl", rti.data())) {
-        //Chunk creation failed
-        return false;
-    }
-
-    //Encode and save PNG
-    unsigned int code;
-    state.info_png.color.colortype = toLodePNGColorType(channels);
-    state.encoder.auto_convert = 0;
-    std::vector<unsigned char> png;
-    if ((code = lodepng::encode(png, pixels, m_trueDims.x, m_trueDims.y, state)) || (code = lodepng::save_file(png, filePathPNG))) {
-        //Encoding or saving failed
-        return false;
-    }
-
-    return true;
+    getTexels(pngData.pixels.size(), pngData.pixels.data());
+    return PNGLoader::save(filePathPNG, pngData) == 0;
 }
 
 template<Renderer R>

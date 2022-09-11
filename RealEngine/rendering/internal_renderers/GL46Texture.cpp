@@ -149,7 +149,7 @@ void GL46Texture::getTexels(const TextureID& te, int level, const glm::ivec2& of
         te.m_id, 0,
         offset.x, offset.y, 0,
         size.x, size.y, 1,
-        GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, static_cast<GLsizei>(bufSize), pixels);
+        GL_RGBA, GL_UNSIGNED_BYTE, static_cast<GLsizei>(bufSize), pixels);
 }
 
 void GL46Texture::clear(const TextureID& te, int level, const glm::vec4& color) const {
