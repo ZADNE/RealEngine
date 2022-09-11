@@ -80,8 +80,8 @@ enum class FramebufferTargetability {
  * @note For internal usage in RealEngine.
 */
 class FramebufferID {
-    friend class GL46_Framebuffer;
-    friend class GL46_Fixture;
+    friend class GL46Framebuffer;
+    friend class GL46Fixture;
 public:
 
     ~FramebufferID() = default;

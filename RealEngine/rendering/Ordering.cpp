@@ -3,7 +3,7 @@
  */
 #include <RealEngine/rendering/Ordering.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46_Ordering.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Ordering.hpp>
 
 namespace RE {
 

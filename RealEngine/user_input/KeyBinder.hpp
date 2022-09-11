@@ -12,8 +12,8 @@
 #include <nlohmann/json.hpp>
 
 #include <RealEngine/user_input/Key.hpp>
-#include <RealEngine/utility/error.hpp>
-#include <RealEngine/main/program/MainProgram.hpp>
+#include <RealEngine/utility/Error.hpp>
+#include <RealEngine/program/MainProgram.hpp>
 
 namespace RE {
 

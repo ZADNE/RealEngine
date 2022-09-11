@@ -17,7 +17,7 @@
 #include <ImGui/imgui.h>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
-#include <RealEngine/utility/error.hpp>
+#include <RealEngine/utility/Error.hpp>
 
 #include <RTICreator/ComboConstants.hpp>
 
@@ -47,7 +47,7 @@ MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
 }
 
 template<RE::Renderer R>
-void MainMenuRoom<R>::sessionStart(const RE::RoomTransitionParameters& params) {
+void MainMenuRoom<R>::sessionStart(const RE::RoomTransitionArguments& args) {
 
 }
 

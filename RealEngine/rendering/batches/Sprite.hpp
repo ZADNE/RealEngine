@@ -4,7 +4,6 @@
 #pragma once
 #include <glm/vec2.hpp>
 
-#include <RealEngine/rendering/vertices/vertices.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 
 namespace RE {

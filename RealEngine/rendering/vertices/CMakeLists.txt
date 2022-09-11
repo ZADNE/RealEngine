@@ -1,5 +1,5 @@
-﻿target_sources(${PROJECT_NAME} PUBLIC
+﻿target_sources(RealEngine PRIVATE
     ShaderProgram.hpp           ShaderProgram.cpp
+    Vertex.hpp                  
     VertexArray.hpp             VertexArray.cpp
-    vertices.hpp                
 )

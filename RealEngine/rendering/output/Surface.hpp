@@ -9,7 +9,6 @@
 #include <glm/mat4x4.hpp>
 
 #include <RealEngine/rendering/textures/Texture.hpp>
-#include <RealEngine/rendering/vertices/vertices.hpp>
 #include <RealEngine/rendering/output/Framebuffer.hpp>
 
 namespace RE {

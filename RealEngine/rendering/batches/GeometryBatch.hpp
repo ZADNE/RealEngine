@@ -5,7 +5,7 @@
 #include <array>
 #include <vector>
 
-#include <RealEngine/rendering/batches/circles.hpp>
+#include <RealEngine/rendering/batches/Circle.hpp>
 #include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
 

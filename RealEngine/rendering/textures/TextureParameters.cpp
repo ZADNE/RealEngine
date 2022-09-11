@@ -6,8 +6,7 @@
 #include <fstream>
 #include <cstring>
 
-#include <RealEngine/utility/error.hpp>
-#include <RealEngine/utility/endianness.hpp>
+#include <RealEngine/utility/Endianness.hpp>
 
 
 namespace glm {

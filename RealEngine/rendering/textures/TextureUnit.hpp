@@ -15,8 +15,8 @@ template<Renderer> class TextureProxy;
 class TextureUnit {
     template<Renderer> friend class Texture;
     template<Renderer> friend class TextureProxy;
-    friend class GL46_ShaderProgram;
-    friend class GL46_Texture;
+    friend class GL46ShaderProgram;
+    friend class GL46Texture;
 public:
 
     constexpr TextureUnit(unsigned int unit) : m_unit(unit) {}

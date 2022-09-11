@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-#include <RealEngine/rendering/internal_renderers/GL46_Buffer.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Buffer.hpp>
 
 
 namespace RE {

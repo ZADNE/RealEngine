@@ -3,7 +3,7 @@
  */
 #include <RealEngine/rendering/Capabilities.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46_Capabilities.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Capabilities.hpp>
 
 namespace RE {
 

@@ -3,7 +3,7 @@
  */
 #include <RealEngine/rendering/output/Viewport.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46_Viewport.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Viewport.hpp>
 
 namespace RE {
 

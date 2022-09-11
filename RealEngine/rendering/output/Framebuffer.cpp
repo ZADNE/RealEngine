@@ -5,7 +5,7 @@
 
 #include <RealEngine/rendering/textures/Texture.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46_Framebuffer.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46Framebuffer.hpp>
 
 
 namespace RE {

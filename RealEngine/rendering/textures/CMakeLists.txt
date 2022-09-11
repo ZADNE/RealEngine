@@ -1,4 +1,4 @@
-﻿target_sources(${PROJECT_NAME} PUBLIC
+﻿target_sources(RealEngine PRIVATE
     ImageUnit.hpp               
     Raster.hpp                  Raster.cpp
     Texture.hpp                 Texture.cpp

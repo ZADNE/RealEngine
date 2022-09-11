@@ -1,6 +1,4 @@
-﻿target_sources(${PROJECT_NAME} PUBLIC
-    endianness.hpp              
-    error.hpp                   error.cpp
-    GLTypeToString.hpp          GLTypeToString.cpp
-    math.hpp                    
+﻿target_sources(RealEngine PRIVATE
+    Endianness.hpp              
+    Error.hpp                   Error.cpp
 )
