@@ -5,6 +5,7 @@
     GL46Ordering.hpp            GL46Ordering.cpp
     GL46ShaderProgram.hpp       GL46ShaderProgram.cpp
     GL46Texture.hpp             GL46Texture.cpp
+    GL46TypeToString.hpp        GL46TypeToString.cpp
     GL46VertexArray.hpp         GL46VertexArray.cpp
     GL46Viewport.hpp            GL46Viewport.cpp
 )

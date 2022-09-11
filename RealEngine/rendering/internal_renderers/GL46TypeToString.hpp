@@ -6,6 +6,6 @@
 
 namespace RE {
 
-std::string_view GLTypeToString(unsigned int type);
+std::string_view GL46TypeToString(unsigned int type);
 
 }

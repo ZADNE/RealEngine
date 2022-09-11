@@ -1,6 +1,5 @@
 ﻿target_sources(RealEngine PRIVATE
-    endianness.hpp              
-    error.hpp                   error.cpp
-    GLTypeToString.hpp          GLTypeToString.cpp
-    math.hpp                    
+    Endianness.hpp              
+    Error.hpp                   Error.cpp
+    Math.hpp                    
 )

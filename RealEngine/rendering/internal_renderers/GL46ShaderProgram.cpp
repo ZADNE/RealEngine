@@ -9,9 +9,8 @@
 #include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <RealEngine/utility/GLTypeToString.hpp>
+#include <RealEngine/rendering/internal_renderers/GL46TypeToString.hpp>
 #include <RealEngine/utility/error.hpp>
-#include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 
 namespace RE {
 
