@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/window/Window.hpp>
+#include <RealEngine/window/Window.hpp>
 
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_sdl.h>

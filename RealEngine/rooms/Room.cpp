@@ -1,9 +1,9 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/rooms/Room.hpp>
+#include <RealEngine/rooms/Room.hpp>
 
-#include <RealEngine/main/program/MainProgram.hpp>
+#include <RealEngine/program/MainProgram.hpp>
 
 namespace RE {
 

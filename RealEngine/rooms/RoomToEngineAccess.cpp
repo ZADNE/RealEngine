@@ -1,10 +1,10 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/rooms/RoomToEngineAccess.hpp>
+#include <RealEngine/rooms/RoomToEngineAccess.hpp>
 
-#include <RealEngine/main/program/MainProgram.hpp>
-#include <RealEngine/main/rooms/Room.hpp>
+#include <RealEngine/program/MainProgram.hpp>
+#include <RealEngine/rooms/Room.hpp>
 
 namespace RE {
 
@@ -14,8 +14,8 @@ void RoomToEngineAccess::scheduleExit(int exitcode) {
     m_mainProgram.scheduleExit(exitcode);
 }
 
-void RoomToEngineAccess::scheduleRoomTransition(size_t name, const RoomTransitionParameters& params) {
-    m_mainProgram.scheduleRoomTransition(name, params);
+void RoomToEngineAccess::scheduleRoomTransition(size_t name, const RoomTransitionArguments& args) {
+    m_mainProgram.scheduleRoomTransition(name, args);
 }
 
 void RoomToEngineAccess::setRelativeCursorMode(bool relative) {

@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/program/MainProgram.hpp>
+#include <RealEngine/program/MainProgram.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -14,7 +14,7 @@
 #include <ImGui/imgui_impl_sdl.h>
 #include <ImGui/imgui_impl_opengl3.h>
 
-#include <RealEngine/main/rooms/Room.hpp>
+#include <RealEngine/rooms/Room.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/output/Framebuffer.hpp>
 
@@ -25,12 +25,12 @@ void MainProgram::initialize() {
     instance();
 }
 
-int MainProgram::run(size_t roomName, const RoomTransitionParameters& params) {
+int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
     try {
         auto& inst = instance();
         switch (inst.m_window.getRenderer()) {
         case RendererID::OPENGL_46:
-            return inst.doRun<RendererGL46>(roomName, params);
+            return inst.doRun<RendererGL46>(roomName, args);
         default:
             return 1;
         }
@@ -103,8 +103,8 @@ void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
 }
 
 template<Renderer R>
-int MainProgram::doRun(size_t roomName, const RoomTransitionParameters& params) {
-    scheduleRoomTransition(roomName, params);
+int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
+    scheduleRoomTransition(roomName, args);
     doRoomTransitionIfScheduled();
     if (!m_roomManager.getCurrentRoom()) {
         throw std::runtime_error("Initial room was not set");
@@ -227,7 +227,7 @@ void MainProgram::doRoomTransitionIfScheduled() {
 
     m_synchronizer.pauseSteps();
     auto prev = m_roomManager.getCurrentRoom();
-    auto current = m_roomManager.goToRoom(m_nextRoomName, m_roomTransitionParameters);
+    auto current = m_roomManager.goToRoom(m_nextRoomName, m_roomTransitionArgs);
     if (prev != current) {//If successfully changed the room
         //Adopt the display settings of the entered room
         adoptRoomDisplaySettings(current->getDisplaySettings());
@@ -241,9 +241,9 @@ void MainProgram::doRoomTransitionIfScheduled() {
     m_synchronizer.resumeSteps();
 }
 
-void MainProgram::scheduleRoomTransition(size_t name, const RoomTransitionParameters& params) {
+void MainProgram::scheduleRoomTransition(size_t name, const RoomTransitionArguments& args) {
     m_nextRoomName = name;
-    m_roomTransitionParameters = params;
+    m_roomTransitionArgs = args;
 }
 
 void MainProgram::pollEvents() {
@@ -272,6 +272,6 @@ MainProgram& MainProgram::instance() {
     return mainProgram;
 }
 
-template int MainProgram::doRun<RendererGL46>(size_t roomName, const RoomTransitionParameters& params);
+template int MainProgram::doRun<RendererGL46>(size_t roomName, const RoomTransitionArguments& args);
 
 }

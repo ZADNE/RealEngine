@@ -47,7 +47,7 @@ MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
 }
 
 template<RE::Renderer R>
-void MainMenuRoom<R>::sessionStart(const RE::RoomTransitionParameters& params) {
+void MainMenuRoom<R>::sessionStart(const RE::RoomTransitionArguments& args) {
 
 }
 

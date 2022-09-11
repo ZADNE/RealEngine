@@ -5,9 +5,9 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
-#include <RealEngine/main/rooms/RoomToEngineAccess.hpp>
-#include <RealEngine/main/rooms/RoomDisplaySettings.hpp>
-#include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
+#include <RealEngine/rooms/RoomToEngineAccess.hpp>
+#include <RealEngine/rooms/RoomDisplaySettings.hpp>
+#include <RealEngine/rooms/RoomTransitionArguments.hpp>
 
 #include <RealEngine/rendering/Renderer.hpp>
 
@@ -55,11 +55,11 @@ public:
 
     /**
      * @brief Informs the room that a new session happens inside it.
-     * @param params    Parameters to initialize the session. These are
+     * @param args      Arguments to initialize the session. These are
      *                  are obtained from previous room when it requests
      *                  transition to this room.
     */
-    virtual void sessionStart(const RoomTransitionParameters& params) = 0;
+    virtual void sessionStart(const RoomTransitionArguments& args) = 0;
 
     /**
      * @brief Informs the room that its session ends.

@@ -3,9 +3,9 @@
  */
 #pragma once
 #include <RealEngine/user_input/InputManager.hpp>
-#include <RealEngine/main/program/Synchronizer.hpp>
-#include <RealEngine/main/window/Window.hpp>
-#include <RealEngine/main/rooms/RoomManager.hpp>
+#include <RealEngine/program/Synchronizer.hpp>
+#include <RealEngine/window/Window.hpp>
+#include <RealEngine/rooms/RoomManager.hpp>
 
 namespace RE {
 
@@ -36,7 +36,7 @@ public:
     /**
      * @copydoc MainProgram::scheduleRoomTransition
     */
-    void scheduleRoomTransition(size_t name, const RoomTransitionParameters& params);
+    void scheduleRoomTransition(size_t name, const RoomTransitionArguments& args);
 
     /**
      * @copydoc MainProgram::setRelativeCursorMode

@@ -7,7 +7,7 @@
 
 #include <glm/vec2.hpp>
 
-#include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
+#include <RealEngine/rooms/RoomTransitionArguments.hpp>
 
 namespace RE {
 
@@ -38,11 +38,11 @@ public:
      * @details Session of current room is ended and then session
      * of the room with name 'name' is started.
      * @param name Identifier of the room
-     * @param params Parameters to start the room's session with
+     * @param args Arguments to start the room's session with
      * @return  Pointer to active room, this can be same as previous room
      *          if the name is invalid.
     */
-    Room* goToRoom(size_t name, const RoomTransitionParameters& params);
+    Room* goToRoom(size_t name, const RoomTransitionArguments& args);
 
     /**
      * @brief Adds new room to the manager.

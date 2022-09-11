@@ -10,12 +10,12 @@
 #include <glm/vec2.hpp>
 
 #include <RealEngine/utility/Error.hpp>
-#include <RealEngine/main/rooms/RoomToEngineAccess.hpp>
-#include <RealEngine/main/rooms/RoomManager.hpp>
-#include <RealEngine/main/rooms/RoomDisplaySettings.hpp>
-#include <RealEngine/main/rooms/RoomTransitionParameters.hpp>
-#include <RealEngine/main/window/Window.hpp>
-#include <RealEngine/main/program/Synchronizer.hpp>
+#include <RealEngine/rooms/RoomToEngineAccess.hpp>
+#include <RealEngine/rooms/RoomManager.hpp>
+#include <RealEngine/rooms/RoomDisplaySettings.hpp>
+#include <RealEngine/rooms/RoomTransitionArguments.hpp>
+#include <RealEngine/window/Window.hpp>
+#include <RealEngine/program/Synchronizer.hpp>
 #include <RealEngine/user_input/InputManager.hpp>
 
 union SDL_Event;
@@ -108,10 +108,10 @@ public:
      * @warning Never call this more than once!
      *
      * @param roomName Name of the first room that will be entered
-     * @param params Parameters that the room will be entered with
+     * @param args Arguments that the room will be entered with
      * @return The exit code that should be returned to the enviroment.
     */
-    static int run(size_t roomName, const RoomTransitionParameters& params);
+    static int run(size_t roomName, const RoomTransitionArguments& args);
 
     /**
      * @brief Schedules the program to exit.
@@ -124,17 +124,16 @@ public:
 
     /**
      * @brief Schedules transition to another ('next') room.
+     * @param name Name of the next room, no transition will happen if there is no room with such name.
+     * @param args Arguments to start the next room's session with.
      *
      * The transition, which happens at the end of current frame,
-     * does following:
+     * does the following:
      * - ends session of current room via sessionEnd()
      * - start session of next room via sessionStart(params)
      * - ensures that at least one step() happens in the next room before render()
-     *
-     * @param name Name of the next room, no transition will happen if there is no room with such name.
-     * @param params Parameters to start the next room's session with.
     */
-    void scheduleRoomTransition(size_t name, const RoomTransitionParameters& params);
+    void scheduleRoomTransition(size_t name, const RoomTransitionArguments& args);
 
     static void pollEventsInMainThread(bool poll);
 
@@ -163,7 +162,7 @@ private:
      * @brief Does the actual game loop on the singleton instance
     */
     template<Renderer R>
-    int doRun(size_t roomName, const RoomTransitionParameters& params);
+    int doRun(size_t roomName, const RoomTransitionArguments& args);
 
     void step();
     void render(double interpolationFactor);
@@ -188,7 +187,7 @@ private:
 
     static constexpr size_t NO_NEXT_ROOM = std::numeric_limits<size_t>::max();
     size_t m_nextRoomName = NO_NEXT_ROOM;
-    RoomTransitionParameters m_roomTransitionParameters;
+    RoomTransitionArguments m_roomTransitionArgs;
 };
 
 }

@@ -13,7 +13,7 @@
 
 #include <RealEngine/user_input/Key.hpp>
 #include <RealEngine/utility/Error.hpp>
-#include <RealEngine/main/program/MainProgram.hpp>
+#include <RealEngine/program/MainProgram.hpp>
 
 namespace RE {
 

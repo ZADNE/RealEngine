@@ -7,8 +7,8 @@
 #include <SDL2/SDL_video.h>
 #include <glm/vec2.hpp>
 
-#include <RealEngine/main/window/WindowSubsystems.hpp>
-#include <RealEngine/main/window/WindowSettings.hpp>
+#include <RealEngine/window/WindowSubsystems.hpp>
+#include <RealEngine/window/WindowSettings.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 
 namespace RE {

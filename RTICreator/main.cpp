@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/program/MainProgram.hpp>
+#include <RealEngine/program/MainProgram.hpp>
 
 #include <RTICreator/MainMenuRoom.hpp>
 

@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/window/WindowSettings.hpp>
+#include <RealEngine/window/WindowSettings.hpp>
 
 #include <fstream>
 #include <filesystem>

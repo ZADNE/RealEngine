@@ -10,6 +10,6 @@ namespace RE {
 /**
  * @brief Used for passing parameters to the next room when transitioning between them.
 */
-using RoomTransitionParameters = std::vector<std::any>;
+using RoomTransitionArguments = std::vector<std::any>;
 
 }

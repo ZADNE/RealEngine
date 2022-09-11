@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/window/GL46Fixture.hpp>
+#include <RealEngine/window/GL46Fixture.hpp>
 
 #include <iostream>
 

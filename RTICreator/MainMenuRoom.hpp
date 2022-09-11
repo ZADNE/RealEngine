@@ -4,8 +4,8 @@
 #pragma once
 #include <optional>
 
-#include <RealEngine/main/rooms/Room.hpp>
-#include <RealEngine/main/program/CommandLineArguments.hpp>
+#include <RealEngine/rooms/Room.hpp>
+#include <RealEngine/program/CommandLineArguments.hpp>
 #include <RealEngine/rendering/BasicShaders.hpp>
 #include <RealEngine/rendering/buffers/BufferTyped.hpp>
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
@@ -25,7 +25,7 @@ public:
 
     MainMenuRoom(RE::CommandLineArguments args);
 
-    void sessionStart(const RE::RoomTransitionParameters& params) override;
+    void sessionStart(const RE::RoomTransitionArguments& args) override;
     void sessionEnd() override;
     void step() override;
     void render(double interpolationFactor) override;

@@ -1,12 +1,12 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/main/window/WindowSubsystems.hpp>
+#include <RealEngine/window/WindowSubsystems.hpp>
 
 #include <SDL2/SDL.h>
 
 #include <RealEngine/utility/Error.hpp>
-#include <RealEngine/main/window/GL46Fixture.hpp>
+#include <RealEngine/window/GL46Fixture.hpp>
 
 namespace RE {
 
