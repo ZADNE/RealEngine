@@ -20,42 +20,42 @@ template<Renderer R>
 Buffer<R>::Buffer(size_t sizeInBytes, BufferUsageFlags flags, const void* data/* = nullptr*/) :
     m_id(s_impl->constructImmutable(sizeInBytes, flags, data)),
     m_sizeInBytes(sizeInBytes)
-#ifndef _DEBUG
-{
-#else
+#ifndef NDEBUG
     , m_storage(IMMUTABLE) {
-#endif // _DEBUG
+#else
+    {
+#endif // DEBUG
 }
 
 template<Renderer R>
 Buffer<R>::Buffer(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data/* = nullptr*/) :
     m_id(s_impl->constructMutable(sizeInBytes, accessFreq, accessNature, data)),
     m_sizeInBytes(sizeInBytes)
-#ifndef _DEBUG
-{
-#else
+#ifndef NDEBUG
     , m_storage(MUTABLE) {
-#endif // _DEBUG
+#else
+    {
+#endif // DEBUG
 }
 
 template<Renderer R>
 Buffer<R>::Buffer(Buffer<R>&& other) noexcept :
     m_id(std::move(other.m_id)),
     m_sizeInBytes(other.m_sizeInBytes)
-#ifndef _DEBUG
-{
-#else
+#ifndef NDEBUG
     , m_storage(other.m_storage) {
-#endif // _DEBUG
+#else
+    {
+#endif // DEBUG
 }
 
 template<Renderer R>
 Buffer<R>& Buffer<R>::operator=(Buffer<R>&& other) noexcept {
     m_id = std::move(other.m_id);
     m_sizeInBytes = other.m_sizeInBytes;
-#ifdef _DEBUG
+#ifndef NDEBUG
     m_storage = other.m_storage;
-#endif // _DEBUG
+#endif // DEBUG
     return *this;
 }
 

@@ -113,23 +113,23 @@ void GL46VertexArray::connectAttributeToBindingPoint(VertexArrayID& va, unsigned
 }
 
 void GL46VertexArray::bind(const VertexArrayID& va) const {
-#ifdef _DEBUG
+#ifndef NDEBUG
     if (s_currentlyBoundID != 0) {
         throw "Overbound vertex arrays";
     }
     s_currentlyBoundID = va.m_id;
-#endif // _DEBUG
+#endif // DEBUG
     glBindVertexArray(va.m_id);
 }
 
 void GL46VertexArray::unbind(const VertexArrayID& va) const {
-#ifdef _DEBUG
+#ifndef NDEBUG
     if (s_currentlyBoundID != va.m_id) {
         throw "Overbound vertex arrays";
     }
     s_currentlyBoundID = 0;
     glBindVertexArray(0);
-#endif // _DEBUG
+#endif // DEBUG
 }
 
 void GL46VertexArray::renderArrays(const VertexArrayID& va, Primitive prim, int first, size_t count) const {
@@ -163,11 +163,11 @@ void GL46VertexArray::renderElementsBaseVertex(const VertexArrayID& va, Primitiv
 }
 
 void GL46VertexArray::throwIfNotCurrentlyBound(const VertexArrayID& va) const {
-#ifdef _DEBUG
+#ifndef NDEBUG
     if (s_currentlyBoundID != va.m_id) {
         throw "Rendered with vertex array that is not bound";
     }
-#endif // _DEBUG
+#endif // DEBUG
 }
 
 }

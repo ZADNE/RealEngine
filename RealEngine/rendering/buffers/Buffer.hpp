@@ -212,9 +212,9 @@ protected:
     BufferID m_id;
     size_t m_sizeInBytes = 0;   /**< Size of the buffer */
 
-#ifdef _DEBUG
+#ifndef NDEBUG
     BufferStorage m_storage = BufferStorage::IMMUTABLE;
-#endif // _DEBUG
+#endif // DEBUG
 
     static inline R::Buffer* s_impl = nullptr;
 };

@@ -85,9 +85,9 @@ private:
     //Prints program's info log
     void printProgramInfoLog(const ShaderProgramID& sp) const;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
     static inline unsigned int s_currentlyUsedID = 0u;
-#endif // _DEBUG
+#endif // DEBUG
 };
 
 }

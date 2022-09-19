@@ -18,11 +18,11 @@ std::string to_string(RendererID r) {
 }
 
 void printSDLVersion() {
-#ifdef _DEBUG
+#ifndef NDEBUG
     SDL_version compiled;
     SDL_VERSION(&compiled);
     std::printf("SDL compiled: %u.%u.%u\n", compiled.major, compiled.minor, compiled.patch);
-#endif // _DEBUG
+#endif // DEBUG
     SDL_version linked;
     SDL_GetVersion(&linked);
     std::printf("SDL linked:   %u.%u.%u\n", linked.major, linked.minor, linked.patch);

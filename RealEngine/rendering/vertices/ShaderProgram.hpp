@@ -90,9 +90,9 @@ public:
     template<typename... Args>
     void setUniform(const std::string& name, Args... args) const {
         auto loc = getUniformLocation(name);
-    #ifdef _DEBUG
+    #ifndef NDEBUG
         if (loc < 0) error(std::string{"Uniform \""} + name + "\" does not exist in the shader program!");
-    #endif // _DEBUG
+    #endif // DEBUG
         setUniform(loc, args...);
     }
 

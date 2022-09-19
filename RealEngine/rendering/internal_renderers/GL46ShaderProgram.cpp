@@ -48,34 +48,34 @@ void GL46ShaderProgram::destruct(ShaderProgramID& sp) const {
 }
 
 void GL46ShaderProgram::use(const ShaderProgramID& sp) const {
-#ifdef _DEBUG
+#ifndef NDEBUG
     if (s_currentlyUsedID != 0) {
         throw "Overbound shader programs";
     }
     s_currentlyUsedID = sp.m_id;
-#endif // _DEBUG
+#endif // DEBUG
     glUseProgram(sp.m_id);
 }
 
 void GL46ShaderProgram::unuse(const ShaderProgramID& sp) const {
-#ifdef _DEBUG
+#ifndef NDEBUG
     if (s_currentlyUsedID != sp.m_id) {
         throw "Overbound shader programs";
     }
     s_currentlyUsedID = 0;
     glUseProgram(0);
-#endif // _DEBUG
+#endif // DEBUG
 }
 
 void GL46ShaderProgram::dispatchCompute(const ShaderProgramID& sp, const glm::uvec3& groupCount, bool use) const {
     if (use) {
         this->use(sp);
     } else {
-    #ifdef _DEBUG
+    #ifndef NDEBUG
         if (s_currentlyUsedID != sp.m_id) {
             throw "Tried to dispatch compute groups without having the program bound for usage!";
         }
-    #endif // _DEBUG
+    #endif // DEBUG
     }
     glDispatchCompute(groupCount.x, groupCount.y, groupCount.z);
     if (use) {
@@ -87,11 +87,11 @@ void GL46ShaderProgram::dispatchCompute(const ShaderProgramID& sp, int indirect,
     if (use) {
         this->use(sp);
     } else {
-    #ifdef _DEBUG
+    #ifndef NDEBUG
         if (s_currentlyUsedID != sp.m_id) {
             throw "Tried to dispatch compute groups without having the program bound for usage!";
         }
-    #endif // _DEBUG
+    #endif // DEBUG
     }
     glDispatchComputeIndirect(indirect);
     if (use) {
@@ -136,11 +136,11 @@ void GL46ShaderProgram::backInterfaceBlock(const ShaderProgramID& sp, unsigned i
     } else if (index.type == RE::BufferType::SHADER_STORAGE) {
         glShaderStorageBlockBinding(sp.m_id, interfaceBlockIndex, index.bindingIndex);
     }
-#ifdef _DEBUG
+#ifndef NDEBUG
     else {
         throw "Interface blocks must be either UNIFORM or SHADER_STORAGE";
     }
-#endif // _DEBUG
+#endif // DEBUG
 }
 
 int GL46ShaderProgram::getUniformLocation(const ShaderProgramID& sp, const std::string& name) const {
@@ -198,11 +198,11 @@ ShaderProgramID GL46ShaderProgram::compileProgram(const ShaderProgramSources& so
     for (auto STAGE : SHADER_STAGES) {
         if (!source[STAGE].m_sources.empty()) {
             shaderID[i] = glCreateShader(convert(STAGE));
-        #ifdef _DEBUG
+        #ifndef NDEBUG
             if (shaderID[i] == 0) {
                 fatalError("Failed to create shader!");
             }
-        #endif // _DEBUG
+        #endif // DEBUG
             compileShader(sp, source[STAGE], shaderID[i]);
         }
         i++;
@@ -269,9 +269,9 @@ void GL46ShaderProgram::linkProgram(ShaderProgramID& sp) const {
         fatalError("Failed to link shaders!");
     }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
     printProgramInfoLog(sp);
-#endif // _DEBUG
+#endif // DEBUG
 }
 
 void GL46ShaderProgram::printProgramInfoLog(const ShaderProgramID& sp) const {

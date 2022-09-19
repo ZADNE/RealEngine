@@ -57,9 +57,9 @@ bool GL46Fixture::prepare() {
 
     int contextFlags = SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG | SDL_GL_CONTEXT_ROBUST_ACCESS_FLAG;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
     contextFlags |= SDL_GL_CONTEXT_DEBUG_FLAG;
-#endif // _DEBUG
+#endif // DEBUG
 
     if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, contextFlags)) {
         error("Could not set context flags!"); return false;
@@ -92,7 +92,7 @@ void GL46Fixture::initialize() {
     std::printf("Renderer:     %s\n", glGetString(GL_RENDERER));
     std::printf("Vendor:       %s\n", glGetString(GL_VENDOR));
 
-#ifdef _DEBUG
+#ifndef NDEBUG
     //Enable OpenGL error callbacks
     if (glDebugMessageCallback) {
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -102,7 +102,7 @@ void GL46Fixture::initialize() {
         };
         glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, sizeof(ids) / sizeof(GLuint), ids, GL_FALSE);
     }
-#endif // _DEBUG
+#endif // DEBUG
 
     //Disable dither that is probably no-op anyway
     glDisable(GL_DITHER);

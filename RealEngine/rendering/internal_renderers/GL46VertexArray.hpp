@@ -41,9 +41,9 @@ private:
 
     void throwIfNotCurrentlyBound(const VertexArrayID& va) const;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
     static inline unsigned int s_currentlyBoundID = 0u;
-#endif // _DEBUG
+#endif // DEBUG
 };
 
 }

@@ -7,9 +7,9 @@
 
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #include <iostream>
-#endif // _DEBUG
+#endif // DEBUG
 
 namespace RE {
 
@@ -95,11 +95,11 @@ void GL46Buffer::bind(const BufferID& bf, BufferType bindType) const {
 }
 
 void GL46Buffer::bindIndexed(const BufferID& bf, const BufferTypedIndex& index) const {
-#ifdef _DEBUG
+#ifndef NDEBUG
     if (!isIndexedBufferType(index.type)) {
         throw "Indexed binding used on type that does not use it";
     }
-#endif // _DEBUG
+#endif // DEBUG
     glBindBufferBase(convert(index.type), index.bindingIndex, bf.m_id);
 }
 
@@ -129,11 +129,11 @@ void GL46Buffer::flushMapped(const BufferID& bf, size_t offsetInBytes, size_t le
 
 bool GL46Buffer::unmap(const BufferID& bf) const {
     auto rval = glUnmapNamedBuffer(bf.m_id);
-#ifdef _DEBUG
+#ifndef NDEBUG
     if (rval == GL_FALSE) {
         std::cerr << "Buffer unmapping failed!\n";
     }
-#endif // _DEBUG
+#endif // DEBUG
     return rval;
 }
 
