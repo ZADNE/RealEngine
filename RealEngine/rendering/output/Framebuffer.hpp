@@ -17,7 +17,7 @@ namespace RE {
 */
 template<Renderer R = RendererLateBind>
 class Framebuffer {
-    friend class GL46Fixture;
+    friend class GL46Fixture; friend class VK13Fixture;
     friend class GL46Framebuffer;
 public:
 
@@ -96,7 +96,7 @@ private:
 */
 template<Renderer R = RendererLateBind>
 class DefaultFrameBuffer {
-    friend class GL46Fixture;
+    friend class GL46Fixture; friend class VK13Fixture;
 public:
 
     /**

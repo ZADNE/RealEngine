@@ -8,4 +8,12 @@
     GL46TypeToString.hpp        GL46TypeToString.cpp
     GL46VertexArray.hpp         GL46VertexArray.cpp
     GL46Viewport.hpp            GL46Viewport.cpp
+    VK13Buffer.hpp              VK13Buffer.cpp
+    VK13Capabilities.hpp        VK13Capabilities.cpp
+    VK13Framebuffer.hpp         VK13Framebuffer.cpp
+    VK13Ordering.hpp            VK13Ordering.cpp
+    VK13ShaderProgram.hpp       VK13ShaderProgram.cpp
+    VK13Texture.hpp             VK13Texture.cpp
+    VK13VertexArray.hpp         VK13VertexArray.cpp
+    VK13Viewport.hpp            VK13Viewport.cpp
 )

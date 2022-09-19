@@ -22,7 +22,7 @@ template<Renderer> class VertexArray;
 */
 template<Renderer R = RendererLateBind>
 class Buffer {
-    friend class GL46Fixture;
+    friend class GL46Fixture; friend class VK13Fixture;
     friend class VertexArray<R>;
 public:
 

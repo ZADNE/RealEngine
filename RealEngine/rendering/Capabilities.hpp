@@ -9,7 +9,7 @@ namespace RE {
 
 template<Renderer R = RendererLateBind>
 class Capabilities {
-    friend class GL46Fixture;
+    friend class GL46Fixture; friend class VK13Fixture;
 protected:
 
     static inline R::Capabilities* s_impl = nullptr;

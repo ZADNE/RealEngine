@@ -45,7 +45,7 @@ class GL46Viewport;
 /**
  * @brief Is renderer type collection that uses OpenGL 4.6
  *
- * This is one of the possible types that can be passed as renderer type
+ * Along RendererVK13, this is one of the possible types that can be passed as renderer type
  * to your early-bind Room-template
 */
 class RendererGL46 {
@@ -60,6 +60,35 @@ public:
     using VertexArray = GL46VertexArray;
     using Viewport = GL46Viewport;
 };
+
+class VK13Buffer;
+class VK13Capabilities;
+class VK13Framebuffer;
+class VK13Ordering;
+class VK13ShaderProgram;
+class VK13Texture;
+class VK13VertexArray;
+class VK13Viewport;
+
+/**
+ * @brief Is renderer type collection that uses Vulkan 1.3
+ *
+ * Along RendererGL46, this is one of the possible types that can be passed as renderer type
+ * to your early-bind Room-template
+*/
+class RendererVK13 {
+public:
+
+    using Buffer = VK13Buffer;
+    using Capabilities = VK13Capabilities;
+    using Framebuffer = VK13Framebuffer;
+    using Ordering = VK13Ordering;
+    using ShaderProgram = VK13ShaderProgram;
+    using Texture = VK13Texture;
+    using VertexArray = VK13VertexArray;
+    using Viewport = VK13Viewport;
+};
+
 
 template<class T>
 concept Renderer = requires {

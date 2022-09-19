@@ -22,7 +22,7 @@ template<Renderer> class Framebuffer;
 */
 template<Renderer R = RendererLateBind>
 class TextureProxy {
-    friend class GL46Fixture;
+    friend class GL46Fixture; friend class VK13Fixture;
     friend class GL46Texture;
 public:
 
@@ -86,7 +86,7 @@ private:
 template<Renderer R = RendererLateBind>
 class Texture {
     friend class TextureProxy<R>;
-    friend class GL46Fixture;
+    friend class GL46Fixture; friend class VK13Fixture;
     friend class Framebuffer<R>;
 public:
 

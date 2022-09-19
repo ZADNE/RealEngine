@@ -11,6 +11,10 @@ set_target_properties(RealEngine PROPERTIES
 	CXX_STANDARD 20
 )
 
+# Vulkan
+
+find_package(Vulkan REQUIRED)
+
 # OpenGL
 find_package(OpenGL REQUIRED)
 
@@ -43,6 +47,7 @@ FetchContent_MakeAvailable(glm json)
 target_link_libraries(RealEngine
 	PUBLIC
 		${CMAKE_DL_LIBS}
+        Vulkan::Vulkan
 		OpenGL::GL
 		GLEW::GLEW
 		SDL2::Main

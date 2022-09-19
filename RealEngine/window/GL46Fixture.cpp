@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
 #include <GL/glew.h>
 
 #include <RealEngine/rendering/buffers/Buffer.hpp>
@@ -63,7 +63,7 @@ bool GL46Fixture::prepare() {
 
     if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, contextFlags)) {
         error("Could not set context flags!"); return false;
-    }
+}
 
     if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)) {
         error("Could not use core profile context!"); return false;
@@ -124,7 +124,7 @@ void GL46Fixture::initialize() {
     //Use blenbing by default
     BlendingCapability<RendererGL46>::enable();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
+    }
 
 GL46Fixture::GL46Fixture() :
     m_defaultFramebufferLateBind(FramebufferID{0u}),

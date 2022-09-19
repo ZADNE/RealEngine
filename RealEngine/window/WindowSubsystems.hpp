@@ -5,20 +5,20 @@
 
 #include <string>
 
-/*! \mainpage RealEngine
- *
- * \section overview Overview
- *
- * To get a minimal working RealEngine application, you need to create your own room class
- * that inherits from RE::Room. The typical main function then looks like this:
- * \code {cpp}
- *  int main(int argc, char* argv[]) {
- *      RE::MainProgram::initialize();
- *      auto* myRoom = RE::MainProgram::addRoom<MyDerivedRoom>(constructorArgs);
- *      return RE::MainProgram::run(myRoom->getName(), transitionparameters);
- *  }
- * \endcode
- */
+ /*! \mainpage RealEngine
+  *
+  * \section overview Overview
+  *
+  * To get a minimal working RealEngine application, you need to create your own room class
+  * that inherits from RE::Room. The typical main function then looks like this:
+  * \code {cpp}
+  *  int main(int argc, char* argv[]) {
+  *      RE::MainProgram::initialize();
+  *      auto* myRoom = RE::MainProgram::addRoom<MyDerivedRoom>(constructorArgs);
+  *      return RE::MainProgram::run(myRoom->getName(), transitionparameters);
+  *  }
+  * \endcode
+  */
 
 
 namespace RE {
@@ -31,7 +31,8 @@ constexpr int RE_VERSION_PATCH = 1;
  * @brief Lists renderers known to RealEngine
 */
 enum class RendererID {
-    OPENGL_46        /**< Open Graphics Library 4.6 renderer */
+    OPENGL_46,      /**< Open Graphics Library 4.6 renderer */
+    VULKAN_13       /**< Vulkan 1.3 renderer */
 };
 
 std::string to_string(RendererID r);

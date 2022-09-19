@@ -17,7 +17,7 @@ namespace RE {
 */
 template<Renderer R = RendererLateBind>
 class VertexArray {
-    friend class GL46Fixture;
+    friend class GL46Fixture; friend class VK13Fixture;
 public:
 
     /**

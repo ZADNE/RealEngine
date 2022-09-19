@@ -14,7 +14,7 @@ namespace RE {
 */
 template<Renderer R = RendererLateBind>
 class ShaderProgram {
-    friend class GL46Fixture;
+    friend class GL46Fixture; friend class VK13Fixture;
 public:
 
     /**
