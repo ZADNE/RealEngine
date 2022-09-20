@@ -91,7 +91,7 @@ public:
     static Room* addRoom(ConstructorArgs&&... args) {
         auto& inst = instance();
         switch (inst.m_window.getRenderer()) {
-        case RendererID::OPENGL_46:
+        case RendererID::OPENGL46:
             return inst.m_roomManager.addRoom<RoomTemplate<RendererGL46>>(std::forward<ConstructorArgs>(args)...);
         default:
             return nullptr;

@@ -2,7 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-
 #include <string>
 
  /*! \mainpage RealEngine
@@ -31,8 +30,9 @@ constexpr int RE_VERSION_PATCH = 1;
  * @brief Lists renderers known to RealEngine
 */
 enum class RendererID {
-    OPENGL_46,      /**< Open Graphics Library 4.6 renderer */
-    VULKAN_13       /**< Vulkan 1.3 renderer */
+    OPENGL46,       /**< Open Graphics Library 4.6 renderer */
+    VULKAN13,       /**< Vulkan 1.3 renderer */
+    ANY             
 };
 
 std::string to_string(RendererID r);
@@ -60,22 +60,38 @@ public:
         return str;
     }
 
+    RendererID getRenderer() const { return m_renderer; }
+
 private:
 
-    void initializeRenderer(RendererID renderer) const;
+    void initializeRenderer() const;
 
     /**
      * @brief Initializes RealEngine's subsystems
-     *
-     * @throws int when a system failed to initialize
+     * @param preferredRenderer The requested renderer.
+     *                          This gets overwritten if the requested renderer cannot be started.
+     * @throws std::runtime_error When a system failed to initialize.
     */
-    WindowSubsystems(RendererID renderer);
+    WindowSubsystems(RendererID preferredRenderer);
 
     /**
-     * @brief De-initializes all RealEngine's subsystems
+     * @brief Is a very simple RAII wrapper around SDL2
     */
-    ~WindowSubsystems();
-};
+    class SDL2_RAII {
+    public:
 
+        SDL2_RAII();
+
+        SDL2_RAII(const SDL2_RAII&) = delete;
+        SDL2_RAII& operator=(const SDL2_RAII&) = delete;
+
+        ~SDL2_RAII();
+
+        void printVersion();
+    };
+
+    SDL2_RAII m_sdl2;
+    RendererID m_renderer;      /**< The actual renderer (may be different from the preferred one) */
+};
 
 }

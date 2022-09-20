@@ -59,7 +59,6 @@ public:
 
     /**
      * @brief Gets current title of the window
-     * @return Current title
     */
     const std::string& getTitle() const;
 
@@ -72,9 +71,13 @@ public:
 
     /**
      * @brief Gets current dimensions of the window
-     * @return Current dimensions
     */
     glm::ivec2 getDims() const { return m_dims; }
+
+    /**
+     * @brief Gets the used renderer (this can be different from the requested one)
+    */
+    RendererID getRenderer() const { return m_subsystems.getRenderer(); }
 
 private:
 

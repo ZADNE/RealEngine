@@ -15,7 +15,7 @@
 namespace RE {
 
 bool VK13Fixture::prepare() {
-    return true;
+    return false;
 }
 
 void VK13Fixture::initialize() {

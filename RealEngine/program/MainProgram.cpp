@@ -29,7 +29,7 @@ int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
     try {
         auto& inst = instance();
         switch (inst.m_window.getRenderer()) {
-        case RendererID::OPENGL_46:
+        case RendererID::OPENGL46:
             return inst.doRun<RendererGL46>(roomName, args);
         default:
             return 1;

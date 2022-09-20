@@ -61,7 +61,7 @@ void Window::setDims(const glm::ivec2& newDims, bool save) {
 }
 
 Window::Window(const WindowSettings& settings, const std::string& title) :
-    WindowSettings(settings), m_subsystems(settings.getRenderer()), m_windowTitle(title) {
+    WindowSettings(settings), m_subsystems(settings.getPreferredRenderer()), m_windowTitle(title) {
     //Prepare flags
     Uint32 SDL_flags = SDL_WINDOW_OPENGL;
     if (m_flags.invisible)
@@ -85,7 +85,7 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
         fatalError("Could not create OpenGL context");
     }
 
-    m_subsystems.initializeRenderer(getRenderer());
+    m_subsystems.initializeRenderer();
 
     //Set vertical synchronisation
     setVSync(m_flags.vSync, false);
