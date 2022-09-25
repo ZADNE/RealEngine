@@ -1,16 +1,33 @@
-﻿/*!
+﻿#include "Window.hpp"
+/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/window/Window.hpp>
 
-#include <ImGui/imgui.h>
+#include <stdexcept>
+
+#include <SDL2/SDL_vulkan.h>
+
 #include <ImGui/imgui_impl_sdl.h>
+#include <ImGui/imgui_impl_vulkan.h>
 #include <ImGui/imgui_impl_opengl3.h>
 
+#include <RealEngine/window/GL46Fixture.hpp>
+#include <RealEngine/window/VK13Fixture.hpp>
 #include <RealEngine/utility/Error.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 
+
 namespace RE {
+
+void Window::initForRenderer(RendererID renderer) {
+    switch (renderer) {
+    case RendererID::VULKAN13:      initForVulkan13(); break;
+    case RendererID::OPENGL46:      initForGL46(); break;
+    case RendererID::ANY:           initForVulkan13(); break;
+    default:                        break;
+    }
+}
 
 void Window::setFullscreen(bool fullscreen, bool save) {
     m_flags.fullscreen = fullscreen;
@@ -61,31 +78,24 @@ void Window::setDims(const glm::ivec2& newDims, bool save) {
 }
 
 Window::Window(const WindowSettings& settings, const std::string& title) :
-    WindowSettings(settings), m_subsystems(settings.getPreferredRenderer()), m_windowTitle(title) {
-    //Prepare flags
-    Uint32 SDL_flags = SDL_WINDOW_OPENGL;
-    if (m_flags.invisible)
-        SDL_flags |= SDL_WINDOW_HIDDEN;
-    if (m_flags.fullscreen)
-        SDL_flags |= SDL_WINDOW_FULLSCREEN;
-    if (m_flags.borderless)
-        SDL_flags |= SDL_WINDOW_BORDERLESS;
+    WindowSettings(settings), m_subsystems(), m_windowTitle(title), m_renderer(RendererID::ANY) {
 
-    //Create window
-    m_SDLwindow = SDL_CreateWindow(m_windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_dims.x, m_dims.y, SDL_flags);
-    if (!m_SDLwindow) {
-        error(SDL_GetError());
-        fatalError("Could not create window");
+    m_subsystems.printRealEngineVersion();
+    m_subsystems.printSubsystemsVersions();
+
+    initForRenderer(settings.getPreferredRenderer());
+
+    if (m_renderer == RendererID::ANY) {//If the preferred renderer could not be initialized
+        for (size_t i = 0; i < static_cast<size_t>(RendererID::ANY); i++) {//Try to init any 
+            initForRenderer(static_cast<RendererID>(i));
+            if (m_renderer != RendererID::ANY) break;
+        }
+
+        if (m_renderer == RendererID::ANY) {//If no renderer could be initialized
+            //Throw becasue there is nothing more we can do
+            throw std::runtime_error{"No renderer could be initialized!"};
+        }
     }
-
-    //Create OpenGL context for the window
-    m_GLContext = SDL_GL_CreateContext(m_SDLwindow);
-    if (!m_GLContext) {
-        error(SDL_GetError());
-        fatalError("Could not create OpenGL context");
-    }
-
-    m_subsystems.initializeRenderer();
 
     //Set vertical synchronisation
     setVSync(m_flags.vSync, false);
@@ -93,29 +103,77 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
     Viewport<>::s_state->windowSize = m_dims;
     Viewport<>::s_state->trackingWindow = true;
 
-    //Initialize ImGui
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-    ImGui_ImplSDL2_InitForOpenGL(m_SDLwindow, m_GLContext);
-    ImGui_ImplOpenGL3_Init("#version 460 core");
+    assert(m_renderer == RendererID::VULKAN13 || m_renderer == RendererID::OPENGL46);
 }
 
 Window::~Window() {
-    //Shutdown ImGui
-    ImGui_ImplOpenGL3_Shutdown();
+    switch (m_renderer) {
+    case RE::RendererID::VULKAN13:
+        ImGui_ImplVulkan_Shutdown();
+        break;
+    case RE::RendererID::OPENGL46:
+        ImGui_ImplOpenGL3_Shutdown();
+        SDL_GL_DeleteContext(m_GLContext);
+        break;
+    }
+
     ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
 
-    //Delete OpenGL context
-    SDL_GL_DeleteContext(m_GLContext);
-
-    //Destroy the SDL window
     SDL_DestroyWindow(m_SDLwindow);
 }
 
 void Window::swapBuffer() {
-    SDL_GL_SwapWindow(m_SDLwindow);
+    switch (m_renderer) {
+    case RE::RendererID::VULKAN13: fatalError(""); break;
+    case RE::RendererID::OPENGL46: SDL_GL_SwapWindow(m_SDLwindow); break;
+    }
+}
+
+void Window::initForGL46() {
+    //Prepare window flags
+    Uint32 SDL_flags = SDL_WINDOW_OPENGL;
+    if (m_flags.invisible) SDL_flags |= SDL_WINDOW_HIDDEN;
+    if (m_flags.fullscreen) SDL_flags |= SDL_WINDOW_FULLSCREEN;
+    if (m_flags.borderless) SDL_flags |= SDL_WINDOW_BORDERLESS;
+
+    //Set OpenGL context creation parameters
+    if (!GL46Fixture::prepare()) goto fail;
+
+    //Create window
+    m_SDLwindow = SDL_CreateWindow(m_windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_dims.x, m_dims.y, SDL_flags);
+    if (!m_SDLwindow) {
+        error(SDL_GetError());
+        goto fail;
+    }
+
+    //Create OpenGL context for the window
+    m_GLContext = SDL_GL_CreateContext(m_SDLwindow);
+    if (!m_GLContext) {
+        error(SDL_GetError());
+        goto fail_SDLWindow;
+    }
+
+    //Initialize some global states to RealEngine-default values
+    GL46Fixture::initialize();
+
+    if (!ImGui_ImplSDL2_InitForOpenGL(m_SDLwindow, m_GLContext)) goto fail_GLContext_SDLWindow;
+    if (!ImGui_ImplOpenGL3_Init("#version 460 core")) goto fail_GLContext_SDLWindow;
+
+    m_renderer = RendererID::OPENGL46;
+    return;
+
+fail_GLContext_SDLWindow:
+    SDL_GL_DeleteContext(m_GLContext);
+    m_GLContext = nullptr;
+fail_SDLWindow:
+    SDL_DestroyWindow(m_SDLwindow);
+    m_SDLwindow = nullptr;
+fail:
+    m_renderer = RendererID::ANY;
+}
+
+void Window::initForVulkan13() {
+    m_renderer = RendererID::ANY;
 }
 
 }

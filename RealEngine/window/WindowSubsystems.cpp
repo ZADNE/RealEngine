@@ -1,4 +1,6 @@
-﻿/*!
+﻿#include "WindowSubsystems.hpp"
+#include "WindowSubsystems.hpp"
+/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/window/WindowSubsystems.hpp>
@@ -6,9 +8,8 @@
 #include <stdexcept>
 
 #include <SDL2/SDL.h>
+#include <ImGui/imgui.h>
 
-#include <RealEngine/window/GL46Fixture.hpp>
-#include <RealEngine/window/VK13Fixture.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 namespace RE {
@@ -22,33 +23,18 @@ std::string to_string(RendererID r) {
     }
 }
 
-void WindowSubsystems::initializeRenderer() const {
-    switch (m_renderer) {
-    case RendererID::OPENGL46: GL46Fixture::initialize(); break;
-    }
+WindowSubsystems::WindowSubsystems() :
+    m_sdl2() {
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
 }
 
-WindowSubsystems::WindowSubsystems(RendererID preferredRenderer) :
-    m_sdl2(), m_renderer(RendererID::ANY) {
-
-    switch (preferredRenderer) {
-    case RendererID::OPENGL46:  if (GL46Fixture::prepare()) { m_renderer = RendererID::OPENGL46; } break;
-    case RendererID::VULKAN13:  if (VK13Fixture::prepare()) { m_renderer = RendererID::VULKAN13; } break;
-    case RendererID::ANY:       if (VK13Fixture::prepare()) { m_renderer = RendererID::VULKAN13; } break;
-    }
-
-    if (m_renderer == RendererID::ANY) {//If the preferred renderer could not be prepared
-        //Try to prepare all other renderers
-        if (GL46Fixture::prepare()) { m_renderer = RendererID::OPENGL46; }
-        if (VK13Fixture::prepare()) { m_renderer = RendererID::VULKAN13; }
-
-        if (m_renderer == RendererID::ANY) {//If no renderer could be prepared
-            //Throw becasue there is nothing more we can do
-            throw std::runtime_error{"No renderer could be prepared!"};
-        }
-    }
-
+void WindowSubsystems::printRealEngineVersion() {
     log(getVersion());
+}
+
+void WindowSubsystems::printSubsystemsVersions() const {
+    m_sdl2.printVersion();
 }
 
 WindowSubsystems::SDL2_RAII::SDL2_RAII() {
@@ -57,14 +43,14 @@ WindowSubsystems::SDL2_RAII::SDL2_RAII() {
         error(errorStr);
         throw std::runtime_error{errorStr};
     }
-    printVersion();
 }
 
 WindowSubsystems::SDL2_RAII::~SDL2_RAII() {
+    ImGui::DestroyContext();
     SDL_Quit();
 }
 
-void WindowSubsystems::SDL2_RAII::printVersion() {
+void WindowSubsystems::SDL2_RAII::printVersion() const {
 #ifndef NDEBUG
     SDL_version compiled;
     SDL_VERSION(&compiled);

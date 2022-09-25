@@ -5,6 +5,7 @@
 #include <string>
 
 #include <SDL2/SDL_video.h>
+#include <ImGui/imgui.h>
 #include <glm/vec2.hpp>
 
 #include <RealEngine/window/WindowSubsystems.hpp>
@@ -77,7 +78,7 @@ public:
     /**
      * @brief Gets the used renderer (this can be different from the requested one)
     */
-    RendererID getRenderer() const { return m_subsystems.getRenderer(); }
+    RendererID getRenderer() const { return m_renderer; }
 
 private:
 
@@ -100,10 +101,17 @@ private:
     */
     void swapBuffer();
 
-    WindowSubsystems m_subsystems;      /**< Empty class that initializes and de-initializes subsystems */
-    SDL_Window* m_SDLwindow = nullptr;  /**< handle to SDL window */
-    SDL_GLContext m_GLContext = nullptr;/**< handle to OpenGL context */
-    std::string m_windowTitle;          /**< Title of the window */
+    void initForRenderer(RendererID renderer);
+    void initForGL46();
+    void initForVulkan13();
+
+    WindowSubsystems m_subsystems;          /**< Empty class that initializes and de-initializes subsystems */
+    SDL_Window* m_SDLwindow = nullptr;      
+    union {
+        SDL_GLContext m_GLContext = nullptr;
+    };
+    RendererID m_renderer;                  /**< The actual renderer (may be different from the preferred one) */
+    std::string m_windowTitle;              /**< Title of the window */
 };
 
 }

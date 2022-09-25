@@ -124,7 +124,7 @@ void GL46Fixture::initialize() {
     //Use blenbing by default
     BlendingCapability<RendererGL46>::enable();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
+}
 
 GL46Fixture::GL46Fixture() :
     m_defaultFramebufferLateBind(FramebufferID{0u}),
