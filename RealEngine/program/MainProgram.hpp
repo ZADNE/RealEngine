@@ -23,7 +23,6 @@ union SDL_Event;
 namespace RE {
 
 class Room;
-class RendererGL46;
 
 struct DisplayInfo {
     std::string name; /**< @brief UTF-8 encoded 'name' */
@@ -91,6 +90,8 @@ public:
     static Room* addRoom(ConstructorArgs&&... args) {
         auto& inst = instance();
         switch (inst.m_window.getRenderer()) {
+        case RendererID::VULKAN13:
+            return inst.m_roomManager.addRoom<RoomTemplate<RendererVK13>>(std::forward<ConstructorArgs>(args)...);
         case RendererID::OPENGL46:
             return inst.m_roomManager.addRoom<RoomTemplate<RendererGL46>>(std::forward<ConstructorArgs>(args)...);
         default:
@@ -180,7 +181,6 @@ private:
     int m_programExitCode = EXIT_SUCCESS;
 
     bool m_pollEventsInMainThread = true;
-    bool m_usingImGui = false;
     glm::vec4 m_clearColor{};
 
     void doRoomTransitionIfScheduled();

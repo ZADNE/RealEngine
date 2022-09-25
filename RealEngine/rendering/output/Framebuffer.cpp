@@ -6,6 +6,7 @@
 #include <RealEngine/rendering/textures/Texture.hpp>
 
 #include <RealEngine/rendering/internal_renderers/GL46Framebuffer.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13Framebuffer.hpp>
 
 
 namespace RE {
@@ -127,9 +128,11 @@ void DefaultFrameBuffer<R>::clearDepthAndStencil(float depth, int stencil) {
 }
 
 template Framebuffer<RendererLateBind>;
+template Framebuffer<RendererVK13>;
 template Framebuffer<RendererGL46>;
 
 template DefaultFrameBuffer<RendererLateBind>;
+template DefaultFrameBuffer<RendererVK13>;
 template DefaultFrameBuffer<RendererGL46>;
 
 }

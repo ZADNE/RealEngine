@@ -329,6 +329,8 @@ void SpriteBatch<R>::createDrawBatches() {
 }
 
 template SpriteBatch<RendererLateBind>;
+template SpriteBatch<RendererVK13>;
+template SpriteBatch<RendererVK13>;
 template SpriteBatch<RendererGL46>;
 
 }

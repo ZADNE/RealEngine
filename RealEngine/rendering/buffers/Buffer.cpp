@@ -6,6 +6,7 @@
 #include <cassert>
 
 #include <RealEngine/rendering/internal_renderers/GL46Buffer.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13Buffer.hpp>
 
 
 namespace RE {
@@ -121,6 +122,7 @@ void* Buffer<R>::map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageF
 }
 
 template Buffer<RendererLateBind>;
+template Buffer<RendererVK13>;
 template Buffer<RendererGL46>;
 
 }

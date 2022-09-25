@@ -4,6 +4,7 @@
 #include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 
 #include <RealEngine/rendering/internal_renderers/GL46ShaderProgram.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13ShaderProgram.hpp>
 
 namespace RE {
 
@@ -105,6 +106,7 @@ template<Renderer R> void ShaderProgram<R>::setUniform(int location, TextureUnit
 template<Renderer R> void ShaderProgram<R>::setUniform(int location, ImageUnit unit) const { s_impl->setUniform(m_id, location, unit); }
 
 template ShaderProgram<RendererLateBind>;
+template ShaderProgram<RendererVK13>;
 template ShaderProgram<RendererGL46>;
 
 }

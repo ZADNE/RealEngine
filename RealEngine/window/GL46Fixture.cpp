@@ -63,7 +63,7 @@ bool GL46Fixture::prepare() {
 
     if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, contextFlags)) {
         error("Could not set context flags!"); return false;
-}
+    }
 
     if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)) {
         error("Could not use core profile context!"); return false;

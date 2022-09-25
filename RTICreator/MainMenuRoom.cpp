@@ -297,4 +297,5 @@ void MainMenuRoom<R>::resetView() {
     m_drawScale = 1.0f;
 }
 
+template MainMenuRoom<RE::RendererVK13>;
 template MainMenuRoom<RE::RendererGL46>;

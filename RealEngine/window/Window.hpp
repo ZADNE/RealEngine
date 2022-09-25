@@ -12,6 +12,8 @@
 #include <RealEngine/window/WindowSettings.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 
+union SDL_Event;
+
 namespace RE {
 
 class MainProgram;
@@ -25,11 +27,50 @@ class MainProgram;
  * The window initializes all subsystems of the RealEngine (SDL2, renderer, ImGui, ...).
 */
 class Window : public WindowSettings {
-    friend class MainProgram;
 public:
+
+    /**
+     * @brief Constructs the window and displays it immediately.
+     *
+     * @param settings Settings to initialize the window with.
+     * @param title Title for the window
+    */
+    Window(const WindowSettings& settings, const std::string& title);
+
+    /**
+     * @brief Destroys the window
+    */
+    ~Window();
 
     Window(const Window& other) = delete;
     void operator=(const Window& other) = delete;
+
+    /**
+     * @brief Prepares ImGui for new frame
+    */
+    template<Renderer R>
+    void prepareNewFrame();
+
+    /**
+     * @brief Draws ImGui
+    */
+    template<Renderer R>
+    void finishNewFrame();
+
+    /**
+     * @brief Passes SDL event to ImGui
+    */
+    void passSDLEvent(SDL_Event& evnt);
+
+    /**
+     * @brief Enables/disables ImGui
+    */
+    void useImGui(bool use) { m_usingImGui = use; }
+
+    /**
+     * @brief Checks whether ImGui is used
+    */
+    bool isImGuiUsed() { return m_usingImGui; }
 
     /**
      * @brief Switches fullscreen on and off.
@@ -82,28 +123,11 @@ public:
 
 private:
 
-    /**
-     * @brief Constructs the window and displays it immediately.
-     *
-     * @param settings Settings to initialize the window with.
-     * @param title Title for the window
-    */
-    Window(const WindowSettings& settings, const std::string& title);
-
-    /**
-     * @brief Destroys the window
-    */
-    ~Window();
-
-    /**
-     * @brief Swaps buffers if using double buffered context (should be).
-     * This is called after each frame by the main program.
-    */
-    void swapBuffer();
-
     void initForRenderer(RendererID renderer);
-    void initForGL46();
     void initForVulkan13();
+    void initForGL46();
+
+    bool createSDLWindow(RendererID renderer);
 
     WindowSubsystems m_subsystems;          /**< Empty class that initializes and de-initializes subsystems */
     SDL_Window* m_SDLwindow = nullptr;      
@@ -112,6 +136,7 @@ private:
     };
     RendererID m_renderer;                  /**< The actual renderer (may be different from the preferred one) */
     std::string m_windowTitle;              /**< Title of the window */
+    bool m_usingImGui = false;
 };
 
 }

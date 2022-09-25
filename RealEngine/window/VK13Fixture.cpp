@@ -15,11 +15,12 @@
 namespace RE {
 
 bool VK13Fixture::prepare() {
-    return false;
+    return true;
 }
 
 void VK13Fixture::initialize() {
-
+    //THE singleton instance
+    static VK13Fixture renderer{};
 }
 
 VK13Fixture::VK13Fixture() {

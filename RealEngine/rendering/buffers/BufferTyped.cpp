@@ -27,6 +27,7 @@ void BufferTyped<R>::bindIndexed() {
 }
 
 template BufferTyped<RendererLateBind>;
+template BufferTyped<RendererVK13>;
 template BufferTyped<RendererGL46>;
 
 }

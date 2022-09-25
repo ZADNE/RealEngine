@@ -11,9 +11,6 @@
 
 #include <glm/common.hpp>
 
-#include <ImGui/imgui_impl_sdl.h>
-#include <ImGui/imgui_impl_opengl3.h>
-
 #include <RealEngine/rooms/Room.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/output/Framebuffer.hpp>
@@ -29,10 +26,9 @@ int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
     try {
         auto& inst = instance();
         switch (inst.m_window.getRenderer()) {
-        case RendererID::OPENGL46:
-            return inst.doRun<RendererGL46>(roomName, args);
-        default:
-            return 1;
+        case RendererID::VULKAN13: return inst.doRun<RendererVK13>(roomName, args);
+        case RendererID::OPENGL46: return inst.doRun<RendererGL46>(roomName, args);
+        default: return 1;
         }
     }
     catch (const std::exception& e) {
@@ -99,7 +95,7 @@ void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
     m_clearColor = s.clearColor;
     m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
     m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
-    m_usingImGui = s.usingImGui;
+    m_window.useImGui(s.usingImGui);
 }
 
 template<Renderer R>
@@ -135,10 +131,14 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
             step();
         }
 
-        //Draw frame
+        //Prepare for drawing
+        m_window.prepareNewFrame<R>();
+
+        //Draw the frame
         render(m_synchronizer.getDrawInterpolationFactor());
 
-        m_window.swapBuffer();
+        //Finish the drawing
+        m_window.finishNewFrame<R>();
 
         doRoomTransitionIfScheduled();
 
@@ -157,18 +157,7 @@ void MainProgram::step() {
 }
 
 void MainProgram::render(double interpolationFactor) {
-    if (m_usingImGui) {//ImGui frame start
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-    }
-
     m_roomManager.getCurrentRoom()->render(interpolationFactor);
-
-    if (m_usingImGui) {//ImGui frame end
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }
 }
 
 void MainProgram::processEvent(SDL_Event* evnt) {
@@ -248,9 +237,9 @@ void MainProgram::scheduleRoomTransition(size_t name, const RoomTransitionArgume
 
 void MainProgram::pollEvents() {
     SDL_Event evnt;
-    if (m_usingImGui) {
+    if (m_window.isImGuiUsed()) {
         while (SDL_PollEvent(&evnt)) {
-            ImGui_ImplSDL2_ProcessEvent(&evnt);
+            m_window.passSDLEvent(evnt);
             processEvent(&evnt);
         }
     } else {

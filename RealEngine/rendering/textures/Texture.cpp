@@ -8,6 +8,7 @@
 #include <RealEngine/utility/Error.hpp>
 
 #include <RealEngine/rendering/internal_renderers/GL46Texture.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13Texture.hpp>
 
 namespace RE {
 
@@ -231,8 +232,10 @@ void Texture<R>::init(const Raster& raster, const TextureParameters& params) {
 }
 
 template TextureProxy<RendererLateBind>;
+template TextureProxy<RendererVK13>;
 template TextureProxy<RendererGL46>;
 template Texture<RendererLateBind>;
+template Texture<RendererVK13>;
 template Texture<RendererGL46>;
 
 }

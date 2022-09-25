@@ -4,6 +4,7 @@
 #include <RealEngine/rendering/Ordering.hpp>
 
 #include <RealEngine/rendering/internal_renderers/GL46Ordering.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13Ordering.hpp>
 
 namespace RE {
 
@@ -28,6 +29,7 @@ void Ordering<R>::issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barr
 }
 
 template Ordering<RendererLateBind>;
+template Ordering<RendererVK13>;
 template Ordering<RendererGL46>;
 
 }
