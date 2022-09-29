@@ -33,9 +33,13 @@ WindowSettings::WindowSettings() {
                 m_preferredRenderer = RendererID::OPENGL46;
             } else if (renderStr == to_string(RendererID::ANY)) {
                 m_preferredRenderer = RendererID::ANY;
+            } else {
+                m_preferredRenderer = RendererID::ANY;
+                save();
             }
         } else {
             m_preferredRenderer = RendererID::ANY;
+            save();
         }
     }
     catch (...) {

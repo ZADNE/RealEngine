@@ -54,7 +54,7 @@ Window::~Window() {
         break;
     case RE::RendererID::OPENGL46:
         ImGui_ImplOpenGL3_Shutdown();
-        SDL_GL_DeleteContext(m_GLContext);
+        SDL_GL_DeleteContext(m_gl46.context);
         break;
     }
 
@@ -156,22 +156,21 @@ void Window::initForRenderer(RendererID renderer) {
 }
 
 void Window::initForVulkan13() {
-    if (!VK13Fixture::prepare()) goto fail;
-
     //Create SDL window
     if (!createSDLWindow(RendererID::VULKAN13)) {
         goto fail;
     }
 
-    //Initialize some global states to RealEngine-default values
-    VK13Fixture::initialize();
+    if (!VK13Fixture::prepare(m_SDLwindow)) goto fail_Vulkan_SDLWindow;
 
-    if (!ImGui_ImplSDL2_InitForVulkan(m_SDLwindow)) goto fail_SDLWindow;
-    //if (!ImGui_ImplVulkan_Init("#version 460 core")) goto fail_SDLWindow;
+    if (!ImGui_ImplSDL2_InitForVulkan(m_SDLwindow)) goto fail_Vulkan_SDLWindow;
+    //if (!ImGui_ImplVulkan_Init("#version 460 core")) goto fail_SDLWindow_Vulkan;
 
     m_renderer = RendererID::VULKAN13;
     return;
 
+fail_Vulkan_SDLWindow:
+    m_unionBytes.fill(std::byte(0x0));
 fail_SDLWindow:
     SDL_DestroyWindow(m_SDLwindow);
     m_SDLwindow = nullptr;
@@ -189,8 +188,8 @@ void Window::initForGL46() {
     }
 
     //Create OpenGL context for the window
-    m_GLContext = SDL_GL_CreateContext(m_SDLwindow);
-    if (!m_GLContext) {
+    m_gl46.context = SDL_GL_CreateContext(m_SDLwindow);
+    if (!m_gl46.context) {
         log(SDL_GetError());
         goto fail_SDLWindow;
     }
@@ -198,15 +197,15 @@ void Window::initForGL46() {
     //Initialize some global states to RealEngine-default values
     GL46Fixture::initialize();
 
-    if (!ImGui_ImplSDL2_InitForOpenGL(m_SDLwindow, m_GLContext)) goto fail_GLContext_SDLWindow;
+    if (!ImGui_ImplSDL2_InitForOpenGL(m_SDLwindow, m_gl46.context)) goto fail_GLContext_SDLWindow;
     if (!ImGui_ImplOpenGL3_Init("#version 460 core")) goto fail_GLContext_SDLWindow;
 
     m_renderer = RendererID::OPENGL46;
     return;
 
 fail_GLContext_SDLWindow:
-    SDL_GL_DeleteContext(m_GLContext);
-    m_GLContext = nullptr;
+    SDL_GL_DeleteContext(m_gl46.context);
+    m_gl46.context = nullptr;
 fail_SDLWindow:
     SDL_DestroyWindow(m_SDLwindow);
     m_SDLwindow = nullptr;

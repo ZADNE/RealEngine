@@ -2,14 +2,20 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/rendering/internal_renderers/GL46Buffer.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46Capabilities.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46Framebuffer.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46Ordering.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46ShaderProgram.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46Texture.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46VertexArray.hpp>
-#include <RealEngine/rendering/internal_renderers/GL46Viewport.hpp>
+#include <optional>
+
+#include <vulkan/vulkan.hpp>
+
+#include <RealEngine/rendering/internal_renderers/VK13Buffer.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13Capabilities.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13Framebuffer.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13Ordering.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13ShaderProgram.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13Texture.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13VertexArray.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13Viewport.hpp>
+
+struct SDL_Window;
 
 namespace RE {
 
@@ -32,7 +38,7 @@ public:
     *
     * @note To be called only once at the start of the program.
     */
-    static bool prepare();
+    static bool prepare(SDL_Window* sdlWindow);
 
     /**
     * @brief Initializes the renderer.
@@ -45,7 +51,7 @@ public:
 
 private:
 
-    VK13Fixture();
+    VK13Fixture(SDL_Window* sdlWindow);
     ~VK13Fixture();
 
     class Implementations {
@@ -53,12 +59,12 @@ private:
 
         Implementations() {
             assignReferences<RendererLateBind>();
-            assignReferences<RendererGL46>();
+            assignReferences<RendererVK13>();
         }
 
         ~Implementations() {
             clearReferences<RendererLateBind>();
-            clearReferences<RendererGL46>();
+            clearReferences<RendererVK13>();
         }
 
         Implementations(const Implementations&) = delete;
@@ -72,19 +78,33 @@ private:
         template<Renderer R>
         void clearReferences();
 
-        GL46Buffer m_bufferImpl;
-        GL46Capabilities m_capabilitiesImpl;
-        GL46Framebuffer m_mainFramebufferImpl;
-        GL46Ordering m_orderingImpl;
-        GL46ShaderProgram m_shaderProgramImpl;
-        GL46Texture m_textureImpl;
-        GL46VertexArray m_vertexArrayImpl;
-        GL46Viewport m_viewportImpl;
+        VK13Buffer m_bufferImpl;
+        VK13Capabilities m_capabilitiesImpl;
+        VK13Framebuffer m_mainFramebufferImpl;
+        VK13Ordering m_orderingImpl;
+        VK13ShaderProgram m_shaderProgramImpl;
+        VK13Texture m_textureImpl;
+        VK13VertexArray m_vertexArrayImpl;
+        VK13Viewport m_viewportImpl;
 
         ViewportState m_viewportState;
     };
 
-    Implementations s_impls;
+    static inline std::optional<VK13Fixture> s_fixture;
+
+    enum class Destroy {
+        NOTHING
+    };
+
+    bool fail(Destroy d);
+
+    vk::Instance m_instance;
+    vk::Device m_device;
+    vk::CommandPool m_commandPool;
+    vk::CommandBuffer m_commandBuffer;
+    vk::SurfaceKHR m_surface;
+
+    Implementations m_impls;
 };
 
 }

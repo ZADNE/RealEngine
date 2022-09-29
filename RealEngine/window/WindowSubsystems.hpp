@@ -4,20 +4,20 @@
 #pragma once
 #include <string>
 
-/*! \mainpage RealEngine
- *
- * \section overview Overview
- *
- * To get a minimal working RealEngine application, you need to create your own room class
- * that inherits from RE::Room. The typical main function then looks like this:
- * \code {cpp}
- *  int main(int argc, char* argv[]) {
- *      RE::MainProgram::initialize();
- *      auto* myRoom = RE::MainProgram::addRoom<MyDerivedRoom>(constructorArgs);
- *      return RE::MainProgram::run(myRoom->getName(), transitionparameters);
- *  }
- * \endcode
-*/
+ /*! \mainpage RealEngine
+  *
+  * \section overview Overview
+  *
+  * To get a minimal working RealEngine application, you need to create your own room class
+  * that inherits from RE::Room. The typical main function then looks like this:
+  * \code {cpp}
+  *  int main(int argc, char* argv[]) {
+  *      RE::MainProgram::initialize();
+  *      auto* myRoom = RE::MainProgram::addRoom<MyDerivedRoom>(constructorArgs);
+  *      return RE::MainProgram::run(myRoom->getName(), transitionparameters);
+  *  }
+  * \endcode
+ */
 
 
 namespace RE {
@@ -26,16 +26,18 @@ constexpr int RE_VERSION_MAJOR = 1;
 constexpr int RE_VERSION_MINOR = 9;
 constexpr int RE_VERSION_PATCH = 1;
 
+constexpr int RE_VERSION = RE_VERSION_MAJOR * 1e6 + RE_VERSION_MINOR * 1e3 + RE_VERSION_PATCH;
+
 /**
  * @brief Lists all renderers known to RealEngine
- * 
+ *
  * The order also represents precedence when no specific renderer is preffered
  * (or if it fails during initialization).
 */
 enum class RendererID {
     VULKAN13,       /**< Vulkan 1.3 renderer */
     OPENGL46,       /**< Open Graphics Library 4.6 renderer */
-    ANY             
+    ANY
 };
 
 std::string to_string(RendererID r);

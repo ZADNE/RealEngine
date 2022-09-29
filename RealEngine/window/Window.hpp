@@ -130,9 +130,20 @@ private:
     bool createSDLWindow(RendererID renderer);
 
     WindowSubsystems m_subsystems;          /**< Empty class that initializes and de-initializes subsystems */
-    SDL_Window* m_SDLwindow = nullptr;      
+    SDL_Window* m_SDLwindow = nullptr;
+
+    struct VK13 {
+
+    };
+
+    struct GL46 {
+        SDL_GLContext context = nullptr;
+    };
+
     union {
-        SDL_GLContext m_GLContext = nullptr;
+        VK13 m_vk13;
+        GL46 m_gl46;
+        std::array<std::byte, std::max(sizeof(m_vk13), sizeof(m_gl46))> m_unionBytes{};
     };
     RendererID m_renderer;                  /**< The actual renderer (may be different from the preferred one) */
     std::string m_windowTitle;              /**< Title of the window */
