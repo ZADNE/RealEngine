@@ -12,7 +12,6 @@ set_target_properties(RealEngine PROPERTIES
 )
 
 # Vulkan
-
 find_package(Vulkan REQUIRED)
 
 # OpenGL
@@ -39,7 +38,7 @@ FetchContent_Declare(json
   GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent.git
   GIT_PROGRESS TRUE
   GIT_SHALLOW TRUE
-  GIT_TAG v3.10.5
+  GIT_TAG v3.9.1
 )
 
 FetchContent_MakeAvailable(glm json)
