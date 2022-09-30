@@ -2,8 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <optional>
-
 #include <vulkan/vulkan.hpp>
 
 #include <RealEngine/rendering/internal_renderers/VK13Buffer.hpp>
@@ -38,21 +36,28 @@ public:
     *
     * @note To be called only once at the start of the program.
     */
-    static bool prepare(SDL_Window* sdlWindow);
-
-    /**
-    * @brief Initializes the renderer.
-    * @warning Do not call this if prepare() has failed.
-    */
-    static void initialize();
+    static bool initialize(SDL_Window* sdlWindow);
 
     VK13Fixture(const VK13Fixture&) = delete;
     VK13Fixture& operator=(const VK13Fixture&) = delete;
 
 private:
 
-    VK13Fixture(SDL_Window* sdlWindow);
+    VK13Fixture();
     ~VK13Fixture();
+
+    enum class Initialized {
+        COMMAND_BUFFER,
+        COMMAND_POOL,
+        DEVICE,
+        INSTANCE,
+        NOTHING
+    };
+
+    bool init(SDL_Window* sdlWindow);
+
+    void destroy(bool throwException);
+
 
     class Implementations {
     public:
@@ -90,14 +95,9 @@ private:
         ViewportState m_viewportState;
     };
 
-    static inline std::optional<VK13Fixture> s_fixture;
+    static VK13Fixture s_fixture;
 
-    enum class Destroy {
-        NOTHING
-    };
-
-    bool fail(Destroy d);
-
+    Initialized m_init = Initialized::NOTHING;
     vk::Instance m_instance;
     vk::Device m_device;
     vk::CommandPool m_commandPool;

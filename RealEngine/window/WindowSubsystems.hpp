@@ -26,7 +26,7 @@ constexpr int RE_VERSION_MAJOR = 1;
 constexpr int RE_VERSION_MINOR = 9;
 constexpr int RE_VERSION_PATCH = 1;
 
-constexpr int RE_VERSION = RE_VERSION_MAJOR * 1e6 + RE_VERSION_MINOR * 1e3 + RE_VERSION_PATCH;
+constexpr int RE_VERSION = RE_VERSION_MAJOR * 1'000'000 + RE_VERSION_MINOR * 1'000 + RE_VERSION_PATCH;
 
 /**
  * @brief Lists all renderers known to RealEngine

@@ -143,7 +143,6 @@ private:
     union {
         VK13 m_vk13;
         GL46 m_gl46;
-        std::array<std::byte, std::max(sizeof(m_vk13), sizeof(m_gl46))> m_unionBytes{};
     };
     RendererID m_renderer;                  /**< The actual renderer (may be different from the preferred one) */
     std::string m_windowTitle;              /**< Title of the window */

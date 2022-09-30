@@ -161,16 +161,14 @@ void Window::initForVulkan13() {
         goto fail;
     }
 
-    if (!VK13Fixture::prepare(m_SDLwindow)) goto fail_Vulkan_SDLWindow;
+    if (!VK13Fixture::initialize(m_SDLwindow)) goto fail_SDLWindow;
 
-    if (!ImGui_ImplSDL2_InitForVulkan(m_SDLwindow)) goto fail_Vulkan_SDLWindow;
+    if (!ImGui_ImplSDL2_InitForVulkan(m_SDLwindow)) goto fail_SDLWindow;
     //if (!ImGui_ImplVulkan_Init("#version 460 core")) goto fail_SDLWindow_Vulkan;
 
     m_renderer = RendererID::VULKAN13;
     return;
 
-fail_Vulkan_SDLWindow:
-    m_unionBytes.fill(std::byte(0x0));
 fail_SDLWindow:
     SDL_DestroyWindow(m_SDLwindow);
     m_SDLwindow = nullptr;
