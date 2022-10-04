@@ -2,7 +2,9 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <vulkan/vulkan.hpp>
+#include <optional>
+
+#include <vulkan/vulkan_raii.hpp>
 
 #include <RealEngine/rendering/internal_renderers/VK13Buffer.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Capabilities.hpp>
@@ -38,25 +40,9 @@ public:
     */
     static bool initialize(SDL_Window* sdlWindow);
 
-    VK13Fixture(const VK13Fixture&) = delete;
-    VK13Fixture& operator=(const VK13Fixture&) = delete;
+    VK13Fixture(SDL_Window* sdlWindow);
 
 private:
-
-    VK13Fixture();
-    ~VK13Fixture();
-
-    enum class Initialized {
-        COMMAND_BUFFER,
-        COMMAND_POOL,
-        DEVICE,
-        INSTANCE,
-        NOTHING
-    };
-
-    bool init(SDL_Window* sdlWindow);
-
-    void destroy(bool throwException);
 
 
     class Implementations {
@@ -95,14 +81,21 @@ private:
         ViewportState m_viewportState;
     };
 
-    static VK13Fixture s_fixture;
+    static std::optional<VK13Fixture> s_fixture;
 
-    Initialized m_init = Initialized::NOTHING;
-    vk::Instance m_instance;
-    vk::Device m_device;
-    vk::CommandPool m_commandPool;
-    vk::CommandBuffer m_commandBuffer;
-    vk::SurfaceKHR m_surface;
+    vk::raii::Context m_context{};
+    vk::raii::Instance m_instance;
+    vk::raii::Device m_device;
+    size_t m_graphicsQueueFamilyIndex{};
+    vk::raii::CommandPool m_commandPool;
+    vk::raii::CommandBuffer m_commandBuffer;
+    vk::raii::SurfaceKHR m_surface;
+
+    vk::raii::Instance createInstance(SDL_Window* sdlWindow);
+    vk::raii::Device createDevice();
+    vk::raii::CommandPool createCommandPool();
+    vk::raii::CommandBuffer createCommandBuffer();
+    vk::raii::SurfaceKHR createSurface(SDL_Window* sdlWindow);
 
     Implementations m_impls;
 };

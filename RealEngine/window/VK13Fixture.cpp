@@ -17,90 +17,74 @@
 
 namespace RE {
 
-VK13Fixture VK13Fixture::s_fixture{};
+std::optional<VK13Fixture> VK13Fixture::s_fixture{};
+
+constexpr vk::ApplicationInfo APP_INFO("RealEngine", 1, "RealEngine", RE_VERSION, VK_API_VERSION_1_3);
 
 bool VK13Fixture::initialize(SDL_Window* sdlWindow) {
-    return s_fixture.init(sdlWindow);
-}
-
-VK13Fixture::VK13Fixture() {
-    
-}
-
-VK13Fixture::~VK13Fixture() {
-    destroy(false);
-}
-
-bool VK13Fixture::init(SDL_Window* sdlWindow) {
-    using enum VK13Fixture::Initialized;
     try {
-        //Get number of required extensions
-        unsigned int instanceExtensionCount;
-        if (!SDL_Vulkan_GetInstanceExtensions(sdlWindow, &instanceExtensionCount, nullptr)) {
-            destroy(true);
-        }
-        std::vector<const char*> instanceExtensions{instanceExtensionCount};
-        if (!SDL_Vulkan_GetInstanceExtensions(sdlWindow, &instanceExtensionCount, instanceExtensions.data())) {
-            destroy(true);
-        }
-
-        //Create Vulkan instance
-        vk::ApplicationInfo applicationInfo("RealEngine", 1, "RealEngine", RE_VERSION, VK_API_VERSION_1_3);
-        vk::InstanceCreateInfo instanceCreateInfo({}, &applicationInfo, {}, instanceExtensions);
-        m_instance = vk::createInstance(instanceCreateInfo);
-        m_init = INSTANCE;
-
-        //Select physical device and its queue
-        vk::PhysicalDevice physicalDevice = m_instance.enumeratePhysicalDevices().front();
-        std::vector<vk::QueueFamilyProperties> queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
-        auto propertyIterator = std::find_if(queueFamilyProperties.begin(),
-                                                queueFamilyProperties.end(),
-                                                [](vk::QueueFamilyProperties const& qfp) { return qfp.queueFlags & vk::QueueFlagBits::eGraphics; });
-        size_t graphicsQueueFamilyIndex = std::distance(queueFamilyProperties.begin(), propertyIterator);
-        assert(graphicsQueueFamilyIndex < queueFamilyProperties.size());
-
-        //Create device
-        float deviceQueuePriority = 1.0f;
-        vk::DeviceQueueCreateInfo deviceQueueCreateInfo(vk::DeviceQueueCreateFlags(), static_cast<uint32_t>(graphicsQueueFamilyIndex), 1, &deviceQueuePriority);
-        m_device = physicalDevice.createDevice(vk::DeviceCreateInfo(vk::DeviceCreateFlags(), deviceQueueCreateInfo));
-        m_init = DEVICE;
-
-        //Create commnad pool
-        m_commandPool = m_device.createCommandPool(vk::CommandPoolCreateInfo(vk::CommandPoolCreateFlags(), graphicsQueueFamilyIndex));
-        m_init = COMMAND_POOL;
-
-        //Create commnad buffer
-        m_commandBuffer = m_device.allocateCommandBuffers(vk::CommandBufferAllocateInfo(m_commandPool, vk::CommandBufferLevel::ePrimary, 1)).front();
-        m_init = COMMAND_BUFFER;
-
-        if (!SDL_Vulkan_CreateSurface(sdlWindow, m_instance, reinterpret_cast<VkSurfaceKHR*>(&m_surface))) {
-            destroy(true);
-        }
-    }
-    catch (std::exception& e) {
-        destroy(false);
+        s_fixture.emplace(sdlWindow);
+    } catch (std::exception&) {
         return false;
     }
     return true;
 }
 
-void VK13Fixture::destroy(bool throwException) {
-    using enum VK13Fixture::Initialized;
-    switch (m_init) {
-    case COMMAND_BUFFER:
-        m_device.freeCommandBuffers(m_commandPool, m_commandBuffer);
-    case COMMAND_POOL:
-        m_device.destroyCommandPool(m_commandPool);
-    case DEVICE:
-        m_device.destroy();
-    case INSTANCE:
-        m_instance.destroy();
-    case NOTHING:
-        m_init = NOTHING;
+VK13Fixture::VK13Fixture(SDL_Window* sdlWindow):
+    m_instance(createInstance(sdlWindow)),
+    m_device(createDevice()),
+    m_commandPool(createCommandPool()),
+    m_commandBuffer(createCommandBuffer()),
+    m_surface(createSurface(sdlWindow)) {
+    
+}
+
+vk::raii::Instance VK13Fixture::createInstance(SDL_Window* sdlWindow) {
+    //Get number of required extensions
+    unsigned int instanceExtensionCount;
+    if (!SDL_Vulkan_GetInstanceExtensions(sdlWindow, &instanceExtensionCount, nullptr)) {
+        throw std::runtime_error("Could not get number of Vulkan extensions required for SDL2!");
     }
-    if (throwException) {
-        throw std::exception("Vulkan initialization failed");
+    std::vector<const char*> instanceExtensions{instanceExtensionCount};
+    if (!SDL_Vulkan_GetInstanceExtensions(sdlWindow, &instanceExtensionCount, instanceExtensions.data())) {
+        throw std::runtime_error("Could not get Vulkan extensions required for SDL2!");
     }
+    //Create Vulkan instance
+    return {m_context, vk::InstanceCreateInfo{{}, &APP_INFO, {}, instanceExtensions}};
+}
+
+vk::raii::Device VK13Fixture::createDevice() {
+    //Select physical device and its queue
+    vk::raii::PhysicalDevice physicalDevice = m_instance.enumeratePhysicalDevices().front();
+    std::vector<vk::QueueFamilyProperties> queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
+    auto propertyIterator = std::find_if(queueFamilyProperties.begin(),
+                                            queueFamilyProperties.end(),
+                                            [](vk::QueueFamilyProperties const& qfp) { return qfp.queueFlags & vk::QueueFlagBits::eGraphics; });
+    m_graphicsQueueFamilyIndex = std::distance(queueFamilyProperties.begin(), propertyIterator);
+    assert(m_graphicsQueueFamilyIndex < queueFamilyProperties.size());
+
+    //Create device
+    float deviceQueuePriority = 1.0f;
+    vk::DeviceQueueCreateInfo deviceQueueCreateInfo(vk::DeviceQueueCreateFlags(), static_cast<uint32_t>(m_graphicsQueueFamilyIndex), 1, &deviceQueuePriority);
+
+    return {physicalDevice, vk::DeviceCreateInfo{vk::DeviceCreateFlags(), deviceQueueCreateInfo}};
+}
+
+vk::raii::CommandPool VK13Fixture::createCommandPool() {
+    return {m_device, vk::CommandPoolCreateInfo(vk::CommandPoolCreateFlags(), m_graphicsQueueFamilyIndex)};
+}
+
+vk::raii::CommandBuffer VK13Fixture::createCommandBuffer() {
+    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{*m_commandPool, vk::CommandBufferLevel::ePrimary, 1};
+    return {std::move(vk::raii::CommandBuffers{m_device, commandBufferAllocateInfo}.front())};
+}
+
+vk::raii::SurfaceKHR VK13Fixture::createSurface(SDL_Window* sdlWindow) {
+    VkSurfaceKHR surface;
+    if (!SDL_Vulkan_CreateSurface(sdlWindow, *m_instance, reinterpret_cast<VkSurfaceKHR*>(&surface))) {
+        throw std::runtime_error("SDL2 could not create Vulkan surface!");
+    }
+    return {m_instance, surface};
 }
 
 template<Renderer R>
