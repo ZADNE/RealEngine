@@ -3,6 +3,8 @@
  */
 #include <RealEngine/window/VK13Fixture.hpp>
 
+#include <iostream>
+
 #include <SDL2/SDL_vulkan.h>
 
 #include <RealEngine/window/WindowSubsystems.hpp>
@@ -15,76 +17,123 @@
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 
+using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
+using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
+
 namespace RE {
 
 std::optional<VK13Fixture> VK13Fixture::s_fixture{};
 
-constexpr vk::ApplicationInfo APP_INFO("RealEngine", 1, "RealEngine", RE_VERSION, VK_API_VERSION_1_3);
-
 bool VK13Fixture::initialize(SDL_Window* sdlWindow) {
     try {
         s_fixture.emplace(sdlWindow);
-    } catch (std::exception&) {
+    }
+    catch (std::exception&) {
         return false;
     }
     return true;
 }
 
-VK13Fixture::VK13Fixture(SDL_Window* sdlWindow):
+VK13Fixture::VK13Fixture(SDL_Window* sdlWindow) :
     m_instance(createInstance(sdlWindow)),
+#ifndef NDEBUG
+    m_debugUtilsMessenger(createDebugUtilsMessenger()),
+#endif // !NDEBUG
+    m_physicalDevice(createPhysicalDevice()),
     m_device(createDevice()),
     m_commandPool(createCommandPool()),
     m_commandBuffer(createCommandBuffer()),
-    m_surface(createSurface(sdlWindow)) {
-    
+    m_surface(createSurface(sdlWindow)),
+    m_swapchain(createSwapcahin()) {
+
 }
 
 vk::raii::Instance VK13Fixture::createInstance(SDL_Window* sdlWindow) {
-    //Get number of required extensions
-    unsigned int instanceExtensionCount;
-    if (!SDL_Vulkan_GetInstanceExtensions(sdlWindow, &instanceExtensionCount, nullptr)) {
+    //Prepare default layers and extensions
+    std::vector<const char*> extensions = {
+#ifndef NDEBUG
+        VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+#endif // !NDEBUG
+    };
+    std::vector<const char*> validationLayers = {
+#ifndef NDEBUG
+        "VK_LAYER_KHRONOS_validation"
+#endif // !NDEBUG
+    };
+
+    //Add extensions required by SDL2
+    unsigned int sdl2ExtensionCount;
+    if (!SDL_Vulkan_GetInstanceExtensions(sdlWindow, &sdl2ExtensionCount, nullptr)) {
         throw std::runtime_error("Could not get number of Vulkan extensions required for SDL2!");
     }
-    std::vector<const char*> instanceExtensions{instanceExtensionCount};
-    if (!SDL_Vulkan_GetInstanceExtensions(sdlWindow, &instanceExtensionCount, instanceExtensions.data())) {
+    size_t defaultExtensionsCount = extensions.size();
+    extensions.resize(defaultExtensionsCount + sdl2ExtensionCount);
+    if (!SDL_Vulkan_GetInstanceExtensions(sdlWindow, &sdl2ExtensionCount, &extensions[defaultExtensionsCount])) {
         throw std::runtime_error("Could not get Vulkan extensions required for SDL2!");
     }
+
     //Create Vulkan instance
-    return {m_context, vk::InstanceCreateInfo{{}, &APP_INFO, {}, instanceExtensions}};
+    vk::ApplicationInfo applicationInfo("RealEngine", 1, "RealEngine", RE_VERSION, VK_API_VERSION_1_3);
+    vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo{{},
+        /*eVerbose | eInfo |*/ eWarning | eError,
+        eGeneral | eValidation | ePerformance,
+        &VK13Fixture::debugMessengerCallback
+    };
+    return vk::raii::Instance{m_context, vk::InstanceCreateInfo{{}, &applicationInfo, validationLayers, extensions, &debugMessengerCreateInfo}};
+}
+
+vk::raii::DebugUtilsMessengerEXT VK13Fixture::createDebugUtilsMessenger() {
+    vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo{{},
+        /*eVerbose | eInfo |*/ eWarning | eError,
+        eGeneral | eValidation | ePerformance,
+        &VK13Fixture::debugMessengerCallback
+    };
+    return vk::raii::DebugUtilsMessengerEXT{m_instance, debugMessengerCreateInfo};
+}
+
+vk::raii::PhysicalDevice VK13Fixture::createPhysicalDevice() {
+    return vk::raii::PhysicalDevices{m_instance}.front();
 }
 
 vk::raii::Device VK13Fixture::createDevice() {
-    //Select physical device and its queue
-    vk::raii::PhysicalDevice physicalDevice = m_instance.enumeratePhysicalDevices().front();
-    std::vector<vk::QueueFamilyProperties> queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
+    //Select queue of the physical device
+    std::vector<vk::QueueFamilyProperties> queueFamilyProperties = m_physicalDevice.getQueueFamilyProperties();
     auto propertyIterator = std::find_if(queueFamilyProperties.begin(),
                                             queueFamilyProperties.end(),
                                             [](vk::QueueFamilyProperties const& qfp) { return qfp.queueFlags & vk::QueueFlagBits::eGraphics; });
-    m_graphicsQueueFamilyIndex = std::distance(queueFamilyProperties.begin(), propertyIterator);
+    m_graphicsQueueFamilyIndex = static_cast<uint32_t>(std::distance(queueFamilyProperties.begin(), propertyIterator));
     assert(m_graphicsQueueFamilyIndex < queueFamilyProperties.size());
 
     //Create device
     float deviceQueuePriority = 1.0f;
     vk::DeviceQueueCreateInfo deviceQueueCreateInfo(vk::DeviceQueueCreateFlags(), static_cast<uint32_t>(m_graphicsQueueFamilyIndex), 1, &deviceQueuePriority);
-
-    return {physicalDevice, vk::DeviceCreateInfo{vk::DeviceCreateFlags(), deviceQueueCreateInfo}};
+    return vk::raii::Device{m_physicalDevice, vk::DeviceCreateInfo{vk::DeviceCreateFlags(), deviceQueueCreateInfo}};
 }
 
 vk::raii::CommandPool VK13Fixture::createCommandPool() {
-    return {m_device, vk::CommandPoolCreateInfo(vk::CommandPoolCreateFlags(), m_graphicsQueueFamilyIndex)};
+    return vk::raii::CommandPool{m_device, vk::CommandPoolCreateInfo(vk::CommandPoolCreateFlags(), m_graphicsQueueFamilyIndex)};
 }
 
 vk::raii::CommandBuffer VK13Fixture::createCommandBuffer() {
     vk::CommandBufferAllocateInfo commandBufferAllocateInfo{*m_commandPool, vk::CommandBufferLevel::ePrimary, 1};
-    return {std::move(vk::raii::CommandBuffers{m_device, commandBufferAllocateInfo}.front())};
+    return vk::raii::CommandBuffer{std::move(vk::raii::CommandBuffers{m_device, commandBufferAllocateInfo}.front())};
 }
 
 vk::raii::SurfaceKHR VK13Fixture::createSurface(SDL_Window* sdlWindow) {
     VkSurfaceKHR surface;
-    if (!SDL_Vulkan_CreateSurface(sdlWindow, *m_instance, reinterpret_cast<VkSurfaceKHR*>(&surface))) {
+    if (!SDL_Vulkan_CreateSurface(sdlWindow, *m_instance, &surface)) {
         throw std::runtime_error("SDL2 could not create Vulkan surface!");
     }
-    return {m_instance, surface};
+    return vk::raii::SurfaceKHR{m_instance, surface};
+}
+
+vk::raii::SwapchainKHR VK13Fixture::createSwapcahin() {
+    return vk::raii::SwapchainKHR{m_device, {}};
+}
+
+VkBool32 VK13Fixture::debugMessengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT sev, VkDebugUtilsMessageTypeFlagsEXT type, const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData) {
+    std::cout << callbackData->pMessage << '\n';
+    return VK_FALSE;
 }
 
 template<Renderer R>

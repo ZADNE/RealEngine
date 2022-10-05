@@ -85,19 +85,33 @@ private:
 
     vk::raii::Context m_context{};
     vk::raii::Instance m_instance;
+#ifndef NDEBUG
+    vk::raii::DebugUtilsMessengerEXT m_debugUtilsMessenger;
+#endif // !NDEBUG
+    vk::raii::PhysicalDevice m_physicalDevice;
     vk::raii::Device m_device;
-    size_t m_graphicsQueueFamilyIndex{};
+    uint32_t m_graphicsQueueFamilyIndex{};
     vk::raii::CommandPool m_commandPool;
     vk::raii::CommandBuffer m_commandBuffer;
     vk::raii::SurfaceKHR m_surface;
+    vk::raii::SwapchainKHR m_swapchain;
+
+    Implementations m_impls;
 
     vk::raii::Instance createInstance(SDL_Window* sdlWindow);
+    vk::raii::DebugUtilsMessengerEXT createDebugUtilsMessenger();
+    vk::raii::PhysicalDevice createPhysicalDevice();
     vk::raii::Device createDevice();
     vk::raii::CommandPool createCommandPool();
     vk::raii::CommandBuffer createCommandBuffer();
     vk::raii::SurfaceKHR createSurface(SDL_Window* sdlWindow);
+    vk::raii::SwapchainKHR createSwapcahin();
 
-    Implementations m_impls;
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallback(
+        VkDebugUtilsMessageSeverityFlagBitsEXT sev,
+        VkDebugUtilsMessageTypeFlagsEXT type,
+        const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
+        void* userData);
 };
 
 }
