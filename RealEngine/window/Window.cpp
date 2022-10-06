@@ -38,9 +38,6 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
         }
     }
 
-    //Set vertical synchronisation
-    setVSync(m_flags.vSync, false);
-
     Viewport<>::s_state->windowSize = m_dims;
     Viewport<>::s_state->trackingWindow = true;
 
@@ -161,7 +158,10 @@ void Window::initForVulkan13() {
         goto fail;
     }
 
-    if (!VK13Fixture::initialize(m_SDLwindow)) goto fail_SDLWindow;
+    glm::ivec2 windowPx;
+    SDL_Vulkan_GetDrawableSize(m_SDLwindow, &windowPx.x, &windowPx.y);
+
+    if (!VK13Fixture::initialize(m_SDLwindow, windowPx, m_flags.vSync)) goto fail_SDLWindow;
 
     if (!ImGui_ImplSDL2_InitForVulkan(m_SDLwindow)) goto fail_SDLWindow;
     //if (!ImGui_ImplVulkan_Init("#version 460 core")) goto fail_SDLWindow_Vulkan;
@@ -194,6 +194,9 @@ void Window::initForGL46() {
 
     //Initialize some global states to RealEngine-default values
     GL46Fixture::initialize();
+
+    //Set vertical synchronisation
+    setVSync(m_flags.vSync, false);
 
     if (!ImGui_ImplSDL2_InitForOpenGL(m_SDLwindow, m_gl46.context)) goto fail_GLContext_SDLWindow;
     if (!ImGui_ImplOpenGL3_Init("#version 460 core")) goto fail_GLContext_SDLWindow;

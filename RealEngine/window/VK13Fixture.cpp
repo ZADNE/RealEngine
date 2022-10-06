@@ -3,6 +3,7 @@
  */
 #include <RealEngine/window/VK13Fixture.hpp>
 
+#include <bitset>
 #include <iostream>
 
 #include <SDL2/SDL_vulkan.h>
@@ -24,9 +25,13 @@ namespace RE {
 
 std::optional<VK13Fixture> VK13Fixture::s_fixture{};
 
-bool VK13Fixture::initialize(SDL_Window* sdlWindow) {
+static constexpr std::array DEVICE_EXTENSIONS = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
+
+bool VK13Fixture::initialize(SDL_Window* sdlWindow, const glm::ivec2& windowPx, bool vSync) {
     try {
-        s_fixture.emplace(sdlWindow);
+        s_fixture.emplace(sdlWindow, windowPx, vSync);
     }
     catch (std::exception&) {
         return false;
@@ -34,17 +39,19 @@ bool VK13Fixture::initialize(SDL_Window* sdlWindow) {
     return true;
 }
 
-VK13Fixture::VK13Fixture(SDL_Window* sdlWindow) :
+VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, const glm::ivec2& windowPx, bool vSync) :
     m_instance(createInstance(sdlWindow)),
 #ifndef NDEBUG
     m_debugUtilsMessenger(createDebugUtilsMessenger()),
 #endif // !NDEBUG
+    m_surface(createSurface(sdlWindow)),
     m_physicalDevice(createPhysicalDevice()),
     m_device(createDevice()),
+    m_graphicsQueue(createQueue(m_graphicsQueueFamilyIndex)),
+    m_presentationQueue(createQueue(m_presentationQueueFamilyIndex)),
+    m_swapchain(createSwapchain()),
     m_commandPool(createCommandPool()),
-    m_commandBuffer(createCommandBuffer()),
-    m_surface(createSurface(sdlWindow)),
-    m_swapchain(createSwapcahin()) {
+    m_commandBuffer(createCommandBuffer()) {
 
 }
 
@@ -91,34 +98,6 @@ vk::raii::DebugUtilsMessengerEXT VK13Fixture::createDebugUtilsMessenger() {
     return vk::raii::DebugUtilsMessengerEXT{m_instance, debugMessengerCreateInfo};
 }
 
-vk::raii::PhysicalDevice VK13Fixture::createPhysicalDevice() {
-    return vk::raii::PhysicalDevices{m_instance}.front();
-}
-
-vk::raii::Device VK13Fixture::createDevice() {
-    //Select queue of the physical device
-    std::vector<vk::QueueFamilyProperties> queueFamilyProperties = m_physicalDevice.getQueueFamilyProperties();
-    auto propertyIterator = std::find_if(queueFamilyProperties.begin(),
-                                            queueFamilyProperties.end(),
-                                            [](vk::QueueFamilyProperties const& qfp) { return qfp.queueFlags & vk::QueueFlagBits::eGraphics; });
-    m_graphicsQueueFamilyIndex = static_cast<uint32_t>(std::distance(queueFamilyProperties.begin(), propertyIterator));
-    assert(m_graphicsQueueFamilyIndex < queueFamilyProperties.size());
-
-    //Create device
-    float deviceQueuePriority = 1.0f;
-    vk::DeviceQueueCreateInfo deviceQueueCreateInfo(vk::DeviceQueueCreateFlags(), static_cast<uint32_t>(m_graphicsQueueFamilyIndex), 1, &deviceQueuePriority);
-    return vk::raii::Device{m_physicalDevice, vk::DeviceCreateInfo{vk::DeviceCreateFlags(), deviceQueueCreateInfo}};
-}
-
-vk::raii::CommandPool VK13Fixture::createCommandPool() {
-    return vk::raii::CommandPool{m_device, vk::CommandPoolCreateInfo(vk::CommandPoolCreateFlags(), m_graphicsQueueFamilyIndex)};
-}
-
-vk::raii::CommandBuffer VK13Fixture::createCommandBuffer() {
-    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{*m_commandPool, vk::CommandBufferLevel::ePrimary, 1};
-    return vk::raii::CommandBuffer{std::move(vk::raii::CommandBuffers{m_device, commandBufferAllocateInfo}.front())};
-}
-
 vk::raii::SurfaceKHR VK13Fixture::createSurface(SDL_Window* sdlWindow) {
     VkSurfaceKHR surface;
     if (!SDL_Vulkan_CreateSurface(sdlWindow, *m_instance, &surface)) {
@@ -127,13 +106,84 @@ vk::raii::SurfaceKHR VK13Fixture::createSurface(SDL_Window* sdlWindow) {
     return vk::raii::SurfaceKHR{m_instance, surface};
 }
 
-vk::raii::SwapchainKHR VK13Fixture::createSwapcahin() {
-    return vk::raii::SwapchainKHR{m_device, {}};
+vk::raii::PhysicalDevice VK13Fixture::createPhysicalDevice() {
+    for (const auto& physicalDevice : vk::raii::PhysicalDevices{m_instance}) {//Iterate over all physical device
+        if (areExtensionsSupported(physicalDevice) && isSwapchainSupported(physicalDevice) && findQueueFamilyIndices(physicalDevice)) {
+            return physicalDevice;
+        }
+    }
+    throw std::runtime_error("No physical device is suitable");
+}
+
+vk::raii::Device VK13Fixture::createDevice() {
+    float deviceQueuePriority = 1.0f;
+    std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos;
+    deviceQueueCreateInfos.emplace_back(vk::DeviceQueueCreateFlags{}, m_graphicsQueueFamilyIndex, 1, &deviceQueuePriority);
+    if (m_graphicsQueueFamilyIndex != m_presentationQueueFamilyIndex) {
+        deviceQueueCreateInfos.emplace_back(vk::DeviceQueueCreateFlags{}, m_presentationQueueFamilyIndex, 1, &deviceQueuePriority);
+    }
+    return vk::raii::Device{m_physicalDevice, vk::DeviceCreateInfo{vk::DeviceCreateFlags{}, deviceQueueCreateInfos, {}, DEVICE_EXTENSIONS}};
+}
+
+vk::raii::Queue VK13Fixture::createQueue(uint32_t familyIndex) {
+    return vk::raii::Queue{m_device, familyIndex, 0u};
+}
+
+vk::raii::SwapchainKHR VK13Fixture::createSwapchain() {
+    auto capabilities = m_physicalDevice.getSurfaceCapabilitiesKHR(*m_surface);
+    std::cout << capabilities.currentExtent.width << ' ' << capabilities.currentExtent.height;
+    vk::SwapchainCreateInfoKHR createInfo{};
+    return vk::raii::SwapchainKHR{m_device, createInfo};
+}
+
+vk::raii::CommandPool VK13Fixture::createCommandPool() {
+    return vk::raii::CommandPool{m_device, vk::CommandPoolCreateInfo{vk::CommandPoolCreateFlags{}, m_graphicsQueueFamilyIndex}};
+}
+
+vk::raii::CommandBuffer VK13Fixture::createCommandBuffer() {
+    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{*m_commandPool, vk::CommandBufferLevel::ePrimary, 1};
+    return vk::raii::CommandBuffer{std::move(vk::raii::CommandBuffers{m_device, commandBufferAllocateInfo}.front())};
 }
 
 VkBool32 VK13Fixture::debugMessengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT sev, VkDebugUtilsMessageTypeFlagsEXT type, const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData) {
     std::cout << callbackData->pMessage << '\n';
     return VK_FALSE;
+}
+
+bool VK13Fixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice) {
+    std::bitset<DEVICE_EXTENSIONS.size()> supported{};
+    for (const auto& extensionProperties : physicalDevice.enumerateDeviceExtensionProperties()) {
+        for (size_t i = 0; i < DEVICE_EXTENSIONS.size(); ++i) {
+            if (strcmp(extensionProperties.extensionName.data(), DEVICE_EXTENSIONS[i]) == 0) {
+                supported[i] = true;
+            }
+        }
+    }
+    return supported.all();
+}
+
+bool VK13Fixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice) {
+    return true;
+}
+
+bool VK13Fixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice) {
+    bool graphicsQueueFound = false;
+    bool presentQueueFound = false;
+    std::vector<vk::QueueFamilyProperties> queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
+    for (size_t i = 0; i < queueFamilyProperties.size(); i++) {//Iterate over all queue families
+        if (queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eGraphics) {
+            m_graphicsQueueFamilyIndex = i;
+            graphicsQueueFound = true;
+        }
+        if (physicalDevice.getSurfaceSupportKHR(i, *m_surface)) {
+            m_presentationQueueFamilyIndex = i;
+            presentQueueFound = true;
+        }
+        if (graphicsQueueFound && presentQueueFound) {
+            return true;
+        }
+    }
+    return false;
 }
 
 template<Renderer R>

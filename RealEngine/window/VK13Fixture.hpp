@@ -33,17 +33,12 @@ public:
     * @brief Tries to prepare for creation of Vulkan 1.3 context.
     * @return True if succeeded.
     * @warning Do not call use() if this fails.
-    *
-    * Requires SDL2 to be initialized.
-    *
-    * @note To be called only once at the start of the program.
     */
-    static bool initialize(SDL_Window* sdlWindow);
+    static bool initialize(SDL_Window* sdlWindow, const glm::ivec2& windowPx, bool vSync);
 
-    VK13Fixture(SDL_Window* sdlWindow);
+    VK13Fixture(SDL_Window* sdlWindow, const glm::ivec2& windowPx, bool vSync);
 
 private:
-
 
     class Implementations {
     public:
@@ -88,30 +83,37 @@ private:
 #ifndef NDEBUG
     vk::raii::DebugUtilsMessengerEXT m_debugUtilsMessenger;
 #endif // !NDEBUG
+    vk::raii::SurfaceKHR m_surface;
+    uint32_t m_graphicsQueueFamilyIndex;
+    uint32_t m_presentationQueueFamilyIndex;
     vk::raii::PhysicalDevice m_physicalDevice;
     vk::raii::Device m_device;
-    uint32_t m_graphicsQueueFamilyIndex{};
+    vk::raii::Queue m_graphicsQueue;
+    vk::raii::Queue m_presentationQueue;
+    vk::raii::SwapchainKHR m_swapchain;
     vk::raii::CommandPool m_commandPool;
     vk::raii::CommandBuffer m_commandBuffer;
-    vk::raii::SurfaceKHR m_surface;
-    vk::raii::SwapchainKHR m_swapchain;
 
     Implementations m_impls;
 
     vk::raii::Instance createInstance(SDL_Window* sdlWindow);
     vk::raii::DebugUtilsMessengerEXT createDebugUtilsMessenger();
+    vk::raii::SurfaceKHR createSurface(SDL_Window* sdlWindow);
     vk::raii::PhysicalDevice createPhysicalDevice();
     vk::raii::Device createDevice();
+    vk::raii::Queue createQueue(uint32_t familyIndex);
+    vk::raii::SwapchainKHR createSwapchain();
     vk::raii::CommandPool createCommandPool();
     vk::raii::CommandBuffer createCommandBuffer();
-    vk::raii::SurfaceKHR createSurface(SDL_Window* sdlWindow);
-    vk::raii::SwapchainKHR createSwapcahin();
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT sev,
         VkDebugUtilsMessageTypeFlagsEXT type,
         const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
         void* userData);
+    bool areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice);
+    bool isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice);
+    bool findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice);
 };
 
 }
