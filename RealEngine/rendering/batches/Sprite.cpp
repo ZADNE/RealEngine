@@ -87,17 +87,16 @@ glm::vec2 SpriteComplex<R>::getScale() const {
     return m_scale;
 }
 
-template SpriteStatic<RendererLateBind>;
-template SpriteStatic<RendererVK13>;
-template SpriteStatic<RendererVK13>;
-template SpriteStatic<RendererGL46>;
-template SpriteAnimated<RendererLateBind>;
-template SpriteAnimated<RendererVK13>;
-template SpriteAnimated<RendererVK13>;
-template SpriteAnimated<RendererGL46>;
-template SpriteComplex<RendererLateBind>;
-template SpriteComplex<RendererVK13>;
-template SpriteComplex<RendererVK13>;
-template SpriteComplex<RendererGL46>;
+template class SpriteStatic<RendererLateBind>;
+template class SpriteStatic<RendererVK13>;
+template class SpriteStatic<RendererGL46>;
+
+template class SpriteAnimated<RendererLateBind>;
+template class SpriteAnimated<RendererVK13>;
+template class SpriteAnimated<RendererGL46>;
+
+template class SpriteComplex<RendererLateBind>;
+template class SpriteComplex<RendererVK13>;
+template class SpriteComplex<RendererGL46>;
 
 }

@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <cstddef>
 #include <utility>
 
 #include <RealEngine/rendering/buffers/BufferTypedIndex.hpp>

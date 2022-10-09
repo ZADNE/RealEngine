@@ -20,8 +20,8 @@ void Viewport<R>::setToWholeWindow() {
     s_state->trackingWindow = true;
 }
 
-template Viewport<RendererLateBind>;
-template Viewport<RendererVK13>;
-template Viewport<RendererGL46>;
+template class Viewport<RendererLateBind>;
+template class Viewport<RendererVK13>;
+template class Viewport<RendererGL46>;
 
 }

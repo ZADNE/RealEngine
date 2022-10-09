@@ -105,8 +105,8 @@ template<Renderer R> void ShaderProgram<R>::setUniform(int location, int count, 
 template<Renderer R> void ShaderProgram<R>::setUniform(int location, TextureUnit unit) const { s_impl->setUniform(m_id, location, unit); }
 template<Renderer R> void ShaderProgram<R>::setUniform(int location, ImageUnit unit) const { s_impl->setUniform(m_id, location, unit); }
 
-template ShaderProgram<RendererLateBind>;
-template ShaderProgram<RendererVK13>;
-template ShaderProgram<RendererGL46>;
+template class ShaderProgram<RendererLateBind>;
+template class ShaderProgram<RendererVK13>;
+template class ShaderProgram<RendererGL46>;
 
 }

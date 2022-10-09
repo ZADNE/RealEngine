@@ -121,8 +121,8 @@ void* Buffer<R>::map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageF
     return s_impl->map(m_id, offsetInBytes, lengthInBytes, mappingUsage);
 }
 
-template Buffer<RendererLateBind>;
-template Buffer<RendererVK13>;
-template Buffer<RendererGL46>;
+template class Buffer<RendererLateBind>;
+template class Buffer<RendererVK13>;
+template class Buffer<RendererGL46>;
 
 }

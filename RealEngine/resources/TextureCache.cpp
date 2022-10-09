@@ -6,7 +6,7 @@
 namespace RE {
 
 TextureUnion::TextureUnion(const std::string& filePathPNG) :
-    m_lateBindTex(filePathPNG) {}
+    m_lateBindTex(filePathPNG, Texture<RendererLateBind>::DEFAULT_PARAMETERS) {}
 
 TextureUnion::~TextureUnion() {
     m_lateBindTex.~Texture();

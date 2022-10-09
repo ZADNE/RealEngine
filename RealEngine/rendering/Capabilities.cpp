@@ -23,8 +23,8 @@ void BlendingCapability<R>::set(bool enabled) {
     Capabilities<R>::s_impl->set(Capability::BLENDING, enabled);
 }
 
-template BlendingCapability<RendererLateBind>;
-template BlendingCapability<RendererVK13>;
-template BlendingCapability<RendererGL46>;
+template class BlendingCapability<RendererLateBind>;
+template class BlendingCapability<RendererVK13>;
+template class BlendingCapability<RendererGL46>;
 
 }

@@ -127,12 +127,12 @@ void DefaultFrameBuffer<R>::clearDepthAndStencil(float depth, int stencil) {
     s_defaultFramebuffer->clearDepthAndStencilAttachments(depth, stencil);
 }
 
-template Framebuffer<RendererLateBind>;
-template Framebuffer<RendererVK13>;
-template Framebuffer<RendererGL46>;
+template class Framebuffer<RendererLateBind>;
+template class Framebuffer<RendererVK13>;
+template class Framebuffer<RendererGL46>;
 
-template DefaultFrameBuffer<RendererLateBind>;
-template DefaultFrameBuffer<RendererVK13>;
-template DefaultFrameBuffer<RendererGL46>;
+template class DefaultFrameBuffer<RendererLateBind>;
+template class DefaultFrameBuffer<RendererVK13>;
+template class DefaultFrameBuffer<RendererGL46>;
 
 }

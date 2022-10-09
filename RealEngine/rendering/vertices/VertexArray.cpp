@@ -94,8 +94,8 @@ void VertexArray<R>::renderElementsBaseVertex(Primitive prim, size_t count, Inde
     s_impl->renderElementsBaseVertex(m_id, prim, count, type, indices, instancecount, basevertex);
 }
 
-template VertexArray<RendererLateBind>;
-template VertexArray<RendererVK13>;
-template VertexArray<RendererGL46>;
+template class VertexArray<RendererLateBind>;
+template class VertexArray<RendererVK13>;
+template class VertexArray<RendererGL46>;
 
 }

@@ -102,6 +102,7 @@ public:
     /**
      * @brief Constructs texture from PNG
      * @param filePathPNG Path to the PNG
+     * @param defParams Parameters that are used if reAl chunk could not be loaded.
      *
      * Parameters are either loaded from reAl chunk of PNG,
      * or if that cannot be done (reAl chunk is missing or it has bad format),
@@ -109,7 +110,7 @@ public:
      *
      * @see DEFAULT_PARAMETERS
     */
-    Texture(const std::string& filePathPNG);
+    Texture(const std::string& filePathPNG, const TextureParameters& defParams);
 
     /**
      * @brief Constructs texture from seed

@@ -153,9 +153,8 @@ void GeometryBatch<R>::switchShaderProgram(const ShaderProgramSources& sources) 
     m_shaderProgram = ShaderProgram<R>{sources};
 }
 
-template GeometryBatch<RendererLateBind>;
-template GeometryBatch<RendererVK13>;
-template GeometryBatch<RendererVK13>;
-template GeometryBatch<RendererGL46>;
+template class GeometryBatch<RendererLateBind>;
+template class GeometryBatch<RendererVK13>;
+template class GeometryBatch<RendererGL46>;
 
 }

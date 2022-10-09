@@ -3,6 +3,7 @@
  */
 #pragma once
 #include <optional>
+#include <memory>
 
 #include <vulkan/vulkan_raii.hpp>
 

@@ -28,8 +28,8 @@ void Ordering<R>::issueIncoherentAccessBarrier(IncoherentAccessBarrierFlags barr
     s_impl->issueIncoherentAccessBarrier(barriers);
 }
 
-template Ordering<RendererLateBind>;
-template Ordering<RendererVK13>;
-template Ordering<RendererGL46>;
+template class Ordering<RendererLateBind>;
+template class Ordering<RendererVK13>;
+template class Ordering<RendererGL46>;
 
 }

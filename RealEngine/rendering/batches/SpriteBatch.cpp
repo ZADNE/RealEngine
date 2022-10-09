@@ -328,9 +328,8 @@ void SpriteBatch<R>::createDrawBatches() {
     m_vbo.redefine(m_vertices.size() * sizeof(VertexPOCOUV), m_vertices.data());
 }
 
-template SpriteBatch<RendererLateBind>;
-template SpriteBatch<RendererVK13>;
-template SpriteBatch<RendererVK13>;
-template SpriteBatch<RendererGL46>;
+template class SpriteBatch<RendererLateBind>;
+template class SpriteBatch<RendererVK13>;
+template class SpriteBatch<RendererGL46>;
 
 }

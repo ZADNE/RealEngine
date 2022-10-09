@@ -62,9 +62,9 @@ Texture<R>& Texture<R>::operator=(Texture<R>&& other) noexcept {
 }
 
 template<Renderer R>
-Texture<R>::Texture(const std::string& filePathPNG) {
+Texture<R>::Texture(const std::string& filePathPNG, const TextureParameters& defParams) {
     PNGLoader::PNGData pngData{
-        .params = DEFAULT_PARAMETERS
+        .params = defParams
     };
 
     if (PNGLoader::load(filePathPNG, pngData) == 0) {
@@ -74,7 +74,7 @@ Texture<R>::Texture(const std::string& filePathPNG) {
 
 template<Renderer R>
 Texture<R>::Texture(const TextureSeed& seed) :
-    Texture<R>(seed.toFullPath()) {
+    Texture<R>(seed.toFullPath(), DEFAULT_PARAMETERS) {
 }
 
 template<Renderer R>
@@ -231,11 +231,12 @@ void Texture<R>::init(const Raster& raster, const TextureParameters& params) {
     setBorderColor(getBorderColor());
 }
 
-template TextureProxy<RendererLateBind>;
-template TextureProxy<RendererVK13>;
-template TextureProxy<RendererGL46>;
-template Texture<RendererLateBind>;
-template Texture<RendererVK13>;
-template Texture<RendererGL46>;
+template class TextureProxy<RendererLateBind>;
+template class TextureProxy<RendererVK13>;
+template class TextureProxy<RendererGL46>;
+
+template class Texture<RendererLateBind>;
+template class Texture<RendererVK13>;
+template class Texture<RendererGL46>;
 
 }
