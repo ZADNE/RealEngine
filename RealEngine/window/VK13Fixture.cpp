@@ -25,13 +25,18 @@ namespace RE {
 
 std::optional<VK13Fixture> VK13Fixture::s_fixture{};
 
-static constexpr std::array DEVICE_EXTENSIONS = {
+constexpr std::array DEVICE_EXTENSIONS = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-bool VK13Fixture::initialize(SDL_Window* sdlWindow, const glm::ivec2& windowPx, bool vSync) {
+constexpr vk::SurfaceFormatKHR SURFACE_FORMAT{
+    vk::Format::eB8G8R8A8Srgb,
+    vk::ColorSpaceKHR::eSrgbNonlinear
+};
+
+bool VK13Fixture::initialize(SDL_Window* sdlWindow, bool vSync) {
     try {
-        s_fixture.emplace(sdlWindow, windowPx, vSync);
+        s_fixture.emplace(sdlWindow, vSync);
     }
     catch (std::exception&) {
         return false;
@@ -39,7 +44,7 @@ bool VK13Fixture::initialize(SDL_Window* sdlWindow, const glm::ivec2& windowPx, 
     return true;
 }
 
-VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, const glm::ivec2& windowPx, bool vSync) :
+VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
     m_instance(createInstance(sdlWindow)),
 #ifndef NDEBUG
     m_debugUtilsMessenger(createDebugUtilsMessenger()),
@@ -49,7 +54,7 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, const glm::ivec2& windowPx, bool
     m_device(createDevice()),
     m_graphicsQueue(createQueue(m_graphicsQueueFamilyIndex)),
     m_presentationQueue(createQueue(m_presentationQueueFamilyIndex)),
-    m_swapchain(createSwapchain()),
+    m_swapchain(createSwapchain(sdlWindow, vSync)),
     m_commandPool(createCommandPool()),
     m_commandBuffer(createCommandBuffer()) {
 
@@ -112,7 +117,7 @@ vk::raii::PhysicalDevice VK13Fixture::createPhysicalDevice() {
             return physicalDevice;
         }
     }
-    throw std::runtime_error("No physical device is suitable");
+    throw std::runtime_error("No physical device is suitable!");
 }
 
 vk::raii::Device VK13Fixture::createDevice() {
@@ -129,9 +134,26 @@ vk::raii::Queue VK13Fixture::createQueue(uint32_t familyIndex) {
     return vk::raii::Queue{m_device, familyIndex, 0u};
 }
 
-vk::raii::SwapchainKHR VK13Fixture::createSwapchain() {
+vk::raii::SwapchainKHR VK13Fixture::createSwapchain(SDL_Window* sdlWindow, bool vSync) {
     auto capabilities = m_physicalDevice.getSurfaceCapabilitiesKHR(*m_surface);
-    std::cout << capabilities.currentExtent.width << ' ' << capabilities.currentExtent.height;
+    //Image count
+    uint32_t imageCount = glm::clamp(
+        capabilities.minImageCount + 1,
+        capabilities.minImageCount,
+        capabilities.maxImageCount ? capabilities.maxImageCount : 8
+    );
+
+    //Extent
+    vk::Extent2D extent;
+    if (capabilities.currentExtent == vk::Extent2D{0xFFFFFFFF, 0xFFFFFFFF}) {
+        extent = capabilities.currentExtent;
+    } else {
+        glm::ivec2 windowPx;
+        SDL_Vulkan_GetDrawableSize(sdlWindow, &windowPx.x, &windowPx.y);
+        extent.width = std::clamp(static_cast<uint32_t>(windowPx.x), capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+        extent.height = std::clamp(static_cast<uint32_t>(windowPx.y), capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+    }
+
     vk::SwapchainCreateInfoKHR createInfo{};
     return vk::raii::SwapchainKHR{m_device, createInfo};
 }
@@ -163,6 +185,11 @@ bool VK13Fixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physica
 }
 
 bool VK13Fixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice) {
+    for (const auto& format : physicalDevice.getSurfaceFormatsKHR(*m_surface)) {
+        if (format == SURFACE_FORMAT) {
+            true;
+        }
+    }
     return true;
 }
 

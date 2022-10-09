@@ -35,9 +35,9 @@ public:
     * @return True if succeeded.
     * @warning Do not call use() if this fails.
     */
-    static bool initialize(SDL_Window* sdlWindow, const glm::ivec2& windowPx, bool vSync);
+    static bool initialize(SDL_Window* sdlWindow, bool vSync);
 
-    VK13Fixture(SDL_Window* sdlWindow, const glm::ivec2& windowPx, bool vSync);
+    VK13Fixture(SDL_Window* sdlWindow, bool vSync);
 
 private:
 
@@ -103,7 +103,7 @@ private:
     vk::raii::PhysicalDevice createPhysicalDevice();
     vk::raii::Device createDevice();
     vk::raii::Queue createQueue(uint32_t familyIndex);
-    vk::raii::SwapchainKHR createSwapchain();
+    vk::raii::SwapchainKHR createSwapchain(SDL_Window* sdlWindow, bool vSync);
     vk::raii::CommandPool createCommandPool();
     vk::raii::CommandBuffer createCommandBuffer();
 

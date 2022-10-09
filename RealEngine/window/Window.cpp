@@ -4,8 +4,6 @@
  */
 #include <RealEngine/window/Window.hpp>
 
-#include <SDL2/SDL_vulkan.h>
-
 #include <ImGui/imgui_impl_sdl.h>
 #include <ImGui/imgui_impl_vulkan.h>
 #include <ImGui/imgui_impl_opengl3.h>
@@ -158,10 +156,7 @@ void Window::initForVulkan13() {
         goto fail;
     }
 
-    glm::ivec2 windowPx;
-    SDL_Vulkan_GetDrawableSize(m_SDLwindow, &windowPx.x, &windowPx.y);
-
-    if (!VK13Fixture::initialize(m_SDLwindow, windowPx, m_flags.vSync)) goto fail_SDLWindow;
+    if (!VK13Fixture::initialize(m_SDLwindow, m_flags.vSync)) goto fail_SDLWindow;
 
     if (!ImGui_ImplSDL2_InitForVulkan(m_SDLwindow)) goto fail_SDLWindow;
     //if (!ImGui_ImplVulkan_Init("#version 460 core")) goto fail_SDLWindow_Vulkan;
