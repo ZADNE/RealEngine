@@ -20,6 +20,11 @@
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
 using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
+using enum vk::SharingMode;
+using enum vk::ImageUsageFlagBits;
+using enum vk::CompositeAlphaFlagBitsKHR;
+using enum vk::PresentModeKHR;
+using enum vk::ImageViewType;
 
 namespace RE {
 
@@ -38,7 +43,8 @@ bool VK13Fixture::initialize(SDL_Window* sdlWindow, bool vSync) {
     try {
         s_fixture.emplace(sdlWindow, vSync);
     }
-    catch (std::exception&) {
+    catch (std::exception& e) {
+        std::cout << "Vulkan 1.3 could not be initialized because: " << e.what() << '\n';
         return false;
     }
     return true;
@@ -55,6 +61,7 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
     m_graphicsQueue(createQueue(m_graphicsQueueFamilyIndex)),
     m_presentationQueue(createQueue(m_presentationQueueFamilyIndex)),
     m_swapchain(createSwapchain(sdlWindow, vSync)),
+    m_swapchainImageViews(createSwapchainImageViews()),
     m_commandPool(createCommandPool()),
     m_commandBuffer(createCommandBuffer()) {
 
@@ -135,27 +142,50 @@ vk::raii::Queue VK13Fixture::createQueue(uint32_t familyIndex) {
 }
 
 vk::raii::SwapchainKHR VK13Fixture::createSwapchain(SDL_Window* sdlWindow, bool vSync) {
-    auto capabilities = m_physicalDevice.getSurfaceCapabilitiesKHR(*m_surface);
+    auto caps = m_physicalDevice.getSurfaceCapabilitiesKHR(*m_surface);
     //Image count
     uint32_t imageCount = glm::clamp(
-        capabilities.minImageCount + 1,
-        capabilities.minImageCount,
-        capabilities.maxImageCount ? capabilities.maxImageCount : 8
+        caps.minImageCount + 1,
+        caps.minImageCount,
+        caps.maxImageCount ? caps.maxImageCount : 8
     );
 
     //Extent
     vk::Extent2D extent;
-    if (capabilities.currentExtent == vk::Extent2D{0xFFFFFFFF, 0xFFFFFFFF}) {
-        extent = capabilities.currentExtent;
+    if (caps.currentExtent == vk::Extent2D{0xFFFFFFFF, 0xFFFFFFFF}) {
+        extent = caps.currentExtent;
     } else {
         glm::ivec2 windowPx;
         SDL_Vulkan_GetDrawableSize(sdlWindow, &windowPx.x, &windowPx.y);
-        extent.width = std::clamp(static_cast<uint32_t>(windowPx.x), capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
-        extent.height = std::clamp(static_cast<uint32_t>(windowPx.y), capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+        extent.width = std::clamp(static_cast<uint32_t>(windowPx.x), caps.minImageExtent.width, caps.maxImageExtent.width);
+        extent.height = std::clamp(static_cast<uint32_t>(windowPx.y), caps.minImageExtent.height, caps.maxImageExtent.height);
     }
 
-    vk::SwapchainCreateInfoKHR createInfo{};
+    //Sharing mode
+    bool oneQueueFamily = m_graphicsQueueFamilyIndex == m_presentationQueueFamilyIndex;
+    auto sharingMode = oneQueueFamily ? eExclusive : eConcurrent;
+    std::array queueFamilyIndices = {m_graphicsQueueFamilyIndex, m_presentationQueueFamilyIndex};
+    vk::SwapchainCreateInfoKHR createInfo{{}, *m_surface, imageCount,
+        SURFACE_FORMAT.format, SURFACE_FORMAT.colorSpace,
+        extent, 1u, eColorAttachment,
+        sharingMode, oneQueueFamily ? vk::ArrayProxyNoTemporaries<const uint32_t>{} : queueFamilyIndices,
+        caps.currentTransform, eOpaque,
+        vSync ? eMailbox : eImmediate, true
+    };
     return vk::raii::SwapchainKHR{m_device, createInfo};
+}
+
+std::vector<vk::raii::ImageView> VK13Fixture::createSwapchainImageViews() {
+    auto images = m_swapchain.getImages();
+    std::vector<vk::raii::ImageView> imageViews;
+    imageViews.reserve(images.size());
+    for (const auto& image : images) {
+        imageViews.emplace_back(m_device.createImageView(vk::ImageViewCreateInfo{{},
+            image, e2D, SURFACE_FORMAT.format, {},
+            vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0u, 1u, 0u, 1u}})
+        );
+    }
+    return imageViews;
 }
 
 vk::raii::CommandPool VK13Fixture::createCommandPool() {
@@ -185,12 +215,19 @@ bool VK13Fixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physica
 }
 
 bool VK13Fixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice) {
+    bool formatSupported = false;
     for (const auto& format : physicalDevice.getSurfaceFormatsKHR(*m_surface)) {
         if (format == SURFACE_FORMAT) {
-            true;
+            formatSupported = true; break;
         }
     }
-    return true;
+    bool mailboxSupported = false;
+    for (const auto& presentMode : physicalDevice.getSurfacePresentModesKHR(*m_surface)) {
+        if (presentMode == vk::PresentModeKHR::eMailbox) {
+            mailboxSupported = true; break;
+        }
+    }
+    return formatSupported && mailboxSupported;
 }
 
 bool VK13Fixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice) {

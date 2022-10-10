@@ -201,7 +201,7 @@ template<RE::Renderer R>
 void MainMenuRoom<R>::load(const std::string& loc) {
     if (loc.empty()) { return; }
     try {
-        m_texture = RE::Texture<R>{loc};
+        m_texture = RE::Texture<R>{loc, RE::Texture<R>::DEFAULT_PARAMETERS};
     }
     catch (...) {
         return;

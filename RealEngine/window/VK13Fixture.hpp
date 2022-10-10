@@ -92,6 +92,7 @@ private:
     vk::raii::Queue m_graphicsQueue;
     vk::raii::Queue m_presentationQueue;
     vk::raii::SwapchainKHR m_swapchain;
+    std::vector<vk::raii::ImageView> m_swapchainImageViews;
     vk::raii::CommandPool m_commandPool;
     vk::raii::CommandBuffer m_commandBuffer;
 
@@ -104,6 +105,7 @@ private:
     vk::raii::Device createDevice();
     vk::raii::Queue createQueue(uint32_t familyIndex);
     vk::raii::SwapchainKHR createSwapchain(SDL_Window* sdlWindow, bool vSync);
+    std::vector<vk::raii::ImageView> createSwapchainImageViews();
     vk::raii::CommandPool createCommandPool();
     vk::raii::CommandBuffer createCommandBuffer();
 
