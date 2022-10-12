@@ -77,7 +77,7 @@ private:
     ShaderProgramID compileProgram(const ShaderProgramSources& source) const;
 
     //Helper function
-    void compileShader(ShaderProgramID& sp, const ShaderSources& source, unsigned int shaderID) const;
+    void compileShader(ShaderProgramID& sp, const ShaderSourceRef& source, unsigned int shaderID) const;
 
     //Helper function
     void linkProgram(ShaderProgramID& sp) const;

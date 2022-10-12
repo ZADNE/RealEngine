@@ -8,7 +8,6 @@ add_subdirectory(textures)
 add_subdirectory(vertices)
 
 target_sources(RealEngine PRIVATE
-    BasicShaders.hpp            
     Capabilities.hpp            Capabilities.cpp
     Ordering.hpp                Ordering.cpp
     Renderer.hpp                

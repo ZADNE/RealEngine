@@ -6,7 +6,6 @@
 
 #include <RealEngine/rooms/Room.hpp>
 #include <RealEngine/program/CommandLineArguments.hpp>
-#include <RealEngine/rendering/BasicShaders.hpp>
 #include <RealEngine/rendering/buffers/BufferTyped.hpp>
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
@@ -16,9 +15,9 @@
 
 constexpr RE::BufferTypedIndex UNIF_BUF_VIEWPORT_MATRIX = {RE::BufferType::UNIFORM, 0u};
 
- /**
-  * @brief Room with the UI
- */
+/**
+ * @brief Room with the UI
+*/
 template<RE::Renderer R>
 class MainMenuRoom : public RE::Room {
 public:
@@ -39,8 +38,22 @@ private:
     void save(const std::string& loc);
     void load(const std::string& filePath);
 
-    RE::SpriteBatch<R> m_sb{{.vert = RE::sprite_vert, .frag = RE::sprite_frag}};
-    RE::GeometryBatch<R> m_gb{{.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
+    static constexpr std::array sprite_vert =
+    #include <RealEngine/rendering/basic_shaders/Sprite.vert.spv>
+        ;
+    static constexpr std::array sprite_frag =
+    #include <RealEngine/rendering/basic_shaders/Sprite.frag.spv>
+        ;
+
+    static constexpr std::array geometry_vert =
+    #include <RealEngine/rendering/basic_shaders/Geometry.vert.spv>
+        ;
+    static constexpr std::array geometry_frag =
+    #include <RealEngine/rendering/basic_shaders/Geometry.frag.spv>
+        ;
+
+    RE::SpriteBatch<R> m_sb{{.vert = sprite_vert,.frag = sprite_frag}};
+    RE::GeometryBatch<R> m_gb{{.vert = geometry_vert,.frag = geometry_frag}};
 
     //Texture
     std::optional<RE::Texture<R>> m_texture;

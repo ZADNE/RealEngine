@@ -2,9 +2,9 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <span>
 #include <string>
 #include <compare>
-#include <vector>
 #include <string_view>
 #include <initializer_list>
 
@@ -33,67 +33,16 @@ enum class ShaderType {
 };
 
 /**
-* @brief Represents source codes of a shader stage
+ * @brief Represents a non-owning handle to SPIR-V source codes of a shader stage
 */
-class ShaderSources {
-    friend class GL46Fixture; friend class VK13Fixture;
-    friend class GL46ShaderProgram;
-    template<typename T>friend struct std::hash;
-public:
-
-    /**
-     * @brief This string is prepended before the first given shader source
-    */
-    inline static std::string_view s_preamble = "#version 460 core\n";
-
-    /**
-     * @brief Constructs empty shader source
-     *
-     * This shader stage will not be used.
-    */
-    ShaderSources() {
-
-    }
-
-    /**
-     * @brief Constructs shader source from a single string
-     * @param source Source code of the shader
-    */
-    ShaderSources(std::string_view source) :
-        m_sources({s_preamble.data(), source.data()}),
-        m_lengths({static_cast<int>(s_preamble.size()), static_cast<int>(source.size())}) {
-
-    }
-
-    /**
-     * @brief Constructs shader source from initalizer list of strings
-     * @param list List of sources
-    */
-    ShaderSources(std::initializer_list<std::string_view> list) :
-        m_sources(list.size() + 1u),
-        m_lengths(list.size() + 1u) {
-        m_sources.emplace_back(s_preamble.data());
-        m_lengths.emplace_back(static_cast<int>(s_preamble.size()));
-        for (auto& sw : list) {
-            m_sources.emplace_back(sw.data());
-            m_lengths.emplace_back(static_cast<int>(sw.size()));
-        }
-    }
-
-    auto operator<=>(const ShaderSources&) const = default;
-
-private:
-
-    std::vector<const char*> m_sources{};/**< C-strings containing the sources */
-    std::vector<int> m_lengths{};/**< Lengths of the sources */
-};
+using ShaderSourceRef = std::span<const int>;
 
 /**
 * @brief POD representing source codes for all shaders within a shader program
 */
 struct ShaderProgramSources {
 
-    const ShaderSources& operator[](ShaderType type) const {
+    ShaderSourceRef operator[](ShaderType type) const {
         switch (type) {
         case RE::ShaderType::VERTEX: return vert;
         case RE::ShaderType::TESS_CONTROL: return tesc;
@@ -105,29 +54,12 @@ struct ShaderProgramSources {
         }
     }
 
-    auto operator<=>(const ShaderProgramSources&) const = default;
-
-    /**
-     * @brief Performs shallow equality test.
-     *
-     * Sources are considered equal when all their shaders point
-     * to same memory location. The contents of strings are NOT compared.
-    */
-    bool operator==(const ShaderProgramSources& other) const {
-        return vert == other.vert &&
-            tesc == other.tesc &&
-            tese == other.tese &&
-            geom == other.geom &&
-            frag == other.frag &&
-            comp == other.comp;
-    }
-
-    ShaderSources vert{};/**< Vertex shader stage of the program */
-    ShaderSources tesc{};/**< Tesselation control shader stage of the program */
-    ShaderSources tese{};/**< Tesselation evaluation stage of the program */
-    ShaderSources geom{};/**< Geometry shader stage of the program */
-    ShaderSources frag{};/**< Fragment shader stage of the program */
-    ShaderSources comp{};/**< Copute shader stage of the program */
+    ShaderSourceRef vert{};/**< Vertex shader stage of the program */
+    ShaderSourceRef tesc{};/**< Tesselation control shader stage of the program */
+    ShaderSourceRef tese{};/**< Tesselation evaluation stage of the program */
+    ShaderSourceRef geom{};/**< Geometry shader stage of the program */
+    ShaderSourceRef frag{};/**< Fragment shader stage of the program */
+    ShaderSourceRef comp{};/**< Copute shader stage of the program */
 };
 
 /**

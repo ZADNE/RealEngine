@@ -3,6 +3,7 @@
  */
 #include <RealEngine/rendering/internal_renderers/GL46ShaderProgram.hpp>
 
+#include <vector>
 #include <iostream>
 #include <array>
 
@@ -196,7 +197,7 @@ ShaderProgramID GL46ShaderProgram::compileProgram(const ShaderProgramSources& so
     unsigned int shaderID[SHADER_STAGES.size()] = {0};
     size_t i = 0;
     for (auto STAGE : SHADER_STAGES) {
-        if (!source[STAGE].m_sources.empty()) {
+        if (!source[STAGE].empty()) {
             shaderID[i] = glCreateShader(convert(STAGE));
         #ifndef NDEBUG
             if (shaderID[i] == 0) {
@@ -222,10 +223,10 @@ ShaderProgramID GL46ShaderProgram::compileProgram(const ShaderProgramSources& so
     return sp;
 }
 
-void GL46ShaderProgram::compileShader(ShaderProgramID& sp, const ShaderSources& sources, unsigned int shaderID) const {
-    glShaderSource(shaderID, static_cast<GLsizei>(sources.m_sources.size()), sources.m_sources.data(), sources.m_lengths.data());
+void GL46ShaderProgram::compileShader(ShaderProgramID& sp, const ShaderSourceRef& source, unsigned int shaderID) const {
+    glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, source.data(), source.size_bytes());
 
-    glCompileShader(shaderID);
+    glSpecializeShader(shaderID, "main", 0u, nullptr, nullptr);
 
     int compileSuccess = 0;
     glGetShaderiv(shaderID, GL_COMPILE_STATUS, &compileSuccess);
