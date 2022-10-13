@@ -2,7 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <span>
 #include <string>
 #include <compare>
 #include <string_view>
@@ -33,9 +32,14 @@ enum class ShaderType {
 };
 
 /**
- * @brief Represents a non-owning handle to SPIR-V source codes of a shader stage
+ * @brief Represents SPIR-V source code of a shader stage
 */
-using ShaderSourceRef = std::span<const int>;
+using ShaderSource = const std::basic_string<int>;
+
+/**
+ * @brief Represents a non-owning handle to source codes of a shader stage
+*/
+using ShaderSourceRef = std::basic_string_view<int>;
 
 /**
 * @brief POD representing source codes for all shaders within a shader program

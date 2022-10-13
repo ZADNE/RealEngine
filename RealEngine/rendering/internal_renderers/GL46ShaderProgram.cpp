@@ -224,7 +224,7 @@ ShaderProgramID GL46ShaderProgram::compileProgram(const ShaderProgramSources& so
 }
 
 void GL46ShaderProgram::compileShader(ShaderProgramID& sp, const ShaderSourceRef& source, unsigned int shaderID) const {
-    glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, source.data(), source.size_bytes());
+    glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, source.data(), source.size() * sizeof(ShaderSourceRef::value_type));
 
     glSpecializeShader(shaderID, "main", 0u, nullptr, nullptr);
 

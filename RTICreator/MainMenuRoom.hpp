@@ -15,6 +15,12 @@
 
 constexpr RE::BufferTypedIndex UNIF_BUF_VIEWPORT_MATRIX = {RE::BufferType::UNIFORM, 0u};
 
+extern RE::ShaderSource sprite_vert;
+extern RE::ShaderSource sprite_frag;
+
+extern RE::ShaderSource geometry_vert;
+extern RE::ShaderSource geometry_frag;
+
 /**
  * @brief Room with the UI
 */
@@ -37,20 +43,6 @@ private:
     void selectAndLoad();
     void save(const std::string& loc);
     void load(const std::string& filePath);
-
-    static constexpr std::array sprite_vert =
-    #include <RealEngine/rendering/basic_shaders/Sprite.vert.spv>
-        ;
-    static constexpr std::array sprite_frag =
-    #include <RealEngine/rendering/basic_shaders/Sprite.frag.spv>
-        ;
-
-    static constexpr std::array geometry_vert =
-    #include <RealEngine/rendering/basic_shaders/Geometry.vert.spv>
-        ;
-    static constexpr std::array geometry_frag =
-    #include <RealEngine/rendering/basic_shaders/Geometry.frag.spv>
-        ;
 
     RE::SpriteBatch<R> m_sb{{.vert = sprite_vert,.frag = sprite_frag}};
     RE::GeometryBatch<R> m_gb{{.vert = geometry_vert,.frag = geometry_frag}};
