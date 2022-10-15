@@ -2,7 +2,7 @@
 project(RealEngine)
 
 include(FetchContent)
-include("cmake/Shaders.cmake")
+include("cmake/RealShaders/RealShaders.cmake")
 
 #Find/fetch dependencies
     #Vulkan
@@ -23,7 +23,10 @@ include("cmake/Shaders.cmake")
 #Declare projects
     #RealEngine library
     add_library_with_shaders(RealEngine STATIC)
-    set_target_properties(RealEngine PROPERTIES CXX_STANDARD 20)
+    set_target_properties(RealEngine PROPERTIES
+        CXX_STANDARD 20
+        SHADERS_CXX_NAMESPACE "RE"
+    )
     target_link_libraries(RealEngine PUBLIC
         ${CMAKE_DL_LIBS}
         Vulkan::Vulkan OpenGL::GL GLEW::GLEW

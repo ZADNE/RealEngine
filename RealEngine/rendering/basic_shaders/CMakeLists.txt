@@ -1,6 +1,6 @@
 ﻿target_shaders(RealEngine
-    Geometry.frag
-    Geometry.vert
-    Sprite.frag
-    Sprite.vert
+    geometry.frag
+    geometry.vert
+    sprite.frag
+    sprite.vert
 )

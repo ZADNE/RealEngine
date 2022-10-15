@@ -12,14 +12,9 @@
 #include <RealEngine/rendering/cameras/View2D.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
+#include <RealEngine/rendering/basic_shaders/AllShaders.hpp>
 
 constexpr RE::BufferTypedIndex UNIF_BUF_VIEWPORT_MATRIX = {RE::BufferType::UNIFORM, 0u};
-
-extern RE::ShaderSource sprite_vert;
-extern RE::ShaderSource sprite_frag;
-
-extern RE::ShaderSource geometry_vert;
-extern RE::ShaderSource geometry_frag;
 
 /**
  * @brief Room with the UI
@@ -44,8 +39,8 @@ private:
     void save(const std::string& loc);
     void load(const std::string& filePath);
 
-    RE::SpriteBatch<R> m_sb{{.vert = sprite_vert,.frag = sprite_frag}};
-    RE::GeometryBatch<R> m_gb{{.vert = geometry_vert,.frag = geometry_frag}};
+    RE::SpriteBatch<R> m_sb{{.vert = RE::sprite_vert,.frag = RE::sprite_frag}};
+    RE::GeometryBatch<R> m_gb{{.vert = RE::geometry_vert,.frag = RE::geometry_frag}};
 
     //Texture
     std::optional<RE::Texture<R>> m_texture;

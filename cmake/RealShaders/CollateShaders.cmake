@@ -1,6 +1,7 @@
-function(target_collate_shaders target)
+#author     Dubsky Tomas
+
+function(RealShaders_CollateShaders target)
     #Load target properties and prepare variables
-    set(shader_bin_prefix_abs "${CMAKE_CURRENT_BINARY_DIR}/compiled_shaders")
     get_property(shader_sources_rel TARGET ${target} PROPERTY SHADER_SOURCES_REL)
     get_property(shader_sources_abs TARGET ${target} PROPERTY SHADER_SOURCES_ABS)
     get_property(shader_includes TARGET ${target} PROPERTY INCLUDE_DIRECTORIES)
@@ -27,9 +28,9 @@ function(target_collate_shaders target)
             break() #Do not compile glsl 'header'
         endif()
         set(shader_source_abs ${shader_source_1})
-        set(shader_bin_abs "${shader_bin_prefix_abs}/${shader_source_rel}.spv")
+        set(shader_bin_abs "${CMAKE_CURRENT_BINARY_DIR}/${shader_source_rel}.spv")
         list(APPEND shader_bins_abs ${shader_bin_abs})
-        set(shader_dep_abs "${shader_bin_prefix_abs}/${shader_source_rel}.d")
+        set(shader_dep_abs "${CMAKE_CURRENT_BINARY_DIR}/${shader_source_rel}.d")
         get_filename_component(shader_bin_dir_abs ${shader_bin_abs} DIRECTORY)
         file(MAKE_DIRECTORY ${shader_bin_dir_abs})
         add_custom_command(
@@ -50,33 +51,6 @@ function(target_collate_shaders target)
     add_dependencies(${target} ${shader_target})
     #Additional include for compiled shaders
     target_include_directories(${target}
-        PUBLIC ${shader_bin_prefix_abs}
+        PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
     )
-    
-endfunction()
-
-#Adds library that can also have shaders added via 'target_shaders'
-macro(add_library_with_shaders)
-    add_library(${ARGV})
-    set_target_properties(${ARGV0} PROPERTIES GLSL_STANDARD "460")
-    cmake_language(DEFER CALL target_collate_shaders ${ARGV0})
-endmacro()
-
-#Adds executable that can also have shaders added via 'target_shaders'
-macro(add_executable_with_shaders)
-    add_executable(${ARGV})
-    set_target_properties(${ARGV0} PROPERTIES GLSL_STANDARD "460")
-    cmake_language(DEFER CALL target_collate_shaders ${ARGV0})
-endmacro()
-
-#Use this to add shader source files to a target
-function(target_shaders target)
-    file(RELATIVE_PATH relative_path ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-    foreach (shader_source IN LISTS ARGN)
-        set_property(TARGET ${target}
-                        APPEND PROPERTY SHADER_SOURCES_REL "${relative_path}/${shader_source}")
-        set_property(TARGET ${target}
-                        APPEND PROPERTY SHADER_SOURCES_ABS "${CMAKE_CURRENT_SOURCE_DIR}/${shader_source}")
-    endforeach()
-    target_sources(${target} PRIVATE ${ARGN})
 endfunction()

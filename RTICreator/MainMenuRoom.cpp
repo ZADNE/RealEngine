@@ -21,21 +21,6 @@
 
 #include <RTICreator/ComboConstants.hpp>
 
-RE::ShaderSource sprite_vert =
-#include <RealEngine/rendering/basic_shaders/Sprite.vert.spv>
-;
-RE::ShaderSource sprite_frag =
-#include <RealEngine/rendering/basic_shaders/Sprite.frag.spv>
-;
-
-RE::ShaderSource geometry_vert =
-#include <RealEngine/rendering/basic_shaders/Sprite.vert.spv>
-;
-
-RE::ShaderSource geometry_frag =
-#include <RealEngine/rendering/basic_shaders/Sprite.frag.spv>
-;
-
 constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
     .clearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
     .framesPerSecondLimit = 144,
