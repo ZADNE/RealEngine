@@ -25,7 +25,7 @@ function(RealShaders_CollateShaders target)
         set(shader_source_rel ${shader_source_0})
         get_filename_component(shader_ext ${shader_source_rel} LAST_EXT)
         if (${shader_ext} STREQUAL ".glsl")
-            break() #Do not compile glsl 'header'
+            continue() #Do not collate glsl 'header'
         endif()
         set(shader_source_abs ${shader_source_1})
         set(shader_bin_abs "${CMAKE_CURRENT_BINARY_DIR}/${shader_source_rel}.spv")
@@ -35,7 +35,7 @@ function(RealShaders_CollateShaders target)
         file(MAKE_DIRECTORY ${shader_bin_dir_abs})
         add_custom_command(
             OUTPUT ${shader_bin_abs}
-            COMMAND Vulkan::glslc -MD -mfmt=c -MF ${shader_dep_abs} ${shader_source_abs}
+            COMMAND ${Vulkan_GLSLC_EXECUTABLE} -MD -mfmt=c -MF ${shader_dep_abs} ${shader_source_abs}
                     -o ${shader_bin_abs} --target-env=vulkan1.2 ${glslc_flags} "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
             DEPENDS ${shader_source_abs}
             BYPRODUCTS ${shader_dep_abs}
