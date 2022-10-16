@@ -2,6 +2,8 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <SDL2/SDL_video.h>
+
 #include <RealEngine/rendering/internal_renderers/GL46Buffer.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46Capabilities.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46Framebuffer.hpp>
@@ -26,30 +28,23 @@ namespace RE {
 class GL46Fixture {
 public:
 
-    /**
-    * @brief Tries to prepare for creation of OpenGL 4.6 context.
-    * @return True if succeeded.
-    * @warning Do not call use() if this fails.
-    *
-    * Requires SDL2 to be initialized.
-    *
-    * @note To be called only once at the start of the program.
-    */
-    static bool prepare();
+    static bool prepareForWindowCreation();
 
     /**
-    * @brief Initializes the renderer.
-    * @warning Do not call this if prepare() has failed.
+     * @brief Sets up for OpenGL 4.6 rendering
+     * @throws If anything fails
     */
-    static void initialize();
+    GL46Fixture(SDL_Window* sdlWindow);
 
     GL46Fixture(const GL46Fixture&) = delete;
     GL46Fixture& operator=(const GL46Fixture&) = delete;
 
-private:
-
-    GL46Fixture();
     ~GL46Fixture();
+
+    void prepareImGuiFrame();
+    void finishImGuiFrame();
+
+private:
 
     class Implementations {
     public:
@@ -87,10 +82,14 @@ private:
         ViewportState m_viewportState;
     };
 
-    Implementations s_impls;
+    SDL_GLContext m_glContext;
+
+    Implementations m_impls;
 
     Framebuffer<RendererLateBind> m_defaultFramebufferLateBind;
     Framebuffer<RendererGL46> m_defaultFramebufferGL46;
+
+    SDL_GLContext createContext(SDL_Window* sdlWindow);
 };
 
 /**

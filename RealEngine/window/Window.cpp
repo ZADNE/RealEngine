@@ -4,12 +4,10 @@
  */
 #include <RealEngine/window/Window.hpp>
 
-#include <ImGui/imgui_impl_sdl.h>
-#include <ImGui/imgui_impl_vulkan.h>
-#include <ImGui/imgui_impl_opengl3.h>
+#include <iostream>
 
-#include <RealEngine/window/GL46Fixture.hpp>
-#include <RealEngine/window/VK13Fixture.hpp>
+#include <ImGui/imgui_impl_sdl.h>
+
 #include <RealEngine/utility/Error.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 
@@ -43,51 +41,37 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 }
 
 Window::~Window() {
-    switch (m_renderer) {
-    case RE::RendererID::VULKAN13:
-        ImGui_ImplVulkan_Shutdown();
-        break;
-    case RE::RendererID::OPENGL46:
-        ImGui_ImplOpenGL3_Shutdown();
-        SDL_GL_DeleteContext(m_gl46.context);
-        break;
-    }
-
-    ImGui_ImplSDL2_Shutdown();
-
+    m_fixture.emplace<std::monostate>();
     SDL_DestroyWindow(m_SDLwindow);
 }
 
 template<>
 void Window::prepareNewFrame<RendererVK13>() {
     if (m_usingImGui) {//ImGui frame start
-        ImGui::NewFrame();
+        std::get<VK13Fixture>(m_fixture).prepareImGuiFrame();
     }
 }
 
 template<>
 void Window::prepareNewFrame<RendererGL46>() {
     if (m_usingImGui) {//ImGui frame start
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
+        std::get<GL46Fixture>(m_fixture).prepareImGuiFrame();
     }
 }
 
 template<>
 void Window::finishNewFrame<RendererVK13>() {
     if (m_usingImGui) {//ImGui frame end
-        ImGui::Render();
+        std::get<VK13Fixture>(m_fixture).finishImGuiFrame();
     }
 }
 
 template<>
 void Window::finishNewFrame<RendererGL46>() {
     if (m_usingImGui) {//ImGui frame end
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        SDL_GL_SwapWindow(m_SDLwindow);
+        std::get<GL46Fixture>(m_fixture).finishImGuiFrame();
     }
+    SDL_GL_SwapWindow(m_SDLwindow);
 }
 
 void Window::passSDLEvent(SDL_Event& evnt) {
@@ -156,10 +140,14 @@ void Window::initForVulkan13() {
         goto fail;
     }
 
-    if (!VK13Fixture::initialize(m_SDLwindow, m_flags.vSync)) goto fail_SDLWindow;
-
-    if (!ImGui_ImplSDL2_InitForVulkan(m_SDLwindow)) goto fail_SDLWindow;
-    //if (!ImGui_ImplVulkan_Init("#version 460 core")) goto fail_SDLWindow_Vulkan;
+    //Create OpenGL 4.6 fixture
+    try {
+        m_fixture.emplace<VK13Fixture>(m_SDLwindow, (bool)m_flags.vSync);
+    }
+    catch (std::exception& e) {
+        std::cerr << e.what();
+        goto fail_SDLWindow;
+    }
 
     m_renderer = RendererID::VULKAN13;
     return;
@@ -172,36 +160,28 @@ fail:
 }
 
 void Window::initForGL46() {
-    //Set OpenGL context creation parameters
-    if (!GL46Fixture::prepare()) goto fail;
+    //Prepare for window creation
+    if (!GL46Fixture::prepareForWindowCreation()) goto fail;
 
     //Create SDL window
     if (!createSDLWindow(RendererID::OPENGL46)) {
         goto fail;
     }
 
-    //Create OpenGL context for the window
-    m_gl46.context = SDL_GL_CreateContext(m_SDLwindow);
-    if (!m_gl46.context) {
-        log(SDL_GetError());
+    //Create OpenGL 4.6 fixture
+    try {
+        m_fixture.emplace<GL46Fixture>(m_SDLwindow);
+    } catch (std::exception& e) {
+        std::cerr << e.what();
         goto fail_SDLWindow;
     }
-
-    //Initialize some global states to RealEngine-default values
-    GL46Fixture::initialize();
 
     //Set vertical synchronisation
     setVSync(m_flags.vSync, false);
 
-    if (!ImGui_ImplSDL2_InitForOpenGL(m_SDLwindow, m_gl46.context)) goto fail_GLContext_SDLWindow;
-    if (!ImGui_ImplOpenGL3_Init("#version 460 core")) goto fail_GLContext_SDLWindow;
-
     m_renderer = RendererID::OPENGL46;
     return;
 
-fail_GLContext_SDLWindow:
-    SDL_GL_DeleteContext(m_gl46.context);
-    m_gl46.context = nullptr;
 fail_SDLWindow:
     SDL_DestroyWindow(m_SDLwindow);
     m_SDLwindow = nullptr;

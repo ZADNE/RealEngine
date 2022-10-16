@@ -2,7 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <optional>
 #include <memory>
 
 #include <vulkan/vulkan_raii.hpp>
@@ -31,13 +30,18 @@ class VK13Fixture {
 public:
 
     /**
-    * @brief Tries to prepare for creation of Vulkan 1.3 context.
-    * @return True if succeeded.
-    * @warning Do not call use() if this fails.
+     * @brief Sets up for Vulkan 1.3 rendering 
+     * @throws If anything fails
     */
-    static bool initialize(SDL_Window* sdlWindow, bool vSync);
-
     VK13Fixture(SDL_Window* sdlWindow, bool vSync);
+
+    VK13Fixture(const VK13Fixture&) = delete;
+    VK13Fixture& operator=(const VK13Fixture&) = delete;
+
+    ~VK13Fixture();
+
+    void prepareImGuiFrame();
+    void finishImGuiFrame();
 
 private:
 
@@ -77,8 +81,6 @@ private:
         ViewportState m_viewportState;
     };
 
-    static std::optional<VK13Fixture> s_fixture;
-
     vk::raii::Context m_context{};
     vk::raii::Instance m_instance;
 #ifndef NDEBUG
@@ -91,10 +93,16 @@ private:
     vk::raii::Device m_device;
     vk::raii::Queue m_graphicsQueue;
     vk::raii::Queue m_presentationQueue;
+    uint32_t m_minImageCount;
+    vk::Extent2D m_swapchainExtent;
     vk::raii::SwapchainKHR m_swapchain;
     std::vector<vk::raii::ImageView> m_swapchainImageViews;
+    vk::raii::RenderPass m_renderPass;
+    std::vector<vk::raii::Framebuffer> m_swapChainFramebuffers;
     vk::raii::CommandPool m_commandPool;
     vk::raii::CommandBuffer m_commandBuffer;
+    vk::raii::PipelineCache m_pipelineCache;
+    vk::raii::DescriptorPool m_descriptorPool;
 
     Implementations m_impls;
 
@@ -106,8 +114,12 @@ private:
     vk::raii::Queue createQueue(uint32_t familyIndex);
     vk::raii::SwapchainKHR createSwapchain(SDL_Window* sdlWindow, bool vSync);
     std::vector<vk::raii::ImageView> createSwapchainImageViews();
+    vk::raii::RenderPass createRenderPass();
+    std::vector<vk::raii::Framebuffer> createSwapchainFramebuffers();
     vk::raii::CommandPool createCommandPool();
     vk::raii::CommandBuffer createCommandBuffer();
+    vk::raii::PipelineCache createPipelineCache();
+    vk::raii::DescriptorPool createDescriptorPool();
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT sev,

@@ -1,12 +1,16 @@
-﻿/*!
+﻿#include "GL46Fixture.hpp"
+#include "GL46Fixture.hpp"
+/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/window/GL46Fixture.hpp>
 
 #include <iostream>
 
-#include <SDL2/SDL_video.h>
 #include <GL/glew.h>
+#include <SDL2/SDL_video.h>
+#include <ImGui/imgui_impl_sdl.h>
+#include <ImGui/imgui_impl_opengl3.h>
 
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/Capabilities.hpp>
@@ -50,7 +54,7 @@ void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GL
     std::cerr << "\n----OpenGL Callback End----" << std::endl;
 }
 
-bool GL46Fixture::prepare() {
+bool GL46Fixture::prepareForWindowCreation() {
     if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)) {
         error("Could not use doublebuffer!"); return false;
     }
@@ -80,10 +84,52 @@ bool GL46Fixture::prepare() {
     return true;
 }
 
-void GL46Fixture::initialize() {
+GL46Fixture::GL46Fixture(SDL_Window* sdlWindow) :
+    m_glContext(createContext(sdlWindow)),
+    m_defaultFramebufferLateBind(FramebufferID{0u}),
+    m_defaultFramebufferGL46(FramebufferID{0u}) {
+    //Initialize ImGui
+    if (!ImGui_ImplSDL2_InitForOpenGL(sdlWindow, m_glContext)) {
+        throw std::runtime_error{"Could not initialize ImGui-SDL2 for OpenGL!"};
+    };
+    if (!ImGui_ImplOpenGL3_Init("#version 460 core")) {
+        ImGui_ImplSDL2_Shutdown();
+        throw std::runtime_error{"Could not initialize ImGui for OpenGL!"};
+    }
+
+    DefaultFrameBuffer<RendererLateBind>::s_defaultFramebuffer = &m_defaultFramebufferLateBind;
+    DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = &m_defaultFramebufferGL46;
+}
+
+GL46Fixture::~GL46Fixture() {
+    DefaultFrameBuffer<RendererLateBind>::s_defaultFramebuffer = nullptr;
+    DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = nullptr;
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    SDL_GL_DeleteContext(m_glContext);
+}
+
+void GL46Fixture::prepareImGuiFrame() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+}
+
+void GL46Fixture::finishImGuiFrame() {
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+SDL_GLContext GL46Fixture::createContext(SDL_Window* sdlWindow) {
+    //Create context
+    auto context = SDL_GL_CreateContext(sdlWindow);
+    if (!context) {
+        throw std::runtime_error{SDL_GetError()};
+    }
+
     //Initialize GLEW
     if (glewInit() != GLEW_OK) {
-        fatalError("GLEW failed initialization!");
+        throw std::runtime_error{"GLEW failed initialization!"};
     }
 
     //Print OpenGL info - should be OpenGL 4.6 (or higher? XD)
@@ -118,25 +164,11 @@ void GL46Fixture::initialize() {
     glEnable(GL_PRIMITIVE_RESTART);
     glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
-    //THE singleton instance
-    static GL46Fixture renderer{};
-
     //Use blenbing by default
     BlendingCapability<RendererGL46>::enable();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
 
-GL46Fixture::GL46Fixture() :
-    m_defaultFramebufferLateBind(FramebufferID{0u}),
-    m_defaultFramebufferGL46(FramebufferID{0u}) {
-
-    DefaultFrameBuffer<RendererLateBind>::s_defaultFramebuffer = &m_defaultFramebufferLateBind;
-    DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = &m_defaultFramebufferGL46;
-}
-
-GL46Fixture::~GL46Fixture() {
-    DefaultFrameBuffer<RendererLateBind>::s_defaultFramebuffer = nullptr;
-    DefaultFrameBuffer<RendererGL46>::s_defaultFramebuffer = nullptr;
+    return context;
 }
 
 template<Renderer R>

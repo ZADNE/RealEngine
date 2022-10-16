@@ -2,15 +2,16 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <variant>
 #include <string>
 
-#include <SDL2/SDL_video.h>
 #include <ImGui/imgui.h>
 #include <glm/vec2.hpp>
 
 #include <RealEngine/window/WindowSubsystems.hpp>
 #include <RealEngine/window/WindowSettings.hpp>
-#include <RealEngine/rendering/buffers/Buffer.hpp>
+#include <RealEngine/window/GL46Fixture.hpp>
+#include <RealEngine/window/VK13Fixture.hpp>
 
 union SDL_Event;
 
@@ -132,18 +133,7 @@ private:
     WindowSubsystems m_subsystems;          /**< Empty class that initializes and de-initializes subsystems */
     SDL_Window* m_SDLwindow = nullptr;
 
-    struct VK13 {
-
-    };
-
-    struct GL46 {
-        SDL_GLContext context = nullptr;
-    };
-
-    union {
-        VK13 m_vk13;
-        GL46 m_gl46;
-    };
+    std::variant<std::monostate, VK13Fixture, GL46Fixture>  m_fixture;
     RendererID m_renderer;                  /**< The actual renderer (may be different from the preferred one) */
     std::string m_windowTitle;              /**< Title of the window */
     bool m_usingImGui = false;
