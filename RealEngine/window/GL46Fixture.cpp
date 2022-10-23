@@ -1,6 +1,4 @@
-﻿#include "GL46Fixture.hpp"
-#include "GL46Fixture.hpp"
-/*!
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/window/GL46Fixture.hpp>
@@ -54,36 +52,6 @@ void GLAPIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GL
     std::cerr << "\n----OpenGL Callback End----" << std::endl;
 }
 
-bool GL46Fixture::prepareForWindowCreation() {
-    if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)) {
-        error("Could not use doublebuffer!"); return false;
-    }
-
-    int contextFlags = SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG | SDL_GL_CONTEXT_ROBUST_ACCESS_FLAG;
-
-#ifndef NDEBUG
-    contextFlags |= SDL_GL_CONTEXT_DEBUG_FLAG;
-#endif // DEBUG
-
-    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, contextFlags)) {
-        error("Could not set context flags!"); return false;
-    }
-
-    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)) {
-        error("Could not use core profile context!"); return false;
-    }
-
-    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4)) {
-        error("Could not use OpenGL 4!"); return false;
-    }
-
-    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6)) {
-        error("Could not use OpenGL 4.6!"); return false;
-    }
-
-    return true;
-}
-
 GL46Fixture::GL46Fixture(SDL_Window* sdlWindow) :
     m_glContext(createContext(sdlWindow)),
     m_defaultFramebufferLateBind(FramebufferID{0u}),
@@ -109,19 +77,50 @@ GL46Fixture::~GL46Fixture() {
     SDL_GL_DeleteContext(m_glContext);
 }
 
-void GL46Fixture::prepareImGuiFrame() {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
-    ImGui::NewFrame();
+void GL46Fixture::prepareFrame(bool useImGui) {
+    if (useImGui) {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+    }
 }
 
-void GL46Fixture::finishImGuiFrame() {
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+void GL46Fixture::finishFrame(bool useImGui, SDL_Window* sdlWindow) {
+    if (useImGui) {
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+    SDL_GL_SwapWindow(sdlWindow);
 }
 
 SDL_GLContext GL46Fixture::createContext(SDL_Window* sdlWindow) {
-    //Create context
+    //Set attributes for the context
+    if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)) {
+        throw std::runtime_error{"Could not use doublebuffer!"};
+    }
+
+    int contextFlags = SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG | SDL_GL_CONTEXT_ROBUST_ACCESS_FLAG;
+#ifndef NDEBUG
+    contextFlags |= SDL_GL_CONTEXT_DEBUG_FLAG;
+#endif // DEBUG
+
+    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, contextFlags)) {
+        throw std::runtime_error{"Could not set context flags!"};
+    }
+
+    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)) {
+        throw std::runtime_error{"Could not use core profile context!"};
+    }
+
+    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4)) {
+        throw std::runtime_error{"Could not use OpenGL 4!"};
+    }
+
+    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6)) {
+        throw std::runtime_error{"Could not use OpenGL 4.6!"};
+    }
+
+    //Create the context
     auto context = SDL_GL_CreateContext(sdlWindow);
     if (!context) {
         throw std::runtime_error{SDL_GetError()};

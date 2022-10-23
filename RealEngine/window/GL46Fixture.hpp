@@ -2,8 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <SDL2/SDL_video.h>
-
 #include <RealEngine/rendering/internal_renderers/GL46Buffer.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46Capabilities.hpp>
 #include <RealEngine/rendering/internal_renderers/GL46Framebuffer.hpp>
@@ -15,6 +13,9 @@
 
 #include <RealEngine/rendering/output/Framebuffer.hpp>
 #include <RealEngine/rendering/Renderer.hpp>
+
+typedef void* SDL_GLContext;
+struct SDL_Window;
 
 namespace RE {
 
@@ -28,8 +29,6 @@ namespace RE {
 class GL46Fixture {
 public:
 
-    static bool prepareForWindowCreation();
-
     /**
      * @brief Sets up for OpenGL 4.6 rendering
      * @throws If anything fails
@@ -41,8 +40,8 @@ public:
 
     ~GL46Fixture();
 
-    void prepareImGuiFrame();
-    void finishImGuiFrame();
+    void prepareFrame(bool useImGui);
+    void finishFrame(bool useImGui, SDL_Window* sdlWindow);
 
 private:
 

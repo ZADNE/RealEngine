@@ -38,10 +38,12 @@ public:
     VK13Fixture(const VK13Fixture&) = delete;
     VK13Fixture& operator=(const VK13Fixture&) = delete;
 
+    VK13Fixture& operator=(VK13Fixture&&) = default;
+
     ~VK13Fixture();
 
-    void prepareImGuiFrame();
-    void finishImGuiFrame();
+    void prepareFrame(bool useImGui);
+    void finishFrame(bool useImGui);
 
 private:
 

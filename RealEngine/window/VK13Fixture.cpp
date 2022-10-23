@@ -87,15 +87,19 @@ VK13Fixture::~VK13Fixture() {
     ImGui_ImplSDL2_Shutdown();
 }
 
-void VK13Fixture::prepareImGuiFrame() {
-    ImGui_ImplVulkan_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
-    ImGui::NewFrame();
+void VK13Fixture::prepareFrame(bool useImGui) {
+    if (useImGui) {
+        ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+    }
 }
 
-void VK13Fixture::finishImGuiFrame() {
-    ImGui::Render();
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *m_commandBuffer);
+void VK13Fixture::finishFrame(bool useImGui) {
+    if (useImGui) {
+        ImGui::Render();
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *m_commandBuffer);
+    }
 }
 
 vk::raii::Instance VK13Fixture::createInstance(SDL_Window* sdlWindow) {

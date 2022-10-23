@@ -2,7 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <variant>
 #include <string>
 
 #include <ImGui/imgui.h>
@@ -133,7 +132,10 @@ private:
     WindowSubsystems m_subsystems;          /**< Empty class that initializes and de-initializes subsystems */
     SDL_Window* m_SDLwindow = nullptr;
 
-    std::variant<std::monostate, VK13Fixture, GL46Fixture>  m_fixture;
+    union {
+        VK13Fixture m_vk13;
+        GL46Fixture m_gl46;
+    };
     RendererID m_renderer;                  /**< The actual renderer (may be different from the preferred one) */
     std::string m_windowTitle;              /**< Title of the window */
     bool m_usingImGui = false;

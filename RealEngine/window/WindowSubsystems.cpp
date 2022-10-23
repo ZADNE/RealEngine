@@ -1,6 +1,4 @@
-﻿#include "WindowSubsystems.hpp"
-#include "WindowSubsystems.hpp"
-/*!
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/window/WindowSubsystems.hpp>

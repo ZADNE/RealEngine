@@ -1,11 +1,11 @@
-﻿#include "Window.hpp"
-/*!
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/window/Window.hpp>
 
 #include <iostream>
 
+#include <SDL2/SDL_video.h>
 #include <ImGui/imgui_impl_sdl.h>
 
 #include <RealEngine/utility/Error.hpp>
@@ -23,7 +23,7 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
     initForRenderer(settings.getPreferredRenderer());
 
     if (m_renderer == RendererID::ANY) {//If the preferred renderer could not be initialized
-        for (size_t i = 0; i < static_cast<size_t>(RendererID::ANY); i++) {//Try to init any 
+        for (size_t i = 0; i < static_cast<size_t>(RendererID::ANY); i++) {//Try to init any other
             initForRenderer(static_cast<RendererID>(i));
             if (m_renderer != RendererID::ANY) break;
         }
@@ -41,37 +41,33 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 }
 
 Window::~Window() {
-    m_fixture.emplace<std::monostate>();
+    switch (m_renderer) {
+    case RE::RendererID::VULKAN13:
+        m_vk13.~VK13Fixture(); break;
+    case RE::RendererID::OPENGL46:
+        m_gl46.~GL46Fixture(); break;
+    }
     SDL_DestroyWindow(m_SDLwindow);
 }
 
 template<>
 void Window::prepareNewFrame<RendererVK13>() {
-    if (m_usingImGui) {//ImGui frame start
-        std::get<VK13Fixture>(m_fixture).prepareImGuiFrame();
-    }
+    m_vk13.prepareFrame(m_usingImGui);
 }
 
 template<>
 void Window::prepareNewFrame<RendererGL46>() {
-    if (m_usingImGui) {//ImGui frame start
-        std::get<GL46Fixture>(m_fixture).prepareImGuiFrame();
-    }
+    m_gl46.prepareFrame(m_usingImGui);
 }
 
 template<>
 void Window::finishNewFrame<RendererVK13>() {
-    if (m_usingImGui) {//ImGui frame end
-        std::get<VK13Fixture>(m_fixture).finishImGuiFrame();
-    }
+    m_vk13.finishFrame(m_usingImGui);
 }
 
 template<>
 void Window::finishNewFrame<RendererGL46>() {
-    if (m_usingImGui) {//ImGui frame end
-        std::get<GL46Fixture>(m_fixture).finishImGuiFrame();
-    }
-    SDL_GL_SwapWindow(m_SDLwindow);
+    m_gl46.finishFrame(m_usingImGui, m_SDLwindow);
 }
 
 void Window::passSDLEvent(SDL_Event& evnt) {
@@ -142,9 +138,8 @@ void Window::initForVulkan13() {
 
     //Create OpenGL 4.6 fixture
     try {
-        m_fixture.emplace<VK13Fixture>(m_SDLwindow, (bool)m_flags.vSync);
-    }
-    catch (std::exception& e) {
+        new (&m_vk13) VK13Fixture(m_SDLwindow, (bool)m_flags.vSync);
+    } catch (std::exception& e) {
         std::cerr << e.what();
         goto fail_SDLWindow;
     }
@@ -160,9 +155,6 @@ fail:
 }
 
 void Window::initForGL46() {
-    //Prepare for window creation
-    if (!GL46Fixture::prepareForWindowCreation()) goto fail;
-
     //Create SDL window
     if (!createSDLWindow(RendererID::OPENGL46)) {
         goto fail;
@@ -170,7 +162,7 @@ void Window::initForGL46() {
 
     //Create OpenGL 4.6 fixture
     try {
-        m_fixture.emplace<GL46Fixture>(m_SDLwindow);
+        new (&m_gl46) GL46Fixture(m_SDLwindow);
     } catch (std::exception& e) {
         std::cerr << e.what();
         goto fail_SDLWindow;
