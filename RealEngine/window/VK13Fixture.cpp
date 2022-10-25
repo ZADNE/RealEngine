@@ -28,6 +28,10 @@ using enum vk::CompositeAlphaFlagBitsKHR;
 using enum vk::PresentModeKHR;
 using enum vk::ImageViewType;
 
+namespace {
+constexpr auto MAX_TIMEOUT = std::numeric_limits<uint64_t>::max();
+}
+
 namespace RE {
 
 constexpr std::array DEVICE_EXTENSIONS = {
@@ -35,7 +39,7 @@ constexpr std::array DEVICE_EXTENSIONS = {
 };
 
 constexpr vk::SurfaceFormatKHR SURFACE_FORMAT{
-    vk::Format::eB8G8R8A8Srgb,
+    vk::Format::eB8G8R8A8Unorm,
     vk::ColorSpaceKHR::eSrgbNonlinear
 };
 
@@ -56,38 +60,74 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
     m_commandPool(createCommandPool()),
     m_commandBuffer(createCommandBuffer()),
     m_pipelineCache(createPipelineCache()),
-    m_descriptorPool(createDescriptorPool()) {
+    m_descriptorPool(createDescriptorPool()),
+    m_imageAvailable(m_device, vk::SemaphoreCreateInfo{}),
+    m_renderingFinished(m_device, vk::SemaphoreCreateInfo{}),
+    m_inFlight(m_device, vk::FenceCreateInfo{vk::FenceCreateFlagBits::eSignaled}) {
     //Initialize ImGui
     if (!ImGui_ImplSDL2_InitForVulkan(sdlWindow)){
         throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
     }
     ImGui_ImplVulkan_InitInfo initInfo{
-        .Instance = *m_instance,
-        .PhysicalDevice = *m_physicalDevice,
-        .Device = *m_device,
-        .QueueFamily = m_graphicsQueueFamilyIndex,
-        .Queue = *m_graphicsQueue,
-        .PipelineCache = *m_pipelineCache,
-        .DescriptorPool = *m_descriptorPool,
-        .Subpass = 0u,
-        .MinImageCount = m_minImageCount,
-        .ImageCount = static_cast<uint32_t>(m_swapchainImageViews.size()),
-        .MSAASamples = VK_SAMPLE_COUNT_1_BIT,
-        .Allocator = nullptr,
+        .Instance = *m_instance, .PhysicalDevice = *m_physicalDevice,
+        .Device = *m_device, .QueueFamily = m_graphicsQueueFamilyIndex,
+        .Queue = *m_graphicsQueue, .PipelineCache = *m_pipelineCache,
+        .DescriptorPool = *m_descriptorPool, .Subpass = 0u,
+        .MinImageCount = m_minImageCount, .ImageCount = static_cast<uint32_t>(m_swapchainImageViews.size()),
+        .MSAASamples = VK_SAMPLE_COUNT_1_BIT, .Allocator = nullptr,
         .CheckVkResultFn = nullptr
     };
     if (!ImGui_ImplVulkan_Init(&initInfo, *m_renderPass)) {
         ImGui_ImplSDL2_Shutdown();
         throw std::runtime_error{"Could not initialize ImGui for Vulkan!"};
     }
+
+    //Create and upload ImGui textures
+    vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
+    m_commandBuffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+    ImGui_ImplVulkan_CreateFontsTexture(*m_commandBuffer);
+    m_commandBuffer.end();
+    m_graphicsQueue.submit(vk::SubmitInfo{{}, {}, *m_commandBuffer}, *uploadFence);
+    assert(m_device.waitForFences(*uploadFence, true, MAX_TIMEOUT) == vk::Result::eSuccess);
 }
 
 VK13Fixture::~VK13Fixture() {
+    assert(m_device.waitForFences(*m_inFlight, true, MAX_TIMEOUT) == vk::Result::eSuccess);
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplSDL2_Shutdown();
 }
 
 void VK13Fixture::prepareFrame(bool useImGui) {
+    //Wait for the previous frame to finish
+    assert(m_device.waitForFences(*m_inFlight, true, MAX_TIMEOUT) == vk::Result::eSuccess);
+    m_device.resetFences(*m_inFlight);
+
+    //Acquire next image
+    vk::AcquireNextImageInfoKHR acquireNextImageInfo{
+        *m_swapchain,
+        MAX_TIMEOUT,
+        *m_imageAvailable,
+        nullptr,
+        1u
+    };
+    auto [res, imageIndex] = m_device.acquireNextImage2KHR(acquireNextImageInfo);
+    assert(res == vk::Result::eSuccess);
+    m_currentImageIndex = imageIndex;
+
+    //Restart command buffer
+    m_commandBuffer.reset();
+    m_commandBuffer.begin({});
+
+    //Begin renderpass
+    vk::ClearValue clearValue{vk::ClearColorValue{std::array{0.1f, 0.1f, 0.1f, 1.0f}}};
+    vk::RenderPassBeginInfo renderPassBeginInfo{
+        *m_renderPass,
+        *m_swapChainFramebuffers[m_currentImageIndex],
+        vk::Rect2D{{}, m_swapchainExtent},
+        clearValue
+    };
+    m_commandBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+
     if (useImGui) {
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplSDL2_NewFrame();
@@ -100,6 +140,26 @@ void VK13Fixture::finishFrame(bool useImGui) {
         ImGui::Render();
         ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *m_commandBuffer);
     }
+
+    //Submit the command buffer
+    m_commandBuffer.endRenderPass();
+    m_commandBuffer.end();
+    vk::PipelineStageFlags waitDstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+    vk::SubmitInfo submitInfo{
+        *m_imageAvailable,
+        waitDstStageMask,
+        *m_commandBuffer,
+        *m_renderingFinished
+    };
+    m_graphicsQueue.submit(submitInfo, *m_inFlight);
+
+    //Present new image
+    vk::PresentInfoKHR presentInfo{
+        *m_renderingFinished,
+        *m_swapchain,
+        m_currentImageIndex
+    };
+    assert(m_presentationQueue.presentKHR(presentInfo) == vk::Result::eSuccess);
 }
 
 vk::raii::Instance VK13Fixture::createInstance(SDL_Window* sdlWindow) {
@@ -224,8 +284,9 @@ std::vector<vk::raii::ImageView> VK13Fixture::createSwapchainImageViews() {
 
 vk::raii::RenderPass VK13Fixture::createRenderPass() {
     vk::AttachmentDescription attachmentDescription{{},
-        SURFACE_FORMAT.format, vk::SampleCountFlagBits::e1,
-        vk::AttachmentLoadOp::eDontCare,    //Color
+        SURFACE_FORMAT.format,
+        vk::SampleCountFlagBits::e1,
+        vk::AttachmentLoadOp::eClear,       //Color
         vk::AttachmentStoreOp::eStore,      //Color
         vk::AttachmentLoadOp::eDontCare,    //Stencil
         vk::AttachmentStoreOp::eDontCare,   //Stencil
@@ -235,14 +296,23 @@ vk::raii::RenderPass VK13Fixture::createRenderPass() {
     vk::AttachmentReference attachmentRef{
         0, vk::ImageLayout::eColorAttachmentOptimal
     };
-    vk::SubpassDescription subPassDescription{{}, 
+    vk::SubpassDescription subpassDescription{{}, 
         vk::PipelineBindPoint::eGraphics,
         {},                 //Input attachments
         attachmentRef       //Color attachments
     };
+    vk::SubpassDependency subpassDependency{
+        VK_SUBPASS_EXTERNAL,                                //Src subpass
+        0u,                                                 //Dst subpass
+        {vk::PipelineStageFlagBits::eColorAttachmentOutput},//Src stage mask
+        {vk::PipelineStageFlagBits::eColorAttachmentOutput},//Dst stage mask
+        vk::AccessFlags{},                                  //Src access mask
+        {vk::AccessFlagBits::eColorAttachmentWrite}         //Dst access mask
+    };
     vk::RenderPassCreateInfo createInfo{{},
         attachmentDescription,
-        subPassDescription
+        subpassDescription,
+        subpassDependency
     };
     return vk::raii::RenderPass{m_device, createInfo};
 }

@@ -105,6 +105,10 @@ private:
     vk::raii::CommandBuffer m_commandBuffer;
     vk::raii::PipelineCache m_pipelineCache;
     vk::raii::DescriptorPool m_descriptorPool;
+    vk::raii::Semaphore m_imageAvailable;
+    vk::raii::Semaphore m_renderingFinished;
+    vk::raii::Fence m_inFlight;
+    uint32_t m_currentImageIndex = 0u;
 
     Implementations m_impls;
 
