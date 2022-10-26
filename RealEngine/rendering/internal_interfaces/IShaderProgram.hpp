@@ -34,12 +34,12 @@ enum class ShaderType {
 /**
  * @brief Represents SPIR-V source code of a shader stage
 */
-using ShaderSource = const std::basic_string<int>;
+using ShaderSource = const std::basic_string<unsigned int>;
 
 /**
  * @brief Represents a non-owning handle to source codes of a shader stage
 */
-using ShaderSourceRef = std::basic_string_view<int>;
+using ShaderSourceRef = std::basic_string_view<unsigned int>;
 
 /**
 * @brief POD representing source codes for all shaders within a shader program

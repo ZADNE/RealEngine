@@ -21,29 +21,29 @@ function(RealShaders_CollateShaders target)
     get_property(glsl_standard TARGET ${target} PROPERTY GLSL_STANDARD)
     list(APPEND glslc_flags "-std=${glsl_standard}")
     #Collate the shaders
+    set(stage_exts ".vert;.tesc;.tese;.geom;.frag;.comp")
     foreach(shader_source IN ZIP_LISTS shader_sources_rel shader_sources_abs)
         set(shader_source_rel ${shader_source_0})
         get_filename_component(shader_ext ${shader_source_rel} LAST_EXT)
-        if (${shader_ext} STREQUAL ".glsl")
-            continue() #Do not collate glsl 'header'
+        if (${shader_ext} IN_LIST stage_exts)
+            set(shader_source_abs ${shader_source_1})
+            set(shader_bin_abs "${CMAKE_CURRENT_BINARY_DIR}/${shader_source_rel}.spv")
+            list(APPEND shader_bins_abs ${shader_bin_abs})
+            set(shader_dep_abs "${CMAKE_CURRENT_BINARY_DIR}/${shader_source_rel}.d")
+            get_filename_component(shader_bin_dir_abs ${shader_bin_abs} DIRECTORY)
+            file(MAKE_DIRECTORY ${shader_bin_dir_abs})
+            add_custom_command(
+                OUTPUT ${shader_bin_abs}
+                COMMAND ${Vulkan_GLSLC_EXECUTABLE} -MD -mfmt=c -MF ${shader_dep_abs} ${shader_source_abs}
+                        -o ${shader_bin_abs} --target-env=opengl4.5 ${glslc_flags} "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
+                DEPENDS ${shader_source_abs}
+                BYPRODUCTS ${shader_dep_abs}
+                COMMENT "Compiling shader: ${shader_source_rel}"
+                DEPFILE ${shader_dep_abs}
+                VERBATIM
+                COMMAND_EXPAND_LISTS
+            )
         endif()
-        set(shader_source_abs ${shader_source_1})
-        set(shader_bin_abs "${CMAKE_CURRENT_BINARY_DIR}/${shader_source_rel}.spv")
-        list(APPEND shader_bins_abs ${shader_bin_abs})
-        set(shader_dep_abs "${CMAKE_CURRENT_BINARY_DIR}/${shader_source_rel}.d")
-        get_filename_component(shader_bin_dir_abs ${shader_bin_abs} DIRECTORY)
-        file(MAKE_DIRECTORY ${shader_bin_dir_abs})
-        add_custom_command(
-            OUTPUT ${shader_bin_abs}
-            COMMAND ${Vulkan_GLSLC_EXECUTABLE} -MD -mfmt=c -MF ${shader_dep_abs} ${shader_source_abs}
-                    -o ${shader_bin_abs} --target-env=vulkan1.2 ${glslc_flags} "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
-            DEPENDS ${shader_source_abs}
-            BYPRODUCTS ${shader_dep_abs}
-            COMMENT "Compiling shader: ${shader_source_rel}"
-            DEPFILE ${shader_dep_abs}
-            VERBATIM
-            COMMAND_EXPAND_LISTS
-        )
     endforeach()
     #Add custom target which compiles the shaders
     set(shader_target "${target}_Shaders")
