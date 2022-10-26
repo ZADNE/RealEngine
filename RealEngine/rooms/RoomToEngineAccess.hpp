@@ -146,7 +146,7 @@ public:
     const std::string& getWindowTitle() const;
 
     /**
-     * @brief Window::setDims
+     * @copydoc Window::setDims
     */
     void setWindowDims(const glm::ivec2& newDims, bool save);
 

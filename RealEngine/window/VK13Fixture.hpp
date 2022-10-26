@@ -42,7 +42,7 @@ public:
 
     ~VK13Fixture();
 
-    void prepareFrame(bool useImGui);
+    void prepareFrame(const glm::vec4& clearColor, bool useImGui);
     void finishFrame(bool useImGui);
 
 private:

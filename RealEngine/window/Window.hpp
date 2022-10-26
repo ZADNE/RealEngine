@@ -46,13 +46,13 @@ public:
     void operator=(const Window& other) = delete;
 
     /**
-     * @brief Prepares ImGui for new frame
+     * @brief Prepares for rendering of new frame
     */
     template<Renderer R>
     void prepareNewFrame();
 
     /**
-     * @brief Draws ImGui
+     * @brief Renders new frame
     */
     template<Renderer R>
     void finishNewFrame();
@@ -61,6 +61,11 @@ public:
      * @brief Passes SDL event to ImGui
     */
     void passSDLEvent(SDL_Event& evnt);
+
+    /**
+     * @brief Set the color that the default framebuffer is cleared with at the start of each frame
+    */
+    void setClearColor(const glm::vec4& clearColor) { m_clearColor = clearColor; }
 
     /**
      * @brief Enables/disables ImGui
@@ -138,6 +143,9 @@ private:
     };
     RendererID m_renderer;                  /**< The actual renderer (may be different from the preferred one) */
     std::string m_windowTitle;              /**< Title of the window */
+
+    //Room-dependent state variables
+    glm::vec4 m_clearColor{};
     bool m_usingImGui = false;
 };
 

@@ -104,13 +104,6 @@ public:
     */
     static void targetMe(FramebufferTarget target);
 
-    static void clearColor(const glm::vec4& color);
-    static void clearColor(const glm::ivec4& color);
-    static void clearColor(const glm::uvec4& color);
-    static void clearDepth(float depth);
-    static void clearStencil(int stencil);
-    static void clearDepthAndStencil(float depth, int stencil);
-
 private:
 
     static inline Framebuffer<R>* s_defaultFramebuffer = nullptr;

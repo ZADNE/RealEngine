@@ -181,7 +181,6 @@ private:
     int m_programExitCode = EXIT_SUCCESS;
 
     bool m_pollEventsInMainThread = true;
-    glm::vec4 m_clearColor{};
 
     void doRoomTransitionIfScheduled();
 

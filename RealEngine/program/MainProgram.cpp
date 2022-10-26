@@ -92,7 +92,7 @@ void MainProgram::setRelativeCursorMode(bool relative) {
 }
 
 void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
-    m_clearColor = s.clearColor;
+    m_window.setClearColor(s.clearColor);
     m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
     m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
     m_window.useImGui(s.usingImGui);
@@ -116,7 +116,6 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
     std::cout << "Entering main loop!" << std::endl;
     while (m_programShouldRun) {
         m_synchronizer.beginFrame();
-        DefaultFrameBuffer<R>::clearColor(m_clearColor);
 
         //Perform simulation steps to catch up the time
         while (m_synchronizer.shouldStepHappen()) {

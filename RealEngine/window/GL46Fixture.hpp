@@ -40,7 +40,7 @@ public:
 
     ~GL46Fixture();
 
-    void prepareFrame(bool useImGui);
+    void prepareFrame(const glm::vec4& clearColor, bool useImGui);
     void finishFrame(bool useImGui, SDL_Window* sdlWindow);
 
 private:

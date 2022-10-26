@@ -30,6 +30,7 @@ using enum vk::ImageViewType;
 
 namespace {
 constexpr auto MAX_TIMEOUT = std::numeric_limits<uint64_t>::max();
+void checkSuccess(vk::Result res) { assert(res == vk::Result::eSuccess); }
 }
 
 namespace RE {
@@ -88,18 +89,18 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
     ImGui_ImplVulkan_CreateFontsTexture(*m_commandBuffer);
     m_commandBuffer.end();
     m_graphicsQueue.submit(vk::SubmitInfo{{}, {}, *m_commandBuffer}, *uploadFence);
-    assert(m_device.waitForFences(*uploadFence, true, MAX_TIMEOUT) == vk::Result::eSuccess);
+    checkSuccess(m_device.waitForFences(*uploadFence, true, MAX_TIMEOUT));
 }
 
 VK13Fixture::~VK13Fixture() {
-    assert(m_device.waitForFences(*m_inFlight, true, MAX_TIMEOUT) == vk::Result::eSuccess);
+    checkSuccess(m_device.waitForFences(*m_inFlight, true, MAX_TIMEOUT));
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplSDL2_Shutdown();
 }
 
-void VK13Fixture::prepareFrame(bool useImGui) {
+void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
     //Wait for the previous frame to finish
-    assert(m_device.waitForFences(*m_inFlight, true, MAX_TIMEOUT) == vk::Result::eSuccess);
+    checkSuccess(m_device.waitForFences(*m_inFlight, true, MAX_TIMEOUT));
     m_device.resetFences(*m_inFlight);
 
     //Acquire next image
@@ -111,7 +112,7 @@ void VK13Fixture::prepareFrame(bool useImGui) {
         1u
     };
     auto [res, imageIndex] = m_device.acquireNextImage2KHR(acquireNextImageInfo);
-    assert(res == vk::Result::eSuccess);
+    checkSuccess(res);
     m_currentImageIndex = imageIndex;
 
     //Restart command buffer
@@ -119,7 +120,8 @@ void VK13Fixture::prepareFrame(bool useImGui) {
     m_commandBuffer.begin({});
 
     //Begin renderpass
-    vk::ClearValue clearValue{vk::ClearColorValue{std::array{0.1f, 0.1f, 0.1f, 1.0f}}};
+    const auto* clearColorPtr = reinterpret_cast<const std::array<float, 4u>*>(&clearColor);
+    vk::ClearValue clearValue{vk::ClearColorValue{*clearColorPtr}};
     vk::RenderPassBeginInfo renderPassBeginInfo{
         *m_renderPass,
         *m_swapChainFramebuffers[m_currentImageIndex],
@@ -159,7 +161,7 @@ void VK13Fixture::finishFrame(bool useImGui) {
         *m_swapchain,
         m_currentImageIndex
     };
-    assert(m_presentationQueue.presentKHR(presentInfo) == vk::Result::eSuccess);
+    checkSuccess(m_presentationQueue.presentKHR(presentInfo));
 }
 
 vk::raii::Instance VK13Fixture::createInstance(SDL_Window* sdlWindow) {
@@ -407,7 +409,7 @@ bool VK13Fixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physica
     bool graphicsQueueFound = false;
     bool presentQueueFound = false;
     std::vector<vk::QueueFamilyProperties> queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
-    for (size_t i = 0; i < queueFamilyProperties.size(); i++) {//Iterate over all queue families
+    for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size()); i++) {//Iterate over all queue families
         if (queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eGraphics) {
             m_graphicsQueueFamilyIndex = i;
             graphicsQueueFound = true;

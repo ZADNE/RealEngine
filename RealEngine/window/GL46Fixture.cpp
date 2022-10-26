@@ -77,7 +77,8 @@ GL46Fixture::~GL46Fixture() {
     SDL_GL_DeleteContext(m_glContext);
 }
 
-void GL46Fixture::prepareFrame(bool useImGui) {
+void GL46Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
+    glClearNamedFramebufferfv(0, GL_COLOR, 0u, const_cast<float*>(&clearColor.r));
     if (useImGui) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();

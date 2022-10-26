@@ -52,12 +52,12 @@ Window::~Window() {
 
 template<>
 void Window::prepareNewFrame<RendererVK13>() {
-    m_vk13.prepareFrame(m_usingImGui);
+    m_vk13.prepareFrame(m_clearColor, m_usingImGui);
 }
 
 template<>
 void Window::prepareNewFrame<RendererGL46>() {
-    m_gl46.prepareFrame(m_usingImGui);
+    m_gl46.prepareFrame(m_clearColor, m_usingImGui);
 }
 
 template<>

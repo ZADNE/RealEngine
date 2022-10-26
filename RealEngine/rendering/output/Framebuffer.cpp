@@ -97,36 +97,6 @@ void DefaultFrameBuffer<R>::targetMe(FramebufferTarget target) {
     s_defaultFramebuffer->targetMe(target);
 }
 
-template<Renderer R>
-void DefaultFrameBuffer<R>::clearColor(const glm::vec4& color) {
-    s_defaultFramebuffer->clearColorAttachment(0u, color);
-}
-
-template<Renderer R>
-void DefaultFrameBuffer<R>::clearColor(const glm::ivec4& color) {
-    s_defaultFramebuffer->clearColorAttachment(0u, color);
-}
-
-template<Renderer R>
-void DefaultFrameBuffer<R>::clearColor(const glm::uvec4& color) {
-    s_defaultFramebuffer->clearColorAttachment(0u, color);
-}
-
-template<Renderer R>
-void DefaultFrameBuffer<R>::clearDepth(float depth) {
-    s_defaultFramebuffer->clearDepthAttachment(depth);
-}
-
-template<Renderer R>
-void DefaultFrameBuffer<R>::clearStencil(int stencil) {
-    s_defaultFramebuffer->clearStencilAttachment(stencil);
-}
-
-template<Renderer R>
-void DefaultFrameBuffer<R>::clearDepthAndStencil(float depth, int stencil) {
-    s_defaultFramebuffer->clearDepthAndStencilAttachments(depth, stencil);
-}
-
 template class Framebuffer<RendererLateBind>;
 template class Framebuffer<RendererVK13>;
 template class Framebuffer<RendererGL46>;
