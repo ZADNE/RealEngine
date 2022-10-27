@@ -21,34 +21,33 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
 
     string(CONCAT folder_hpp
         ${hpp_preamble})
-
+        
+    set(stage_exts ".vert;.tesc;.tese;.geom;.frag;.comp")
     foreach(shader IN LISTS ARGN)
-        #Do not generate C++ for glsl 'headers'
         get_filename_component(shader_ext ${shader} LAST_EXT)
-        if ("${shader_ext}" STREQUAL ".glsl")
-            break() 
+        if (${shader_ext} IN_LIST stage_exts)
+            #Compose declarations for the C++ constant
+            string(REPLACE "." "_" shader_ ${shader})
+            set(shader_declaration_line "extern RE::ShaderSource ${shader_}\;\n")
+            string(APPEND folder_hpp "${shader_declaration_line}")
+            string(CONCAT shader_hpp
+                ${hpp_preamble}
+                "${shader_declaration_line}"
+                ${cpp_namespace_end})
+            file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.hpp" ${shader_hpp})
+            #Compose definition for the constant
+            set(shader_rel "${path_rel}/${shader}")
+            string(CONCAT shader_cpp
+                ${cpp_preamble}
+                "#include <${path_rel}/${shader_}.hpp>\n\n"
+                ${cpp_namespace_start}
+                "RE::ShaderSource ${shader_} =\n"
+                "#include <${path_rel}/${shader}.spv>\n"
+                "\;\n"
+                ${cpp_namespace_end})
+            file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.cpp" ${shader_cpp})
+            target_sources(${target} ${scope} "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.cpp")
         endif()
-        #Compose declarations for the C++ constant
-        string(REPLACE "." "_" shader_ ${shader})
-        set(shader_declaration_line "extern RE::ShaderSource ${shader_}\;\n")
-        string(APPEND folder_hpp "${shader_declaration_line}")
-        string(CONCAT shader_hpp
-            ${hpp_preamble}
-            "${shader_declaration_line}"
-            ${cpp_namespace_end})
-        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.hpp" ${shader_hpp})
-        #Compose definition for the constant
-        set(shader_rel "${path_rel}/${shader}")
-        string(CONCAT shader_cpp
-            ${cpp_preamble}
-            "#include <${path_rel}/${shader_}.hpp>\n\n"
-            ${cpp_namespace_start}
-            "RE::ShaderSource ${shader_} =\n"
-            "#include <${path_rel}/${shader}.spv>\n"
-            "\;\n"
-            ${cpp_namespace_end})
-        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.cpp" ${shader_cpp})
-        target_sources(${target} ${scope} "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.cpp")
     endforeach()
     
     string(APPEND folder_hpp ${cpp_namespace_end})
