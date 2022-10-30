@@ -102,7 +102,7 @@ void GL46ShaderProgram::dispatchCompute(const ShaderProgramID& sp, int indirect,
 
 void GL46ShaderProgram::printInfo(const ShaderProgramID& sp) const {
     std::cout << "|SHADER: " << sp.m_id << '\n';
-    //ATTRIBUTE INFO
+    //ATTRIBUTES
     int numberAttributes;
     glGetProgramiv(sp.m_id, GL_ACTIVE_ATTRIBUTES, &numberAttributes);
     std::cout << "|ATTRIBUTES: " << std::to_string(numberAttributes) << "\n";
@@ -116,7 +116,7 @@ void GL46ShaderProgram::printInfo(const ShaderProgramID& sp) const {
         std::cout << "|  layout (location = " << std::to_string(loc) << ") in " << GL46TypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
     }
 
-    //UNIFORM INFO
+    //UNIFORMS
     int numberUniforms;
     glGetProgramiv(sp.m_id, GL_ACTIVE_UNIFORMS, &numberUniforms);
     std::cout << "|UNIFORMS: " << std::to_string(numberUniforms) << "\n";
@@ -127,7 +127,28 @@ void GL46ShaderProgram::printInfo(const ShaderProgramID& sp) const {
         GLchar name[32];
         glGetActiveUniform(sp.m_id, i, 32, &length, &size, &type, &name[0]);
         int loc = glGetUniformLocation(sp.m_id, &name[0]);
-        std::cout << "|  layout (location = " << std::to_string(loc) << ") uniform " << GL46TypeToString(type) << " " << name << ((size > 1) ? ("[" + std::to_string(size) + "]") : "") << '\n';
+        std::printf("|  layout (location = %i) uniform %s %s%s;\n",
+            loc, &(GL46TypeToString(type))[0], name, ((size > 1) ? ("[" + std::to_string(size) + "]") : "").c_str());
+    }
+
+    //UNIFORM BLOCKS
+    GLint numberUniformBlocks;
+    glGetProgramiv(sp.m_id, GL_ACTIVE_UNIFORM_BLOCKS, &numberUniformBlocks);
+    std::cout << "|UNIFORM BLOCKS: " << std::to_string(numberUniformBlocks) << "\n";
+    for (int i = 0; i < numberUniformBlocks; i++) {
+        GLint nameLength;
+        glGetActiveUniformBlockiv(sp.m_id, i, GL_UNIFORM_BLOCK_NAME_LENGTH, &nameLength);
+        GLchar name[32];
+        glGetActiveUniformBlockName(sp.m_id, i, 32, nullptr, name);
+        GLuint binding = glGetUniformBlockIndex(sp.m_id, name);
+        GLint currBoundTo;
+        glGetActiveUniformBlockiv(sp.m_id, i, GL_UNIFORM_BLOCK_BINDING, &currBoundTo);
+        GLint dataSize;
+        glGetActiveUniformBlockiv(sp.m_id, i, GL_UNIFORM_BLOCK_DATA_SIZE, &dataSize);
+        GLint numberActiveUniforms;
+        glGetActiveUniformBlockiv(sp.m_id, i, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &numberActiveUniforms);
+        std::printf("|  layout (binding = %u (currBoundTo = %i)) uniform %s {%i active uniforms (totalSize = %i)};\n",
+            binding, currBoundTo, name, numberActiveUniforms, dataSize);
     }
 }
 
@@ -235,13 +256,13 @@ void GL46ShaderProgram::compileShader(ShaderProgramID& sp, const ShaderSourceRef
         int maxLength = 0;
         glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &maxLength);
 
-        std::vector<GLchar> infoLog(maxLength);
-        glGetShaderInfoLog(shaderID, maxLength, &maxLength, &infoLog[0]);
+        if (maxLength > 0) {
+            std::vector<GLchar> infoLog(maxLength);
+            glGetShaderInfoLog(shaderID, maxLength, &maxLength, infoLog.data());
+            error(infoLog.data());
+        }
 
         glDeleteShader(shaderID);
-
-        std::printf("%s\n", &infoLog[0]);
-
         fatalError("Failed to compile an internal shader!");
     }
 
@@ -258,15 +279,12 @@ void GL46ShaderProgram::linkProgram(ShaderProgramID& sp) const {
         int maxLength = 0;
         glGetProgramiv(sp.m_id, GL_INFO_LOG_LENGTH, &maxLength);
 
-        //The maxLength includes the NULL character
-        std::vector<GLchar> infoLog(maxLength);
-        glGetProgramInfoLog(sp.m_id, maxLength, &maxLength, &infoLog[0]);
+        if (maxLength > 0) {
+            std::vector<GLchar> infoLog(maxLength);
+            glGetProgramInfoLog(sp.m_id, maxLength, &maxLength, infoLog.data());
+            error(infoLog.data());
+        }
 
-        std::printf("%s\n", &infoLog[0]);
-
-        //Free shaders if not failing hard
-
-        //Fail hard
         fatalError("Failed to link shaders!");
     }
 
