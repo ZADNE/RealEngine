@@ -30,7 +30,7 @@ class VK13Fixture {
 public:
 
     /**
-     * @brief Sets up for Vulkan 1.3 rendering 
+     * @brief Sets up for Vulkan 1.3 rendering
      * @throws If anything fails
     */
     VK13Fixture(SDL_Window* sdlWindow, bool vSync);
@@ -135,6 +135,8 @@ private:
     bool areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice);
     bool isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice);
     bool findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice);
+
+    void recreateImGuiFontTexture();
 };
 
 }

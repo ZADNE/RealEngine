@@ -122,9 +122,19 @@ public:
     glm::ivec2 getDims() const { return m_dims; }
 
     /**
+     * @brief       Sets the preferred renderer.
+     * @param vSync True if vertical synchronization should be used, false for immediate buffer swap.
+     * @param save  Changed settings are saved to file if true.
+     * @details     Program needs to be restarted to change the renderer.
+     *              It is not guaranteed that the renderer will be used - a different one
+     *              may be used instead if the preferred one could not be initialized.
+    */
+    void setPreferredRenderer(RendererID renderer, bool save);
+
+    /**
      * @brief Gets the used renderer (this can be different from the requested one)
     */
-    RendererID getRenderer() const { return m_renderer; }
+    RendererID getUsedRenderer() const { return m_renderer; }
 
 private:
 

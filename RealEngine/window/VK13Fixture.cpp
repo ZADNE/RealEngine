@@ -31,6 +31,7 @@ using enum vk::ImageViewType;
 namespace {
 constexpr auto MAX_TIMEOUT = std::numeric_limits<uint64_t>::max();
 void checkSuccess(vk::Result res) { assert(res == vk::Result::eSuccess); }
+void checkSuccessImGui(VkResult res) { checkSuccess(vk::Result{res}); }
 }
 
 namespace RE {
@@ -66,7 +67,7 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
     m_renderingFinished(m_device, vk::SemaphoreCreateInfo{}),
     m_inFlight(m_device, vk::FenceCreateInfo{vk::FenceCreateFlagBits::eSignaled}) {
     //Initialize ImGui
-    if (!ImGui_ImplSDL2_InitForVulkan(sdlWindow)){
+    if (!ImGui_ImplSDL2_InitForVulkan(sdlWindow)) {
         throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
     }
     ImGui_ImplVulkan_InitInfo initInfo{
@@ -76,20 +77,12 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
         .DescriptorPool = *m_descriptorPool, .Subpass = 0u,
         .MinImageCount = m_minImageCount, .ImageCount = static_cast<uint32_t>(m_swapchainImageViews.size()),
         .MSAASamples = VK_SAMPLE_COUNT_1_BIT, .Allocator = nullptr,
-        .CheckVkResultFn = nullptr
+        .CheckVkResultFn = &checkSuccessImGui
     };
     if (!ImGui_ImplVulkan_Init(&initInfo, *m_renderPass)) {
         ImGui_ImplSDL2_Shutdown();
         throw std::runtime_error{"Could not initialize ImGui for Vulkan!"};
     }
-
-    //Create and upload ImGui textures
-    vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
-    m_commandBuffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-    ImGui_ImplVulkan_CreateFontsTexture(*m_commandBuffer);
-    m_commandBuffer.end();
-    m_graphicsQueue.submit(vk::SubmitInfo{{}, {}, *m_commandBuffer}, *uploadFence);
-    checkSuccess(m_device.waitForFences(*uploadFence, true, MAX_TIMEOUT));
 }
 
 VK13Fixture::~VK13Fixture() {
@@ -114,6 +107,11 @@ void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
     auto [res, imageIndex] = m_device.acquireNextImage2KHR(acquireNextImageInfo);
     checkSuccess(res);
     m_currentImageIndex = imageIndex;
+
+    //Rebuild fonts if new font were added
+    if (!ImGui::GetIO().Fonts->IsBuilt()) {
+        recreateImGuiFontTexture();
+    }
 
     //Restart command buffer
     m_commandBuffer.reset();
@@ -298,7 +296,7 @@ vk::raii::RenderPass VK13Fixture::createRenderPass() {
     vk::AttachmentReference attachmentRef{
         0, vk::ImageLayout::eColorAttachmentOptimal
     };
-    vk::SubpassDescription subpassDescription{{}, 
+    vk::SubpassDescription subpassDescription{{},
         vk::PipelineBindPoint::eGraphics,
         {},                 //Input attachments
         attachmentRef       //Color attachments
@@ -423,6 +421,15 @@ bool VK13Fixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physica
         }
     }
     return false;
+}
+
+void VK13Fixture::recreateImGuiFontTexture() {
+    vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
+    m_commandBuffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+    ImGui_ImplVulkan_CreateFontsTexture(*m_commandBuffer);
+    m_commandBuffer.end();
+    m_graphicsQueue.submit(vk::SubmitInfo{{}, {}, *m_commandBuffer}, *uploadFence);
+    checkSuccess(m_device.waitForFences(*uploadFence, true, MAX_TIMEOUT));
 }
 
 template<Renderer R>

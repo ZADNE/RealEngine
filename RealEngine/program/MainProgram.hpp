@@ -89,7 +89,7 @@ public:
     template<template<Renderer> class RoomTemplate, typename... ConstructorArgs> requires DerivedFromRoom<RoomTemplate<RendererGL46>>
     static Room* addRoom(ConstructorArgs&&... args) {
         auto& inst = instance();
-        switch (inst.m_window.getRenderer()) {
+        switch (inst.m_window.getUsedRenderer()) {
         case RendererID::VULKAN13:
             return inst.m_roomManager.addRoom<RoomTemplate<RendererVK13>>(std::forward<ConstructorArgs>(args)...);
         case RendererID::OPENGL46:

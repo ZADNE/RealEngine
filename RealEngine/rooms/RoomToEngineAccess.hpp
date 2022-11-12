@@ -101,7 +101,7 @@ public:
 #pragma region Window
 
     /**
-     * @copydoc Window::getFlags 
+     * @copydoc Window::getFlags
     */
     WindowFlags getWindowFlags() const;
 
@@ -113,7 +113,7 @@ public:
     /**
      * @copydoc Window::isFullscreen
     */
-    bool isWindowFullscreen() const; 
+    bool isWindowFullscreen() const;
 
     /**
      * @copydoc Window::setBorderless
@@ -154,6 +154,21 @@ public:
      * @copydoc Window::getDims
     */
     glm::ivec2 getWindowDims() const;
+
+    /**
+     * @copydoc Window::setPreferredRenderer
+    */
+    void setPreferredRenderer(RendererID renderer, bool save);
+
+    /**
+     * @copydoc Window::getPreferredRenderer
+    */
+    RendererID getPreferredRenderer() const;
+
+    /**
+     * @copydoc Window::getUsedRenderer
+    */
+    RendererID getUsedRenderer() const;
 
     /**
      * @copydoc WindowSettings::save

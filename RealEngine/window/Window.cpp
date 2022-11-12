@@ -110,6 +110,11 @@ const std::string& Window::getTitle() const {
     return m_windowTitle;
 }
 
+void Window::setPreferredRenderer(RendererID renderer, bool save) {
+    m_preferredRenderer = renderer;
+    if (save) this->save();
+}
+
 void Window::setDims(const glm::ivec2& newDims, bool save) {
     SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
     SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
@@ -139,7 +144,8 @@ void Window::initForVulkan13() {
     //Create OpenGL 4.6 fixture
     try {
         new (&m_vk13) VK13Fixture(m_SDLwindow, (bool)m_flags.vSync);
-    } catch (std::exception& e) {
+    }
+    catch (std::exception& e) {
         std::cerr << e.what();
         goto fail_SDLWindow;
     }
@@ -163,7 +169,8 @@ void Window::initForGL46() {
     //Create OpenGL 4.6 fixture
     try {
         new (&m_gl46) GL46Fixture(m_SDLwindow);
-    } catch (std::exception& e) {
+    }
+    catch (std::exception& e) {
         std::cerr << e.what();
         goto fail_SDLWindow;
     }

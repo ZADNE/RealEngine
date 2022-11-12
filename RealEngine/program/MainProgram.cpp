@@ -25,7 +25,7 @@ void MainProgram::initialize() {
 int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
     try {
         auto& inst = instance();
-        switch (inst.m_window.getRenderer()) {
+        switch (inst.m_window.getUsedRenderer()) {
         case RendererID::VULKAN13: return inst.doRun<RendererVK13>(roomName, args);
         case RendererID::OPENGL46: return inst.doRun<RendererGL46>(roomName, args);
         default: return 1;

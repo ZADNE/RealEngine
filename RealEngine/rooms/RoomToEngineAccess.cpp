@@ -127,6 +127,18 @@ glm::ivec2 RoomToEngineAccess::getWindowDims() const {
     return m_window.getDims();
 }
 
+void RoomToEngineAccess::setPreferredRenderer(RendererID renderer, bool save) {
+    m_window.setPreferredRenderer(renderer, save);
+}
+
+RendererID RoomToEngineAccess::getPreferredRenderer() const {
+    return m_window.getPreferredRenderer();
+}
+
+RendererID RoomToEngineAccess::getUsedRenderer() const {
+    return m_window.getUsedRenderer();
+}
+
 void RoomToEngineAccess::saveWindowSettings() {
     m_window.save();
 }
