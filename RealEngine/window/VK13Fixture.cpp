@@ -86,7 +86,7 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
 }
 
 VK13Fixture::~VK13Fixture() {
-    checkSuccess(m_device.waitForFences(*m_inFlight, true, MAX_TIMEOUT));
+    m_device.waitIdle();
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplSDL2_Shutdown();
 }
