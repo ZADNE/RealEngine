@@ -3,6 +3,7 @@
  */
 #pragma once
 #include <memory>
+#include <array>
 
 #include <vulkan/vulkan_raii.hpp>
 
@@ -38,6 +39,7 @@ public:
     VK13Fixture(const VK13Fixture&) = delete;
     VK13Fixture& operator=(const VK13Fixture&) = delete;
 
+    VK13Fixture(VK13Fixture&&) = default;
     VK13Fixture& operator=(VK13Fixture&&) = default;
 
     ~VK13Fixture();
@@ -45,7 +47,11 @@ public:
     void prepareFrame(const glm::vec4& clearColor, bool useImGui);
     void finishFrame(bool useImGui);
 
+    void changePresentation(bool vSync);
+
 private:
+
+    void recreateSwapchain();
 
     class Implementations {
     public:
@@ -83,6 +89,15 @@ private:
         ViewportState m_viewportState;
     };
 
+    static constexpr size_t FRAMES_IN_FLIGHT = 2;
+    template<typename T>
+    using PerFrameInFlight = std::array<T, FRAMES_IN_FLIGHT>;
+
+
+    uint32_t m_imageIndex = 0u;
+    size_t m_frame = 0;
+    SDL_Window* m_sdlWindow = nullptr;
+    bool m_vSync = false;
     vk::raii::Context m_context{};
     vk::raii::Instance m_instance;
 #ifndef NDEBUG
@@ -102,28 +117,30 @@ private:
     vk::raii::RenderPass m_renderPass;
     std::vector<vk::raii::Framebuffer> m_swapChainFramebuffers;
     vk::raii::CommandPool m_commandPool;
-    vk::raii::CommandBuffer m_commandBuffer;
+    PerFrameInFlight<vk::raii::CommandBuffer> m_commandBuffers;
     vk::raii::PipelineCache m_pipelineCache;
     vk::raii::DescriptorPool m_descriptorPool;
-    vk::raii::Semaphore m_imageAvailable;
-    vk::raii::Semaphore m_renderingFinished;
-    vk::raii::Fence m_inFlight;
-    uint32_t m_currentImageIndex = 0u;
+    PerFrameInFlight<vk::raii::Semaphore> m_imageAvailableSems;
+    PerFrameInFlight<vk::raii::Semaphore> m_renderingFinishedSems;
+    PerFrameInFlight<vk::raii::Fence> m_inFlightFences;
+    bool m_recreteSwapchain = false;
 
     Implementations m_impls;
 
-    vk::raii::Instance createInstance(SDL_Window* sdlWindow);
+    vk::raii::Instance createInstance();
     vk::raii::DebugUtilsMessengerEXT createDebugUtilsMessenger();
-    vk::raii::SurfaceKHR createSurface(SDL_Window* sdlWindow);
+    vk::raii::SurfaceKHR createSurface();
     vk::raii::PhysicalDevice createPhysicalDevice();
     vk::raii::Device createDevice();
     vk::raii::Queue createQueue(uint32_t familyIndex);
-    vk::raii::SwapchainKHR createSwapchain(SDL_Window* sdlWindow, bool vSync);
+    vk::raii::SwapchainKHR createSwapchain();
     std::vector<vk::raii::ImageView> createSwapchainImageViews();
     vk::raii::RenderPass createRenderPass();
     std::vector<vk::raii::Framebuffer> createSwapchainFramebuffers();
     vk::raii::CommandPool createCommandPool();
-    vk::raii::CommandBuffer createCommandBuffer();
+    PerFrameInFlight<vk::raii::CommandBuffer> createCommandBuffers();
+    PerFrameInFlight<vk::raii::Semaphore> createSemaphores();
+    PerFrameInFlight<vk::raii::Fence> createFences();
     vk::raii::PipelineCache createPipelineCache();
     vk::raii::DescriptorPool createDescriptorPool();
 

@@ -15,20 +15,20 @@
 namespace RE {
 
 Window::Window(const WindowSettings& settings, const std::string& title) :
-    WindowSettings(settings), m_subsystems(), m_windowTitle(title), m_renderer(RendererID::ANY) {
+    WindowSettings(settings), m_subsystems(), m_windowTitle(title), m_usedRenderer(RendererID::ANY) {
 
     m_subsystems.printRealEngineVersion();
     m_subsystems.printSubsystemsVersions();
 
     initForRenderer(settings.getPreferredRenderer());
 
-    if (m_renderer == RendererID::ANY) {//If the preferred renderer could not be initialized
+    if (m_usedRenderer == RendererID::ANY) {//If the preferred renderer could not be initialized
         for (size_t i = 0; i < static_cast<size_t>(RendererID::ANY); i++) {//Try to init any other
             initForRenderer(static_cast<RendererID>(i));
-            if (m_renderer != RendererID::ANY) break;
+            if (m_usedRenderer != RendererID::ANY) break;
         }
 
-        if (m_renderer == RendererID::ANY) {//If no renderer could be initialized
+        if (m_usedRenderer == RendererID::ANY) {//If no renderer could be initialized
             //There is nothing more we can do
             fatalError("No renderer could be initialized!");
         }
@@ -37,11 +37,11 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
     Viewport<>::s_state->windowSize = m_dims;
     Viewport<>::s_state->trackingWindow = true;
 
-    assert(m_renderer == RendererID::VULKAN13 || m_renderer == RendererID::OPENGL46);
+    assert(m_usedRenderer == RendererID::VULKAN13 || m_usedRenderer == RendererID::OPENGL46);
 }
 
 Window::~Window() {
-    switch (m_renderer) {
+    switch (m_usedRenderer) {
     case RE::RendererID::VULKAN13:
         m_vk13.~VK13Fixture(); break;
     case RE::RendererID::OPENGL46:
@@ -89,14 +89,18 @@ void Window::setBorderless(bool borderless, bool save) {
 
 void Window::setVSync(bool vSync, bool save) {
     m_flags.vSync = vSync;
-    if (m_flags.vSync) {
-        if (SDL_GL_SetSwapInterval(-1)) {
-            //Cannot use adaptive vSync, use regular vSync
-            log(SDL_GetError());
-            SDL_GL_SetSwapInterval(1);
+    if (m_usedRenderer == RendererID::VULKAN13) {
+        m_vk13.changePresentation(m_flags.vSync);
+    } else if (m_usedRenderer == RendererID::OPENGL46) {
+        if (m_flags.vSync) {
+            if (SDL_GL_SetSwapInterval(-1)) {
+                //Cannot use adaptive vSync, use regular vSync
+                log(SDL_GetError());
+                SDL_GL_SetSwapInterval(1);
+            }
+        } else {
+            SDL_GL_SetSwapInterval(0);
         }
-    } else {
-        SDL_GL_SetSwapInterval(0);
     }
     if (save) this->save();
 }
@@ -150,14 +154,14 @@ void Window::initForVulkan13() {
         goto fail_SDLWindow;
     }
 
-    m_renderer = RendererID::VULKAN13;
+    m_usedRenderer = RendererID::VULKAN13;
     return;
 
 fail_SDLWindow:
     SDL_DestroyWindow(m_SDLwindow);
     m_SDLwindow = nullptr;
 fail:
-    m_renderer = RendererID::ANY;
+    m_usedRenderer = RendererID::ANY;
 }
 
 void Window::initForGL46() {
@@ -178,14 +182,14 @@ void Window::initForGL46() {
     //Set vertical synchronisation
     setVSync(m_flags.vSync, false);
 
-    m_renderer = RendererID::OPENGL46;
+    m_usedRenderer = RendererID::OPENGL46;
     return;
 
 fail_SDLWindow:
     SDL_DestroyWindow(m_SDLwindow);
     m_SDLwindow = nullptr;
 fail:
-    m_renderer = RendererID::ANY;
+    m_usedRenderer = RendererID::ANY;
 }
 
 bool Window::createSDLWindow(RendererID renderer) {

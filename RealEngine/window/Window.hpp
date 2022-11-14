@@ -134,7 +134,7 @@ public:
     /**
      * @brief Gets the used renderer (this can be different from the requested one)
     */
-    RendererID getUsedRenderer() const { return m_renderer; }
+    RendererID getUsedRenderer() const { return m_usedRenderer; }
 
 private:
 
@@ -151,7 +151,7 @@ private:
         VK13Fixture m_vk13;
         GL46Fixture m_gl46;
     };
-    RendererID m_renderer;                  /**< The actual renderer (may be different from the preferred one) */
+    RendererID m_usedRenderer;              /**< The actual renderer (may be different from the preferred one) */
     std::string m_windowTitle;              /**< Title of the window */
 
     //Room-dependent state variables

@@ -46,28 +46,30 @@ constexpr vk::SurfaceFormatKHR SURFACE_FORMAT{
 };
 
 VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
-    m_instance(createInstance(sdlWindow)),
+    m_sdlWindow(sdlWindow),
+    m_vSync(vSync),
+    m_instance(createInstance()),
 #ifndef NDEBUG
     m_debugUtilsMessenger(createDebugUtilsMessenger()),
 #endif // !NDEBUG
-    m_surface(createSurface(sdlWindow)),
+    m_surface(createSurface()),
     m_physicalDevice(createPhysicalDevice()),
     m_device(createDevice()),
     m_graphicsQueue(createQueue(m_graphicsQueueFamilyIndex)),
     m_presentationQueue(createQueue(m_presentationQueueFamilyIndex)),
-    m_swapchain(createSwapchain(sdlWindow, vSync)),
+    m_swapchain(createSwapchain()),
     m_swapchainImageViews(createSwapchainImageViews()),
     m_renderPass(createRenderPass()),
     m_swapChainFramebuffers(createSwapchainFramebuffers()),
     m_commandPool(createCommandPool()),
-    m_commandBuffer(createCommandBuffer()),
+    m_commandBuffers(createCommandBuffers()),
     m_pipelineCache(createPipelineCache()),
     m_descriptorPool(createDescriptorPool()),
-    m_imageAvailable(m_device, vk::SemaphoreCreateInfo{}),
-    m_renderingFinished(m_device, vk::SemaphoreCreateInfo{}),
-    m_inFlight(m_device, vk::FenceCreateInfo{vk::FenceCreateFlagBits::eSignaled}) {
+    m_imageAvailableSems(createSemaphores()),
+    m_renderingFinishedSems(createSemaphores()),
+    m_inFlightFences(createFences()) {
     //Initialize ImGui
-    if (!ImGui_ImplSDL2_InitForVulkan(sdlWindow)) {
+    if (!ImGui_ImplSDL2_InitForVulkan(m_sdlWindow)) {
         throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
     }
     ImGui_ImplVulkan_InitInfo initInfo{
@@ -93,20 +95,27 @@ VK13Fixture::~VK13Fixture() {
 
 void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
     //Wait for the previous frame to finish
-    checkSuccess(m_device.waitForFences(*m_inFlight, true, MAX_TIMEOUT));
-    m_device.resetFences(*m_inFlight);
+    checkSuccess(m_device.waitForFences(*m_inFlightFences[m_frame], true, MAX_TIMEOUT));
+
+    //Recreate swapchain if required
+    if (m_recreteSwapchain) {
+        recreateSwapchain();
+        m_recreteSwapchain = false;
+    }
+
+    m_device.resetFences(*m_inFlightFences[m_frame]);
 
     //Acquire next image
     vk::AcquireNextImageInfoKHR acquireNextImageInfo{
         *m_swapchain,
         MAX_TIMEOUT,
-        *m_imageAvailable,
+        *m_imageAvailableSems[m_frame],
         nullptr,
         1u
     };
     auto [res, imageIndex] = m_device.acquireNextImage2KHR(acquireNextImageInfo);
     checkSuccess(res);
-    m_currentImageIndex = imageIndex;
+    m_imageIndex = imageIndex;
 
     //Rebuild fonts if new font were added
     if (!ImGui::GetIO().Fonts->IsBuilt()) {
@@ -114,19 +123,19 @@ void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
     }
 
     //Restart command buffer
-    m_commandBuffer.reset();
-    m_commandBuffer.begin({});
+    m_commandBuffers[m_frame].reset();
+    m_commandBuffers[m_frame].begin({});
 
     //Begin renderpass
     const auto* clearColorPtr = reinterpret_cast<const std::array<float, 4u>*>(&clearColor);
     vk::ClearValue clearValue{vk::ClearColorValue{*clearColorPtr}};
     vk::RenderPassBeginInfo renderPassBeginInfo{
         *m_renderPass,
-        *m_swapChainFramebuffers[m_currentImageIndex],
+        *m_swapChainFramebuffers[m_imageIndex],
         vk::Rect2D{{}, m_swapchainExtent},
         clearValue
     };
-    m_commandBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+    m_commandBuffers[m_frame].beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
 
     if (useImGui) {
         ImGui_ImplVulkan_NewFrame();
@@ -138,31 +147,54 @@ void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
 void VK13Fixture::finishFrame(bool useImGui) {
     if (useImGui) {
         ImGui::Render();
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *m_commandBuffer);
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *m_commandBuffers[m_frame]);
     }
 
     //Submit the command buffer
-    m_commandBuffer.endRenderPass();
-    m_commandBuffer.end();
+    m_commandBuffers[m_frame].endRenderPass();
+    m_commandBuffers[m_frame].end();
     vk::PipelineStageFlags waitDstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
     vk::SubmitInfo submitInfo{
-        *m_imageAvailable,
+        *m_imageAvailableSems[m_frame],
         waitDstStageMask,
-        *m_commandBuffer,
-        *m_renderingFinished
+        *m_commandBuffers[m_frame],
+        *m_renderingFinishedSems[m_frame]
     };
-    m_graphicsQueue.submit(submitInfo, *m_inFlight);
+    m_graphicsQueue.submit(submitInfo, *m_inFlightFences[m_frame]);
 
     //Present new image
     vk::PresentInfoKHR presentInfo{
-        *m_renderingFinished,
+        *m_renderingFinishedSems[m_frame],
         *m_swapchain,
-        m_currentImageIndex
+        m_imageIndex
     };
-    checkSuccess(m_presentationQueue.presentKHR(presentInfo));
+
+    try {
+        checkSuccess(m_presentationQueue.presentKHR(presentInfo));
+    }
+    catch (vk::OutOfDateKHRError& e) {
+        recreateSwapchain();
+    }
+
+    m_frame = (m_frame + 1) % FRAMES_IN_FLIGHT;
 }
 
-vk::raii::Instance VK13Fixture::createInstance(SDL_Window* sdlWindow) {
+void VK13Fixture::changePresentation(bool vSync) {
+    m_vSync = vSync;
+    m_recreteSwapchain = true;
+}
+
+void VK13Fixture::recreateSwapchain() {
+    m_device.waitIdle();
+    m_swapChainFramebuffers.~vector();
+    m_swapchainImageViews.~vector();
+    m_swapchain.~SwapchainKHR();
+    new (&m_swapchain) decltype(m_swapchain){createSwapchain()};
+    new (&m_swapchainImageViews) decltype(m_swapchainImageViews){createSwapchainImageViews()};
+    new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers){createSwapchainFramebuffers()};
+}
+
+vk::raii::Instance VK13Fixture::createInstance() {
     //Prepare default layers and extensions
     std::vector<const char*> extensions = {
 #ifndef NDEBUG
@@ -177,12 +209,12 @@ vk::raii::Instance VK13Fixture::createInstance(SDL_Window* sdlWindow) {
 
     //Add extensions required by SDL2
     unsigned int sdl2ExtensionCount;
-    if (!SDL_Vulkan_GetInstanceExtensions(sdlWindow, &sdl2ExtensionCount, nullptr)) {
+    if (!SDL_Vulkan_GetInstanceExtensions(m_sdlWindow, &sdl2ExtensionCount, nullptr)) {
         throw std::runtime_error("Could not get number of Vulkan extensions required for SDL2!");
     }
     size_t defaultExtensionsCount = extensions.size();
     extensions.resize(defaultExtensionsCount + sdl2ExtensionCount);
-    if (!SDL_Vulkan_GetInstanceExtensions(sdlWindow, &sdl2ExtensionCount, &extensions[defaultExtensionsCount])) {
+    if (!SDL_Vulkan_GetInstanceExtensions(m_sdlWindow, &sdl2ExtensionCount, &extensions[defaultExtensionsCount])) {
         throw std::runtime_error("Could not get Vulkan extensions required for SDL2!");
     }
 
@@ -205,9 +237,9 @@ vk::raii::DebugUtilsMessengerEXT VK13Fixture::createDebugUtilsMessenger() {
     return vk::raii::DebugUtilsMessengerEXT{m_instance, debugMessengerCreateInfo};
 }
 
-vk::raii::SurfaceKHR VK13Fixture::createSurface(SDL_Window* sdlWindow) {
+vk::raii::SurfaceKHR VK13Fixture::createSurface() {
     VkSurfaceKHR surface;
-    if (!SDL_Vulkan_CreateSurface(sdlWindow, *m_instance, &surface)) {
+    if (!SDL_Vulkan_CreateSurface(m_sdlWindow, *m_instance, &surface)) {
         throw std::runtime_error("SDL2 could not create Vulkan surface!");
     }
     return vk::raii::SurfaceKHR{m_instance, surface};
@@ -236,7 +268,7 @@ vk::raii::Queue VK13Fixture::createQueue(uint32_t familyIndex) {
     return vk::raii::Queue{m_device, familyIndex, 0u};
 }
 
-vk::raii::SwapchainKHR VK13Fixture::createSwapchain(SDL_Window* sdlWindow, bool vSync) {
+vk::raii::SwapchainKHR VK13Fixture::createSwapchain() {
     auto caps = m_physicalDevice.getSurfaceCapabilitiesKHR(*m_surface);
     //Minimum image count
     m_minImageCount = glm::clamp(
@@ -250,7 +282,7 @@ vk::raii::SwapchainKHR VK13Fixture::createSwapchain(SDL_Window* sdlWindow, bool 
         m_swapchainExtent = caps.currentExtent;
     } else {
         glm::ivec2 windowPx;
-        SDL_Vulkan_GetDrawableSize(sdlWindow, &windowPx.x, &windowPx.y);
+        SDL_Vulkan_GetDrawableSize(m_sdlWindow, &windowPx.x, &windowPx.y);
         m_swapchainExtent.width = std::clamp(static_cast<uint32_t>(windowPx.x), caps.minImageExtent.width, caps.maxImageExtent.width);
         m_swapchainExtent.height = std::clamp(static_cast<uint32_t>(windowPx.y), caps.minImageExtent.height, caps.maxImageExtent.height);
     }
@@ -264,7 +296,7 @@ vk::raii::SwapchainKHR VK13Fixture::createSwapchain(SDL_Window* sdlWindow, bool 
         m_swapchainExtent, 1u, eColorAttachment,
         sharingMode, oneQueueFamily ? vk::ArrayProxyNoTemporaries<const uint32_t>{} : queueFamilyIndices,
         caps.currentTransform, eOpaque,
-        vSync ? eMailbox : eImmediate, true
+        m_vSync ? eMailbox : eImmediate, true
     };
     return vk::raii::SwapchainKHR{m_device, createInfo};
 }
@@ -339,9 +371,21 @@ vk::raii::CommandPool VK13Fixture::createCommandPool() {
     return vk::raii::CommandPool{m_device, createInfo};
 }
 
-vk::raii::CommandBuffer VK13Fixture::createCommandBuffer() {
-    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{*m_commandPool, vk::CommandBufferLevel::ePrimary, 1};
-    return vk::raii::CommandBuffer{std::move(vk::raii::CommandBuffers{m_device, commandBufferAllocateInfo}.front())};
+VK13Fixture::PerFrameInFlight<vk::raii::CommandBuffer> VK13Fixture::createCommandBuffers() {
+    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{*m_commandPool, vk::CommandBufferLevel::ePrimary, FRAMES_IN_FLIGHT};
+    vk::raii::CommandBuffers buffers{m_device, commandBufferAllocateInfo};
+    assert(buffers.size() == FRAMES_IN_FLIGHT);
+    return PerFrameInFlight<vk::raii::CommandBuffer>{std::move(buffers[0]), std::move(buffers[1])};
+}
+
+VK13Fixture::PerFrameInFlight<vk::raii::Semaphore> VK13Fixture::createSemaphores() {
+    vk::SemaphoreCreateInfo createInfo{};
+    return {vk::raii::Semaphore{m_device, createInfo}, vk::raii::Semaphore{m_device, createInfo}};
+}
+
+VK13Fixture::PerFrameInFlight<vk::raii::Fence> VK13Fixture::createFences() {
+    vk::FenceCreateInfo createInfo{vk::FenceCreateFlagBits::eSignaled};
+    return {vk::raii::Fence{m_device, createInfo}, vk::raii::Fence{m_device, createInfo}};
 }
 
 vk::raii::PipelineCache VK13Fixture::createPipelineCache() {
@@ -425,10 +469,10 @@ bool VK13Fixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physica
 
 void VK13Fixture::recreateImGuiFontTexture() {
     vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
-    m_commandBuffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-    ImGui_ImplVulkan_CreateFontsTexture(*m_commandBuffer);
-    m_commandBuffer.end();
-    m_graphicsQueue.submit(vk::SubmitInfo{{}, {}, *m_commandBuffer}, *uploadFence);
+    m_commandBuffers[m_frame].begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+    ImGui_ImplVulkan_CreateFontsTexture(*m_commandBuffers[m_frame]);
+    m_commandBuffers[m_frame].end();
+    m_graphicsQueue.submit(vk::SubmitInfo{{}, {}, *m_commandBuffers[m_frame]}, *uploadFence);
     checkSuccess(m_device.waitForFences(*uploadFence, true, MAX_TIMEOUT));
 }
 
