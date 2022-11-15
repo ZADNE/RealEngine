@@ -179,10 +179,11 @@ void Window::initForGL46() {
         goto fail_SDLWindow;
     }
 
-    //Set vertical synchronisation
-    setVSync(m_flags.vSync, false);
 
     m_usedRenderer = RendererID::OPENGL46;
+
+    //Set vertical synchronisation
+    setVSync(m_flags.vSync, false);
     return;
 
 fail_SDLWindow:

@@ -36,11 +36,11 @@ enum class BufferUsageFlags : unsigned int {
     CLIENT_STORAGE = 32
 };
 
-inline BufferUsageFlags operator|(BufferUsageFlags a, BufferUsageFlags b) {
+constexpr inline BufferUsageFlags operator|(BufferUsageFlags a, BufferUsageFlags b) {
     return static_cast<BufferUsageFlags>(static_cast<unsigned int>(a) | static_cast<unsigned int>(b));
 }
 
-inline bool operator&(BufferUsageFlags a, BufferUsageFlags b) {
+constexpr inline bool operator&(BufferUsageFlags a, BufferUsageFlags b) {
     return static_cast<unsigned int>(a) & static_cast<unsigned int>(b);
 }
 
@@ -58,11 +58,11 @@ enum class BufferMapUsageFlags : unsigned int {
     UNSYNCHRONIZED = 128        /**< Indicates that the GL should not attempt to synchronize pending operations on the buffer */
 };
 
-inline BufferMapUsageFlags operator|(BufferMapUsageFlags a, BufferMapUsageFlags b) {
+constexpr inline BufferMapUsageFlags operator|(BufferMapUsageFlags a, BufferMapUsageFlags b) {
     return static_cast<BufferMapUsageFlags>(static_cast<unsigned int>(a) | static_cast<unsigned int>(b));
 }
 
-inline bool operator&(BufferMapUsageFlags a, BufferMapUsageFlags b) {
+constexpr inline bool operator&(BufferMapUsageFlags a, BufferMapUsageFlags b) {
     return static_cast<unsigned int>(a) & static_cast<unsigned int>(b);
 }
 
@@ -85,7 +85,7 @@ public:
     }
 
     BufferID& operator=(const BufferID&) = delete;
-    BufferID& operator=(BufferID && other) noexcept {
+    BufferID& operator=(BufferID&& other) noexcept {
         std::swap(m_id, other.m_id);
         m_access = other.m_access;
         return *this;

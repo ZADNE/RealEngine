@@ -4,7 +4,7 @@ function(RealShaders_CollateShaders target)
     #Load target properties and prepare variables
     get_property(shader_sources_rel TARGET ${target} PROPERTY SHADER_SOURCES_REL)
     get_property(shader_sources_abs TARGET ${target} PROPERTY SHADER_SOURCES_ABS)
-    get_property(shader_includes TARGET ${target} PROPERTY INCLUDE_DIRECTORIES)
+    set(shader_includes "$<TARGET_PROPERTY:${target},INCLUDE_DIRECTORIES>")
     #Determine shader compilation flags
     if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
         set(glslc_flags "-O")

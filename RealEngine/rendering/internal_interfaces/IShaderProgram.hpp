@@ -12,6 +12,8 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
+#include <vulkan/vulkan.hpp>
+
 #include <RealEngine/utility/Error.hpp>
 #include <RealEngine/rendering/buffers/BufferTypedIndex.hpp>
 #include <RealEngine/rendering/textures/TextureUnit.hpp>
@@ -34,27 +36,33 @@ enum class ShaderType {
 /**
  * @brief Represents SPIR-V source code of a shader stage
 */
-using ShaderSource = const std::basic_string<unsigned int>;
+using ShaderSource = const std::basic_string<uint32_t>;
 
 /**
  * @brief Represents a non-owning handle to source codes of a shader stage
 */
-using ShaderSourceRef = std::basic_string_view<unsigned int>;
+using ShaderSourceRef = std::basic_string_view<uint32_t>;
 
 /**
 * @brief POD representing source codes for all shaders within a shader program
 */
 struct ShaderProgramSources {
 
+    static constexpr size_t NUM_STAGES = 6;
+
+    ShaderSourceRef operator[](size_t type) const {
+        return operator[](static_cast<ShaderType>(type));
+    }
+
     ShaderSourceRef operator[](ShaderType type) const {
         switch (type) {
-        case RE::ShaderType::VERTEX: return vert;
-        case RE::ShaderType::TESS_CONTROL: return tesc;
-        case RE::ShaderType::TESS_EVALUATION: return tese;
-        case RE::ShaderType::GEOMETRY: return geom;
-        case RE::ShaderType::FRAGMENT: return frag;
-        case RE::ShaderType::COMPUTE: return comp;
-        default: fatalError("Tried to access invalid shader type");
+        case ShaderType::VERTEX: return vert;
+        case ShaderType::TESS_CONTROL: return tesc;
+        case ShaderType::TESS_EVALUATION: return tese;
+        case ShaderType::GEOMETRY: return geom;
+        case ShaderType::FRAGMENT: return frag;
+        case ShaderType::COMPUTE: return comp;
+        default: throw Exception{"Tried to access invalid shader type"};
         }
     }
 
@@ -79,22 +87,28 @@ public:
 
     ShaderProgramID(const ShaderProgramID&) = delete;
     ShaderProgramID(ShaderProgramID&& other) noexcept :
-        m_id(other.m_id) {
-        other.m_id = 0;
+        m_data(other.m_data) {
+        std::memset(&other.m_data, 0, sizeof(other.m_data));
     }
 
     ShaderProgramID& operator=(const ShaderProgramID&) = delete;
     ShaderProgramID& operator=(ShaderProgramID&& other) noexcept {
-        std::swap(m_id, other.m_id);
+        std::swap(m_data, other.m_data);
         return *this;
     }
 
 private:
 
-    ShaderProgramID(unsigned int id) :
-        m_id(id) {}
+    ShaderProgramID(vk::Pipeline pipeline) :
+        m_data({.pipeline = pipeline}) {}
 
-    unsigned int m_id = 0;      /**< Internal identifier */
+    ShaderProgramID(unsigned int id) :
+        m_data({.id = id}) {}
+
+    union Data {
+        vk::Pipeline pipeline;
+        unsigned int id;
+    } m_data;
 };
 
 /**

@@ -13,6 +13,7 @@ namespace RE {
 * Do not use this directly - use ShaderProgram instead.
 */
 class VK13ShaderProgram final : public IShaderProgram {
+    friend class VK13Fixture;
 public:
 
     ShaderProgramID construct(const ShaderProgramSources& sources) const override;
@@ -70,6 +71,14 @@ public:
 
     void setUniform(const ShaderProgramID& sp, int location, TextureUnit unit) const override;
     void setUniform(const ShaderProgramID& sp, int location, ImageUnit unit) const override;
+
+private:
+
+    VK13ShaderProgram(const vk::Device& device) :
+        m_device(device) {
+    }
+
+    const vk::Device& m_device;
 };
 
 }

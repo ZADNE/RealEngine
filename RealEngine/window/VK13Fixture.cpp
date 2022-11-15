@@ -172,7 +172,7 @@ void VK13Fixture::finishFrame(bool useImGui) {
     try {
         checkSuccess(m_presentationQueue.presentKHR(presentInfo));
     }
-    catch (vk::OutOfDateKHRError& e) {
+    catch (vk::OutOfDateKHRError&) {
         recreateSwapchain();
     }
 

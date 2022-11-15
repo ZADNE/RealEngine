@@ -56,7 +56,8 @@ private:
     class Implementations {
     public:
 
-        Implementations() {
+        Implementations(const vk::Device& device) :
+            m_shaderProgramImpl(device) {
             assignReferences<RendererLateBind>();
             assignReferences<RendererVK13>();
         }
@@ -125,7 +126,7 @@ private:
     PerFrameInFlight<vk::raii::Fence> m_inFlightFences;
     bool m_recreteSwapchain = false;
 
-    Implementations m_impls;
+    Implementations m_impls{*m_device};
 
     vk::raii::Instance createInstance();
     vk::raii::DebugUtilsMessengerEXT createDebugUtilsMessenger();

@@ -1,10 +1,11 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  *  @file
  */
 #pragma once
 #include <stdlib.h>
 
+#include <stdexcept>
 #include <string_view>
 
 namespace RE {
@@ -34,6 +35,21 @@ void error(std::string_view error, bool appendEOL = true);
  * @param newLine If true, end of line will be appended at the end of message.
  */
 void log(std::string_view message, bool appendEOL = true);
+
+/**
+ * @brief Is the base class for exceptions thrown by RealEngine
+*/
+class Exception : public std::runtime_error {
+public:
+
+    Exception(const char* str) :
+        std::runtime_error(str) {
+    }
+
+    Exception(const std::string& str) :
+        std::runtime_error(str) {
+    }
+};
 
 
 }
