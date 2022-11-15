@@ -36,12 +36,23 @@ enum class ShaderType {
 /**
  * @brief Represents SPIR-V source code of a shader stage
 */
-using ShaderSource = const std::basic_string<uint32_t>;
+struct ShaderSource {
+    const std::basic_string<uint32_t> vk13;/**< SPIR-V compiled for Vulkan 1.3 environment */
+    const std::basic_string<uint32_t> gl46;/**< SPIR-V compiled for OpenGL 4.6 environment */
+};
 
 /**
  * @brief Represents a non-owning handle to source codes of a shader stage
 */
-using ShaderSourceRef = std::basic_string_view<uint32_t>;
+struct ShaderSourceRef {
+    ShaderSourceRef() {}
+    ShaderSourceRef(const ShaderSource& source) :
+        vk13(source.vk13),
+        gl46(source.gl46) {}
+
+    std::basic_string_view<uint32_t> vk13{};
+    std::basic_string_view<uint32_t> gl46{};
+};
 
 /**
 * @brief POD representing source codes for all shaders within a shader program

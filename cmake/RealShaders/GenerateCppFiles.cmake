@@ -41,9 +41,13 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
                 ${cpp_preamble}
                 "#include <${path_rel}/${shader_}.hpp>\n\n"
                 ${cpp_namespace_start}
-                "RE::ShaderSource ${shader_} =\n"
-                "#include <${path_rel}/${shader}.spv>\n"
-                "\;\n"
+                "//Generated from file: ${path_rel}/${shader}\n"
+                "RE::ShaderSource ${shader_} ={\n"
+                "    .vk13 =\n"
+                "    #include <${path_rel}/${shader}.spv_vk13>\n"
+                "    ,.gl46 =\n"
+                "    #include <${path_rel}/${shader}.spv_gl46>\n"
+                "}\;\n"
                 ${cpp_namespace_end})
             file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.cpp" ${shader_cpp})
             target_sources(${target} ${scope} "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.cpp")

@@ -165,7 +165,7 @@ ShaderProgramID GL46ShaderProgram::compileProgram(const ShaderProgramSources& so
     //Create, compile and attach shaders
     std::array<unsigned int, ShaderProgramSources::NUM_STAGES> shaderIDs{};
     for (size_t i = 0; i < ShaderProgramSources::NUM_STAGES; ++i) {
-        if (!sources[i].empty()) {
+        if (!sources[i].gl46.empty()) {
             shaderIDs[i] = glCreateShader(convert(i));
         #ifndef NDEBUG
             if (shaderIDs[i] == 0) {
@@ -191,7 +191,7 @@ ShaderProgramID GL46ShaderProgram::compileProgram(const ShaderProgramSources& so
 }
 
 void GL46ShaderProgram::compileShader(ShaderProgramID& sp, const ShaderSourceRef& source, unsigned int shaderID) const {
-    glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, source.data(), static_cast<GLsizei>(source.size() * sizeof(ShaderSourceRef::value_type)));
+    glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, source.gl46.data(), static_cast<GLsizei>(source.gl46.size() * sizeof(uint32_t)));
 
     glSpecializeShader(shaderID, "main", 0u, nullptr, nullptr);
 
@@ -216,7 +216,6 @@ void GL46ShaderProgram::compileShader(ShaderProgramID& sp, const ShaderSourceRef
 }
 
 void GL46ShaderProgram::linkProgram(ShaderProgramID& sp) const {
-    //Link our program
     glLinkProgram(sp.m_data.id);
 
     int isLinked = 0;

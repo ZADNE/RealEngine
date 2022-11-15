@@ -27,11 +27,11 @@ ShaderProgramID VK13ShaderProgram::construct(const ShaderProgramSources& sources
     std::array<vk::PipelineShaderStageCreateInfo, 6> stages;
     size_t shaderCount = 0;
     for (size_t st = 0; st < ShaderProgramSources::NUM_STAGES; ++st) {
-        if (!sources[st].empty()) {
+        if (!sources[st].vk13.empty()) {
             modules[shaderCount] = m_device.createShaderModule({
                 vk::ShaderModuleCreateFlags{},
-                sources[st].size() * 4,
-                sources[st].data()}
+                sources[st].vk13.size() * 4,
+                sources[st].vk13.data()}
             );
             stages[shaderCount] = vk::PipelineShaderStageCreateInfo{
                 vk::PipelineShaderStageCreateFlags{},
