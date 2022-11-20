@@ -23,9 +23,10 @@ static vk::ShaderStageFlagBits convert(size_t st) {
 }
 
 ShaderProgramID VK13ShaderProgram::construct(const ShaderProgramSources& sources) const {
+    //Create shader modules
     std::array<vk::ShaderModule, 6> modules;
     std::array<vk::PipelineShaderStageCreateInfo, 6> stages;
-    size_t shaderCount = 0;
+    uint32_t shaderCount = 0;
     for (size_t st = 0; st < ShaderProgramSources::NUM_STAGES; ++st) {
         if (!sources[st].vk13.empty()) {
             modules[shaderCount] = m_device.createShaderModule({
@@ -43,7 +44,43 @@ ShaderProgramID VK13ShaderProgram::construct(const ShaderProgramSources& sources
         }
     }
 
-    return ShaderProgramID{0u};
+    vk::PipelineInputAssemblyStateCreateInfo inputAssembly{{},
+        vk::PrimitiveTopology::eTriangleStrip,
+        false                                   //Enable primitive restart
+    };
+    vk::PipelineViewportStateCreateInfo viewport{{},
+        1u, nullptr,                            //Viewport
+        1u, nullptr                             //Scissor
+    };
+    vk::PipelineRasterizationStateCreateInfo rasterization{};
+    vk::PipelineMultisampleStateCreateInfo multisample{};
+    vk::PipelineColorBlendAttachmentState colorBlendAttachment{false};
+    vk::PipelineColorBlendStateCreateInfo colorBlend{{},
+        false, vk::LogicOp::eClear,             //Logic op (disable)
+        colorBlendAttachment
+    };
+    vk::PipelineDynamicStateCreateInfo dynamic{
+
+    };
+    //Create pipeline
+    vk::GraphicsPipelineCreateInfo createInfo{vk::PipelineCreateFlags{},
+        shaderCount, stages.data(),             //Shader modules
+        nullptr,                                //Vertex input
+        &inputAssembly,
+        nullptr,                                //Tesselation
+        &viewport,
+        &rasterization,
+        &multisample,
+        nullptr,                                //Depth & stencil
+        &colorBlend,
+        &dynamic
+    };
+    auto id = ShaderProgramID{m_device.createGraphicsPipeline(vk::PipelineCache{}, createInfo).value};
+    //Destroy shader modules
+    for (uint32_t i = 0; i < shaderCount; i++) {
+        m_device.destroyShaderModule(modules[i]);
+    }
+    return id;
 }
 
 void VK13ShaderProgram::destruct(ShaderProgramID& sp) const {
