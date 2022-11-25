@@ -52,16 +52,30 @@ ShaderProgramID VK13ShaderProgram::construct(const ShaderProgramSources& sources
         1u, nullptr,                            //Viewport
         1u, nullptr                             //Scissor
     };
-    vk::PipelineRasterizationStateCreateInfo rasterization{};
+    vk::PipelineRasterizationStateCreateInfo rasterization{
+        vk::PipelineRasterizationStateCreateFlags{},
+        false,                                  //Enable depth clamping
+        false,                                  //Enable rasterizer discard
+        vk::PolygonMode::eFill,
+        vk::CullModeFlagBits::eNone,
+        vk::FrontFace::eClockwise,
+        false,                                  //Enable depth bias
+        0.0f,                                   //Depth bias constant factor
+        0.0f,                                   //Depth bias clamp
+        0.0f,                                   //Depth bias slope factor
+        1.0f,                                   //Line width
+    };
     vk::PipelineMultisampleStateCreateInfo multisample{};
     vk::PipelineColorBlendAttachmentState colorBlendAttachment{false};
     vk::PipelineColorBlendStateCreateInfo colorBlend{{},
         false, vk::LogicOp::eClear,             //Logic op (disable)
         colorBlendAttachment
     };
-    vk::PipelineDynamicStateCreateInfo dynamic{
-
-    };
+    std::array dynamicStates = std::to_array<vk::DynamicState>({
+        vk::DynamicState::eViewport,
+        vk::DynamicState::eScissor
+    });
+    vk::PipelineDynamicStateCreateInfo dynamic{{},dynamicStates};
     //Create pipeline
     vk::GraphicsPipelineCreateInfo createInfo{vk::PipelineCreateFlags{},
         shaderCount, stages.data(),             //Shader modules
