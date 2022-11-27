@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.24)
 project(RealEngine)
 
 include(FetchContent)
@@ -14,11 +14,13 @@ include("cmake/RealShaders/RealShaders.cmake")
     #SDL2
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
     find_package(SDL2 REQUIRED)
+    #SPIRV-Cross
+    FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/sdk-1.3.231.1.tar.gz)
     #GLM
     FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/refs/tags/0.9.9.8.tar.gz)
     #nlohmann json
     FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
-    FetchContent_MakeAvailable(glm json)
+    FetchContent_MakeAvailable(SPIRV-Cross glm json)
 
 #Declare projects
     #RealEngine library
@@ -29,7 +31,8 @@ include("cmake/RealShaders/RealShaders.cmake")
     )
     target_link_libraries(RealEngine PUBLIC
         ${CMAKE_DL_LIBS}
-        Vulkan::Vulkan OpenGL::GL GLEW::GLEW
+        Vulkan::Vulkan spirv-cross-core spirv-cross-reflect
+        OpenGL::GL GLEW::GLEW
         SDL2::Main
         glm
         nlohmann_json::nlohmann_json

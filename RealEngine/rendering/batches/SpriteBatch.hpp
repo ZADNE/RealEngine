@@ -7,11 +7,11 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
+#include <RealEngine/rendering/Pipeline.hpp>
+#include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/output/Surface.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
-#include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 #include <RealEngine/rendering/batches/Sprite.hpp>
-#include <RealEngine/rendering/vertices/VertexArray.hpp>
 
 namespace RE {
 
@@ -55,8 +55,8 @@ class SpriteBatch {
 public:
 
     /**
-     * @brief Constructs new SpriteBatch
-     * @param sources Sources used to construct the shader program that will be used for drawing
+     * @brief Constructs new SpriteBatch that will draw with given shaders
+     * @details The pipeline created from the shaders is stored inside the sprite batch.
     */
     SpriteBatch(const ShaderProgramSources& sources);
 
@@ -118,27 +118,25 @@ public:
     void addSurface(const Surface<R>& surface, const glm::vec2& position, int depth, int index, Color color, const glm::vec2& direction, const glm::vec2& scale);//Rotated based on the vector
 
     /**
-     * @brief Draws the batch with stored shader program
+     * @brief Draws the batch with the stored pipeline
     */
     void draw();
 
     /**
-     * @brief Draws once with different shader program  (the shader is not stored)
-     * @param program 
+     * @brief Draws once with different pipeline  (the pipeline is not stored)
     */
-    void draw(const ShaderProgram<R>& program);
+    void draw(const Pipeline<R>& pipeline);
 
     /**
-     * @brief Switches to a different program that will be used for drawing
+     * @brief Changes to a different pipeline that will be used for drawing
     */
-    void switchShaderProgram(const ShaderProgramSources& sources);
+    void changePipeline(const ShaderProgramSources& sources);
 
 private:
 
     void sortGlyphs(GlyphSortType sortType);
     void createDrawBatches();
 
-    VertexArray<R> m_vao;
     Buffer<R> m_vbo{0, BufferAccessFrequency::STREAM, BufferAccessNature::DRAW};
 
     std::vector<Glyph<R>*> m_glyphPointers;
@@ -150,7 +148,8 @@ private:
     static constexpr bool comparePosToNeg(Glyph<R>* a, Glyph<R>* b) { return (a->depth < b->depth); }
     static constexpr bool compareTexture(Glyph<R>* a, Glyph<R>* b) { return (a->tex > b->tex); }
 
-    ShaderProgram<R> m_shaderProgram;
+    Pipeline<R> m_pipeline;
+    vk::PipelineVertexInputStateCreateInfo createVertexInputStateInfo() const;
 
     static inline constexpr glm::vec4 UV_RECT = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
     static inline constexpr glm::vec4 SUV_RECT = glm::vec4(0.0f, 1.0f, 1.0f, -1.0f);//Used for drawing surfaces

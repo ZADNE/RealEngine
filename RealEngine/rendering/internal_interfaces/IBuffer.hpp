@@ -71,8 +71,8 @@ constexpr inline bool operator&(BufferMapUsageFlags a, BufferMapUsageFlags b) {
  * @note For internal usage in RealEngine.
 */
 class BufferID {
-    friend class GL46Buffer; friend class VK13Buffer;
-    friend class GL46VertexArray;
+    friend class VK13Buffer; friend class GL46Buffer;
+    friend class VK13Pipeline; friend class GL46VertexArray;
 public:
 
     ~BufferID() = default;

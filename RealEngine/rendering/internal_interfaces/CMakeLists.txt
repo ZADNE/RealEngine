@@ -3,6 +3,7 @@
     ICapabilities.hpp           
     IFramebuffer.hpp            
     IOrdering.hpp               
+    IPipeline.hpp               
     IShaderProgram.hpp          
     ITexture.hpp                
     IVertexArray.hpp            

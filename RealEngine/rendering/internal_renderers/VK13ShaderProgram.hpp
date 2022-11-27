@@ -31,14 +31,6 @@ public:
 
     void setUniform(const ShaderProgramID& sp, int location, TextureUnit unit) const override;
     void setUniform(const ShaderProgramID& sp, int location, ImageUnit unit) const override;
-
-private:
-
-    VK13ShaderProgram(const vk::Device& device) :
-        m_device(device) {
-    }
-
-    const vk::Device& m_device;
 };
 
 }

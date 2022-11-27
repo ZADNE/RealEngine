@@ -15,6 +15,7 @@
 #include <RealEngine/rendering/Capabilities.hpp>
 #include <RealEngine/rendering/output/Framebuffer.hpp>
 #include <RealEngine/rendering/Ordering.hpp>
+#include <RealEngine/rendering/Pipeline.hpp>
 #include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
@@ -416,7 +417,7 @@ vk::raii::DescriptorPool VK13Fixture::createDescriptorPool() {
 
 VkBool32 VK13Fixture::debugMessengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT sev, VkDebugUtilsMessageTypeFlagsEXT type, const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData) {
     std::cerr << callbackData->pMessage << '\n';
-    return VK_FALSE;
+    return false;
 }
 
 bool VK13Fixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice) {
@@ -482,6 +483,7 @@ void VK13Fixture::Implementations::assignReferences() {
     Capabilities<R>::s_impl = &m_capabilitiesImpl;
     Framebuffer<R>::s_impl = &m_mainFramebufferImpl;
     Ordering<R>::s_impl = &m_orderingImpl;
+    Pipeline<R>::s_impl = &m_pipelineImpl;
     ShaderProgram<R>::s_impl = &m_shaderProgramImpl;
     Texture<R>::s_impl = &m_textureImpl;
     TextureProxy<R>::s_impl = &m_textureImpl;
@@ -496,6 +498,7 @@ void VK13Fixture::Implementations::clearReferences() {
     Capabilities<R>::s_impl = nullptr;
     Framebuffer<R>::s_impl = nullptr;
     Ordering<R>::s_impl = nullptr;
+    Pipeline<R>::s_impl = nullptr;
     ShaderProgram<R>::s_impl = nullptr;
     Texture<R>::s_impl = nullptr;
     TextureProxy<R>::s_impl = nullptr;

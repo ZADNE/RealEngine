@@ -11,5 +11,6 @@ add_subdirectory(vertices)
 target_sources(RealEngine PRIVATE
     Capabilities.hpp            Capabilities.cpp
     Ordering.hpp                Ordering.cpp
+    Pipeline.hpp                Pipeline.cpp
     Renderer.hpp                
 )
