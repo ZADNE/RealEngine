@@ -8,13 +8,7 @@
 #include <vulkan/vulkan_raii.hpp>
 
 #include <RealEngine/rendering/internal_renderers/VK13Buffer.hpp>
-#include <RealEngine/rendering/internal_renderers/VK13Capabilities.hpp>
-#include <RealEngine/rendering/internal_renderers/VK13Framebuffer.hpp>
-#include <RealEngine/rendering/internal_renderers/VK13Ordering.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Pipeline.hpp>
-#include <RealEngine/rendering/internal_renderers/VK13ShaderProgram.hpp>
-#include <RealEngine/rendering/internal_renderers/VK13Texture.hpp>
-#include <RealEngine/rendering/internal_renderers/VK13VertexArray.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Viewport.hpp>
 
 struct SDL_Window;
@@ -57,7 +51,12 @@ private:
     class Implementations {
     public:
 
-        Implementations(const vk::Device& device, const vk::PipelineCache& pipelineCache, const vk::RenderPass& renderPass) :
+        Implementations(
+            const vk::PhysicalDevice& physicalDevice, const vk::Device& device,
+            const vk::Queue& graphicsQueue, const vk::RenderPass& renderPass,
+            const vk::CommandPool& commandPool, const vk::PipelineCache& pipelineCache
+        ) :
+            m_bufferImpl(physicalDevice, device, graphicsQueue, commandPool),
             m_pipelineImpl(device, pipelineCache, renderPass) {
             assignReferences<RendererLateBind>();
             assignReferences<RendererVK13>();
@@ -80,14 +79,7 @@ private:
         void clearReferences();
 
         VK13Buffer m_bufferImpl;
-        VK13Capabilities m_capabilitiesImpl;
-        VK13Framebuffer m_mainFramebufferImpl;
-        VK13Ordering m_orderingImpl;
         VK13Pipeline m_pipelineImpl;
-        VK13ShaderProgram m_shaderProgramImpl;
-        VK13Texture m_textureImpl;
-        VK13VertexArray m_vertexArrayImpl;
-        VK13Viewport m_viewportImpl;
 
         ViewportState m_viewportState;
     };
@@ -128,7 +120,11 @@ private:
     PerFrameInFlight<vk::raii::Fence> m_inFlightFences;
     bool m_recreteSwapchain = false;
 
-    Implementations m_impls{*m_device, *m_pipelineCache, *m_renderPass};
+    Implementations m_impls{
+        *m_physicalDevice, *m_device,
+        *m_graphicsQueue, *m_renderPass,
+        *m_commandPool, *m_pipelineCache
+    };
 
     vk::raii::Instance createInstance();
     vk::raii::DebugUtilsMessengerEXT createDebugUtilsMessenger();

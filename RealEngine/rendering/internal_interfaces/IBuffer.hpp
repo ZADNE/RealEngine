@@ -35,6 +35,7 @@ private:
 
     struct VK13 {
         vk::Buffer buffer;
+        vk::DeviceMemory memory;
     };
 
     BufferID(const VK13& vk13) :
@@ -55,7 +56,7 @@ private:
 class IBuffer {
 public:
 
-    virtual BufferID construct(size_t sizeInBytes, vk::BufferUsageFlags flags, const void* data) const = 0;
+    virtual BufferID construct(size_t sizeInBytes, vk::BufferUsageFlags usage, const void* data) const = 0;
     virtual void destruct(BufferID& bf) const = 0;
 
     /*virtual void bind(const BufferID& bf, BufferType bindType) const = 0;

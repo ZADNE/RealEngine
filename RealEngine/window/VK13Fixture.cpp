@@ -248,8 +248,14 @@ vk::raii::SurfaceKHR VK13Fixture::createSurface() {
 
 vk::raii::PhysicalDevice VK13Fixture::createPhysicalDevice() {
     for (const auto& physicalDevice : vk::raii::PhysicalDevices{m_instance}) {//Iterate over all physical device
+        auto props = physicalDevice.getProperties2();
         if (areExtensionsSupported(physicalDevice) && isSwapchainSupported(physicalDevice) && findQueueFamilyIndices(physicalDevice)) {
-            return physicalDevice;
+            auto major = VK_API_VERSION_MAJOR(props.properties.apiVersion);
+            auto minor = VK_API_VERSION_MINOR(props.properties.apiVersion);
+            if (major >= 1 && minor >= 2) {
+                std::cout << "Vulkan:       " << major << '.' << minor << std::endl;
+                return physicalDevice;
+            }
         }
     }
     throw std::runtime_error("No physical device is suitable!");
@@ -480,30 +486,14 @@ void VK13Fixture::recreateImGuiFontTexture() {
 template<Renderer R>
 void VK13Fixture::Implementations::assignReferences() {
     Buffer<R>::s_impl = &m_bufferImpl;
-    Capabilities<R>::s_impl = &m_capabilitiesImpl;
-    Framebuffer<R>::s_impl = &m_mainFramebufferImpl;
-    Ordering<R>::s_impl = &m_orderingImpl;
     Pipeline<R>::s_impl = &m_pipelineImpl;
-    ShaderProgram<R>::s_impl = &m_shaderProgramImpl;
-    Texture<R>::s_impl = &m_textureImpl;
-    TextureProxy<R>::s_impl = &m_textureImpl;
-    VertexArray<R>::s_impl = &m_vertexArrayImpl;
-    Viewport<R>::s_impl = &m_viewportImpl;
     Viewport<R>::s_state = &m_viewportState;
 }
 
 template<Renderer R>
 void VK13Fixture::Implementations::clearReferences() {
     Buffer<R>::s_impl = nullptr;
-    Capabilities<R>::s_impl = nullptr;
-    Framebuffer<R>::s_impl = nullptr;
-    Ordering<R>::s_impl = nullptr;
     Pipeline<R>::s_impl = nullptr;
-    ShaderProgram<R>::s_impl = nullptr;
-    Texture<R>::s_impl = nullptr;
-    TextureProxy<R>::s_impl = nullptr;
-    VertexArray<R>::s_impl = nullptr;
-    Viewport<R>::s_impl = nullptr;
     Viewport<R>::s_state = nullptr;
 }
 

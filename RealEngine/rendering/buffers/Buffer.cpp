@@ -11,8 +11,8 @@
 namespace RE {
 
 template<Renderer R>
-Buffer<R>::Buffer(size_t sizeInBytes, vk::BufferUsageFlags flags, const void* data/* = nullptr*/) :
-    m_id(s_impl->construct(sizeInBytes, flags, data)),
+Buffer<R>::Buffer(size_t sizeInBytes, vk::BufferUsageFlags usage, const void* data/* = nullptr*/) :
+    m_id(s_impl->construct(sizeInBytes, usage, data)),
     m_sizeInBytes(sizeInBytes) {
 }
 

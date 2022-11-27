@@ -20,8 +20,11 @@ public:
 
 private:
 
-    VK13Pipeline(const vk::Device& device, const vk::PipelineCache& pipelineCache, const vk::RenderPass& renderPass) :
-        m_device(device), m_pipelineCache(pipelineCache), m_renderPass(renderPass) {
+    VK13Pipeline(
+        const vk::Device& device, const vk::PipelineCache& pipelineCache,
+        const vk::RenderPass& renderPass) :
+        m_device(device), m_pipelineCache(pipelineCache),
+        m_renderPass(renderPass) {
     }
 
     void reflect(const ShaderSourceRef& src, vk::ShaderStageFlagBits st, std::vector<vk::DescriptorSetLayoutBinding>& dslbs) const;
