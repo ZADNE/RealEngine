@@ -5,58 +5,27 @@
 
 #include <cassert>
 
-#include <RealEngine/rendering/internal_renderers/GL46Buffer.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Buffer.hpp>
 
 
 namespace RE {
 
-using enum BufferType;
-using enum BufferStorage;
-using enum BufferAccessFrequency;
-using enum BufferAccessNature;
-using enum BufferUsageFlags;
-
 template<Renderer R>
-Buffer<R>::Buffer(size_t sizeInBytes, BufferUsageFlags flags, const void* data/* = nullptr*/) :
-    m_id(s_impl->constructImmutable(sizeInBytes, flags, data)),
-    m_sizeInBytes(sizeInBytes)
-#ifndef NDEBUG
-    , m_storage(IMMUTABLE) {
-#else
-    {
-#endif // DEBUG
-}
-
-template<Renderer R>
-Buffer<R>::Buffer(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data/* = nullptr*/) :
-    m_id(s_impl->constructMutable(sizeInBytes, accessFreq, accessNature, data)),
-    m_sizeInBytes(sizeInBytes)
-#ifndef NDEBUG
-    , m_storage(MUTABLE) {
-#else
-    {
-#endif // DEBUG
+Buffer<R>::Buffer(size_t sizeInBytes, vk::BufferUsageFlags flags, const void* data/* = nullptr*/) :
+    m_id(s_impl->construct(sizeInBytes, flags, data)),
+    m_sizeInBytes(sizeInBytes) {
 }
 
 template<Renderer R>
 Buffer<R>::Buffer(Buffer<R>&& other) noexcept :
     m_id(std::move(other.m_id)),
-    m_sizeInBytes(other.m_sizeInBytes)
-#ifndef NDEBUG
-    , m_storage(other.m_storage) {
-#else
-    {
-#endif // DEBUG
+    m_sizeInBytes(other.m_sizeInBytes) {
 }
 
 template<Renderer R>
 Buffer<R>& Buffer<R>::operator=(Buffer<R>&& other) noexcept {
     m_id = std::move(other.m_id);
     m_sizeInBytes = other.m_sizeInBytes;
-#ifndef NDEBUG
-    m_storage = other.m_storage;
-#endif // DEBUG
     return *this;
 }
 
@@ -65,7 +34,7 @@ Buffer<R>::~Buffer() {
     s_impl->destruct(m_id);
 }
 
-template<Renderer R>
+/*template<Renderer R>
 void Buffer<R>::bind(BufferType bindType) const {
     s_impl->bind(m_id, bindType);
 }
@@ -119,10 +88,9 @@ size_t Buffer<R>::size() const {
 template<Renderer R>
 void* Buffer<R>::map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const {
     return s_impl->map(m_id, offsetInBytes, lengthInBytes, mappingUsage);
-}
+}*/
 
 template class Buffer<RendererLateBind>;
 template class Buffer<RendererVK13>;
-template class Buffer<RendererGL46>;
 
 }

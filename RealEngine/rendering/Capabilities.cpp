@@ -3,7 +3,6 @@
  */
 #include <RealEngine/rendering/Capabilities.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46Capabilities.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Capabilities.hpp>
 
 namespace RE {
@@ -25,6 +24,5 @@ void BlendingCapability<R>::set(bool enabled) {
 
 template class BlendingCapability<RendererLateBind>;
 template class BlendingCapability<RendererVK13>;
-template class BlendingCapability<RendererGL46>;
 
 }

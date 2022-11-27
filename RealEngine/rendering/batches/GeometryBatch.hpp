@@ -6,8 +6,9 @@
 #include <vector>
 
 #include <RealEngine/rendering/batches/Circle.hpp>
-#include <RealEngine/rendering/vertices/ShaderProgram.hpp>
-#include <RealEngine/rendering/vertices/VertexArray.hpp>
+#include <RealEngine/rendering/Pipeline.hpp>
+#include <RealEngine/rendering/buffers/Buffer.hpp>
+#include <RealEngine/rendering/vertices/Vertex.hpp>
 
 namespace RE {
 
@@ -50,12 +51,12 @@ public:
     void addPrimitives(PRIM prim, size_t first, size_t count, const RE::VertexPOCO* data, bool separate = true);
 
     void addCircles(size_t first, size_t count, const RE::CirclePOCO* data);
-    
+
     /**
      * @brief Draws the batch with stored shader program
     */
     void draw();
-    
+
     /**
      * @brief Switches to a different program that will be used for drawing
     */
@@ -63,11 +64,11 @@ public:
 
 private:
 
-    VertexArray<R> m_va;
-    Buffer<R> m_buf{BufferAccessFrequency::STREAM, BufferAccessNature::DRAW};
-    ShaderProgram<R> m_shaderProgram;
+    Buffer<R> m_buf{sizeof(VertexPOCO) * 512, vk::BufferUsageFlagBits::eVertexBuffer};
+    Pipeline<R> m_pipeline;
+    vk::PipelineVertexInputStateCreateInfo createVertexInputStateInfo() const;
 
-    std::array<std::vector<RE::VertexPOCO>, PRIMITIVES_COUNT + SHAPES_COUNT> m_vertices;
+    std::array<std::vector<VertexPOCO>, PRIMITIVES_COUNT + SHAPES_COUNT> m_vertices;
     std::array<std::vector<unsigned int>, PRIMITIVES_COUNT + SHAPES_COUNT> m_indices;
 };
 

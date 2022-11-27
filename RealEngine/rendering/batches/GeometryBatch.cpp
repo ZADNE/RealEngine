@@ -7,11 +7,9 @@
 
 #include <glm/gtc/constants.hpp>
 
-#include <RealEngine/rendering/internal_interfaces/IVertexArray.hpp>
-
 namespace RE {
 
-Primitive convertPrimEnum(size_t prim_shape) {
+/*Primitive convertPrimEnum(size_t prim_shape) {
     switch (prim_shape) {
     case (size_t)PRIM::POINTS:
         return Primitive::POINTS;
@@ -35,17 +33,11 @@ Primitive convertPrimEnum(size_t prim_shape) {
         //Shouldn't get here
         return Primitive::LINE_LOOP;
     }
-}
+}*/
 
 template<Renderer R>
 GeometryBatch<R>::GeometryBatch(const ShaderProgramSources& sources) :
-    m_shaderProgram(sources) {
-    m_va.setAttribute(ATTR_POSITION, VertexComponentCount::XY, VertexComponentType::FLOAT, offsetof(VertexPOCO, position), false);
-    m_va.setAttribute(ATTR_COLOR, VertexComponentCount::RGBA, VertexComponentType::UNSIGNED_BYTE, offsetof(VertexPOCO, color), true);
-    m_va.setBindingPoint(0u, m_buf, 0, sizeof(VertexPOCO));
-    m_va.setBindingPoint(1u, m_buf, 0, sizeof(VertexPOCO));
-    m_va.connectAttributeToBindingPoint(ATTR_POSITION, 0u);
-    m_va.connectAttributeToBindingPoint(ATTR_COLOR, 1u);
+    m_pipeline(createVertexInputStateInfo(), sources) {
 }
 
 template<Renderer R>
@@ -69,10 +61,10 @@ void GeometryBatch<R>::end() {
     }
     size_t offset = 0;
 
-    m_buf.redefine(totalSize * sizeof(VertexPOCO), nullptr);
+    //m_buf.redefine(totalSize * sizeof(VertexPOCO), nullptr);
     for (size_t i = 0u; i < PRIMITIVES_COUNT + SHAPES_COUNT; ++i) {
         if (m_vertices[i].empty()) continue;
-        m_buf.overwrite(offset, m_vertices[i]);
+        //m_buf.overwrite(offset, m_vertices[i]);
         offset += m_vertices[i].size() * sizeof(VertexPOCO);
     }
 }
@@ -133,7 +125,7 @@ void GeometryBatch<R>::addCircles(size_t first, size_t count, const RE::CirclePO
 
 template<Renderer R>
 void GeometryBatch<R>::draw() {
-    m_shaderProgram.use();
+    /*m_shaderProgram.use();
     m_va.bind();
 
     int offset = 0u;
@@ -145,16 +137,36 @@ void GeometryBatch<R>::draw() {
     }
 
     m_va.unbind();
-    m_shaderProgram.unuse();
+    m_shaderProgram.unuse();*/
 }
 
 template<Renderer R>
 void GeometryBatch<R>::switchShaderProgram(const ShaderProgramSources& sources) {
-    m_shaderProgram = ShaderProgram<R>{sources};
+    m_pipeline = Pipeline<R>{createVertexInputStateInfo(), sources};
+}
+
+template<Renderer R>
+vk::PipelineVertexInputStateCreateInfo GeometryBatch<R>::createVertexInputStateInfo() const {
+    static constexpr std::array bindings = std::to_array<vk::VertexInputBindingDescription>({{
+        0u,                             //Binding index
+        sizeof(VertexPOCO),             //Stride
+        vk::VertexInputRate::eVertex    //Input rate
+    }});
+    static constexpr std::array attributes = std::to_array<vk::VertexInputAttributeDescription>({{
+        ATTR_POSITION,                  //Location
+        0u,                             //Binding index
+        vk::Format::eR32G32B32A32Sfloat,//Format
+        offsetof(VertexPOCO, position)  //Relative offset
+    },{
+        ATTR_COLOR,                     //Location
+        0u,                             //Binding index
+        vk::Format::eR8G8B8A8Unorm,     //Format
+        offsetof(VertexPOCO, color)     //Relative offset
+    }});
+    return vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes};
 }
 
 template class GeometryBatch<RendererLateBind>;
 template class GeometryBatch<RendererVK13>;
-template class GeometryBatch<RendererGL46>;
 
 }

@@ -1,5 +1,4 @@
-﻿#include "SpriteBatch.hpp"
-/*!
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
@@ -316,7 +315,7 @@ void SpriteBatch<R>::createDrawBatches() {
     }
 
     //Uploade m_vertices to VBO
-    m_vbo.redefine(m_vertices.size() * sizeof(VertexPOCOUV), m_vertices.data());
+    //m_vbo.redefine(m_vertices.size() * sizeof(VertexPOCOUV), m_vertices.data());
 }
 
 template<Renderer R>
@@ -347,6 +346,5 @@ vk::PipelineVertexInputStateCreateInfo SpriteBatch<R>::createVertexInputStateInf
 
 template class SpriteBatch<RendererLateBind>;
 template class SpriteBatch<RendererVK13>;
-template class SpriteBatch<RendererGL46>;
 
 }

@@ -1,5 +1,4 @@
-﻿#include "VK13Pipeline.hpp"
-/*!
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/rendering/internal_renderers/VK13Pipeline.hpp>
@@ -115,9 +114,9 @@ PipelineID VK13Pipeline::construct(const vk::PipelineVertexInputStateCreateInfo&
 }
 
 void VK13Pipeline::destruct(PipelineID& pl) const {
-    m_device.destroyPipeline(pl.m_.vk.pipeline);
-    m_device.destroyPipelineLayout(pl.m_.vk.pipelineLayout);
-    m_device.destroyDescriptorSetLayout(pl.m_.vk.descriptorSetLayout);
+    m_device.destroyPipeline(pl.m_.vk13.pipeline);
+    m_device.destroyPipelineLayout(pl.m_.vk13.pipelineLayout);
+    m_device.destroyDescriptorSetLayout(pl.m_.vk13.descriptorSetLayout);
 }
 
 void VK13Pipeline::reflect(const ShaderSourceRef& src, vk::ShaderStageFlagBits st, std::vector<vk::DescriptorSetLayoutBinding>& dslbs) const {

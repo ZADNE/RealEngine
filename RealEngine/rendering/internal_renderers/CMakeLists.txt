@@ -1,14 +1,14 @@
 ﻿target_sources(RealEngine PRIVATE
-    GL46Buffer.hpp              GL46Buffer.cpp
-    GL46Capabilities.hpp        GL46Capabilities.cpp
-    GL46Framebuffer.hpp         GL46Framebuffer.cpp
-    GL46Ordering.hpp            GL46Ordering.cpp
-    GL46Pipeline.hpp            GL46Pipeline.cpp
-    GL46ShaderProgram.hpp       GL46ShaderProgram.cpp
-    GL46Texture.hpp             GL46Texture.cpp
-    GL46TypeToString.hpp        GL46TypeToString.cpp
-    GL46VertexArray.hpp         GL46VertexArray.cpp
-    GL46Viewport.hpp            GL46Viewport.cpp
+#    GL46Buffer.hpp              GL46Buffer.cpp
+#    GL46Capabilities.hpp        GL46Capabilities.cpp
+#    GL46Framebuffer.hpp         GL46Framebuffer.cpp
+#    GL46Ordering.hpp            GL46Ordering.cpp
+#    GL46Pipeline.hpp            GL46Pipeline.cpp
+#    GL46ShaderProgram.hpp       GL46ShaderProgram.cpp
+#    GL46Texture.hpp             GL46Texture.cpp
+#    GL46TypeToString.hpp        GL46TypeToString.cpp
+#    GL46VertexArray.hpp         GL46VertexArray.cpp
+#    GL46Viewport.hpp            GL46Viewport.cpp
     VK13Buffer.hpp              VK13Buffer.cpp
     VK13Capabilities.hpp        VK13Capabilities.cpp
     VK13Framebuffer.hpp         VK13Framebuffer.cpp

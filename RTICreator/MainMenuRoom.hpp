@@ -51,8 +51,8 @@ private:
 
     //View
     RE::View2D m_texView;
-    RE::BufferTyped<R> m_texViewBuf{UNIF_BUF_VIEWPORT_MATRIX, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE};
-    RE::BufferTyped<R> m_windowViewBuf{UNIF_BUF_VIEWPORT_MATRIX, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE};
+    //RE::BufferTyped<R> m_texViewBuf{UNIF_BUF_VIEWPORT_MATRIX, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE};
+    //RE::BufferTyped<R> m_windowViewBuf{UNIF_BUF_VIEWPORT_MATRIX, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE};
     glm::vec2 m_overlap = glm::vec2(0.2f, 0.2f);
     glm::vec3 m_backgroundColor = glm::vec3(0.1f, 0.1f, 0.1f);
 

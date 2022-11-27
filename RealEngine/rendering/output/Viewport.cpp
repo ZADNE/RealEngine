@@ -3,7 +3,6 @@
  */
 #include <RealEngine/rendering/output/Viewport.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46Viewport.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Viewport.hpp>
 
 namespace RE {
@@ -22,6 +21,5 @@ void Viewport<R>::setToWholeWindow() {
 
 template class Viewport<RendererLateBind>;
 template class Viewport<RendererVK13>;
-template class Viewport<RendererGL46>;
 
 }

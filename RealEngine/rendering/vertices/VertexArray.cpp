@@ -3,7 +3,6 @@
  */
 #include <RealEngine/rendering/vertices/VertexArray.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46VertexArray.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13VertexArray.hpp>
 
 namespace RE {
@@ -96,6 +95,5 @@ void VertexArray<R>::renderElementsBaseVertex(Primitive prim, size_t count, Inde
 
 template class VertexArray<RendererLateBind>;
 template class VertexArray<RendererVK13>;
-template class VertexArray<RendererGL46>;
 
 }

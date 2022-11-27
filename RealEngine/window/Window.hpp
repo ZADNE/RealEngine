@@ -9,7 +9,6 @@
 
 #include <RealEngine/window/WindowSubsystems.hpp>
 #include <RealEngine/window/WindowSettings.hpp>
-#include <RealEngine/window/GL46Fixture.hpp>
 #include <RealEngine/window/VK13Fixture.hpp>
 
 union SDL_Event;
@@ -140,7 +139,6 @@ private:
 
     void initForRenderer(RendererID renderer);
     void initForVulkan13();
-    void initForGL46();
 
     bool createSDLWindow(RendererID renderer);
 
@@ -149,7 +147,6 @@ private:
 
     union {
         VK13Fixture m_vk13;
-        GL46Fixture m_gl46;
     };
     RendererID m_usedRenderer;              /**< The actual renderer (may be different from the preferred one) */
     std::string m_windowTitle;              /**< Title of the window */

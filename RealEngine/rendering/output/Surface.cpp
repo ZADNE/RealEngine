@@ -111,6 +111,5 @@ void Surface<R>::attachTexturesToFramebuffer() {
 
 template class Surface<RendererLateBind>;
 template class Surface<RendererVK13>;
-template class Surface<RendererGL46>;
 
 }

@@ -27,7 +27,6 @@ int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
         auto& inst = instance();
         switch (inst.m_window.getUsedRenderer()) {
         case RendererID::VULKAN13: return inst.doRun<RendererVK13>(roomName, args);
-        case RendererID::OPENGL46: return inst.doRun<RendererGL46>(roomName, args);
         default: return 1;
         }
     }
@@ -259,7 +258,5 @@ MainProgram& MainProgram::instance() {
     static MainProgram mainProgram;
     return mainProgram;
 }
-
-template int MainProgram::doRun<RendererGL46>(size_t roomName, const RoomTransitionArguments& args);
 
 }

@@ -7,7 +7,6 @@
 #include <RealEngine/resources/PNGLoader.hpp>
 #include <RealEngine/utility/Error.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46Texture.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Texture.hpp>
 
 namespace RE {
@@ -233,10 +232,8 @@ void Texture<R>::init(const Raster& raster, const TextureParameters& params) {
 
 template class TextureProxy<RendererLateBind>;
 template class TextureProxy<RendererVK13>;
-template class TextureProxy<RendererGL46>;
 
 template class Texture<RendererLateBind>;
 template class Texture<RendererVK13>;
-template class Texture<RendererGL46>;
 
 }

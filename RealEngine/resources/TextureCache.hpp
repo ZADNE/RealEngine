@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -30,22 +30,15 @@ public:
 private:
 
     Texture<RendererLateBind> m_lateBindTex;
-    Texture<RendererGL46> m_gl46Tex;
     Texture<RendererVK13> m_vk13Tex;
 
     static_assert(
-        sizeof(m_lateBindTex) == sizeof(m_gl46Tex) &&
         sizeof(m_lateBindTex) == sizeof(m_vk13Tex));
 };
 
 template<>
 inline const Texture<RendererVK13>& TextureUnion::get<RendererVK13>() const {
     return m_vk13Tex;
-}
-
-template<>
-inline const Texture<RendererGL46>& TextureUnion::get<RendererGL46>() const {
-    return m_gl46Tex;
 }
 
 /**

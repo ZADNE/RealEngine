@@ -5,7 +5,6 @@
 
 #include <RealEngine/rendering/textures/Texture.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46Framebuffer.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Framebuffer.hpp>
 
 
@@ -99,10 +98,8 @@ void DefaultFrameBuffer<R>::targetMe(FramebufferTarget target) {
 
 template class Framebuffer<RendererLateBind>;
 template class Framebuffer<RendererVK13>;
-template class Framebuffer<RendererGL46>;
 
 template class DefaultFrameBuffer<RendererLateBind>;
 template class DefaultFrameBuffer<RendererVK13>;
-template class DefaultFrameBuffer<RendererGL46>;
 
 }

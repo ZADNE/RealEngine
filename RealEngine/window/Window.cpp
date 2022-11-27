@@ -44,8 +44,6 @@ Window::~Window() {
     switch (m_usedRenderer) {
     case RE::RendererID::VULKAN13:
         m_vk13.~VK13Fixture(); break;
-    case RE::RendererID::OPENGL46:
-        m_gl46.~GL46Fixture(); break;
     }
     SDL_DestroyWindow(m_SDLwindow);
 }
@@ -56,18 +54,8 @@ void Window::prepareNewFrame<RendererVK13>() {
 }
 
 template<>
-void Window::prepareNewFrame<RendererGL46>() {
-    m_gl46.prepareFrame(m_clearColor, m_usingImGui);
-}
-
-template<>
 void Window::finishNewFrame<RendererVK13>() {
     m_vk13.finishFrame(m_usingImGui);
-}
-
-template<>
-void Window::finishNewFrame<RendererGL46>() {
-    m_gl46.finishFrame(m_usingImGui, m_SDLwindow);
 }
 
 void Window::passSDLEvent(SDL_Event& evnt) {
@@ -134,7 +122,6 @@ void Window::setDims(const glm::ivec2& newDims, bool save) {
 void Window::initForRenderer(RendererID renderer) {
     switch (renderer) {
     case RendererID::VULKAN13:      initForVulkan13(); break;
-    case RendererID::OPENGL46:      initForGL46(); break;
     default:                        break;
     }
 }
@@ -164,41 +151,11 @@ fail:
     m_usedRenderer = RendererID::ANY;
 }
 
-void Window::initForGL46() {
-    //Create SDL window
-    if (!createSDLWindow(RendererID::OPENGL46)) {
-        goto fail;
-    }
-
-    //Create OpenGL 4.6 fixture
-    try {
-        new (&m_gl46) GL46Fixture(m_SDLwindow);
-    }
-    catch (std::exception& e) {
-        std::cerr << e.what();
-        goto fail_SDLWindow;
-    }
-
-
-    m_usedRenderer = RendererID::OPENGL46;
-
-    //Set vertical synchronisation
-    setVSync(m_flags.vSync, false);
-    return;
-
-fail_SDLWindow:
-    SDL_DestroyWindow(m_SDLwindow);
-    m_SDLwindow = nullptr;
-fail:
-    m_usedRenderer = RendererID::ANY;
-}
-
 bool Window::createSDLWindow(RendererID renderer) {
     //Prepare window flags
     Uint32 SDL_flags = 0;
     switch (renderer) {
     case RE::RendererID::VULKAN13: SDL_flags |= SDL_WINDOW_VULKAN; break;
-    case RE::RendererID::OPENGL46: SDL_flags |= SDL_WINDOW_OPENGL; break;
     }
     if (m_flags.invisible) SDL_flags |= SDL_WINDOW_HIDDEN;
     if (m_flags.fullscreen) SDL_flags |= SDL_WINDOW_FULLSCREEN;

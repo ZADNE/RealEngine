@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/rendering/batches/Sprite.hpp>
@@ -19,7 +19,7 @@ float SpriteStatic<R>::getSpeed() const {
 
 template<Renderer R>
 Color SpriteStatic<R>::getColor() const {
-    return Color{ 255u, 255u, 255u, 255u };
+    return Color{255u, 255u, 255u, 255u};
 }
 
 template<Renderer R>
@@ -89,14 +89,11 @@ glm::vec2 SpriteComplex<R>::getScale() const {
 
 template class SpriteStatic<RendererLateBind>;
 template class SpriteStatic<RendererVK13>;
-template class SpriteStatic<RendererGL46>;
 
 template class SpriteAnimated<RendererLateBind>;
 template class SpriteAnimated<RendererVK13>;
-template class SpriteAnimated<RendererGL46>;
 
 template class SpriteComplex<RendererLateBind>;
 template class SpriteComplex<RendererVK13>;
-template class SpriteComplex<RendererGL46>;
 
 }

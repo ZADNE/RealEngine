@@ -137,7 +137,7 @@ private:
     void sortGlyphs(GlyphSortType sortType);
     void createDrawBatches();
 
-    Buffer<R> m_vbo{0, BufferAccessFrequency::STREAM, BufferAccessNature::DRAW};
+    Buffer<R> m_vbo{sizeof(VertexPOCOUV) * 512, vk::BufferUsageFlagBits::eVertexBuffer};
 
     std::vector<Glyph<R>*> m_glyphPointers;
     std::vector<Glyph<R>> m_glyphs;

@@ -3,7 +3,6 @@
  */
 #include <RealEngine/rendering/Pipeline.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46Pipeline.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Pipeline.hpp>
 
 namespace RE {
@@ -31,6 +30,5 @@ Pipeline<R>::~Pipeline() {
 
 template class Pipeline<RendererLateBind>;
 template class Pipeline<RendererVK13>;
-template class Pipeline<RendererGL46>;
 
 }

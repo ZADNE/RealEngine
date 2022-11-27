@@ -10,7 +10,7 @@
 namespace RE {
 
 class PipelineID {
-    friend class VK13Pipeline; friend class GL46Pipeline;
+    friend class VK13Pipeline;
 public:
 
     ~PipelineID() = default;
@@ -34,19 +34,12 @@ private:
         vk::PipelineLayout pipelineLayout;
         vk::Pipeline pipeline;
     };
-    struct GL46 {
-        unsigned int va;
-        unsigned int sp;
-    };
 
-    PipelineID(const VK13& vk) :
-        m_({.vk = vk}) {}
-    PipelineID(const GL46& gl) :
-        m_({.gl = gl}) {}
+    PipelineID(const VK13& vk13) :
+        m_({.vk13 = vk13}) {}
 
     union {
-        VK13 vk;
-        GL46 gl;
+        VK13 vk13;
     } m_;
 };
 

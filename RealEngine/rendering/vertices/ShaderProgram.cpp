@@ -3,7 +3,6 @@
  */
 #include <RealEngine/rendering/vertices/ShaderProgram.hpp>
 
-#include <RealEngine/rendering/internal_renderers/GL46ShaderProgram.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13ShaderProgram.hpp>
 
 namespace RE {
@@ -64,6 +63,5 @@ template<Renderer R> void ShaderProgram<R>::setUniform(int location, ImageUnit u
 
 template class ShaderProgram<RendererLateBind>;
 template class ShaderProgram<RendererVK13>;
-template class ShaderProgram<RendererGL46>;
 
 }

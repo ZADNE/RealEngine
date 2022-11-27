@@ -43,7 +43,7 @@ MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
     }
 
     glm::vec2 window = engine().getWindowDims();
-    m_windowViewBuf.overwrite(0u, glm::ortho(0.0f, window.x, 0.0f, window.y));
+    //m_windowViewBuf.overwrite(0u, glm::ortho(0.0f, window.x, 0.0f, window.y));
 }
 
 template<RE::Renderer R>
@@ -84,15 +84,15 @@ void MainMenuRoom<R>::step() {
 template<RE::Renderer R>
 void MainMenuRoom<R>::render(double interpolationFactor) {
     auto mat = m_texView.getViewMatrix();
-    m_texViewBuf.overwrite(0u, mat);
-    m_texViewBuf.bindIndexed();
+    //m_texViewBuf.overwrite(0u, mat);
+    //m_texViewBuf.bindIndexed();
 
     //Texture
     if (m_texture) {
         drawTexture();
     }
 
-    m_windowViewBuf.bindIndexed();
+    //m_windowViewBuf.bindIndexed();
 
     //Menu
     if (ImGui::Begin("RTICreator v3.0.0")) {
@@ -298,4 +298,3 @@ void MainMenuRoom<R>::resetView() {
 }
 
 template MainMenuRoom<RE::RendererVK13>;
-template MainMenuRoom<RE::RendererGL46>;
