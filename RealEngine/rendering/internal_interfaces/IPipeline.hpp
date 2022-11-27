@@ -30,9 +30,9 @@ public:
 private:
 
     struct VK13 {
-        vk::DescriptorSetLayout descriptorSetLayout;
-        vk::PipelineLayout pipelineLayout;
-        vk::Pipeline pipeline;
+        vk::DescriptorSetLayout descriptorSetLayout = nullptr;
+        vk::PipelineLayout pipelineLayout = nullptr;
+        vk::Pipeline pipeline = nullptr;
     };
 
     PipelineID(const VK13& vk13) :

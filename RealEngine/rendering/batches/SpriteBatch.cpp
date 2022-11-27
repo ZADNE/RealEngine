@@ -39,6 +39,7 @@ Glyph<R>::Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy<R> t
 template<Renderer R>
 SpriteBatch<R>::SpriteBatch(const ShaderProgramSources& sources) :
     m_pipeline(createVertexInputStateInfo(), sources) {
+    m_vertices = m_vbo.map<VertexPOCOUV>(0u, sizeof(VertexPOCOUV) * 512);
 }
 
 template<Renderer R>
@@ -279,12 +280,11 @@ void SpriteBatch<R>::sortGlyphs(GlyphSortType sortType) {
 
 template<Renderer R>
 void SpriteBatch<R>::createDrawBatches() {
-    m_vertices.clear();
     if (m_glyphPointers.empty()) {//If there are no glyphs to draw
         return;
     }
 
-    m_vertices.resize(m_glyphPointers.size() * 6u);
+    assert(m_glyphPointers.size() * 6u < 512);
 
     int currentVertex = 0;
     int offset = 0;
@@ -313,9 +313,6 @@ void SpriteBatch<R>::createDrawBatches() {
         m_vertices[currentVertex++] = m_glyphPointers[i]->botRight;
         offset += 6;
     }
-
-    //Uploade m_vertices to VBO
-    //m_vbo.redefine(m_vertices.size() * sizeof(VertexPOCOUV), m_vertices.data());
 }
 
 template<Renderer R>

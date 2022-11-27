@@ -15,8 +15,11 @@ class VK13Buffer final : public IBuffer {
     friend class VK13Fixture;
 public:
 
-    BufferID construct(size_t sizeInBytes, vk::BufferUsageFlags usage, const void* data) const override;
+    BufferID construct(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data) const override;
     void destruct(BufferID& bf) const override;
+
+    void* map(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes) const override;
+    void unmap(const BufferID& bf) const override;
 
 private:
 
@@ -28,7 +31,11 @@ private:
     }
 
     uint32_t selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const;
-    BufferID createBufferAndMemory(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
+    struct BufferAndMemory {
+        vk::Buffer buffer = nullptr;
+        vk::DeviceMemory memory = nullptr;
+    };
+    BufferAndMemory createBufferAndMemory(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
     void copyBetweenBuffers(const vk::Buffer& src, const vk::Buffer& dst, const vk::BufferCopy& copyInfo) const;
 
     const vk::PhysicalDevice& m_physicalDevice;

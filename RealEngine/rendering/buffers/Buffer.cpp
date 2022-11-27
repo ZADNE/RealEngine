@@ -11,8 +11,8 @@
 namespace RE {
 
 template<Renderer R>
-Buffer<R>::Buffer(size_t sizeInBytes, vk::BufferUsageFlags usage, const void* data/* = nullptr*/) :
-    m_id(s_impl->construct(sizeInBytes, usage, data)),
+Buffer<R>::Buffer(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data/* = nullptr*/) :
+    m_id(s_impl->construct(sizeInBytes, usage, memProperty, data)),
     m_sizeInBytes(sizeInBytes) {
 }
 
@@ -73,22 +73,22 @@ void Buffer<R>::invalidate(size_t lengthInBytes) const {
 template<Renderer R>
 void Buffer<R>::flushMapped(size_t offsetInBytes, size_t lengthInBytes) const {
     s_impl->flushMapped(m_id, offsetInBytes, lengthInBytes);
-}
+}*/
 
 template<Renderer R>
-bool Buffer<R>::unmap() const {
-    return s_impl->unmap(m_id);
+void Buffer<R>::unmap() const {
+    s_impl->unmap(m_id);
 }
 
-template<Renderer R>
+/*template<Renderer R>
 size_t Buffer<R>::size() const {
     return m_sizeInBytes;
-}
+}*/
 
 template<Renderer R>
-void* Buffer<R>::map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const {
-    return s_impl->map(m_id, offsetInBytes, lengthInBytes, mappingUsage);
-}*/
+void* Buffer<R>::map(size_t offsetInBytes, size_t lengthInBytes) const {
+    return s_impl->map(m_id, offsetInBytes, lengthInBytes);
+}
 
 template class Buffer<RendererLateBind>;
 template class Buffer<RendererVK13>;

@@ -63,8 +63,9 @@ public:
     void switchShaderProgram(const ShaderProgramSources& sources);
 
 private:
-
-    Buffer<R> m_buf{sizeof(VertexPOCO) * 512, vk::BufferUsageFlagBits::eVertexBuffer};
+    using enum vk::BufferUsageFlagBits;
+    using enum vk::MemoryPropertyFlagBits;
+    Buffer<R> m_vbo{sizeof(VertexPOCO) * 512, eVertexBuffer, eHostVisible | eHostCoherent};
     Pipeline<R> m_pipeline;
     vk::PipelineVertexInputStateCreateInfo createVertexInputStateInfo() const;
 

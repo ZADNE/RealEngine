@@ -137,12 +137,14 @@ private:
     void sortGlyphs(GlyphSortType sortType);
     void createDrawBatches();
 
-    Buffer<R> m_vbo{sizeof(VertexPOCOUV) * 512, vk::BufferUsageFlagBits::eVertexBuffer};
+    using enum vk::BufferUsageFlagBits;
+    using enum vk::MemoryPropertyFlagBits;
+    Buffer<R> m_vbo{sizeof(VertexPOCOUV) * 512, eVertexBuffer, eHostVisible | eHostCoherent};
 
     std::vector<Glyph<R>*> m_glyphPointers;
     std::vector<Glyph<R>> m_glyphs;
     std::vector<DrawBatch<R>> m_drawBatches;
-    std::vector<VertexPOCOUV> m_vertices;
+    VertexPOCOUV* m_vertices = nullptr;
 
     static constexpr bool compareNegToPos(Glyph<R>* a, Glyph<R>* b) { return (a->depth > b->depth); }
     static constexpr bool comparePosToNeg(Glyph<R>* a, Glyph<R>* b) { return (a->depth < b->depth); }

@@ -34,8 +34,8 @@ public:
 private:
 
     struct VK13 {
-        vk::Buffer buffer;
-        vk::DeviceMemory memory;
+        vk::Buffer mainBuffer = nullptr;
+        vk::DeviceMemory mainMemory = nullptr;
     };
 
     BufferID(const VK13& vk13) :
@@ -56,22 +56,11 @@ private:
 class IBuffer {
 public:
 
-    virtual BufferID construct(size_t sizeInBytes, vk::BufferUsageFlags usage, const void* data) const = 0;
+    virtual BufferID construct(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data) const = 0;
     virtual void destruct(BufferID& bf) const = 0;
 
-    /*virtual void bind(const BufferID& bf, BufferType bindType) const = 0;
-    virtual void bindIndexed(const BufferID& bf, const BufferTypedIndex& index) const = 0;
-
-    virtual void overwrite(const BufferID& bf, size_t offsetInBytes, size_t countBytes, const void* data) const = 0;
-
-    virtual void redefine(BufferID& bf, size_t sizeInBytes, const void* data) const = 0;
-
-    virtual void invalidate(const BufferID& bf) const = 0;
-    virtual void invalidate(const BufferID& bf, size_t lengthInBytes) const = 0;
-
-    virtual void* map(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const = 0;
-    virtual void flushMapped(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes) const = 0;
-    virtual bool unmap(const BufferID& bf) const = 0;*/
+    virtual void* map(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes) const = 0;
+    virtual void unmap(const BufferID& bf) const = 0;
 };
 
 }

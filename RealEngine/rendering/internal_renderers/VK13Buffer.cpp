@@ -5,33 +5,48 @@
  */
 #include <RealEngine/rendering/internal_renderers/VK13Buffer.hpp>
 
+#include <RealEngine/utility/Error.hpp>
+
 namespace RE {
 
 using enum vk::MemoryPropertyFlagBits;
 using enum vk::BufferUsageFlagBits;
 
-BufferID VK13Buffer::construct(size_t sizeInBytes, vk::BufferUsageFlags usage, const void* data) const {
-    if (data) {//If initial data are provided
-        //Create staging and final buffer
-        auto stage = createBufferAndMemory(sizeInBytes, eTransferSrc, eHostVisible | eHostCoherent);
-        auto buffer = createBufferAndMemory(sizeInBytes, usage | eTransferDst, eDeviceLocal);
+constexpr auto HOST_MEM = eHostVisible | eHostCoherent;
+
+BufferID VK13Buffer::construct(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data) const {
+    BufferAndMemory main{};
+    if (data && (memProperty & HOST_MEM) != HOST_MEM) {//If initial data are provided or stage is requested
+        auto stage = createBufferAndMemory(sizeInBytes, eTransferSrc, HOST_MEM);
+        main = createBufferAndMemory(sizeInBytes, usage | eTransferDst, memProperty);
         //Copy from data to staging buffer
-        std::memcpy(m_device.mapMemory(stage.m_.vk13.memory, 0, sizeInBytes), data, sizeInBytes);
-        m_device.unmapMemory(stage.m_.vk13.memory);
+        std::memcpy(m_device.mapMemory(stage.memory, 0, sizeInBytes), data, sizeInBytes);
+        m_device.unmapMemory(stage.memory);
         //Copy from staging to final buffer
-        copyBetweenBuffers(stage.m_.vk13.buffer, buffer.m_.vk13.buffer, vk::BufferCopy{0u, 0u, sizeInBytes});
-        //Destruct the staging buffer
-        destruct(stage);
-        //Return the final buffer
-        return buffer;
+        copyBetweenBuffers(stage.buffer, main.buffer, vk::BufferCopy{0u, 0u, sizeInBytes});
+        //Destruct the temporary stage
+        m_device.destroyBuffer(stage.buffer);
+        m_device.free(stage.memory);
     } else {//If no initial data are provided
-        return createBufferAndMemory(sizeInBytes, usage, eDeviceLocal);
+        main = createBufferAndMemory(sizeInBytes, usage, memProperty);
     }
+    return BufferID::VK13{
+        .mainBuffer = main.buffer,
+        .mainMemory = main.memory
+    };
 }
 
 void VK13Buffer::destruct(BufferID& bf) const {
-    m_device.destroyBuffer(bf.m_.vk13.buffer);
-    m_device.free(bf.m_.vk13.memory);
+    m_device.destroyBuffer(bf.m_.vk13.mainBuffer);
+    m_device.free(bf.m_.vk13.mainMemory);
+}
+
+void* VK13Buffer::map(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes) const {
+    return m_device.mapMemory(bf.m_.vk13.mainMemory, offsetInBytes, lengthInBytes);
+}
+
+void VK13Buffer::unmap(const BufferID& bf) const {
+    m_device.unmapMemory(bf.m_.vk13.mainMemory);
 }
 
 uint32_t VK13Buffer::selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const {
@@ -41,10 +56,10 @@ uint32_t VK13Buffer::selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFla
             return i;
         }
     }
-    return 0;
+    throw Exception{"Could not find memory that suits the buffer!"};
 }
 
-BufferID VK13Buffer::createBufferAndMemory(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const {
+VK13Buffer::BufferAndMemory VK13Buffer::createBufferAndMemory(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const {
     vk::BufferCreateInfo createInfo{{},
         sizeInBytes,
         usage,
@@ -56,7 +71,7 @@ BufferID VK13Buffer::createBufferAndMemory(size_t sizeInBytes, vk::BufferUsageFl
         sizeInBytes, selectMemoryType(memReq.memoryTypeBits, properties)
     });
     m_device.bindBufferMemory2(vk::BindBufferMemoryInfo{buffer, memory, 0u});
-    return BufferID::VK13{.buffer = buffer, .memory = memory};
+    return BufferAndMemory{.buffer = buffer, .memory = memory};
 }
 
 void VK13Buffer::copyBetweenBuffers(const vk::Buffer& src, const vk::Buffer& dst, const vk::BufferCopy& copyInfo) const {

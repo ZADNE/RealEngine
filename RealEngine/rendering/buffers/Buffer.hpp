@@ -29,7 +29,7 @@ public:
      * @param data  If a valid pointer is provided, it is used to initialize the contents of the buffer.
      *              If the nullptr is provided, the contents of the buffer are undefined.
     */
-    Buffer(size_t sizeInBytes, vk::BufferUsageFlags usage, const void* data = nullptr);
+    Buffer(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data = nullptr);
 
     /**
      * @brief Contruct buffer as a storage for given type
@@ -160,10 +160,10 @@ public:
      * @brief Maps a range of the buffer to the client's memory
      * @tparam T Reinterpreted type of the returned pointer
     */
-    /*template<typename T>
-    T* map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const {
-        return reinterpret_cast<T*>(map(offsetInBytes, lengthInBytes, mappingUsage));
-    }*/
+    template<typename T>
+    T* map(size_t offsetInBytes, size_t lengthInBytes) const {
+        return reinterpret_cast<T*>(map(offsetInBytes, lengthInBytes));
+    }
 
     /**
      * @brief Indicates modifications to a mapped range of the buffer
@@ -174,7 +174,7 @@ public:
      * @brief Releases the mapping of the buffer
      * @return True if success. Buffer's contents are undefined if false is returned.
     */
-    //bool unmap() const;
+    void unmap() const;
 
     /**
      * @brief Gets size of the buffer in bytes
@@ -183,7 +183,7 @@ public:
 
 protected:
 
-    //void* map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const;
+    void* map(size_t offsetInBytes, size_t lengthInBytes) const;
 
     BufferID m_id;
     size_t m_sizeInBytes = 0;   /**< Size of the buffer */
