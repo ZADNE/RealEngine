@@ -106,7 +106,7 @@ VK13Fixture::~VK13Fixture() {
 
 void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
     //Wait for the previous frame to finish
-    checkSuccess(m_device.waitForFences(**m_inFlightFences, true, MAX_TIMEOUT));
+    checkSuccess(m_device.waitForFences(*current(m_inFlightFences), true, MAX_TIMEOUT));
 
     //Recreate swapchain if required
     if (m_recreteSwapchain) {
@@ -114,13 +114,13 @@ void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
         m_recreteSwapchain = false;
     }
 
-    m_device.resetFences(**m_inFlightFences);
+    m_device.resetFences(*current(m_inFlightFences));
 
     //Acquire next image
     vk::AcquireNextImageInfoKHR acquireNextImageInfo{
         *m_swapchain,
         MAX_TIMEOUT,
-        **m_imageAvailableSems,
+        *current(m_imageAvailableSems),
         nullptr,
         1u
     };
@@ -134,12 +134,12 @@ void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
     }
 
     //Restart command buffer
-    m_commandBuffers->reset();
-    m_commandBuffers->begin({});
+    current(m_commandBuffers).reset();
+    current(m_commandBuffers).begin({});
 
     //Set current commandbuffer
-    m_bufferImpl.setCommandBuffer(&(**m_commandBuffers));
-    m_pipelineImpl.setCommandBuffer(&(**m_commandBuffers));
+    m_bufferImpl.setCommandBuffer(&(*current(m_commandBuffers)));
+    m_pipelineImpl.setCommandBuffer(&(*current(m_commandBuffers)));
 
     //Begin renderpass
     const auto* clearColorPtr = reinterpret_cast<const std::array<float, 4u>*>(&clearColor);
@@ -150,7 +150,7 @@ void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
         vk::Rect2D{{}, m_swapchainExtent},
         clearValue
     };
-    m_commandBuffers->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+    current(m_commandBuffers).beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
 
     if (useImGui) {
         ImGui_ImplVulkan_NewFrame();
@@ -162,24 +162,24 @@ void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
 void VK13Fixture::finishFrame(bool useImGui) {
     if (useImGui) {
         ImGui::Render();
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), **m_commandBuffers);
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *current(m_commandBuffers));
     }
 
     //Submit the command buffer
-    m_commandBuffers->endRenderPass();
-    m_commandBuffers->end();
+    current(m_commandBuffers).endRenderPass();
+    current(m_commandBuffers).end();
     vk::PipelineStageFlags waitDstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
     vk::SubmitInfo submitInfo{
-        **m_imageAvailableSems,
+        *current(m_imageAvailableSems),
         waitDstStageMask,
-        **m_commandBuffers,
-        **m_renderingFinishedSems
+        *current(m_commandBuffers),
+        *current(m_renderingFinishedSems)
     };
-    m_graphicsQueue.submit(submitInfo, **m_inFlightFences);
+    m_graphicsQueue.submit(submitInfo, *current(m_inFlightFences));
 
     //Present new image
     vk::PresentInfoKHR presentInfo{
-        **m_renderingFinishedSems,
+        *current(m_renderingFinishedSems),
         *m_swapchain,
         m_imageIndex
     };
@@ -496,10 +496,10 @@ void VK13Fixture::recreateSwapchain() {
 
 void VK13Fixture::recreateImGuiFontTexture() {
     vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
-    m_commandBuffers->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-    ImGui_ImplVulkan_CreateFontsTexture(**m_commandBuffers);
-    m_commandBuffers->end();
-    m_graphicsQueue.submit(vk::SubmitInfo{{}, {}, **m_commandBuffers}, *uploadFence);
+    current(m_commandBuffers).begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+    ImGui_ImplVulkan_CreateFontsTexture(*current(m_commandBuffers));
+    current(m_commandBuffers).end();
+    m_graphicsQueue.submit(vk::SubmitInfo{{}, {}, *current(m_commandBuffers)}, *uploadFence);
     checkSuccess(m_device.waitForFences(*uploadFence, true, MAX_TIMEOUT));
 }
 

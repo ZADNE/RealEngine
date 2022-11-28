@@ -4,6 +4,8 @@
 #pragma once
 #include <array>
 #include <algorithm>
+#include <utility>
+#include <initializer_list>
 
 namespace RE {
 
@@ -16,29 +18,12 @@ void setFrame(int totalFrame);
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 template<typename T>
-struct PerFrameInFlight {
+using PerFrameInFlight = std::array<T, MAX_FRAMES_IN_FLIGHT>;
 
-    PerFrameInFlight(std::initializer_list<T> il) :
-        m_objects(il) {
-    }
 
-    PerFrameInFlight(const T& object) {
-        std::fill_n(m_objects.data(), FRAMES_IN_FLIGHT, object);
-    }
-
-    T& operator[](int index) {
-        return m_objects[index];
-    }
-
-    T& operator*() {
-        return m_objects[CURRENT_FRAME];
-    }
-
-    T* operator->() {
-        return &m_objects[CURRENT_FRAME];
-    }
-
-    std::array<T, MAX_FRAMES_IN_FLIGHT> m_objects;
-};
+template<typename T>
+T& current(PerFrameInFlight<T>& perFrameInFlight) {
+    return perFrameInFlight[CURRENT_FRAME];
+}
 
 }

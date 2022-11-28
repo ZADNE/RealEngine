@@ -53,10 +53,12 @@ private:
         glm::mat4 textureView;
         glm::mat4 windowView;
     };
-    RE::PerFrameInFlight<RE::Buffer<R>> m_ubos{RE::Buffer<R>{
-        sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
-        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
-    }};
+    RE::PerFrameInFlight<RE::Buffer<R>> m_ubos{
+        RE::Buffer<R>{sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
+        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent},
+        RE::Buffer<R>{sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
+        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent}
+    };
     RE::PerFrameInFlight<ViewMatrices*> m_mappedUbos{nullptr};
 
     glm::vec2 m_overlap = glm::vec2(0.2f, 0.2f);
