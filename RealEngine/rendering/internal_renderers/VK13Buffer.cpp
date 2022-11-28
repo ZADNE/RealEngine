@@ -1,6 +1,4 @@
-﻿#include "VK13Buffer.hpp"
-#include "VK13Buffer.hpp"
-/*!
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/rendering/internal_renderers/VK13Buffer.hpp>
@@ -13,6 +11,17 @@ using enum vk::MemoryPropertyFlagBits;
 using enum vk::BufferUsageFlagBits;
 
 constexpr auto HOST_MEM = eHostVisible | eHostCoherent;
+
+VK13Buffer::VK13Buffer(
+    const vk::PhysicalDevice& physicalDevice, const vk::Device& device,
+    const vk::Queue& graphicsQueue, const vk::CommandPool& commandPool) :
+    m_physicalDevice(physicalDevice), m_device(device),
+    m_graphicsQueue(graphicsQueue), m_commandPool(commandPool) {
+}
+
+void VK13Buffer::setCommandBuffer(const vk::CommandBuffer* commandBuffer) {
+    m_commandBuffer = commandBuffer;
+}
 
 BufferID VK13Buffer::construct(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data) const {
     BufferAndMemory main{};
@@ -49,6 +58,10 @@ void VK13Buffer::unmap(const BufferID& bf) const {
     m_device.unmapMemory(bf.m_.vk13.mainMemory);
 }
 
+void VK13Buffer::bindAsVertexBuffer(const BufferID& bf, uint32_t binding, uint64_t offsetInBytes) const {
+    m_commandBuffer->bindVertexBuffers(binding, bf.m_.vk13.mainBuffer, offsetInBytes);
+}
+
 uint32_t VK13Buffer::selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const {
     auto memProperties = m_physicalDevice.getMemoryProperties2().memoryProperties;
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
@@ -69,7 +82,7 @@ VK13Buffer::BufferAndMemory VK13Buffer::createBufferAndMemory(size_t sizeInBytes
     auto memReq = m_device.getBufferMemoryRequirements2({buffer}).memoryRequirements;
     auto memory = m_device.allocateMemory({
         sizeInBytes, selectMemoryType(memReq.memoryTypeBits, properties)
-    });
+        });
     m_device.bindBufferMemory2(vk::BindBufferMemoryInfo{buffer, memory, 0u});
     return BufferAndMemory{.buffer = buffer, .memory = memory};
 }
@@ -78,7 +91,7 @@ void VK13Buffer::copyBetweenBuffers(const vk::Buffer& src, const vk::Buffer& dst
     //Allocate temporary command buffer
     auto commandBuffer = m_device.allocateCommandBuffers({
         m_commandPool, vk::CommandBufferLevel::ePrimary, 1u
-    }).front();
+        }).front();
     //Record the copy
     commandBuffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
     commandBuffer.copyBuffer(src, dst, copyInfo);

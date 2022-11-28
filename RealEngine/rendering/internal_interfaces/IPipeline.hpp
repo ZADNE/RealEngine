@@ -4,7 +4,6 @@
 #pragma once
 #include <vulkan/vulkan.hpp>
 
-#include <RealEngine/rendering/internal_interfaces/IBuffer.hpp>
 #include <RealEngine/rendering/internal_interfaces/IShaderProgram.hpp>
 
 namespace RE {
@@ -48,6 +47,9 @@ public:
 
     virtual PipelineID construct(const vk::PipelineVertexInputStateCreateInfo& vi, const ShaderProgramSources& srcs) const = 0;
     virtual void destruct(PipelineID& pl) const = 0;
+
+    virtual void bind(const PipelineID& pl, vk::PipelineBindPoint bindPoint) const = 0;
+    virtual void draw(const PipelineID& pl, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const = 0;
 };
 
 }

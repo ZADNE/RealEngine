@@ -22,6 +22,17 @@ static vk::ShaderStageFlagBits convert(size_t st) {
     }
 }
 
+VK13Pipeline::VK13Pipeline(
+    const vk::Device& device, const vk::PipelineCache& pipelineCache,
+    const vk::RenderPass& renderPass) :
+    m_device(device), m_pipelineCache(pipelineCache),
+    m_renderPass(renderPass) {
+}
+
+void VK13Pipeline::setCommandBuffer(const vk::CommandBuffer* commandBuffer) {
+    m_commandBuffer = commandBuffer;
+}
+
 PipelineID VK13Pipeline::construct(const vk::PipelineVertexInputStateCreateInfo& vi, const ShaderProgramSources& srcs) const {
     //Create shader modules
     std::array<vk::ShaderModule, 6> modules;
@@ -75,7 +86,7 @@ PipelineID VK13Pipeline::construct(const vk::PipelineVertexInputStateCreateInfo&
     std::array dynamicStates = std::to_array<vk::DynamicState>({
         vk::DynamicState::eViewport,
         vk::DynamicState::eScissor
-    });
+        });
     vk::PipelineDynamicStateCreateInfo dynamic{{}, dynamicStates};
     vk::DescriptorSetLayout descriptorSetLayout{
         m_device.createDescriptorSetLayout(vk::DescriptorSetLayoutCreateInfo{{}, dslbs})
@@ -117,6 +128,15 @@ void VK13Pipeline::destruct(PipelineID& pl) const {
     m_device.destroyPipeline(pl.m_.vk13.pipeline);
     m_device.destroyPipelineLayout(pl.m_.vk13.pipelineLayout);
     m_device.destroyDescriptorSetLayout(pl.m_.vk13.descriptorSetLayout);
+}
+
+void VK13Pipeline::bind(const PipelineID& pl, vk::PipelineBindPoint bindPoint) const {
+    m_commandBuffer->bindPipeline(bindPoint, pl.m_.vk13.pipeline);
+}
+
+void VK13Pipeline::draw(const PipelineID& pl, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const {
+    (void)pl;
+    m_commandBuffer->draw(vertexCount, instanceCount, firstVertex, firstInstance);
 }
 
 void VK13Pipeline::reflect(const ShaderSourceRef& src, vk::ShaderStageFlagBits st, std::vector<vk::DescriptorSetLayoutBinding>& dslbs) const {

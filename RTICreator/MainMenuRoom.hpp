@@ -6,7 +6,7 @@
 
 #include <RealEngine/rooms/Room.hpp>
 #include <RealEngine/program/CommandLineArguments.hpp>
-#include <RealEngine/rendering/buffers/BufferTyped.hpp>
+#include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/cameras/View2D.hpp>
@@ -14,11 +14,9 @@
 #include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/rendering/basic_shaders/AllShaders.hpp>
 
-constexpr RE::BufferTypedIndex UNIF_BUF_VIEWPORT_MATRIX = {RE::BufferType::UNIFORM, 0u};
-
-/**
- * @brief Room with the UI
-*/
+ /**
+  * @brief Room with the UI
+ */
 template<RE::Renderer R>
 class MainMenuRoom : public RE::Room {
 public:
@@ -51,8 +49,16 @@ private:
 
     //View
     RE::View2D m_texView;
-    //RE::BufferTyped<R> m_texViewBuf{UNIF_BUF_VIEWPORT_MATRIX, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE};
-    //RE::BufferTyped<R> m_windowViewBuf{UNIF_BUF_VIEWPORT_MATRIX, sizeof(glm::mat4), RE::BufferUsageFlags::DYNAMIC_STORAGE};
+    struct ViewMatrices {
+        glm::mat4 textureView;
+        glm::mat4 windowView;
+    };
+    RE::PerFrameInFlight<RE::Buffer<R>> m_ubos{RE::Buffer<R>{
+        sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
+        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
+    }};
+    RE::PerFrameInFlight<ViewMatrices*> m_mappedUbos{nullptr};
+
     glm::vec2 m_overlap = glm::vec2(0.2f, 0.2f);
     glm::vec3 m_backgroundColor = glm::vec3(0.1f, 0.1f, 0.1f);
 

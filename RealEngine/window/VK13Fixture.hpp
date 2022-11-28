@@ -7,6 +7,7 @@
 
 #include <vulkan/vulkan_raii.hpp>
 
+#include <RealEngine/rendering/PerFrameInFlight.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Buffer.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Pipeline.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Viewport.hpp>
@@ -46,49 +47,7 @@ public:
 
 private:
 
-    void recreateSwapchain();
-
-    class Implementations {
-    public:
-
-        Implementations(
-            const vk::PhysicalDevice& physicalDevice, const vk::Device& device,
-            const vk::Queue& graphicsQueue, const vk::RenderPass& renderPass,
-            const vk::CommandPool& commandPool, const vk::PipelineCache& pipelineCache
-        ) :
-            m_bufferImpl(physicalDevice, device, graphicsQueue, commandPool),
-            m_pipelineImpl(device, pipelineCache, renderPass) {
-            assignReferences<RendererLateBind>();
-            assignReferences<RendererVK13>();
-        }
-
-        ~Implementations() {
-            clearReferences<RendererLateBind>();
-            clearReferences<RendererVK13>();
-        }
-
-        Implementations(const Implementations&) = delete;
-        Implementations& operator=(const Implementations&) = delete;
-
-    private:
-
-        template<Renderer R>
-        void assignReferences();
-
-        template<Renderer R>
-        void clearReferences();
-
-        VK13Buffer m_bufferImpl;
-        VK13Pipeline m_pipelineImpl;
-
-        ViewportState m_viewportState;
-    };
-
-    static constexpr size_t FRAMES_IN_FLIGHT = 2;
-    template<typename T>
-    using PerFrameInFlight = std::array<T, FRAMES_IN_FLIGHT>;
-
-
+    //Vulkan objects
     uint32_t m_imageIndex = 0u;
     size_t m_frame = 0;
     SDL_Window* m_sdlWindow = nullptr;
@@ -119,13 +78,15 @@ private:
     PerFrameInFlight<vk::raii::Semaphore> m_renderingFinishedSems;
     PerFrameInFlight<vk::raii::Fence> m_inFlightFences;
     bool m_recreteSwapchain = false;
-
-    Implementations m_impls{
-        *m_physicalDevice, *m_device,
-        *m_graphicsQueue, *m_renderPass,
-        *m_commandPool, *m_pipelineCache
-    };
-
+    //Implementations
+    VK13Buffer m_bufferImpl;
+    VK13Pipeline m_pipelineImpl;
+    ViewportState m_viewportState;
+    template<Renderer R>
+    void assignImplementationReferences();
+    template<Renderer R>
+    void clearImplementationReferences();
+    //Create object helpers
     vk::raii::Instance createInstance();
     vk::raii::DebugUtilsMessengerEXT createDebugUtilsMessenger();
     vk::raii::SurfaceKHR createSurface();
@@ -151,6 +112,8 @@ private:
     bool areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice);
     bool isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice);
     bool findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice);
+
+    void recreateSwapchain();
 
     void recreateImGuiFontTexture();
 };

@@ -31,6 +31,9 @@ template<RE::Renderer R>
 MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
     Room(0, INITIAL_DISPLAY_SETTINGS),
     m_texView(engine().getWindowDims()) {
+    for (size_t i = 0; i < RE::FRAMES_IN_FLIGHT; i++) {
+        m_mappedUbos[i] = m_ubos[i].map<ViewMatrices>(0u, sizeof(ViewMatrices));
+    }
 
     engine().setWindowTitle("RTICreator v3.0.0");
 

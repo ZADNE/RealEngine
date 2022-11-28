@@ -24,10 +24,10 @@ public:
     Pipeline<R>& operator=(const Pipeline<R>&) = delete;
     Pipeline<R>& operator=(Pipeline<R>&& other) noexcept;
 
-    /**
-     * @brief Destructs shader program
-    */
     ~Pipeline();
+
+    void bind(vk::PipelineBindPoint bindPoint) const;
+    void draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const;
 
 private:
 

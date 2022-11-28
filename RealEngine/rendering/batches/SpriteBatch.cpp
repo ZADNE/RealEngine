@@ -246,16 +246,11 @@ void SpriteBatch<R>::draw() {
 
 template<Renderer R>
 void SpriteBatch<R>::draw(const Pipeline<R>& pipeline) {
-    /*program.use();
-    m_vao.bind();
-
+    pipeline.bind(vk::PipelineBindPoint::eGraphics);
     for (size_t i = 0u; i < m_drawBatches.size(); i++) {
         m_drawBatches[i].tex.bind();
-        m_vao.renderArrays(Primitive::TRIANGLES, m_drawBatches[i].offset, m_drawBatches[i].count);
+        pipeline.draw(m_drawBatches[i].count, 1, m_drawBatches[i].offset, 0);
     }
-
-    m_vao.unbind();
-    program.unuse();*/
 }
 
 template<Renderer R>

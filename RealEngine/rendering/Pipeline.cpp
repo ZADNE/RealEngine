@@ -28,6 +28,16 @@ Pipeline<R>::~Pipeline() {
     s_impl->destruct(m_id);
 }
 
+template<Renderer R>
+void Pipeline<R>::bind(vk::PipelineBindPoint bindPoint) const {
+    s_impl->bind(m_id, bindPoint);
+}
+
+template<Renderer R>
+void Pipeline<R>::draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const {
+    s_impl->draw(m_id, vertexCount, instanceCount, firstVertex, firstInstance);
+}
+
 template class Pipeline<RendererLateBind>;
 template class Pipeline<RendererVK13>;
 

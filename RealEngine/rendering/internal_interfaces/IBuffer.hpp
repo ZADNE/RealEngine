@@ -2,9 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <cstddef>
-#include <utility>
-
 #include <vulkan/vulkan.hpp>
 
 namespace RE {
@@ -56,11 +53,13 @@ private:
 class IBuffer {
 public:
 
-    virtual BufferID construct(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data) const = 0;
+    virtual BufferID construct(uint64_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data) const = 0;
     virtual void destruct(BufferID& bf) const = 0;
 
-    virtual void* map(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes) const = 0;
+    virtual void* map(const BufferID& bf, uint64_t offsetInBytes, uint64_t lengthInBytes) const = 0;
     virtual void unmap(const BufferID& bf) const = 0;
+
+    virtual void bindAsVertexBuffer(const BufferID& bf, uint32_t binding, uint64_t offsetInBytes) const = 0;
 };
 
 }

@@ -12,23 +12,23 @@ namespace RE {
 * Do not use this directly - use Buffer class instead.
 */
 class VK13Buffer final : public IBuffer {
-    friend class VK13Fixture;
 public:
+    //Fixture functions
+    VK13Buffer(
+        const vk::PhysicalDevice& physicalDevice, const vk::Device& device,
+        const vk::Queue& graphicsQueue, const vk::CommandPool& commandPool);
+    void setCommandBuffer(const vk::CommandBuffer* commandBuffer);
 
+    //IBuffer implementation
     BufferID construct(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data) const override;
     void destruct(BufferID& bf) const override;
 
     void* map(const BufferID& bf, size_t offsetInBytes, size_t lengthInBytes) const override;
     void unmap(const BufferID& bf) const override;
 
-private:
+    void bindAsVertexBuffer(const BufferID& bf, uint32_t binding, uint64_t offsetInBytes) const override;
 
-    VK13Buffer(
-        const vk::PhysicalDevice& physicalDevice, const vk::Device& device,
-        const vk::Queue& graphicsQueue, const vk::CommandPool& commandPool) :
-        m_physicalDevice(physicalDevice), m_device(device),
-        m_graphicsQueue(graphicsQueue), m_commandPool(commandPool) {
-    }
+private:
 
     uint32_t selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const;
     struct BufferAndMemory {
@@ -42,6 +42,7 @@ private:
     const vk::Device& m_device;
     const vk::Queue& m_graphicsQueue;
     const vk::CommandPool& m_commandPool;
+    const vk::CommandBuffer* m_commandBuffer = nullptr;
 };
 
 }
