@@ -81,8 +81,9 @@ VK13Buffer::BufferAndMemory VK13Buffer::createBufferAndMemory(size_t sizeInBytes
     auto buffer = m_device.createBuffer(createInfo);
     auto memReq = m_device.getBufferMemoryRequirements2({buffer}).memoryRequirements;
     auto memory = m_device.allocateMemory({
-        sizeInBytes, selectMemoryType(memReq.memoryTypeBits, properties)
-        });
+        std::max(sizeInBytes, memReq.alignment),
+        selectMemoryType(memReq.memoryTypeBits, properties)
+    });
     m_device.bindBufferMemory2(vk::BindBufferMemoryInfo{buffer, memory, 0u});
     return BufferAndMemory{.buffer = buffer, .memory = memory};
 }

@@ -4,6 +4,7 @@
 #include <RTICreator/MainMenuRoom.hpp>
 
 #include <iostream>
+#include <algorithm>
 
 #if not defined(WIN32) && not defined(_WIN32) && not defined(__WIN32__)
 #error "Since this tool requires file selection dialog window and I did not want another library dependency, it is a Windows-only tool. Sorry!"
@@ -31,9 +32,9 @@ template<RE::Renderer R>
 MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
     Room(0, INITIAL_DISPLAY_SETTINGS),
     m_texView(engine().getWindowDims()) {
-    for (size_t i = 0; i < RE::FRAMES_IN_FLIGHT; i++) {
-        m_mappedUbos[i] = m_ubos[i].map<ViewMatrices>(0u, sizeof(ViewMatrices));
-    }
+    std::transform(m_ubos.cbegin(), m_ubos.cend(), m_mappedUbos.begin(), [](const RE::Buffer<R>& buf) {
+        return buf.map<ViewMatrices>(0u, sizeof(ViewMatrices));
+    });
 
     engine().setWindowTitle("RTICreator v3.0.0");
 
@@ -45,8 +46,9 @@ MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
         load(args[1]);
     }
 
-    glm::vec2 window = engine().getWindowDims();
-    //m_windowViewBuf.overwrite(0u, glm::ortho(0.0f, window.x, 0.0f, window.y));
+    //Initialize window view matrices
+    auto window = engine().getWindowDims();
+    windowResizedCallback(window, window);
 }
 
 template<RE::Renderer R>
@@ -87,8 +89,10 @@ void MainMenuRoom<R>::step() {
 template<RE::Renderer R>
 void MainMenuRoom<R>::render(double interpolationFactor) {
     auto mat = m_texView.getViewMatrix();
+    RE::current(m_mappedUbos)->textureView = mat;
     //m_texViewBuf.overwrite(0u, mat);
     //m_texViewBuf.bindIndexed();
+    //RE::current(m_ubos)->bind();
 
     //Texture
     if (m_texture) {
@@ -131,6 +135,9 @@ void MainMenuRoom<R>::render(double interpolationFactor) {
 template<RE::Renderer R>
 void MainMenuRoom<R>::windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {
     m_texView.resizeView(newSize);
+    std::for_each(m_mappedUbos.cbegin(), m_mappedUbos.cend(), [&](ViewMatrices* mapped) {
+        mapped->windowView = glm::ortho(0.0f, static_cast<float>(newSize.x), 0.0f, static_cast<float>(newSize.y));
+    });
 }
 
 template<RE::Renderer R>

@@ -7,13 +7,16 @@
 
 namespace RE {
 
+template<Renderer> class DescriptorSet;
+
 /**
  * @brief Controls how vertices are rendered to screen.
  * @tparam R The renderer that will perform the commands
 */
 template<Renderer R = RendererLateBind>
 class Pipeline {
-    friend class GL46Fixture; friend class VK13Fixture;
+    friend class VK13Fixture;
+    friend class DescriptorSet<R>;
 public:
 
     Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const ShaderProgramSources& srcs);

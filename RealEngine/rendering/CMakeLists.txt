@@ -10,6 +10,7 @@ add_subdirectory(vertices)
 
 target_sources(RealEngine PRIVATE
     Capabilities.hpp            Capabilities.cpp
+    DescriptorSet.hpp           DescriptorSet.cpp
     Ordering.hpp                Ordering.cpp
     PerFrameInFlight.hpp        PerFrameInFlight.cpp
     Pipeline.hpp                Pipeline.cpp

@@ -10,7 +10,7 @@
 
 namespace RE {
 
-template<Renderer> class VertexArray;
+template<Renderer> class DescriptorSet;
 
 /**
  * @brief Is a continuous block of memory stored in the GPU's memory
@@ -19,7 +19,7 @@ template<Renderer> class VertexArray;
 template<Renderer R = RendererLateBind>
 class Buffer {
     friend class VK13Fixture;
-    friend class VertexArray<R>;
+    friend class DescriptorSet<R>;
 public:
 
     /**

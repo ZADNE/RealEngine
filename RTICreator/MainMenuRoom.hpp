@@ -37,8 +37,8 @@ private:
     void save(const std::string& loc);
     void load(const std::string& filePath);
 
-    RE::SpriteBatch<R> m_sb{{.vert = RE::sprite_vert,.frag = RE::sprite_frag}};
-    RE::GeometryBatch<R> m_gb{{.vert = RE::geometry_vert,.frag = RE::geometry_frag}};
+    RE::SpriteBatch<R> m_sb{{.vert = RE::sprite_vert, .frag = RE::sprite_frag}};
+    RE::GeometryBatch<R> m_gb{{.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
 
     //Texture
     std::optional<RE::Texture<R>> m_texture;

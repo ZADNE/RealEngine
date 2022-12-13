@@ -9,6 +9,7 @@
 
 #include <RealEngine/rendering/PerFrameInFlight.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Buffer.hpp>
+#include <RealEngine/rendering/internal_renderers/VK13DescriptorSet.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Pipeline.hpp>
 #include <RealEngine/rendering/internal_renderers/VK13Viewport.hpp>
 
@@ -49,7 +50,7 @@ private:
 
     //Vulkan objects
     uint32_t m_imageIndex = 0u;
-    size_t m_frame = 0;
+    int m_frame = 0;
     SDL_Window* m_sdlWindow = nullptr;
     bool m_vSync = false;
     vk::raii::Context m_context{};
@@ -80,6 +81,7 @@ private:
     bool m_recreteSwapchain = false;
     //Implementations
     VK13Buffer m_bufferImpl;
+    VK13DescriptorSet m_descriptorSetImpl;
     VK13Pipeline m_pipelineImpl;
     ViewportState m_viewportState;
     template<Renderer R>

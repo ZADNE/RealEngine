@@ -19,7 +19,7 @@ public:
         const vk::RenderPass& renderPass);
     void setCommandBuffer(const vk::CommandBuffer* commandBuffer);
 
-    //IPipeline implementation
+    //Interface implementation
     PipelineID construct(const vk::PipelineVertexInputStateCreateInfo& vi, const ShaderProgramSources& srcs) const override;
     void destruct(PipelineID& pl) const override;
 

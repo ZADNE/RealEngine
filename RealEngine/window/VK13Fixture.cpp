@@ -12,13 +12,8 @@
 
 #include <RealEngine/window/WindowSubsystems.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
-#include <RealEngine/rendering/Capabilities.hpp>
-#include <RealEngine/rendering/output/Framebuffer.hpp>
-#include <RealEngine/rendering/Ordering.hpp>
+#include <RealEngine/rendering/DescriptorSet.hpp>
 #include <RealEngine/rendering/Pipeline.hpp>
-#include <RealEngine/rendering/vertices/ShaderProgram.hpp>
-#include <RealEngine/rendering/textures/Texture.hpp>
-#include <RealEngine/rendering/vertices/VertexArray.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
@@ -72,6 +67,7 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
     m_inFlightFences(createFences()),
     //Implementations
     m_bufferImpl(*m_physicalDevice, *m_device, *m_graphicsQueue, *m_commandPool),
+    m_descriptorSetImpl(*m_device, *m_descriptorPool),
     m_pipelineImpl(*m_device, *m_pipelineCache, *m_renderPass) {
     assignImplementationReferences<RendererLateBind>();
     assignImplementationReferences<RendererVK13>();
@@ -506,6 +502,7 @@ void VK13Fixture::recreateImGuiFontTexture() {
 template<Renderer R>
 void VK13Fixture::assignImplementationReferences() {
     Buffer<R>::s_impl = &m_bufferImpl;
+    DescriptorSet<R>::s_impl = &m_descriptorSetImpl;
     Pipeline<R>::s_impl = &m_pipelineImpl;
     Viewport<R>::s_state = &m_viewportState;
 }
@@ -513,6 +510,7 @@ void VK13Fixture::assignImplementationReferences() {
 template<Renderer R>
 void VK13Fixture::clearImplementationReferences() {
     Buffer<R>::s_impl = nullptr;
+    DescriptorSet<R>::s_impl = nullptr;
     Pipeline<R>::s_impl = nullptr;
     Viewport<R>::s_state = nullptr;
 }

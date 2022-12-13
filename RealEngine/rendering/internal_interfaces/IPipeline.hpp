@@ -10,6 +10,7 @@ namespace RE {
 
 class PipelineID {
     friend class VK13Pipeline;
+    friend class VK13DescriptorSet;
 public:
 
     ~PipelineID() = default;

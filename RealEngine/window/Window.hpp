@@ -41,8 +41,8 @@ public:
     */
     ~Window();
 
-    Window(const Window& other) = delete;
-    void operator=(const Window& other) = delete;
+    Window(const Window&) = delete;
+    void operator=(const Window&) = delete;
 
     /**
      * @brief Prepares for rendering of new frame

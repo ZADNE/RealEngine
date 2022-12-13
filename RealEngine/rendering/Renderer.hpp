@@ -7,6 +7,7 @@ namespace RE {
 
 class IBuffer;
 class ICapabilities;
+class IDescriptorSet;
 class IFramebuffer;
 class IOrdering;
 class IPipeline;
@@ -26,6 +27,7 @@ public:
 
     using Buffer = IBuffer;
     using Capabilities = ICapabilities;
+    using DescriptorSet = IDescriptorSet;
     using Framebuffer = IFramebuffer;
     using Ordering = IOrdering;
     using Pipeline = IPipeline;
@@ -37,6 +39,7 @@ public:
 
 class VK13Buffer;
 class VK13Capabilities;
+class VK13DescriptorSet;
 class VK13Framebuffer;
 class VK13Ordering;
 class VK13Pipeline;
@@ -53,6 +56,7 @@ public:
 
     using Buffer = VK13Buffer;
     using Capabilities = VK13Capabilities;
+    using DescriptorSet = VK13DescriptorSet;
     using Framebuffer = VK13Framebuffer;
     using Ordering = VK13Ordering;
     using Pipeline = VK13Pipeline;
@@ -67,6 +71,7 @@ template<class T>
 concept Renderer = requires {
     typename T::Buffer;
     typename T::Capabilities;
+    typename T::DescriptorSet;
     typename T::Framebuffer;
     typename T::Ordering;
     typename T::Pipeline;
