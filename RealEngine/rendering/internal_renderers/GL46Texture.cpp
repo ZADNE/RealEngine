@@ -52,10 +52,10 @@ GLenum convert(TextureChannels channels, TextureFormat type, TextureBitdepthPerC
 
 int wrapStyleToGLEnum(TextureWrapStyle style) {
     switch (style) {
-    case RE::TextureWrapStyle::CLAMP_TO_EDGE: return GL_CLAMP_TO_EDGE;
-    case RE::TextureWrapStyle::CLAMP_TO_BORDER: return GL_CLAMP_TO_BORDER;
-    case RE::TextureWrapStyle::REPEAT_NORMALLY: return GL_REPEAT;
-    case RE::TextureWrapStyle::REPEAT_MIRRORED: return GL_MIRRORED_REPEAT;
+    case TextureWrapStyle::CLAMP_TO_EDGE: return GL_CLAMP_TO_EDGE;
+    case TextureWrapStyle::CLAMP_TO_BORDER: return GL_CLAMP_TO_BORDER;
+    case TextureWrapStyle::REPEAT_NORMALLY: return GL_REPEAT;
+    case TextureWrapStyle::REPEAT_MIRRORED: return GL_MIRRORED_REPEAT;
     default:
         return GL_CLAMP_TO_EDGE;
     }
@@ -63,12 +63,12 @@ int wrapStyleToGLEnum(TextureWrapStyle style) {
 
 int minFilterToGLEnum(TextureMinFilter filter) {
     switch (filter) {
-    case RE::TextureMinFilter::NEAREST_NO_MIPMAPS: return GL_NEAREST;
-    case RE::TextureMinFilter::LINEAR_NO_MIPMAPS: return GL_LINEAR;
-    case RE::TextureMinFilter::NEAREST_MIPMAP_NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
-    case RE::TextureMinFilter::NEAREST_MIPMAP_LINEAR: return GL_NEAREST_MIPMAP_LINEAR;
-    case RE::TextureMinFilter::LINEAR_MIPMAP_NEAREST: return GL_LINEAR_MIPMAP_NEAREST;
-    case RE::TextureMinFilter::LINEAR_MIPMAP_LINEAR: return GL_LINEAR_MIPMAP_LINEAR;
+    case TextureMinFilter::NEAREST_NO_MIPMAPS: return GL_NEAREST;
+    case TextureMinFilter::LINEAR_NO_MIPMAPS: return GL_LINEAR;
+    case TextureMinFilter::NEAREST_MIPMAP_NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
+    case TextureMinFilter::NEAREST_MIPMAP_LINEAR: return GL_NEAREST_MIPMAP_LINEAR;
+    case TextureMinFilter::LINEAR_MIPMAP_NEAREST: return GL_LINEAR_MIPMAP_NEAREST;
+    case TextureMinFilter::LINEAR_MIPMAP_LINEAR: return GL_LINEAR_MIPMAP_LINEAR;
     default:
         return GL_NEAREST;
     }

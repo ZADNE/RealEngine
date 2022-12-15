@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -27,7 +27,7 @@ using KeyBindingInfoList = std::array<KeyBindingInfo, static_cast<size_t>(KeyBin
  * Keybinder holds a list of key-binding points. Upon creation, the key-binding points
  * are assigned previously saved values (= bound keys). If the saved bindings cannot be loaded,
  * default bindings are assigned.
- * 
+ *
  * The key bound to a point can accessed via operator[]. The bindings can be overbound synchronously
  * via changeBinding() or asynchronously via listenChangeBinding().
  *
@@ -133,7 +133,7 @@ public:
     void saveCurrentBindings() {
         nlohmann::ordered_json j;
 
-        for (size_t i = 0; i < static_cast<size_t>(KeyBindings::COUNT); i++){
+        for (size_t i = 0; i < static_cast<size_t>(KeyBindings::COUNT); i++) {
             j[infoList[i].name] = keyToString(m_bindings[i]);
         }
 
@@ -224,7 +224,7 @@ private:
 
     std::string m_bindingFileName = "bindings.json";
 
-    std::array<RE::Key, static_cast<size_t>(KeyBindings::COUNT)> m_bindings;
+    std::array<Key, static_cast<size_t>(KeyBindings::COUNT)> m_bindings;
 };
 
 }

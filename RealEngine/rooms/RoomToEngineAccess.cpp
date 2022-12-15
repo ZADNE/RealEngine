@@ -26,15 +26,15 @@ void RoomToEngineAccess::setRelativeCursorMode(bool relative) {
 
 #pragma region InputManager
 
-int RoomToEngineAccess::isKeyDown(RE::Key keyID) const {
+int RoomToEngineAccess::isKeyDown(Key keyID) const {
     return m_inputManager.isDown(keyID);
 }
 
-int RoomToEngineAccess::wasKeyPressed(RE::Key keyID) const {
+int RoomToEngineAccess::wasKeyPressed(Key keyID) const {
     return m_inputManager.wasPressed(keyID);
 }
 
-int RoomToEngineAccess::wasKeyReleased(RE::Key keyID) const {
+int RoomToEngineAccess::wasKeyReleased(Key keyID) const {
     return m_inputManager.wasReleased(keyID);
 }
 

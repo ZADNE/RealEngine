@@ -29,12 +29,12 @@ public:
     void begin();
     void end();
 
-    void addVertices(uint32_t first, uint32_t count, const RE::VertexPOCO* data, bool separate = true);
+    void addVertices(uint32_t first, uint32_t count, const VertexPOCO* data, bool separate = true);
 
     /**
      * @brief Draws the batch with stored shader program
     */
-    void draw(const vk::CommandBuffer& commandBuffer, const vk::ArrayProxyNoTemporaries<RE::DescriptorSet<R>>& descriptorSets);
+    void draw(const vk::CommandBuffer& commandBuffer, const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& descriptorSets);
 
     /**
      * @brief Changes to a different pipeline that will be used for drawing

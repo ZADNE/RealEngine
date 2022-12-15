@@ -12,11 +12,11 @@ namespace RE {
 */
 inline std::string_view to_string(TextureChannels channels) {
     switch (channels) {
-    case RE::TextureChannels::R: return "R";
-    case RE::TextureChannels::RG: return "RG";
-    case RE::TextureChannels::RGB: return "RGB";
-    case RE::TextureChannels::RGBA: return "RGBA";
-    default: return "<UNKNOWN RE::TextureChannels>";
+    case TextureChannels::R: return "R";
+    case TextureChannels::RG: return "RG";
+    case TextureChannels::RGB: return "RGB";
+    case TextureChannels::RGBA: return "RGBA";
+    default: return "<UNKNOWN TextureChannels>";
     }
 }
 
@@ -25,11 +25,11 @@ inline std::string_view to_string(TextureChannels channels) {
 */
 inline std::string_view to_string(TextureFormat format) {
     switch (format) {
-    case RE::TextureFormat::NORMALIZED_UNSIGNED: return "NORMALIZED_UNSIGNED";
-    case RE::TextureFormat::NORMALIZED_SIGNED: return "NORMALIZED_SIGNED";
-    case RE::TextureFormat::INTEGRAL_UNSIGNED: return "INTEGRAL_UNSIGNED";
-    case RE::TextureFormat::INTEGRAL_SIGNED: return "INTEGRAL_SIGNED";
-    default: return "<UNKNOWN RE::TextureFormat>";
+    case TextureFormat::NORMALIZED_UNSIGNED: return "NORMALIZED_UNSIGNED";
+    case TextureFormat::NORMALIZED_SIGNED: return "NORMALIZED_SIGNED";
+    case TextureFormat::INTEGRAL_UNSIGNED: return "INTEGRAL_UNSIGNED";
+    case TextureFormat::INTEGRAL_SIGNED: return "INTEGRAL_SIGNED";
+    default: return "<UNKNOWN TextureFormat>";
     }
 }
 
@@ -38,13 +38,13 @@ inline std::string_view to_string(TextureFormat format) {
 */
 inline std::string_view to_string(TextureMinFilter minFilter) {
     switch (minFilter) {
-    case RE::TextureMinFilter::NEAREST_NO_MIPMAPS: return "NEAREST_NO_MIPMAPS";
-    case RE::TextureMinFilter::LINEAR_NO_MIPMAPS: return "LINEAR_NO_MIPMAPS";
-    case RE::TextureMinFilter::NEAREST_MIPMAP_NEAREST: return "NEAREST_MIPMAP_NEAREST";
-    case RE::TextureMinFilter::NEAREST_MIPMAP_LINEAR: return "NEAREST_MIPMAP_LINEAR";
-    case RE::TextureMinFilter::LINEAR_MIPMAP_NEAREST: return "LINEAR_MIPMAP_NEAREST";
-    case RE::TextureMinFilter::LINEAR_MIPMAP_LINEAR: return "LINEAR_MIPMAP_LINEAR";
-    default: return "<UNKNOWN RE::TextureMinFilter>";
+    case TextureMinFilter::NEAREST_NO_MIPMAPS: return "NEAREST_NO_MIPMAPS";
+    case TextureMinFilter::LINEAR_NO_MIPMAPS: return "LINEAR_NO_MIPMAPS";
+    case TextureMinFilter::NEAREST_MIPMAP_NEAREST: return "NEAREST_MIPMAP_NEAREST";
+    case TextureMinFilter::NEAREST_MIPMAP_LINEAR: return "NEAREST_MIPMAP_LINEAR";
+    case TextureMinFilter::LINEAR_MIPMAP_NEAREST: return "LINEAR_MIPMAP_NEAREST";
+    case TextureMinFilter::LINEAR_MIPMAP_LINEAR: return "LINEAR_MIPMAP_LINEAR";
+    default: return "<UNKNOWN TextureMinFilter>";
     }
 }
 
@@ -53,9 +53,9 @@ inline std::string_view to_string(TextureMinFilter minFilter) {
 */
 inline std::string_view to_string(TextureMagFilter magFilter) {
     switch (magFilter) {
-    case RE::TextureMagFilter::NEAREST: return "NEAREST";
-    case RE::TextureMagFilter::LINEAR: return "LINEAR";
-    default: return "<UNKNOWN RE::TextureMagFilter>";
+    case TextureMagFilter::NEAREST: return "NEAREST";
+    case TextureMagFilter::LINEAR: return "LINEAR";
+    default: return "<UNKNOWN TextureMagFilter>";
     }
 }
 
@@ -64,11 +64,11 @@ inline std::string_view to_string(TextureMagFilter magFilter) {
 */
 inline std::string_view to_string(TextureWrapStyle wrapStyle) {
     switch (wrapStyle) {
-    case RE::TextureWrapStyle::CLAMP_TO_EDGE: return "CLAMP_TO_EDGE";
-    case RE::TextureWrapStyle::CLAMP_TO_BORDER: return "CLAMP_TO_BORDER";
-    case RE::TextureWrapStyle::REPEAT_NORMALLY: return "REPEAT_NORMALLY";
-    case RE::TextureWrapStyle::REPEAT_MIRRORED: return "REPEAT_MIRRORED";
-    default: return "<UNKNOWN RE::TextureWrapStyle>";
+    case TextureWrapStyle::CLAMP_TO_EDGE: return "CLAMP_TO_EDGE";
+    case TextureWrapStyle::CLAMP_TO_BORDER: return "CLAMP_TO_BORDER";
+    case TextureWrapStyle::REPEAT_NORMALLY: return "REPEAT_NORMALLY";
+    case TextureWrapStyle::REPEAT_MIRRORED: return "REPEAT_MIRRORED";
+    default: return "<UNKNOWN TextureWrapStyle>";
     }
 }
 

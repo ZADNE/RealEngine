@@ -55,8 +55,8 @@ void MainProgram::pollEventsInMainThread(bool poll) {
     mainProgram.m_inputManager.update();
 }
 
-std::vector<RE::DisplayInfo> MainProgram::getDisplays() const {
-    std::vector<RE::DisplayInfo> infos;
+std::vector<DisplayInfo> MainProgram::getDisplays() const {
+    std::vector<DisplayInfo> infos;
     int numberOfDisplays = SDL_GetNumVideoDisplays();
     if (numberOfDisplays < 0) { return infos; }
     infos.reserve(numberOfDisplays);
@@ -160,31 +160,31 @@ void MainProgram::render(const vk::CommandBuffer& commandBuffer, double interpol
 }
 
 void MainProgram::processEvent(SDL_Event* evnt) {
-    RE::Key key = RE::Key::UNKNOWN;
+    Key key = Key::UNKNOWN;
     switch (evnt->type) {
     case SDL_KEYDOWN:
         key = SDLKToREKey(evnt->key.keysym.sym);
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(RE::Key::ANY_KEY);
+            m_inputManager.press(Key::ANY_KEY);
             m_inputManager.press(key);
         }
         break;
     case SDL_KEYUP:
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(RE::Key::ANY_KEY, -1);
+            m_inputManager.press(Key::ANY_KEY, -1);
             m_inputManager.release(SDLKToREKey(evnt->key.keysym.sym));
         }
         break;
     case SDL_MOUSEBUTTONDOWN:
         if (evnt->key.repeat == 0) {
             auto key = SDLKToREKey(evnt->button.button);
-            m_inputManager.press(RE::Key::ANY_KEY);
+            m_inputManager.press(Key::ANY_KEY);
             m_inputManager.press(key, evnt->button.clicks);
         }
         break;
     case SDL_MOUSEBUTTONUP:
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(RE::Key::ANY_KEY, -1);
+            m_inputManager.press(Key::ANY_KEY, -1);
             m_inputManager.release(SDLKToREKey(evnt->button.button));
         }
         break;

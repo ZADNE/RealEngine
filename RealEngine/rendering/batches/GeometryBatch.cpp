@@ -26,7 +26,7 @@ void GeometryBatch<R>::end() {
 }
 
 template<Renderer R>
-void GeometryBatch<R>::addVertices(uint32_t first, uint32_t countVer, const RE::VertexPOCO* data, bool separate/* = true*/) {
+void GeometryBatch<R>::addVertices(uint32_t first, uint32_t countVer, const VertexPOCO* data, bool separate/* = true*/) {
     //Vertices
     std::copy(&data[first], &data[first + countVer], &m_vertices[m_vertexCount]);
     //Indices
@@ -40,7 +40,7 @@ void GeometryBatch<R>::addVertices(uint32_t first, uint32_t countVer, const RE::
 }
 
 template<Renderer R>
-void GeometryBatch<R>::draw(const vk::CommandBuffer& commandBuffer, const vk::ArrayProxyNoTemporaries<RE::DescriptorSet<R>>& descriptorSets) {
+void GeometryBatch<R>::draw(const vk::CommandBuffer& commandBuffer, const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& descriptorSets) {
     m_pipeline.bind(vk::PipelineBindPoint::eGraphics);
     m_vbo.bindAsVertexBuffer(0u, 0ull);
     m_ibo.bindAsIndexBuffer(0ull, vk::IndexType::eUint32);

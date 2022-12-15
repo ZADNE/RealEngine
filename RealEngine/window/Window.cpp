@@ -42,7 +42,7 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 
 Window::~Window() {
     switch (m_usedRenderer) {
-    case RE::RendererID::VULKAN13:
+    case RendererID::VULKAN13:
         m_vk13.~VK13Fixture(); break;
     }
     SDL_DestroyWindow(m_SDLwindow);
@@ -160,7 +160,7 @@ bool Window::createSDLWindow(RendererID renderer) {
     //Prepare window flags
     Uint32 SDL_flags = 0;
     switch (renderer) {
-    case RE::RendererID::VULKAN13: SDL_flags |= SDL_WINDOW_VULKAN; break;
+    case RendererID::VULKAN13: SDL_flags |= SDL_WINDOW_VULKAN; break;
     }
     if (m_flags.invisible) SDL_flags |= SDL_WINDOW_HIDDEN;
     if (m_flags.fullscreen) SDL_flags |= SDL_WINDOW_FULLSCREEN;

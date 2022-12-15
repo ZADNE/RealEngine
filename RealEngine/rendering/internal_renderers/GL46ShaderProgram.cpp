@@ -143,9 +143,9 @@ void GL46ShaderProgram::printInfo(const ShaderProgramID& sp) const {
 }
 
 void GL46ShaderProgram::backInterfaceBlock(const ShaderProgramID& sp, unsigned int interfaceBlockIndex, const BufferTypedIndex& index) const {
-    if (index.type == RE::BufferType::UNIFORM) {
+    if (index.type == BufferType::UNIFORM) {
         glUniformBlockBinding(sp.m_data.id, interfaceBlockIndex, index.bindingIndex);
-    } else if (index.type == RE::BufferType::SHADER_STORAGE) {
+    } else if (index.type == BufferType::SHADER_STORAGE) {
         glShaderStorageBlockBinding(sp.m_data.id, interfaceBlockIndex, index.bindingIndex);
     }
 #ifndef NDEBUG

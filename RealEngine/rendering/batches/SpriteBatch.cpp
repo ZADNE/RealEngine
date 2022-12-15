@@ -240,12 +240,12 @@ void SpriteBatch<R>::addSurface(const Surface<R>& surface, const glm::vec2& posi
 }
 
 template<Renderer R>
-void SpriteBatch<R>::draw(const vk::ArrayProxyNoTemporaries<RE::DescriptorSet<R>>& descriptorSets) {
+void SpriteBatch<R>::draw(const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& descriptorSets) {
     draw(descriptorSets, m_pipeline);
 }
 
 template<Renderer R>
-void SpriteBatch<R>::draw(const vk::ArrayProxyNoTemporaries<RE::DescriptorSet<R>>& descriptorSets, const Pipeline<R>& pipeline) {
+void SpriteBatch<R>::draw(const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& descriptorSets, const Pipeline<R>& pipeline) {
     pipeline.bind(vk::PipelineBindPoint::eGraphics);
     for (size_t i = 0u; i < m_drawBatches.size(); i++) {
         m_drawBatches[i].tex.bind();

@@ -121,12 +121,12 @@ public:
     /**
      * @brief Draws the batch with the stored pipeline
     */
-    void draw(const vk::ArrayProxyNoTemporaries<RE::DescriptorSet<R>>& descriptorSets);
+    void draw(const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& descriptorSets);
 
     /**
      * @brief Draws once with different pipeline  (the pipeline is not stored)
     */
-    void draw(const vk::ArrayProxyNoTemporaries<RE::DescriptorSet<R>>& descriptorSets, const Pipeline<R>& pipeline);
+    void draw(const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& descriptorSets, const Pipeline<R>& pipeline);
 
     /**
      * @brief Changes to a different pipeline that will be used for drawing
