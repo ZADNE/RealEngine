@@ -63,100 +63,6 @@ public:
     ~Buffer();
 
     /**
-     * @brief Binds the buffer to a generic binding point.
-     * @details Each type of buffer has its own generic binding point.
-     * @param bindType The type of binding point to bind this buffer to.
-    */
-    //void bind(BufferType bindType) const;
-
-    /**
-     * @brief Binds the buffer to an indexed binding point (as well as generic binding point)
-     * @details Indexed binding is only available for these types:
-     * ATOMIC_COUNTER, TRANSFORM_FEEDBACK, UNIFORM, and SHADER_STORAGE.
-     * @param index The typed index to bind this buffer to.
-    */
-    //void bindIndexed(const BufferTypedIndex& index) const;
-
-    /**
-     * @brief Overwrites a portion of or whole buffer
-     * @param offsetInBytes Offset in bytes within the buffer to overwrite
-     * @param countBytes Number of bytes to overwrite
-     * @param data The data to overwrite with
-    */
-    //void overwrite(size_t offsetInBytes, size_t countBytes, const void* data) const;
-
-    /**
-     * @brief Overwrites the buffer with instance of a type
-     * @tparam T The type to overwrite the buffer with
-     * @param offsetInBytes Offset in bytes within the buffer to overwrite
-     * @param data The instance to overwrite the buffer with
-    */
-    /*template<typename T>
-    void overwrite(size_t offsetInBytes, const T& data) const {
-        overwrite(offsetInBytes, sizeof(T), reinterpret_cast<const void*>(&data));
-    }*/
-
-    /**
-     * @brief Overwrites the buffer with an array
-     * @tparam T Element type of the array
-     * @param offsetInBytes Offset in bytes within the buffer to overwrite
-     * @param data Array (provided as a vector) to overwrite the buffer with
-    */
-    /*template<typename T>
-    void overwrite(size_t offsetInBytes, const std::vector<T>& data) const {
-        overwrite(offsetInBytes, data.size() * sizeof(T), reinterpret_cast<const void*>(data.data()));
-    }*/
-
-    /**
-     * @brief Ensures that the buffer is big enough to store the data and writes it
-     *
-     * Since this operation may cause resize of the buffer,
-     * it can only be applied to mutable buffers.
-     * @param sizeInBytes Size of the data required to write
-     * @param data The data to write
-    */
-    //void redefine(size_t sizeInBytes, const void* data);
-
-    /**
-     * @brief Ensures that the buffer is big enough to store the data and writes it
-     *
-     * Since this operation may cause resize of the buffer,
-     * it can only be applied to mutable buffers.
-     * @tparam T Type to write
-     * @param data Instance to write
-    */
-    /*template<typename T>
-    void redefine(const T& data) {
-        redefine(sizeof(T), reinterpret_cast<const void*>(&data));
-    }*/
-
-    /**
-     * @brief Ensures that the buffer is big enough to store the data and writes it
-     *
-     * Since this operation may cause resize of the buffer,
-     * it can only be applied to mutable buffers.
-     * @tparam T Element type of the array
-     * @param data Array (provided as a vector) to redefine the buffer as
-    */
-    /*template<typename T>
-    void redefine(const std::vector<T>& data) {
-        redefine(data.size() * sizeof(T), reinterpret_cast<const void*>(data.data()));
-    }*/
-
-    /**
-     * @brief Makes the contents of the buffer undefined
-     *
-     * This effectively frees the backing block of memory of the buffer.
-    */
-    //void invalidate() const;
-
-    /**
-     * @brief Makes a range of the buffer undefined
-     * @param lengthInBytes Length of the range at the beginning of the buffer to invalidate
-    */
-    //void invalidate(size_t lengthInBytes) const;
-
-    /**
      * @brief Maps a range of the buffer to the client's memory
      * @tparam T Reinterpreted type of the returned pointer
     */
@@ -166,20 +72,14 @@ public:
     }
 
     /**
-     * @brief Indicates modifications to a mapped range of the buffer
-    */
-    //void flushMapped(size_t offsetInBytes, size_t lengthInBytes) const;
-
-    /**
      * @brief Releases the mapping of the buffer
      * @return True if success. Buffer's contents are undefined if false is returned.
     */
     void unmap() const;
 
-    /**
-     * @brief Gets size of the buffer in bytes
-    */
-    //size_t size() const;
+    void bindAsVertexBuffer(uint32_t binding, uint64_t offsetInBytes) const;
+
+    void bindAsIndexBuffer(uint64_t offsetInBytes, vk::IndexType indexType) const;
 
 protected:
 

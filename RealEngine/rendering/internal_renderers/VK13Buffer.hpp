@@ -27,6 +27,7 @@ public:
     void unmap(const BufferID& bf) const override;
 
     void bindAsVertexBuffer(const BufferID& bf, uint32_t binding, uint64_t offsetInBytes) const override;
+    void bindAsIndexBuffer(const BufferID& bf, uint64_t offsetInBytes, vk::IndexType indexType) const override;
 
 private:
 

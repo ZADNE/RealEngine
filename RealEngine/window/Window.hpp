@@ -46,15 +46,19 @@ public:
 
     /**
      * @brief Prepares for rendering of new frame
+     * @return The command buffer that should be used for rendering of this frame
     */
     template<Renderer R>
-    void prepareNewFrame();
+    const vk::CommandBuffer& prepareNewFrame();
 
     /**
      * @brief Renders new frame
     */
     template<Renderer R>
     void finishNewFrame();
+
+    template<Renderer R>
+    void prepareForDestructionOfRendererObjects();
 
     /**
      * @brief Passes SDL event to ImGui

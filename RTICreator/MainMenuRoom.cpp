@@ -35,6 +35,10 @@ MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
     std::transform(m_ubos.cbegin(), m_ubos.cend(), m_mappedUbos.begin(), [](const RE::Buffer<R>& buf) {
         return buf.map<ViewMatrices>(0u, sizeof(ViewMatrices));
     });
+    for (int i = 0; i < RE::MAX_FRAMES_IN_FLIGHT; i++) {
+        m_descSets[i].texture.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, textureView), sizeof(glm::mat4));
+        m_descSets[i].window.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, windowView), sizeof(glm::mat4));
+    }
 
     engine().setWindowTitle("RTICreator v3.0.0");
 
@@ -87,19 +91,14 @@ void MainMenuRoom<R>::step() {
 }
 
 template<RE::Renderer R>
-void MainMenuRoom<R>::render(double interpolationFactor) {
+void MainMenuRoom<R>::render(const vk::CommandBuffer& commandBuffer, double interpolationFactor) {
     auto mat = m_texView.getViewMatrix();
     RE::current(m_mappedUbos)->textureView = mat;
-    //m_texViewBuf.overwrite(0u, mat);
-    //m_texViewBuf.bindIndexed();
-    //RE::current(m_ubos)->bind();
 
     //Texture
     if (m_texture) {
-        drawTexture();
+        drawTexture(commandBuffer);
     }
-
-    //m_windowViewBuf.bindIndexed();
 
     //Menu
     if (ImGui::Begin("RTICreator v3.0.0")) {
@@ -232,7 +231,7 @@ void MainMenuRoom<R>::load(const std::string& loc) {
 }
 
 template<RE::Renderer R>
-void MainMenuRoom<R>::drawTexture() {
+void MainMenuRoom<R>::drawTexture(const vk::CommandBuffer& commandBuffer) {
     glm::vec2 windowDims = glm::vec2(engine().getWindowDims());
     auto texDims = m_texture->getSubimagesSpritesCount() * m_texture->getSubimageDims();
     auto botLeft = -texDims * 0.5f;
@@ -246,10 +245,10 @@ void MainMenuRoom<R>::drawTexture() {
         1.0f + m_overlap * 2.0f
     };
 
-    m_sb.begin();
+    /*m_sb.begin();
     m_sb.add(posSizeRect, uvRect, *m_texture, 0);
     m_sb.end(RE::GlyphSortType::POS_TOP);
-    m_sb.draw();
+    m_sb.draw(RE::current(m_descSets).texture);*/
 
     m_gb.begin();
     std::vector<RE::VertexPOCO> vertices;
@@ -269,7 +268,7 @@ void MainMenuRoom<R>::drawTexture() {
         vertices.emplace_back(coord + glm::vec2(texDims.x, 0.0f), color);
     }
     if (vertices.size() > 0u) {
-        m_gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
+        m_gb.addVertices(0u, vertices.size(), vertices.data(), false);
         vertices.clear();
     }
     //Pivots
@@ -286,18 +285,22 @@ void MainMenuRoom<R>::drawTexture() {
         }
     }
 
-    m_gb.addPrimitives(RE::PRIM::LINES, 0u, vertices.size(), vertices.data(), false);
+    m_gb.addVertices(0u, vertices.size(), vertices.data(), false);
     vertices.clear();
     //Whole image
     color = {255u, 0u, 0u, 255u};
     vertices.emplace_back(botLeft, color);
     vertices.emplace_back(botLeft + glm::vec2(texDims.x, 0.0f), color);
+    vertices.emplace_back(botLeft + glm::vec2(texDims.x, 0.0f), color);
+    vertices.emplace_back(botLeft + glm::vec2(texDims.x, texDims.y), color);
     vertices.emplace_back(botLeft + glm::vec2(texDims.x, texDims.y), color);
     vertices.emplace_back(botLeft + glm::vec2(0.0f, texDims.y), color);
-    m_gb.addPrimitives(RE::PRIM::LINE_LOOP, 0u, vertices.size(), vertices.data());
+    vertices.emplace_back(botLeft + glm::vec2(0.0f, texDims.y), color);
+    vertices.emplace_back(botLeft, color);
+    m_gb.addVertices(0u, vertices.size(), vertices.data(), false);
 
     m_gb.end();
-    m_gb.draw();
+    m_gb.draw(commandBuffer, RE::current(m_descSets).texture);
 }
 
 template<RE::Renderer R>

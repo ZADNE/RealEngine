@@ -100,7 +100,7 @@ VK13Fixture::~VK13Fixture() {
     clearImplementationReferences<RendererVK13>();
 }
 
-void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
+const vk::CommandBuffer& VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
     //Wait for the previous frame to finish
     checkSuccess(m_device.waitForFences(*current(m_inFlightFences), true, MAX_TIMEOUT));
 
@@ -130,12 +130,14 @@ void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
     }
 
     //Restart command buffer
-    current(m_commandBuffers).reset();
-    current(m_commandBuffers).begin({});
+    auto& commandBuffer = current(m_commandBuffers);
+    commandBuffer.reset();
+    commandBuffer.begin({});
 
     //Set current commandbuffer
-    m_bufferImpl.setCommandBuffer(&(*current(m_commandBuffers)));
-    m_pipelineImpl.setCommandBuffer(&(*current(m_commandBuffers)));
+    m_bufferImpl.setCommandBuffer(&(*commandBuffer));
+    m_descriptorSetImpl.setCommandBuffer(&(*commandBuffer));
+    m_pipelineImpl.setCommandBuffer(&(*commandBuffer));
 
     //Begin renderpass
     const auto* clearColorPtr = reinterpret_cast<const std::array<float, 4u>*>(&clearColor);
@@ -146,29 +148,45 @@ void VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
         vk::Rect2D{{}, m_swapchainExtent},
         clearValue
     };
-    current(m_commandBuffers).beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+    commandBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
 
+    //Begin ImGui frame
     if (useImGui) {
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
     }
+
+    //Set default viewport & scissor
+    glm::vec2 extent{m_swapchainExtent.width, m_swapchainExtent.height};
+    commandBuffer.setViewport(0u, vk::Viewport{
+        0.0f, extent.y,                                     //X, Y
+        extent.x, -extent.y,                                //Width, height
+        0.0f, 1.0f                                          //MinDepth, MaxDepth
+        });
+    commandBuffer.setScissor(0u, vk::Rect2D{
+        {0, 0},                                             //X, Y
+        {m_swapchainExtent.width, m_swapchainExtent.height} //Width, height
+        });
+
+    return (*commandBuffer);
 }
 
 void VK13Fixture::finishFrame(bool useImGui) {
+    auto& commandBuffer = current(m_commandBuffers);
     if (useImGui) {
         ImGui::Render();
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *current(m_commandBuffers));
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *commandBuffer);
     }
 
     //Submit the command buffer
-    current(m_commandBuffers).endRenderPass();
-    current(m_commandBuffers).end();
+    commandBuffer.endRenderPass();
+    commandBuffer.end();
     vk::PipelineStageFlags waitDstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
     vk::SubmitInfo submitInfo{
         *current(m_imageAvailableSems),
         waitDstStageMask,
-        *current(m_commandBuffers),
+        *commandBuffer,
         *current(m_renderingFinishedSems)
     };
     m_graphicsQueue.submit(submitInfo, *current(m_inFlightFences));
@@ -193,6 +211,10 @@ void VK13Fixture::finishFrame(bool useImGui) {
 void VK13Fixture::changePresentation(bool vSync) {
     m_vSync = vSync;
     m_recreteSwapchain = true;
+}
+
+void VK13Fixture::prepareForDestructionOfRendererObjects() {
+    m_device.waitIdle();
 }
 
 vk::raii::Instance VK13Fixture::createInstance() {
@@ -419,9 +441,9 @@ vk::raii::DescriptorPool VK13Fixture::createDescriptorPool() {
         {eUniformBufferDynamic, 128},
         {eStorageBufferDynamic, 128},
         {eInputAttachment, 128},
-    });
+        });
     vk::DescriptorPoolCreateInfo createInfo{{},
-        static_cast<uint32_t>(m_swapchainImageViews.size()),
+        static_cast<uint32_t>(m_swapchainImageViews.size()) * 8u, //'8 is just enough' - needs more work
         poolSizes
     };
     return vk::raii::DescriptorPool{m_device, createInfo};

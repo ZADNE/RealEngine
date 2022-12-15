@@ -19,7 +19,7 @@ class Pipeline {
     friend class DescriptorSet<R>;
 public:
 
-    Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const ShaderProgramSources& srcs);
+    Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const ShaderProgramSources& srcs);
 
     Pipeline(const Pipeline<R>&) = delete;
     Pipeline(Pipeline<R>&& other) noexcept;
@@ -30,7 +30,9 @@ public:
     ~Pipeline();
 
     void bind(vk::PipelineBindPoint bindPoint) const;
+
     void draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const;
+    void drawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance) const;
 
 private:
 

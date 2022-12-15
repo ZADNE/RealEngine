@@ -41,10 +41,12 @@ public:
 
     ~VK13Fixture();
 
-    void prepareFrame(const glm::vec4& clearColor, bool useImGui);
+    const vk::CommandBuffer& prepareFrame(const glm::vec4& clearColor, bool useImGui);
     void finishFrame(bool useImGui);
 
     void changePresentation(bool vSync);
+
+    void prepareForDestructionOfRendererObjects();
 
 private:
 

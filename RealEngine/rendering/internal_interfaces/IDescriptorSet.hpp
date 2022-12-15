@@ -34,7 +34,7 @@ public:
 private:
 
     struct VK13 {
-        vk::DescriptorSet desciptorSet = nullptr;
+        vk::DescriptorSet descriptorSet = nullptr;
     };
 
     DescriptorSetID(const VK13& vk13) :
@@ -55,8 +55,12 @@ private:
 class IDescriptorSet {
 public:
 
-    virtual DescriptorSetID construct(const PipelineID& pl, vk::DescriptorType type, uint32_t binding, const BufferID& bf, vk::DeviceSize offset, vk::DeviceSize range) const = 0;
+    virtual DescriptorSetID construct(const PipelineID& pl) const = 0;
     virtual void destruct(DescriptorSetID& ds) const = 0;
+
+    virtual void write(const DescriptorSetID& ds, vk::DescriptorType type, uint32_t binding, const BufferID& bf, vk::DeviceSize offset, vk::DeviceSize range) const = 0;
+
+    virtual void bind(const DescriptorSetID& ds, vk::PipelineBindPoint bindPoint, const PipelineID& pl) const = 0;
 };
 
 }

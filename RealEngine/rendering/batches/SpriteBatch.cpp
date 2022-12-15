@@ -38,7 +38,7 @@ Glyph<R>::Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy<R> t
 
 template<Renderer R>
 SpriteBatch<R>::SpriteBatch(const ShaderProgramSources& sources) :
-    m_pipeline(createVertexInputStateInfo(), sources) {
+    m_pipeline(createVertexInputStateInfo(), {{}, vk::PrimitiveTopology::eTriangleList, false}, sources) {
     m_vertices = m_vbo.map<VertexPOCOUV>(0u, sizeof(VertexPOCOUV) * 512);
 }
 
@@ -240,22 +240,25 @@ void SpriteBatch<R>::addSurface(const Surface<R>& surface, const glm::vec2& posi
 }
 
 template<Renderer R>
-void SpriteBatch<R>::draw() {
-    draw(m_pipeline);
+void SpriteBatch<R>::draw(const vk::ArrayProxyNoTemporaries<RE::DescriptorSet<R>>& descriptorSets) {
+    draw(descriptorSets, m_pipeline);
 }
 
 template<Renderer R>
-void SpriteBatch<R>::draw(const Pipeline<R>& pipeline) {
+void SpriteBatch<R>::draw(const vk::ArrayProxyNoTemporaries<RE::DescriptorSet<R>>& descriptorSets, const Pipeline<R>& pipeline) {
     pipeline.bind(vk::PipelineBindPoint::eGraphics);
     for (size_t i = 0u; i < m_drawBatches.size(); i++) {
         m_drawBatches[i].tex.bind();
+        for (const auto& set : descriptorSets) {
+            set.bind(vk::PipelineBindPoint::eGraphics, m_pipeline);
+        }
         pipeline.draw(m_drawBatches[i].count, 1, m_drawBatches[i].offset, 0);
     }
 }
 
 template<Renderer R>
 void SpriteBatch<R>::changePipeline(const ShaderProgramSources& sources) {
-    m_pipeline = Pipeline<R>{createVertexInputStateInfo(), sources};
+    m_pipeline = Pipeline<R>{createVertexInputStateInfo(), {{}, vk::PrimitiveTopology::eTriangleList, false}, sources};
 }
 
 template<Renderer R>

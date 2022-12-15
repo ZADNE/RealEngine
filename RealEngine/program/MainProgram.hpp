@@ -164,7 +164,7 @@ private:
     int doRun(size_t roomName, const RoomTransitionArguments& args);
 
     void step();
-    void render(double interpolationFactor);
+    void render(const vk::CommandBuffer& commandBuffer, double interpolationFactor);
 
     void pollEvents();
     void processEvent(SDL_Event* evnt);

@@ -46,11 +46,13 @@ private:
 class IPipeline {
 public:
 
-    virtual PipelineID construct(const vk::PipelineVertexInputStateCreateInfo& vi, const ShaderProgramSources& srcs) const = 0;
+    virtual PipelineID construct(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const ShaderProgramSources& srcs) const = 0;
     virtual void destruct(PipelineID& pl) const = 0;
 
     virtual void bind(const PipelineID& pl, vk::PipelineBindPoint bindPoint) const = 0;
+
     virtual void draw(const PipelineID& pl, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const = 0;
+    virtual void drawIndexed(const PipelineID& pl, uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance) const = 0;
 };
 
 }

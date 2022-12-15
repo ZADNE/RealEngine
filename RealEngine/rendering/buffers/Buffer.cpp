@@ -34,56 +34,20 @@ Buffer<R>::~Buffer() {
     s_impl->destruct(m_id);
 }
 
-/*template<Renderer R>
-void Buffer<R>::bind(BufferType bindType) const {
-    s_impl->bind(m_id, bindType);
-}
-
-template<Renderer R>
-void Buffer<R>::bindIndexed(const BufferTypedIndex& index) const {
-    s_impl->bindIndexed(m_id, index);
-}
-
-template<Renderer R>
-void Buffer<R>::overwrite(size_t offsetInBytes, size_t countBytes, const void* data) const {
-    s_impl->overwrite(m_id, offsetInBytes, countBytes, data);
-}
-
-template<Renderer R>
-void Buffer<R>::redefine(size_t sizeInBytes, const void* data) {
-    assert(m_storage == MUTABLE);
-    if (sizeInBytes > m_sizeInBytes) {
-        m_sizeInBytes = sizeInBytes;
-        s_impl->redefine(m_id, sizeInBytes, data);
-    } else {
-        s_impl->overwrite(m_id, 0, sizeInBytes, data);
-    }
-}
-
-template<Renderer R>
-void Buffer<R>::invalidate() const {
-    s_impl->invalidate(m_id);
-}
-
-template<Renderer R>
-void Buffer<R>::invalidate(size_t lengthInBytes) const {
-    s_impl->invalidate(m_id, lengthInBytes);
-}
-
-template<Renderer R>
-void Buffer<R>::flushMapped(size_t offsetInBytes, size_t lengthInBytes) const {
-    s_impl->flushMapped(m_id, offsetInBytes, lengthInBytes);
-}*/
-
 template<Renderer R>
 void Buffer<R>::unmap() const {
     s_impl->unmap(m_id);
 }
 
-/*template<Renderer R>
-size_t Buffer<R>::size() const {
-    return m_sizeInBytes;
-}*/
+template<Renderer R>
+void Buffer<R>::bindAsVertexBuffer(uint32_t binding, uint64_t offsetInBytes) const {
+    s_impl->bindAsVertexBuffer(m_id, binding, offsetInBytes);
+}
+
+template<Renderer R>
+void Buffer<R>::bindAsIndexBuffer(uint64_t offsetInBytes, vk::IndexType indexType) const {
+    s_impl->bindAsIndexBuffer(m_id, offsetInBytes, indexType);
+}
 
 template<Renderer R>
 void* Buffer<R>::map(size_t offsetInBytes, size_t lengthInBytes) const {

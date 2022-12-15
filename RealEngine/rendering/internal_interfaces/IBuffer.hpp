@@ -61,6 +61,7 @@ public:
     virtual void unmap(const BufferID& bf) const = 0;
 
     virtual void bindAsVertexBuffer(const BufferID& bf, uint32_t binding, uint64_t offsetInBytes) const = 0;
+    virtual void bindAsIndexBuffer(const BufferID& bf, uint64_t offsetInBytes, vk::IndexType indexType) const = 0;
 };
 
 }

@@ -49,13 +49,18 @@ Window::~Window() {
 }
 
 template<>
-void Window::prepareNewFrame<RendererVK13>() {
-    m_vk13.prepareFrame(m_clearColor, m_usingImGui);
+const vk::CommandBuffer& Window::prepareNewFrame<RendererVK13>() {
+    return m_vk13.prepareFrame(m_clearColor, m_usingImGui);
 }
 
 template<>
 void Window::finishNewFrame<RendererVK13>() {
     m_vk13.finishFrame(m_usingImGui);
+}
+
+template<>
+void Window::prepareForDestructionOfRendererObjects<RendererVK13>() {
+    m_vk13.prepareForDestructionOfRendererObjects();
 }
 
 void Window::passSDLEvent(SDL_Event& evnt) {

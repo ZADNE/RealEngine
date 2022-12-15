@@ -62,6 +62,10 @@ void VK13Buffer::bindAsVertexBuffer(const BufferID& bf, uint32_t binding, uint64
     m_commandBuffer->bindVertexBuffers(binding, bf.m_.vk13.mainBuffer, offsetInBytes);
 }
 
+void VK13Buffer::bindAsIndexBuffer(const BufferID& bf, uint64_t offsetInBytes, vk::IndexType indexType) const {
+    m_commandBuffer->bindIndexBuffer(bf.m_.vk13.mainBuffer, offsetInBytes, indexType);
+}
+
 uint32_t VK13Buffer::selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const {
     auto memProperties = m_physicalDevice.getMemoryProperties2().memoryProperties;
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
@@ -83,7 +87,7 @@ VK13Buffer::BufferAndMemory VK13Buffer::createBufferAndMemory(size_t sizeInBytes
     auto memory = m_device.allocateMemory({
         std::max(sizeInBytes, memReq.alignment),
         selectMemoryType(memReq.memoryTypeBits, properties)
-    });
+        });
     m_device.bindBufferMemory2(vk::BindBufferMemoryInfo{buffer, memory, 0u});
     return BufferAndMemory{.buffer = buffer, .memory = memory};
 }

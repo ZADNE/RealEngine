@@ -9,140 +9,50 @@
 
 namespace RE {
 
-/*Primitive convertPrimEnum(size_t prim_shape) {
-    switch (prim_shape) {
-    case (size_t)PRIM::POINTS:
-        return Primitive::POINTS;
-    case (size_t)PRIM::LINE_STRIP:
-        return Primitive::LINE_STRIP;
-    case (size_t)PRIM::LINE_LOOP:
-        return Primitive::LINE_LOOP;
-    case (size_t)PRIM::LINES:
-        return Primitive::LINES;
-    case (size_t)PRIM::TRIANGLE_STRIP:
-        return Primitive::TRIANGLE_STRIP;
-    case (size_t)PRIM::TRIANGLE_FAN:
-        return Primitive::TRIANGLE_FAN;
-    case (size_t)PRIM::TRIANGLES:
-        return Primitive::TRIANGLES;
-    case (size_t)SHAPE::CIRCLE:
-        return Primitive::LINE_LOOP;
-    case (size_t)SHAPE::DISC:
-        return Primitive::TRIANGLE_FAN;
-    default:
-        //Shouldn't get here
-        return Primitive::LINE_LOOP;
-    }
-}*/
-
 template<Renderer R>
-GeometryBatch<R>::GeometryBatch(const ShaderProgramSources& sources) :
-    m_pipeline(createVertexInputStateInfo(), sources) {
+GeometryBatch<R>::GeometryBatch(const vk::PipelineInputAssemblyStateCreateInfo& ia, const ShaderProgramSources& sources) :
+    m_pipeline(createVertexInputStateInfo(), ia, sources) {
 }
 
 template<Renderer R>
 void GeometryBatch<R>::begin() {
-    //Clearing all previous vertices
-    for (auto& vector : m_vertices) {
-        vector.clear();
-    }
-    //Clearing all previous indices
-    for (auto& vector : m_indices) {
-        vector.clear();
-    }
+    m_vertexCount = 0u;
+    m_indexCount = 0u;
 }
 
 template<Renderer R>
 void GeometryBatch<R>::end() {
-    //Uploading to VBO
-    size_t totalSize = 0;
-    for (auto& vector : m_vertices) {
-        totalSize += vector.size();
-    }
-    size_t offset = 0;
-
-    //m_buf.redefine(totalSize * sizeof(VertexPOCO), nullptr);
-    for (size_t i = 0u; i < PRIMITIVES_COUNT + SHAPES_COUNT; ++i) {
-        if (m_vertices[i].empty()) continue;
-        //m_buf.overwrite(offset, m_vertices[i]);
-        offset += m_vertices[i].size() * sizeof(VertexPOCO);
-    }
+    //Nothing to do :-)
 }
 
 template<Renderer R>
-void GeometryBatch<R>::addPrimitives(PRIM prim, size_t first, size_t countVer, const RE::VertexPOCO* data, bool separate/* = true*/) {
-    unsigned int last = (unsigned int)m_vertices[(size_t)prim].size();
-
+void GeometryBatch<R>::addVertices(uint32_t first, uint32_t countVer, const RE::VertexPOCO* data, bool separate/* = true*/) {
     //Vertices
-    size_t prevSize = m_vertices[(size_t)prim].size();
-    m_vertices[(size_t)prim].resize(prevSize + countVer);
-    std::copy(&data[first], &data[first + countVer], &m_vertices[(size_t)prim][prevSize]);
-    m_indices[(size_t)prim].reserve(m_indices[(size_t)prim].size() + countVer + separate);
-
-    for (size_t i = 0u; i < countVer; ++i) {
-        m_indices[(size_t)prim].push_back(last++);
+    std::copy(&data[first], &data[first + countVer], &m_vertices[m_vertexCount]);
+    //Indices
+    for (uint32_t i = 0u; i < countVer; ++i) {
+        m_indices[m_indexCount++] = m_vertexCount++;
     }
-
     //Separator
-    if (separate && (prim == PRIM::LINE_STRIP || prim == PRIM::LINE_LOOP || prim == PRIM::TRIANGLE_STRIP || prim == PRIM::TRIANGLE_FAN)) {
-        m_indices[(size_t)prim].push_back(PRIMITIVE_RESTART_INDEX<unsigned int>());
+    if (separate) {
+        m_indices[m_indexCount++] = PRIMITIVE_RESTART_INDEX<uint32_t>();
     }
 }
 
 template<Renderer R>
-void GeometryBatch<R>::addCircles(size_t first, size_t count, const RE::CirclePOCO* data) {
-    unsigned int last;
-    VertexPOCO mid;
-    VertexPOCO edge;
-    for (size_t i = 0u; i < count; ++i) {//For each circle
-        size_t index = (size_t)(data[first + i].disc ? SHAPE::DISC : SHAPE::CIRCLE);
-        last = (unsigned int)m_vertices[index].size();
-        mid.position = data[first + i].pos;
-        mid.color = data[first + i].mid;
-        edge.color = data[first + i].edge;
-        if (data[first + i].disc) {
-            m_vertices[index].push_back(mid);
-            m_indices[index].push_back(last++);
-        }
-        unsigned int rad = (unsigned int)data[first + i].rad;
-        rad--; rad |= rad >> 1; rad |= rad >> 2; rad |= rad >> 4; rad |= rad >> 8; rad |= rad >> 16; rad++;
-        rad = (unsigned int)std::log2<unsigned int>(rad);
-        rad = (rad + 4u) / 2u;
-        float steps = std::pow(2.0f, (float)rad);
-        for (float j = 0.0f; j < steps; ++j) {//For each edge
-            float d = j * glm::pi<float>() * 2.0f / steps;
-            edge.position.x = mid.position.x + cos(d) * data[first + i].rad;
-            edge.position.y = mid.position.y + sin(d) * data[first + i].rad;
-            m_vertices[index].push_back(edge);
-            m_indices[index].push_back(last++);
-        }
-        if (data[first + i].disc) {
-            m_indices[index].push_back(last - (int)steps);
-        }
-        m_indices[index].push_back(PRIMITIVE_RESTART_INDEX<unsigned int>());
+void GeometryBatch<R>::draw(const vk::CommandBuffer& commandBuffer, const vk::ArrayProxyNoTemporaries<RE::DescriptorSet<R>>& descriptorSets) {
+    m_pipeline.bind(vk::PipelineBindPoint::eGraphics);
+    m_vbo.bindAsVertexBuffer(0u, 0ull);
+    m_ibo.bindAsIndexBuffer(0ull, vk::IndexType::eUint32);
+    for (const auto& set : descriptorSets) {
+        set.bind(vk::PipelineBindPoint::eGraphics, m_pipeline);
     }
+    m_pipeline.drawIndexed(m_indexCount, 1u, 0u, 0, 0u);
 }
 
 template<Renderer R>
-void GeometryBatch<R>::draw() {
-    /*m_shaderProgram.use();
-    m_va.bind();
-
-    int offset = 0u;
-
-    for (size_t i = 0u; i < PRIMITIVES_COUNT + SHAPES_COUNT; ++i) {
-        if (m_vertices[i].empty()) continue;
-        m_va.renderElementsBaseVertex(convertPrimEnum(i), m_indices[i].size(), IndexType::UNSIGNED_INT, m_indices[i].data(), offset);
-        offset += static_cast<int>(m_vertices[i].size());
-    }
-
-    m_va.unbind();
-    m_shaderProgram.unuse();*/
-}
-
-template<Renderer R>
-void GeometryBatch<R>::switchShaderProgram(const ShaderProgramSources& sources) {
-    m_pipeline = Pipeline<R>{createVertexInputStateInfo(), sources};
+void GeometryBatch<R>::changePipeline(const vk::PipelineInputAssemblyStateCreateInfo& ia, const ShaderProgramSources& sources) {
+    m_pipeline = Pipeline<R>{createVertexInputStateInfo(), ia, sources};
 }
 
 template<Renderer R>

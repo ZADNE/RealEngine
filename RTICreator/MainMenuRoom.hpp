@@ -7,6 +7,7 @@
 #include <RealEngine/rooms/Room.hpp>
 #include <RealEngine/program/CommandLineArguments.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
+#include <RealEngine/rendering/DescriptorSet.hpp>
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/cameras/View2D.hpp>
@@ -26,7 +27,7 @@ public:
     void sessionStart(const RE::RoomTransitionArguments& args) override;
     void sessionEnd() override;
     void step() override;
-    void render(double interpolationFactor) override;
+    void render(const vk::CommandBuffer& commandBuffer, double interpolationFactor) override;
     void windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) override;
 
 private:
@@ -38,7 +39,7 @@ private:
     void load(const std::string& filePath);
 
     RE::SpriteBatch<R> m_sb{{.vert = RE::sprite_vert, .frag = RE::sprite_frag}};
-    RE::GeometryBatch<R> m_gb{{.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
+    RE::GeometryBatch<R> m_gb{{{}, vk::PrimitiveTopology::eLineList, false}, {.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
 
     //Texture
     std::optional<RE::Texture<R>> m_texture;
@@ -50,8 +51,12 @@ private:
     //View
     RE::View2D m_texView;
     struct ViewMatrices {
-        glm::mat4 textureView;
-        glm::mat4 windowView;
+        alignas(256) glm::mat4 textureView;
+        alignas(256) glm::mat4 windowView;
+    };
+    struct DescriptorSets {
+        RE::DescriptorSet<R> texture;
+        RE::DescriptorSet<R> window;
     };
     RE::PerFrameInFlight<RE::Buffer<R>> m_ubos{
         RE::Buffer<R>{sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
@@ -60,6 +65,16 @@ private:
         vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent}
     };
     RE::PerFrameInFlight<ViewMatrices*> m_mappedUbos{nullptr};
+    RE::PerFrameInFlight<DescriptorSets> m_descSets{
+        DescriptorSets{
+            .texture = RE::DescriptorSet<R>{m_gb.getPipeline()},
+            .window = RE::DescriptorSet<R>{m_gb.getPipeline()}
+        },
+        DescriptorSets{
+            .texture = RE::DescriptorSet<R>{m_gb.getPipeline()},
+            .window = RE::DescriptorSet<R>{m_gb.getPipeline()}
+        }
+    };
 
     glm::vec2 m_overlap = glm::vec2(0.2f, 0.2f);
     glm::vec3 m_backgroundColor = glm::vec3(0.1f, 0.1f, 0.1f);
@@ -76,7 +91,7 @@ private:
 
 
     glm::vec2 m_offset = glm::vec2(0.0f, 0.0f);
-    void drawTexture();
+    void drawTexture(const vk::CommandBuffer& commandBuffer);
     void resetView();
 
     float m_drawScale = 1.0f;

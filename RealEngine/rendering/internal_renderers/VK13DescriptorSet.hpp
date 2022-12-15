@@ -16,16 +16,21 @@ public:
     //Fixture functions
     VK13DescriptorSet(
         const vk::Device& device, const vk::DescriptorPool& descriptorPool);
+    void setCommandBuffer(const vk::CommandBuffer* commandBuffer);
 
     //Interface implementation
-    DescriptorSetID construct(const PipelineID& pl, vk::DescriptorType type, uint32_t binding, const BufferID& bf, vk::DeviceSize offset, vk::DeviceSize range) const override;
+    DescriptorSetID construct(const PipelineID& pl) const override;
     void destruct(DescriptorSetID& ds) const override;
+
+    void write(const DescriptorSetID& ds, vk::DescriptorType type, uint32_t binding, const BufferID& bf, vk::DeviceSize offset, vk::DeviceSize range) const override;
+
+    void bind(const DescriptorSetID& ds, vk::PipelineBindPoint bindPoint, const PipelineID& pl) const override;
 
 private:
 
     const vk::Device& m_device;
     const vk::DescriptorPool& m_descriptorPool;
-
+    const vk::CommandBuffer* m_commandBuffer = nullptr;
 };
 
 }

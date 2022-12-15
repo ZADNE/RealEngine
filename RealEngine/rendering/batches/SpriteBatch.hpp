@@ -12,6 +12,7 @@
 #include <RealEngine/rendering/output/Surface.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/rendering/batches/Sprite.hpp>
+#include <RealEngine/rendering/DescriptorSet.hpp>
 
 namespace RE {
 
@@ -120,17 +121,19 @@ public:
     /**
      * @brief Draws the batch with the stored pipeline
     */
-    void draw();
+    void draw(const vk::ArrayProxyNoTemporaries<RE::DescriptorSet<R>>& descriptorSets);
 
     /**
      * @brief Draws once with different pipeline  (the pipeline is not stored)
     */
-    void draw(const Pipeline<R>& pipeline);
+    void draw(const vk::ArrayProxyNoTemporaries<RE::DescriptorSet<R>>& descriptorSets, const Pipeline<R>& pipeline);
 
     /**
      * @brief Changes to a different pipeline that will be used for drawing
     */
     void changePipeline(const ShaderProgramSources& sources);
+
+    const Pipeline<R>& getPipeline() const { return m_pipeline; }
 
 private:
 

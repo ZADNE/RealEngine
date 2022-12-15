@@ -19,7 +19,7 @@ class DescriptorSet {
     friend class VK13Fixture;
 public:
 
-    DescriptorSet(const Pipeline<R>& pl, vk::DescriptorType type, uint32_t binding, const Buffer<R>& bf, vk::DeviceSize offset, vk::DeviceSize range);
+    DescriptorSet(const Pipeline<R>& pl);
 
     DescriptorSet(const DescriptorSet<R>&) = delete;
     DescriptorSet(DescriptorSet<R>&& other) noexcept;
@@ -28,6 +28,10 @@ public:
     DescriptorSet<R>& operator=(DescriptorSet<R>&& other) noexcept;
 
     ~DescriptorSet();
+
+    void write(vk::DescriptorType type, uint32_t binding, const Buffer<R>& bf, vk::DeviceSize offset, vk::DeviceSize range);
+
+    void bind(vk::PipelineBindPoint bindPoint, const Pipeline<R>& pl) const;
 
 private:
 

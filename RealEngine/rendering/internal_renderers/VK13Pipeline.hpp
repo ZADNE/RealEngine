@@ -20,11 +20,13 @@ public:
     void setCommandBuffer(const vk::CommandBuffer* commandBuffer);
 
     //Interface implementation
-    PipelineID construct(const vk::PipelineVertexInputStateCreateInfo& vi, const ShaderProgramSources& srcs) const override;
+    PipelineID construct(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& inputAssembly, const ShaderProgramSources& srcs) const override;
     void destruct(PipelineID& pl) const override;
 
     void bind(const PipelineID& pl, vk::PipelineBindPoint bindPoint) const override;
+
     void draw(const PipelineID& pl, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const override;
+    void drawIndexed(const PipelineID& pl, uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance) const override;
 
 private:
 

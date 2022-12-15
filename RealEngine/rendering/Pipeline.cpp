@@ -8,8 +8,8 @@
 namespace RE {
 
 template<Renderer R>
-Pipeline<R>::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const ShaderProgramSources& srcs) :
-    m_id(s_impl->construct(vi, srcs)) {
+Pipeline<R>::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const ShaderProgramSources& srcs) :
+    m_id(s_impl->construct(vi, ia, srcs)) {
 }
 
 template<Renderer R>
@@ -36,6 +36,11 @@ void Pipeline<R>::bind(vk::PipelineBindPoint bindPoint) const {
 template<Renderer R>
 void Pipeline<R>::draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const {
     s_impl->draw(m_id, vertexCount, instanceCount, firstVertex, firstInstance);
+}
+
+template<Renderer R>
+void Pipeline<R>::drawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance) const {
+    s_impl->drawIndexed(m_id, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
 template class Pipeline<RendererLateBind>;

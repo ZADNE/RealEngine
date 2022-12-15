@@ -33,7 +33,7 @@ void VK13Pipeline::setCommandBuffer(const vk::CommandBuffer* commandBuffer) {
     m_commandBuffer = commandBuffer;
 }
 
-PipelineID VK13Pipeline::construct(const vk::PipelineVertexInputStateCreateInfo& vi, const ShaderProgramSources& srcs) const {
+PipelineID VK13Pipeline::construct(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const ShaderProgramSources& srcs) const {
     //Create shader modules
     std::array<vk::ShaderModule, 6> modules;
     std::array<vk::PipelineShaderStageCreateInfo, 6> stages;
@@ -56,10 +56,6 @@ PipelineID VK13Pipeline::construct(const vk::PipelineVertexInputStateCreateInfo&
             shaderCount++;
         }
     }
-    vk::PipelineInputAssemblyStateCreateInfo inputAssembly{{},
-        vk::PrimitiveTopology::eTriangleStrip,
-        false                                   //Enable primitive restart
-    };
     vk::PipelineViewportStateCreateInfo viewport{{},
         nullptr,                                //Viewport
         nullptr                                 //Scissor
@@ -78,7 +74,19 @@ PipelineID VK13Pipeline::construct(const vk::PipelineVertexInputStateCreateInfo&
         1.0f,                                   //Line width
     };
     vk::PipelineMultisampleStateCreateInfo multisample{};
-    vk::PipelineColorBlendAttachmentState colorBlendAttachment{false};
+    using enum vk::BlendFactor;
+    using enum vk::BlendOp;
+    using enum vk::ColorComponentFlagBits;
+    vk::PipelineColorBlendAttachmentState colorBlendAttachment{
+        true,                                   //Enable blending
+        eSrcAlpha,                              //Src color
+        eOneMinusSrcAlpha,                      //Dst color
+        eAdd,                                   //Color operation
+        eOne,                                   //Src alpha
+        eOneMinusSrcAlpha,                      //Dst alpha
+        eAdd,                                   //Alpha operation
+        eR | eG | eB | eA                       //Write mask
+    };
     vk::PipelineColorBlendStateCreateInfo colorBlend{{},
         false, vk::LogicOp::eClear,             //Logic op (disable)
         colorBlendAttachment
@@ -86,7 +94,7 @@ PipelineID VK13Pipeline::construct(const vk::PipelineVertexInputStateCreateInfo&
     std::array dynamicStates = std::to_array<vk::DynamicState>({
         vk::DynamicState::eViewport,
         vk::DynamicState::eScissor
-        });
+    });
     vk::PipelineDynamicStateCreateInfo dynamic{{}, dynamicStates};
     vk::DescriptorSetLayout descriptorSetLayout{
         m_device.createDescriptorSetLayout(vk::DescriptorSetLayoutCreateInfo{{}, dslbs})
@@ -99,7 +107,7 @@ PipelineID VK13Pipeline::construct(const vk::PipelineVertexInputStateCreateInfo&
     vk::GraphicsPipelineCreateInfo createInfo{vk::PipelineCreateFlags{},
         shaderCount, stages.data(),             //Shader modules
         &vi,
-        &inputAssembly,
+        &ia,
         nullptr,                                //Tesselation
         &viewport,
         &rasterization,
@@ -137,6 +145,11 @@ void VK13Pipeline::bind(const PipelineID& pl, vk::PipelineBindPoint bindPoint) c
 void VK13Pipeline::draw(const PipelineID& pl, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const {
     (void)pl;
     m_commandBuffer->draw(vertexCount, instanceCount, firstVertex, firstInstance);
+}
+
+void VK13Pipeline::drawIndexed(const PipelineID& pl, uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance) const {
+    (void)pl;
+    m_commandBuffer->drawIndexed(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
 void VK13Pipeline::reflect(const ShaderSourceRef& src, vk::ShaderStageFlagBits st, std::vector<vk::DescriptorSetLayoutBinding>& dslbs) const {

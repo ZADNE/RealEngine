@@ -37,7 +37,7 @@ function(RealShaders_CollateShaders target)
                 COMMAND ${Vulkan_GLSLC_EXECUTABLE} -MD -mfmt=c -MF ${shader_dep_abs} ${shader_source_abs}
                         -o "${shader_bin_abs}_vk13" --target-env=vulkan1.2 ${glslc_flags} "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
                 COMMAND ${Vulkan_GLSLC_EXECUTABLE} -MD -mfmt=c ${shader_source_abs}
-                        -o "${shader_bin_abs}_gl46" --target-env=opengl4.5 ${glslc_flags} "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
+                        -o "${shader_bin_abs}_gl46" --target-env=vulkan1.2 ${glslc_flags} "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
                 DEPENDS ${shader_source_abs}
                 BYPRODUCTS ${shader_dep_abs}
                 COMMENT "Compiling shader: ${shader_source_rel}"
