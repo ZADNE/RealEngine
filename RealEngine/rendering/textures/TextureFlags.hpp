@@ -147,7 +147,7 @@ static_assert(TEX_BITDEPTH_PER_CHANNEL_BITS == (3 << TEX_VAL_TO_BITDEPTH_LEFTSHI
 enum class TextureBitdepthPerChannel : TextureFlagsType {
     BITS_8 = 0 << TEX_VAL_TO_BITDEPTH_LEFTSHIFT,    /**< 8 bits per channel  */
     BITS_16 = 1 << TEX_VAL_TO_BITDEPTH_LEFTSHIFT,   /**< 16 bits per channel */
-    BITS_32 = 2 << TEX_VAL_TO_BITDEPTH_LEFTSHIFT,   /**< 32 bits per channel; normalized formats are sotred as floats instead! */
+    BITS_32 = 2 << TEX_VAL_TO_BITDEPTH_LEFTSHIFT,   /**< 32 bits per channel; normalized formats are stored as floats instead! */
 };
 
 /**

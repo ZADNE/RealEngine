@@ -42,7 +42,7 @@ private:
     RE::GeometryBatch<R> m_gb{{{}, vk::PrimitiveTopology::eLineList, false}, {.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
 
     //Texture
-    std::optional<RE::Texture<R>> m_texture;
+    std::optional<RE::Texture> m_texture;
     std::string m_textureLoc;
     std::string m_lastVisitedLoc;
 

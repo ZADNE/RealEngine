@@ -15,6 +15,7 @@
 #include <RealEngine/rendering/DescriptorSet.hpp>
 #include <RealEngine/rendering/Pipeline.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
+#include <RealEngine/rendering/textures/Texture.hpp>
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
 using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
@@ -69,6 +70,10 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
     m_bufferImpl(*m_physicalDevice, *m_device, *m_graphicsQueue, *m_commandPool),
     m_descriptorSetImpl(*m_device, *m_descriptorPool),
     m_pipelineImpl(*m_device, *m_pipelineCache, *m_renderPass) {
+    Texture::s_physicalDevice = &(*m_physicalDevice);
+    Texture::s_device = &(*m_device);
+    Texture::s_graphicsQueue = &(*m_graphicsQueue);
+    Texture::s_commandPool = &(*m_commandPool);
     assignImplementationReferences<RendererLateBind>();
     assignImplementationReferences<RendererVK13>();
     setFramesInFlight(2);

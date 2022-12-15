@@ -10,41 +10,9 @@
 namespace RE {
 
 /**
- * @brief Is a Texture that can be accessed with late-bind or as specific renderer
-*/
-union TextureUnion {
-public:
-
-    TextureUnion(const std::string& filePathPNG);
-
-    ~TextureUnion();
-
-    TextureUnion(const TextureUnion&) = delete;
-    TextureUnion& operator=(const TextureUnion&) = delete;
-
-    template<Renderer R = RendererLateBind>
-    const Texture<R>& get() const {
-        return m_lateBindTex;
-    }
-
-private:
-
-    Texture<RendererLateBind> m_lateBindTex;
-    Texture<RendererVK13> m_vk13Tex;
-
-    static_assert(
-        sizeof(m_lateBindTex) == sizeof(m_vk13Tex));
-};
-
-template<>
-inline const Texture<RendererVK13>& TextureUnion::get<RendererVK13>() const {
-    return m_vk13Tex;
-}
-
-/**
  * @brief Is a Texture that can be shared across late-bind and renderer-specific Rooms
 */
-using SharedTexture = std::shared_ptr<TextureUnion>;
+using SharedTexture = std::shared_ptr<Texture>;
 
 class TextureCache {
 public:
@@ -60,7 +28,7 @@ public:
 
 private:
 
-    std::unordered_map<std::string, std::weak_ptr<TextureUnion>> m_textureMap;
+    std::unordered_map<std::string, std::weak_ptr<Texture>> m_textureMap;
 };
 
 }

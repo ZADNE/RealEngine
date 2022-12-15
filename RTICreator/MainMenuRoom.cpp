@@ -141,7 +141,7 @@ void MainMenuRoom<R>::windowResizedCallback(const glm::ivec2& oldSize, const glm
 
 template<RE::Renderer R>
 void MainMenuRoom<R>::parametersGUI() {
-    if (imguiCombo("Minification filter", m_minFilter, MIN_FILTERS_LABELS)) {
+    /*if (imguiCombo("Minification filter", m_minFilter, MIN_FILTERS_LABELS)) {
         m_texture->setMinFilter(MIN_FILTERS[m_minFilter]);
     }
     if (imguiCombo("Magnification filter", m_magFilter, MAG_FILTERS_LABELS)) {
@@ -176,7 +176,7 @@ void MainMenuRoom<R>::parametersGUI() {
         WRAP_STYLES[m_wrapStyleX] == RE::TextureWrapStyle::CLAMP_TO_BORDER)
         && ImGui::ColorPicker4("Border color", &m_borderColor.x)) {
         m_texture->setBorderColor(m_borderColor);
-    }
+    }*/
 }
 
 template<RE::Renderer R>
@@ -210,7 +210,7 @@ template<RE::Renderer R>
 void MainMenuRoom<R>::load(const std::string& loc) {
     if (loc.empty()) { return; }
     try {
-        m_texture = RE::Texture<R>{loc, RE::Texture<R>::DEFAULT_PARAMETERS};
+        m_texture = RE::Texture{loc, RE::Texture::DEFAULT_PARAMETERS};
     }
     catch (...) {
         return;
@@ -220,14 +220,14 @@ void MainMenuRoom<R>::load(const std::string& loc) {
     m_textureLoc = loc;
 
     //Init GUI
-    m_minFilter = findSelectedFromCombo(m_texture->getMinFilter(), MIN_FILTERS);
+    /*m_minFilter = findSelectedFromCombo(m_texture->getMinFilter(), MIN_FILTERS);
     m_magFilter = findSelectedFromCombo(m_texture->getMagFilter(), MAG_FILTERS);
     m_wrapStyleX = findSelectedFromCombo(m_texture->getWrapStyleX(), WRAP_STYLES);
     m_wrapStyleY = findSelectedFromCombo(m_texture->getWrapStyleY(), WRAP_STYLES);
     m_subimagesSprites = m_texture->getSubimagesSpritesCount();
     m_subimageDims = m_texture->getSubimageDims();
     m_pivot = m_texture->getPivot();
-    m_borderColor = glm::vec4(m_texture->getBorderColor()) / 255.0f;
+    m_borderColor = glm::vec4(m_texture->getBorderColor()) / 255.0f;*/
 }
 
 template<RE::Renderer R>

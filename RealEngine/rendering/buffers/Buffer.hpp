@@ -20,6 +20,7 @@ template<Renderer R = RendererLateBind>
 class Buffer {
     friend class VK13Fixture;
     friend class DescriptorSet<R>;
+    friend class Texture;
 public:
 
     /**

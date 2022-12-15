@@ -13,6 +13,7 @@ namespace RE {
 class BufferID {
     friend class VK13Buffer;
     friend class VK13DescriptorSet;
+    friend class Texture;
 public:
 
     ~BufferID() = default;

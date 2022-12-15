@@ -13,7 +13,6 @@
 
 #include <RealEngine/rooms/Room.hpp>
 #include <RealEngine/rendering/output/Viewport.hpp>
-#include <RealEngine/rendering/output/Framebuffer.hpp>
 
 namespace RE {
 
