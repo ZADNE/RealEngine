@@ -9,24 +9,20 @@
 
 namespace RE {
 
-template<Renderer R>
-GeometryBatch<R>::GeometryBatch(const vk::PipelineInputAssemblyStateCreateInfo& ia, const ShaderProgramSources& sources) :
+GeometryBatch::GeometryBatch(const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& sources) :
     m_pipeline(createVertexInputStateInfo(), ia, sources) {
 }
 
-template<Renderer R>
-void GeometryBatch<R>::begin() {
+void GeometryBatch::begin() {
     m_vertexCount = 0u;
     m_indexCount = 0u;
 }
 
-template<Renderer R>
-void GeometryBatch<R>::end() {
+void GeometryBatch::end() {
     //Nothing to do :-)
 }
 
-template<Renderer R>
-void GeometryBatch<R>::addVertices(uint32_t first, uint32_t countVer, const VertexPOCO* data, bool separate/* = true*/) {
+void GeometryBatch::addVertices(uint32_t first, uint32_t countVer, const VertexPOCO* data, bool separate/* = true*/) {
     //Vertices
     std::copy(&data[first], &data[first + countVer], &m_vertices[m_vertexCount]);
     //Indices
@@ -39,8 +35,7 @@ void GeometryBatch<R>::addVertices(uint32_t first, uint32_t countVer, const Vert
     }
 }
 
-template<Renderer R>
-void GeometryBatch<R>::draw(const vk::CommandBuffer& commandBuffer, const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& descriptorSets) {
+void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets) {
     m_pipeline.bind(vk::PipelineBindPoint::eGraphics);
     m_vbo.bindAsVertexBuffer(0u, 0ull);
     m_ibo.bindAsIndexBuffer(0ull, vk::IndexType::eUint32);
@@ -50,13 +45,11 @@ void GeometryBatch<R>::draw(const vk::CommandBuffer& commandBuffer, const vk::Ar
     m_pipeline.drawIndexed(m_indexCount, 1u, 0u, 0, 0u);
 }
 
-template<Renderer R>
-void GeometryBatch<R>::changePipeline(const vk::PipelineInputAssemblyStateCreateInfo& ia, const ShaderProgramSources& sources) {
-    m_pipeline = Pipeline<R>{createVertexInputStateInfo(), ia, sources};
+void GeometryBatch::changePipeline(const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& sources) {
+    m_pipeline = Pipeline{createVertexInputStateInfo(), ia, sources};
 }
 
-template<Renderer R>
-vk::PipelineVertexInputStateCreateInfo GeometryBatch<R>::createVertexInputStateInfo() const {
+vk::PipelineVertexInputStateCreateInfo GeometryBatch::createVertexInputStateInfo() const {
     static constexpr std::array bindings = std::to_array<vk::VertexInputBindingDescription>({{
         0u,                             //Binding index
         sizeof(VertexPOCO),             //Stride
@@ -75,8 +68,5 @@ vk::PipelineVertexInputStateCreateInfo GeometryBatch<R>::createVertexInputStateI
     }});
     return vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes};
 }
-
-template class GeometryBatch<RendererLateBind>;
-template class GeometryBatch<RendererVK13>;
 
 }

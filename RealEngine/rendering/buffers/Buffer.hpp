@@ -4,22 +4,18 @@
 #pragma once
 #include <vector>
 
-#include <RealEngine/rendering/internal_interfaces/IBuffer.hpp>
-#include <RealEngine/rendering/Renderer.hpp>
+#include <vulkan/vulkan.hpp>
 
 
 namespace RE {
-
-template<Renderer> class DescriptorSet;
 
 /**
  * @brief Is a continuous block of memory stored in the GPU's memory
  * @tparam R The renderer that will perform the commands
 */
-template<Renderer R = RendererLateBind>
 class Buffer {
     friend class VK13Fixture;
-    friend class DescriptorSet<R>;
+    friend class DescriptorSet;
     friend class Texture;
 public:
 
@@ -52,11 +48,11 @@ public:
     Buffer(vk::BufferUsageFlags usage, const std::vector<T>& data) :
         Buffer(data.size() * sizeof(T), usage, data.data()) {}
 
-    Buffer(const Buffer<R>&) = delete;
-    Buffer(Buffer<R>&& other) noexcept;
+    Buffer(const Buffer&) = delete;
+    Buffer(Buffer&& other) noexcept;
 
-    Buffer<R>& operator=(const Buffer<R>&) = delete;
-    Buffer<R>& operator=(Buffer<R>&& other) noexcept;
+    Buffer& operator=(const Buffer&) = delete;
+    Buffer& operator=(Buffer&& other) noexcept;
 
     /**
      * @brief Frees the backing memory block on the GPU and destructs the buffer.
@@ -86,10 +82,23 @@ protected:
 
     void* map(size_t offsetInBytes, size_t lengthInBytes) const;
 
-    BufferID m_id;
-    size_t m_sizeInBytes = 0;   /**< Size of the buffer */
+    uint32_t selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const;
+    struct BufferAndMemory {
+        vk::Buffer buffer = nullptr;
+        vk::DeviceMemory memory = nullptr;
+    };
+    BufferAndMemory createBufferAndMemory(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
+    void copyBetweenBuffers(const vk::Buffer& src, const vk::Buffer& dst, const vk::BufferCopy& copyInfo) const;
 
-    static inline R::Buffer* s_impl = nullptr;
+
+    vk::DeviceMemory m_memory{};
+    vk::Buffer m_buffer{};
+
+    static inline const vk::PhysicalDevice* s_physicalDevice = nullptr;
+    static inline const vk::Device* s_device = nullptr;
+    static inline const vk::Queue* s_graphicsQueue = nullptr;
+    static inline const vk::CommandPool* s_commandPool = nullptr;
+    static inline const vk::CommandBuffer* s_commandBuffer = nullptr;
 };
 
 }

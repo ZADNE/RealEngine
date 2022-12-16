@@ -28,16 +28,15 @@ constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
     .usingImGui = true
 };
 
-template<RE::Renderer R>
-MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
+MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
     Room(0, INITIAL_DISPLAY_SETTINGS),
     m_texView(engine().getWindowDims()) {
-    std::transform(m_ubos.cbegin(), m_ubos.cend(), m_mappedUbos.begin(), [](const RE::Buffer<R>& buf) {
+    std::transform(m_ubos.cbegin(), m_ubos.cend(), m_mappedUbos.begin(), [](const RE::Buffer& buf) {
         return buf.map<ViewMatrices>(0u, sizeof(ViewMatrices));
     });
     for (int i = 0; i < RE::MAX_FRAMES_IN_FLIGHT; i++) {
-        m_descSets[i].texture.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, textureView), sizeof(glm::mat4));
-        m_descSets[i].window.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, windowView), sizeof(glm::mat4));
+        m_descSets[i].geometry.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, textureView), sizeof(glm::mat4));
+        m_descSets[i].sprite.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, windowView), sizeof(glm::mat4));
     }
 
     engine().setWindowTitle("RTICreator v3.0.0");
@@ -55,18 +54,15 @@ MainMenuRoom<R>::MainMenuRoom(RE::CommandLineArguments args) :
     windowResizedCallback(window, window);
 }
 
-template<RE::Renderer R>
-void MainMenuRoom<R>::sessionStart(const RE::RoomTransitionArguments& args) {
+void MainMenuRoom::sessionStart(const RE::RoomTransitionArguments& args) {
 
 }
 
-template<RE::Renderer R>
-void MainMenuRoom<R>::sessionEnd() {
+void MainMenuRoom::sessionEnd() {
 
 }
 
-template<RE::Renderer R>
-void MainMenuRoom<R>::step() {
+void MainMenuRoom::step() {
     auto cursorPos = (glm::vec2)engine().getCursorAbs();
 
     if (engine().isKeyDown(RE::Key::MMB) && m_texture) {
@@ -90,8 +86,7 @@ void MainMenuRoom<R>::step() {
     }
 }
 
-template<RE::Renderer R>
-void MainMenuRoom<R>::render(const vk::CommandBuffer& commandBuffer, double interpolationFactor) {
+void MainMenuRoom::render(const vk::CommandBuffer& commandBuffer, double interpolationFactor) {
     auto mat = m_texView.getViewMatrix();
     RE::current(m_mappedUbos)->textureView = mat;
 
@@ -131,16 +126,14 @@ void MainMenuRoom<R>::render(const vk::CommandBuffer& commandBuffer, double inte
     ImGui::End();
 }
 
-template<RE::Renderer R>
-void MainMenuRoom<R>::windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {
+void MainMenuRoom::windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {
     m_texView.resizeView(newSize);
     std::for_each(m_mappedUbos.cbegin(), m_mappedUbos.cend(), [&](ViewMatrices* mapped) {
         mapped->windowView = glm::ortho(0.0f, static_cast<float>(newSize.x), 0.0f, static_cast<float>(newSize.y));
     });
 }
 
-template<RE::Renderer R>
-void MainMenuRoom<R>::parametersGUI() {
+void MainMenuRoom::parametersGUI() {
     /*if (imguiCombo("Minification filter", m_minFilter, MIN_FILTERS_LABELS)) {
         m_texture->setMinFilter(MIN_FILTERS[m_minFilter]);
     }
@@ -179,8 +172,7 @@ void MainMenuRoom<R>::parametersGUI() {
     }*/
 }
 
-template<RE::Renderer R>
-void MainMenuRoom<R>::selectAndLoad() {
+void MainMenuRoom::selectAndLoad() {
     char filename[MAX_PATH] = {};
     OPENFILENAMEA ofn;
     ZeroMemory(&ofn, sizeof(ofn));
@@ -200,14 +192,12 @@ void MainMenuRoom<R>::selectAndLoad() {
     load(filename);
 }
 
-template<RE::Renderer R>
-void MainMenuRoom<R>::save(const std::string& loc) {
+void MainMenuRoom::save(const std::string& loc) {
     if (loc.empty()) { return; }
     m_texture->saveToFile(loc);
 }
 
-template<RE::Renderer R>
-void MainMenuRoom<R>::load(const std::string& loc) {
+void MainMenuRoom::load(const std::string& loc) {
     if (loc.empty()) { return; }
     try {
         m_texture = RE::Texture{loc, RE::Texture::DEFAULT_PARAMETERS};
@@ -230,8 +220,7 @@ void MainMenuRoom<R>::load(const std::string& loc) {
     m_borderColor = glm::vec4(m_texture->getBorderColor()) / 255.0f;*/
 }
 
-template<RE::Renderer R>
-void MainMenuRoom<R>::drawTexture(const vk::CommandBuffer& commandBuffer) {
+void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
     glm::vec2 windowDims = glm::vec2(engine().getWindowDims());
     auto texDims = m_texture->getSubimagesSpritesCount() * m_texture->getSubimageDims();
     auto botLeft = -texDims * 0.5f;
@@ -248,7 +237,7 @@ void MainMenuRoom<R>::drawTexture(const vk::CommandBuffer& commandBuffer) {
     /*m_sb.begin();
     m_sb.add(posSizeRect, uvRect, *m_texture, 0);
     m_sb.end(RE::GlyphSortType::POS_TOP);
-    m_sb.draw(RE::current(m_descSets).texture);*/
+    m_sb.draw(RE::current(m_descSets).sprite);*/
 
     m_gb.begin();
     std::vector<RE::VertexPOCO> vertices;
@@ -300,14 +289,11 @@ void MainMenuRoom<R>::drawTexture(const vk::CommandBuffer& commandBuffer) {
     m_gb.addVertices(0u, vertices.size(), vertices.data(), false);
 
     m_gb.end();
-    m_gb.draw(commandBuffer, RE::current(m_descSets).texture);
+    m_gb.draw(commandBuffer, RE::current(m_descSets).geometry);
 }
 
-template<RE::Renderer R>
-void MainMenuRoom<R>::resetView() {
+void MainMenuRoom::resetView() {
     m_texView.setScale({1.0f, 1.0f});
     m_texView.setPosition(glm::vec2{0.0f, 0.0f});
     m_drawScale = 1.0f;
 }
-
-template MainMenuRoom<RE::RendererVK13>;

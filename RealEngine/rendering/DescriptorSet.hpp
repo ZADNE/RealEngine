@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/rendering/internal_interfaces/IDescriptorSet.hpp>
+#include <vulkan/vulkan.hpp>
 
 #include <RealEngine/rendering/Pipeline.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
@@ -10,34 +10,31 @@
 
 namespace RE {
 
-/**
- * @brief Controls how vertices are rendered to screen.
- * @tparam R The renderer that will perform the commands
-*/
-template<Renderer R = RendererLateBind>
 class DescriptorSet {
     friend class VK13Fixture;
 public:
 
-    DescriptorSet(const Pipeline<R>& pl);
+    DescriptorSet(const Pipeline& pl);
 
-    DescriptorSet(const DescriptorSet<R>&) = delete;
-    DescriptorSet(DescriptorSet<R>&& other) noexcept;
+    DescriptorSet(const DescriptorSet&) = delete;
+    DescriptorSet(DescriptorSet&& other) noexcept;
 
-    DescriptorSet<R>& operator=(const DescriptorSet<R>&) = delete;
-    DescriptorSet<R>& operator=(DescriptorSet<R>&& other) noexcept;
+    DescriptorSet& operator=(const DescriptorSet&) = delete;
+    DescriptorSet& operator=(DescriptorSet&& other) noexcept;
 
     ~DescriptorSet();
 
-    void write(vk::DescriptorType type, uint32_t binding, const Buffer<R>& bf, vk::DeviceSize offset, vk::DeviceSize range);
+    void write(vk::DescriptorType type, uint32_t binding, const Buffer& bf, vk::DeviceSize offset, vk::DeviceSize range);
 
-    void bind(vk::PipelineBindPoint bindPoint, const Pipeline<R>& pl) const;
+    void bind(vk::PipelineBindPoint bindPoint, const Pipeline& pl) const;
 
 private:
 
-    DescriptorSetID m_id;
+    vk::DescriptorSet m_descriptorSet{};
 
-    static inline R::DescriptorSet* s_impl = nullptr;
+    static inline const vk::Device* s_device = nullptr;
+    static inline const vk::DescriptorPool* s_descriptorPool = nullptr;
+    static inline const vk::CommandBuffer* s_commandBuffer = nullptr;
 };
 
 }

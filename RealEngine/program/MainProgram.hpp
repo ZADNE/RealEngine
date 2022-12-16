@@ -76,28 +76,6 @@ public:
     }
 
     /**
-     * @brief Adds an early-bind Room to the management
-     * @tparam RoomType A class template derived from Room that will be instantiated.
-     * @return Raw pointer to the created room
-     *
-     * Your room template will be instantiated with the highest probability
-     * available renderer.
-     *
-     * Single type of room can be added multiple times, the only requirement is that
-     * each room must have unique name.
-    */
-    template<template<Renderer> class RoomTemplate, typename... ConstructorArgs> requires DerivedFromRoom<RoomTemplate<RendererVK13>>
-    static Room* addRoom(ConstructorArgs&&... args) {
-        auto& inst = instance();
-        switch (inst.m_window.getUsedRenderer()) {
-        case RendererID::VULKAN13:
-            return inst.m_roomManager.addRoom<RoomTemplate<RendererVK13>>(std::forward<ConstructorArgs>(args)...);
-        default:
-            return nullptr;
-        }
-    }
-
-    /**
      * @brief Runs the program
      *
      * The return value represent the exit code that this
@@ -160,7 +138,6 @@ private:
     /**
      * @brief Does the actual game loop on the singleton instance
     */
-    template<Renderer R>
     int doRun(size_t roomName, const RoomTransitionArguments& args);
 
     void step();

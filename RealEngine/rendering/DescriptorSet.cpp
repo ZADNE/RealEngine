@@ -3,42 +3,50 @@
  */
 #include <RealEngine/rendering/DescriptorSet.hpp>
 
-#include <RealEngine/rendering/internal_renderers/VK13DescriptorSet.hpp>
-
 namespace RE {
 
-template<Renderer R>
-DescriptorSet<R>::DescriptorSet(const Pipeline<R>& pl) :
-    m_id(s_impl->construct(pl.m_id)) {
+DescriptorSet::DescriptorSet(const Pipeline& pl) :
+    m_descriptorSet(s_device->allocateDescriptorSets(vk::DescriptorSetAllocateInfo{
+        *s_descriptorPool, pl.m_descriptorSetLayout
+        }).back()) {
 }
 
-template<Renderer R>
-DescriptorSet<R>::DescriptorSet(DescriptorSet<R>&& other) noexcept :
-    m_id(std::move(other.m_id)) {
+DescriptorSet::DescriptorSet(DescriptorSet&& other) noexcept :
+    m_descriptorSet(other.m_descriptorSet) {
+    other.m_descriptorSet = nullptr;
 }
 
-template<Renderer R>
-DescriptorSet<R>& DescriptorSet<R>::operator=(DescriptorSet<R>&& other) noexcept {
-    m_id = std::move(other.m_id);
+DescriptorSet& DescriptorSet::operator=(DescriptorSet&& other) noexcept {
+    std::swap(m_descriptorSet, other.m_descriptorSet);
     return *this;
 }
 
-template<Renderer R>
-DescriptorSet<R>::~DescriptorSet() {
-    s_impl->destruct(m_id);
+DescriptorSet::~DescriptorSet() {
+    //No operation is required, destriptor sets are freed when their pool is freed
 }
 
-template<Renderer R>
-void DescriptorSet<R>::write(vk::DescriptorType type, uint32_t binding, const Buffer<R>& bf, vk::DeviceSize offset, vk::DeviceSize range) {
-    s_impl->write(m_id, type, binding, bf.m_id, offset, range);
+void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Buffer& bf, vk::DeviceSize offset, vk::DeviceSize range) {
+    auto bufferInfo = vk::DescriptorBufferInfo{
+        bf.m_buffer,
+        offset,
+        range
+    };
+    s_device->updateDescriptorSets(
+        vk::WriteDescriptorSet{
+            m_descriptorSet,
+            binding,
+            0u,
+            type,
+            {},
+            bufferInfo,
+            {}
+        },
+        {}
+    );
 }
 
-template<Renderer R>
-void DescriptorSet<R>::bind(vk::PipelineBindPoint bindPoint, const Pipeline<R>& pl) const {
-    s_impl->bind(m_id, bindPoint, pl.m_id);
+void DescriptorSet::bind(vk::PipelineBindPoint bindPoint, const Pipeline& pl) const {
+    s_commandBuffer->bindDescriptorSets(bindPoint, pl.m_pipelineLayout, 0u, m_descriptorSet, {});
 }
-
-template class DescriptorSet<RendererLateBind>;
-template class DescriptorSet<RendererVK13>;
 
 }

@@ -14,8 +14,7 @@ glm::vec2 rotatePoint(const glm::vec2& point, float radAngle) {
 
 namespace RE {
 
-template<Renderer R>
-Glyph<R>::Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color) :
+Glyph::Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color) :
     tex(tex),
     depth(depth),
     topLeft({posSize.x, posSize.y + posSize.w}, color, {uv.x, uv.y + uv.w}),
@@ -25,8 +24,7 @@ Glyph<R>::Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex,
 
 }
 
-template<Renderer R>
-Glyph<R>::Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color, float radAngle, const glm::vec2& origin) :
+Glyph::Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color, float radAngle, const glm::vec2& origin) :
     tex(tex),
     depth(depth),
     topLeft({glm::vec2{posSize.x, posSize.y} + rotatePoint(glm::vec2(0.0f, posSize.w) - origin, radAngle)}, color, {uv.x, uv.y + uv.w}),
@@ -36,20 +34,17 @@ Glyph<R>::Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex,
 
 }
 
-template<Renderer R>
-SpriteBatch<R>::SpriteBatch(const ShaderProgramSources& sources) :
+SpriteBatch::SpriteBatch(const PipelineSources& sources) :
     m_pipeline(createVertexInputStateInfo(), {{}, vk::PrimitiveTopology::eTriangleList, false}, sources) {
     m_vertices = m_vbo.map<VertexPOCOUV>(0u, sizeof(VertexPOCOUV) * 512);
 }
 
-template<Renderer R>
-void SpriteBatch<R>::begin() {
+void SpriteBatch::begin() {
     m_drawBatches.clear();
     m_glyphs.clear();
 }
 
-template<Renderer R>
-void SpriteBatch<R>::end(GlyphSortType sortType) {
+void SpriteBatch::end(GlyphSortType sortType) {
     m_glyphPointers.resize(m_glyphs.size());
     for (size_t i = 0; i < m_glyphs.size(); i++) {
         m_glyphPointers[i] = &m_glyphs[i];
@@ -59,165 +54,133 @@ void SpriteBatch<R>::end(GlyphSortType sortType) {
 }
 
 //UNCOLORED
-template<Renderer R>
-void SpriteBatch<R>::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth) {
+void SpriteBatch::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth) {
     m_glyphs.emplace_back(posSize, uv, tex, depth, WHITE);
 }
-template<Renderer R>
-void SpriteBatch<R>::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, float radAngle, const glm::vec2& origin) {
+void SpriteBatch::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, float radAngle, const glm::vec2& origin) {
     m_glyphs.emplace_back(posSize, uv, tex, depth, WHITE, -radAngle, origin);
 }
-template<Renderer R>
-void SpriteBatch<R>::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, const glm::vec2& direction, const glm::vec2& origin) {
+void SpriteBatch::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, const glm::vec2& direction, const glm::vec2& origin) {
     float radAngle = atan2(direction.y, direction.x);
     m_glyphs.emplace_back(posSize, uv, tex, depth, WHITE, -radAngle, origin);
 }
 //COLORED
-template<Renderer R>
-void SpriteBatch<R>::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color) {
+void SpriteBatch::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color) {
     m_glyphs.emplace_back(posSize, uv, tex, depth, color);
 }
-template<Renderer R>
-void SpriteBatch<R>::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color, float radAngle, const glm::vec2& origin) {
+void SpriteBatch::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color, float radAngle, const glm::vec2& origin) {
     m_glyphs.emplace_back(posSize, uv, tex, depth, color, -radAngle, origin);
 }
-template<Renderer R>
-void SpriteBatch<R>::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color, const glm::vec2& direction, const glm::vec2& origin) {
+void SpriteBatch::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color, const glm::vec2& direction, const glm::vec2& origin) {
     float radAngle = atan2(direction.y, direction.x);
     m_glyphs.emplace_back(posSize, uv, tex, depth, color, -radAngle, origin);
 }
 //UNCOLORED, UNSTRETCHED
-template<Renderer R>
-void SpriteBatch<R>::addTexture(const Texture& tex, const glm::vec2& position, int depth) {
+void SpriteBatch::addTexture(const Texture& tex, const glm::vec2& position, int depth) {
     m_glyphs.emplace_back(glm::vec4(position - tex.getPivot(), tex.getSubimageDims()), UV_RECT, TextureProxy{tex}, depth, WHITE);
 }
-template<Renderer R>
-void SpriteBatch<R>::addTexture(const Texture& tex, const glm::vec2& position, int depth, float radAngle) {
+void SpriteBatch::addTexture(const Texture& tex, const glm::vec2& position, int depth, float radAngle) {
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims()), UV_RECT, TextureProxy{tex}, depth, WHITE, radAngle, tex.getPivot());
 }
-template<Renderer R>
-void SpriteBatch<R>::addTexture(const Texture& tex, const glm::vec2& position, int depth, const glm::vec2& direction) {
+void SpriteBatch::addTexture(const Texture& tex, const glm::vec2& position, int depth, const glm::vec2& direction) {
     float radAngle = atan2(direction.y, direction.x);
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims()), UV_RECT, TextureProxy{tex}, depth, WHITE, -radAngle, tex.getPivot());
 }
 //COLORED, STRETCHED
-template<Renderer R>
-void SpriteBatch<R>::addTexture(const Texture& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
+void SpriteBatch::addTexture(const Texture& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
     m_glyphs.emplace_back(glm::vec4(position - tex.getPivot() * scale, tex.getSubimageDims() * scale), UV_RECT, TextureProxy{tex}, depth, color);
 }
-template<Renderer R>
-void SpriteBatch<R>::addTexture(const Texture& tex, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
+void SpriteBatch::addTexture(const Texture& tex, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * scale), UV_RECT, TextureProxy{tex}, depth, color, radAngle, tex.getPivot() * scale);
 }
-template<Renderer R>
-void SpriteBatch<R>::addTexture(const Texture& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale) {
+void SpriteBatch::addTexture(const Texture& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale) {
     float radAngle = atan2(direction.y, direction.x);
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * scale), UV_RECT, TextureProxy{tex}, depth, color, radAngle, tex.getPivot() * scale);
 }
 //UNCOLORED, UNSTRETCHED
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth) {
+void SpriteBatch::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth) {
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position - tex.getPivot(), tex.getSubimageDims()), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, WHITE);
 }
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth, float radAngle) {
+void SpriteBatch::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth, float radAngle) {
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims()), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, WHITE, radAngle, tex.getPivot());
 }
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth, const glm::vec2& direction) {
+void SpriteBatch::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth, const glm::vec2& direction) {
     float radAngle = atan2(direction.y, direction.x);
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims()), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, WHITE, radAngle, tex.getPivot());
 }
 //COLORED, STRETCHED
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
+void SpriteBatch::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position - tex.getPivot() * scale, tex.getSubimageDims() * scale), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, color);
 }
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
+void SpriteBatch::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * scale), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, color, radAngle, tex.getPivot() * scale);
 }
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale) {
+void SpriteBatch::addSprite(const SpriteStatic& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale) {
     float radAngle = atan2(direction.y, direction.x);
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * scale), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, color, radAngle, tex.getPivot() * scale);
 }
 //COLORED, STRETCHED BY FULLSPRITE
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth) {
+void SpriteBatch::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth) {
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * sprite.getScale()), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, sprite.getColor(), 0.0f, tex.getPivot() * sprite.getScale());
 }
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth, float radAngle) {
+void SpriteBatch::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth, float radAngle) {
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * sprite.getScale()), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, sprite.getColor(), radAngle, tex.getPivot() * sprite.getScale());
 }
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth, const glm::vec2& direction) {
+void SpriteBatch::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth, const glm::vec2& direction) {
     float radAngle = atan2(direction.y, direction.x);
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * sprite.getScale()), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, sprite.getColor(), radAngle, tex.getPivot() * sprite.getScale());
 }
 //COLORED, STRETCHED BY USER
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
+void SpriteBatch::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * scale), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, color, 0.0f, tex.getPivot() * scale);
 }
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
+void SpriteBatch::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * scale), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, color, radAngle, tex.getPivot() * scale);
 }
-template<Renderer R>
-void SpriteBatch<R>::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale) {
+void SpriteBatch::addSprite(const SpriteComplex& sprite, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& scale) {
     float radAngle = atan2(direction.y, direction.x);
     const auto& tex = sprite.getTexture();
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * scale), glm::vec4(glm::floor(sprite.getSubimageSprite()) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, color, radAngle, tex.getPivot() * scale);
 }
 //UNCOLORED, UNSTRETCHED
-template<Renderer R>
-void SpriteBatch<R>::addSubimage(const Texture& tex, const glm::vec2& position, int depth, const glm::vec2& subImg_Spr) {
+void SpriteBatch::addSubimage(const Texture& tex, const glm::vec2& position, int depth, const glm::vec2& subImg_Spr) {
     m_glyphs.emplace_back(glm::vec4(position - tex.getPivot(), tex.getSubimageDims()), glm::vec4(glm::floor(subImg_Spr) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, WHITE);
 }
-template<Renderer R>
-void SpriteBatch<R>::addSubimage(const Texture& tex, const glm::vec2& position, int depth, float radAngle, const glm::vec2& subImg_Spr) {
+void SpriteBatch::addSubimage(const Texture& tex, const glm::vec2& position, int depth, float radAngle, const glm::vec2& subImg_Spr) {
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims()), glm::vec4(glm::floor(subImg_Spr) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, WHITE, radAngle, tex.getPivot());
 }
-template<Renderer R>
-void SpriteBatch<R>::addSubimage(const Texture& tex, const glm::vec2& position, int depth, const glm::vec2& direction, const glm::vec2& subImg_Spr) {
+void SpriteBatch::addSubimage(const Texture& tex, const glm::vec2& position, int depth, const glm::vec2& direction, const glm::vec2& subImg_Spr) {
     float radAngle = atan2(direction.y, direction.x);
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims()), glm::vec4(glm::floor(subImg_Spr) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, WHITE, radAngle, tex.getPivot());
 }
 //COLORED, STRETCHED
-template<Renderer R>
-void SpriteBatch<R>::addSubimage(const Texture& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& subImg_Spr, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
+void SpriteBatch::addSubimage(const Texture& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& subImg_Spr, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
     m_glyphs.emplace_back(glm::vec4(position - tex.getPivot() * scale, tex.getSubimageDims() * scale), glm::vec4(glm::floor(subImg_Spr) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, color);
 }
-template<Renderer R>
-void SpriteBatch<R>::addSubimage(const Texture& tex, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& subImg_Spr, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
+void SpriteBatch::addSubimage(const Texture& tex, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& subImg_Spr, const glm::vec2& scale/* = glm::vec2(1.0f, 1.0f)*/) {
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * scale), glm::vec4(glm::floor(subImg_Spr) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, color, radAngle, tex.getPivot() * scale);
 }
-template<Renderer R>
-void SpriteBatch<R>::addSubimage(const Texture& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& subImg_Spr, const glm::vec2& scale) {
+void SpriteBatch::addSubimage(const Texture& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& subImg_Spr, const glm::vec2& scale) {
     float radAngle = atan2(direction.y, direction.x);
     m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * scale), glm::vec4(glm::floor(subImg_Spr) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, color, radAngle, tex.getPivot() * scale);
 }
 
-template<Renderer R>
-void SpriteBatch<R>::draw(const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& descriptorSets) {
+void SpriteBatch::draw(const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets) {
     draw(descriptorSets, m_pipeline);
 }
 
-template<Renderer R>
-void SpriteBatch<R>::draw(const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& descriptorSets, const Pipeline<R>& pipeline) {
+void SpriteBatch::draw(const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets, const Pipeline& pipeline) {
     pipeline.bind(vk::PipelineBindPoint::eGraphics);
     for (size_t i = 0u; i < m_drawBatches.size(); i++) {
         m_drawBatches[i].tex.bind();
@@ -228,13 +191,11 @@ void SpriteBatch<R>::draw(const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& d
     }
 }
 
-template<Renderer R>
-void SpriteBatch<R>::changePipeline(const ShaderProgramSources& sources) {
-    m_pipeline = Pipeline<R>{createVertexInputStateInfo(), {{}, vk::PrimitiveTopology::eTriangleList, false}, sources};
+void SpriteBatch::changePipeline(const PipelineSources& sources) {
+    m_pipeline = Pipeline{createVertexInputStateInfo(), {{}, vk::PrimitiveTopology::eTriangleList, false}, sources};
 }
 
-template<Renderer R>
-void SpriteBatch<R>::sortGlyphs(GlyphSortType sortType) {
+void SpriteBatch::sortGlyphs(GlyphSortType sortType) {
     switch (sortType) {
     case GlyphSortType::NEG_TOP:
         std::stable_sort(m_glyphPointers.begin(), m_glyphPointers.end(), compareNegToPos);
@@ -248,8 +209,7 @@ void SpriteBatch<R>::sortGlyphs(GlyphSortType sortType) {
     }
 }
 
-template<Renderer R>
-void SpriteBatch<R>::createDrawBatches() {
+void SpriteBatch::createDrawBatches() {
     if (m_glyphPointers.empty()) {//If there are no glyphs to draw
         return;
     }
@@ -285,8 +245,7 @@ void SpriteBatch<R>::createDrawBatches() {
     }
 }
 
-template<Renderer R>
-vk::PipelineVertexInputStateCreateInfo SpriteBatch<R>::createVertexInputStateInfo() const {
+vk::PipelineVertexInputStateCreateInfo SpriteBatch::createVertexInputStateInfo() const {
     static constexpr std::array bindings = std::to_array<vk::VertexInputBindingDescription>({{
         0u,                             //Binding index
         sizeof(VertexPOCOUV),           //Stride
@@ -310,8 +269,5 @@ vk::PipelineVertexInputStateCreateInfo SpriteBatch<R>::createVertexInputStateInf
     }});
     return vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes};
 }
-
-template class SpriteBatch<RendererLateBind>;
-template class SpriteBatch<RendererVK13>;
 
 }

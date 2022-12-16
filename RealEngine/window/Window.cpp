@@ -9,7 +9,6 @@
 #include <ImGui/imgui_impl_sdl.h>
 
 #include <RealEngine/utility/Error.hpp>
-#include <RealEngine/rendering/output/Viewport.hpp>
 
 
 namespace RE {
@@ -34,9 +33,6 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
         }
     }
 
-    Viewport<>::s_state->windowSize = m_dims;
-    Viewport<>::s_state->trackingWindow = true;
-
     assert(m_usedRenderer == RendererID::VULKAN13 || m_usedRenderer == RendererID::OPENGL46);
 }
 
@@ -48,18 +44,15 @@ Window::~Window() {
     SDL_DestroyWindow(m_SDLwindow);
 }
 
-template<>
-const vk::CommandBuffer& Window::prepareNewFrame<RendererVK13>() {
+const vk::CommandBuffer& Window::prepareNewFrame() {
     return m_vk13.prepareFrame(m_clearColor, m_usingImGui);
 }
 
-template<>
-void Window::finishNewFrame<RendererVK13>() {
+void Window::finishNewFrame() {
     m_vk13.finishFrame(m_usingImGui);
 }
 
-template<>
-void Window::prepareForDestructionOfRendererObjects<RendererVK13>() {
+void Window::prepareForDestructionOfRendererObjects() {
     m_vk13.prepareForDestructionOfRendererObjects();
 }
 
@@ -116,11 +109,6 @@ void Window::setDims(const glm::ivec2& newDims, bool save) {
     SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
     SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
-
-    Viewport<>::s_state->windowSize = m_dims;
-    if (Viewport<>::s_state->trackingWindow) {
-        Viewport<>::setToWholeWindow();
-    }
     if (save) this->save();
 }
 

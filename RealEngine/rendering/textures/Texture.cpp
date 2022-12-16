@@ -28,6 +28,8 @@ glm::vec4 colorToFloatColor(Color color, TextureFormat type) {
 Texture::Texture(Texture&& other) noexcept :
     m_image(other.m_image),
     m_deviceMemory(other.m_deviceMemory),
+    m_imageView(other.m_imageView),
+    m_sampler(other.m_sampler),
     m_flags(other.m_flags),
     m_subimageDims(other.m_subimageDims),
     m_pivot(other.m_pivot),
@@ -36,11 +38,15 @@ Texture::Texture(Texture&& other) noexcept :
     m_borderColor(other.m_borderColor) {
     other.m_image = nullptr;
     other.m_deviceMemory = nullptr;
+    other.m_imageView = nullptr;
+    other.m_sampler = nullptr;
 }
 
 Texture& Texture::operator=(Texture&& other) noexcept {
     std::swap(m_image, other.m_image);
     std::swap(m_deviceMemory, other.m_deviceMemory);
+    std::swap(m_imageView, other.m_imageView);
+    std::swap(m_sampler, other.m_sampler);
     m_flags = other.m_flags;
     m_trueDims = other.m_trueDims;
     m_subimageDims = other.m_subimageDims;
@@ -69,6 +75,8 @@ Texture::Texture(const Raster& raster, const TextureParameters& params/* = DEFAU
 }
 
 Texture::~Texture() {
+    s_device->destroySampler(m_sampler);
+    s_device->destroyImageView(m_imageView);
     s_device->destroyImage(m_image);
     s_device->free(m_deviceMemory);
 }
@@ -109,7 +117,7 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
     m_borderColor = params.getBorderColor();
     //Create a staging buffer
     vk::DeviceSize nBytes = m_trueDims.x * m_trueDims.y * 4u;
-    Buffer<RendererVK13> stagingBuffer{
+    Buffer stagingBuffer{
         nBytes,
         vk::BufferUsageFlagBits::eTransferSrc,
         vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
@@ -147,16 +155,16 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
     commandBuffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
     transitionImageLayout(commandBuffer, eUndefined, eTransferDstOptimal);
     commandBuffer.copyBufferToImage(
-        stagingBuffer.m_id.m_.vk13.mainBuffer,
+        stagingBuffer.m_buffer,
         m_image,
         eTransferDstOptimal,
         vk::BufferImageCopy{
             0u, 0u, 0u,
             vk::ImageSubresourceLayers{
                 vk::ImageAspectFlagBits::eColor,
-                0u,                                         //Mip level
-                0u,                                         //Base array layer
-                1u                                          //Array layer count
+                0u,                                     //Mip level
+                0u,                                     //Base array layer
+                1u                                      //Array layer count
             },
             vk::Offset3D{0u, 0u, 0u},
             vk::Extent3D{m_trueDims.x, m_trueDims.y, 1u}
@@ -167,6 +175,22 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
     s_graphicsQueue->submit(vk::SubmitInfo{nullptr, {}, commandBuffer});
     s_graphicsQueue->waitIdle();
     s_device->freeCommandBuffers(*s_commandPool, commandBuffer);
+    //Create image view
+    m_imageView = s_device->createImageView(vk::ImageViewCreateInfo{{},
+        m_image,
+        vk::ImageViewType::e2D,
+        vk::Format::eR8G8B8A8Unorm,
+        vk::ComponentMapping{},                         //Component mapping (= identity)
+        vk::ImageSubresourceRange{
+            vk::ImageAspectFlagBits::eColor,
+            0u,                                         //Mip level
+            1u,                                         //Mip level count
+            0u,                                         //Base array layer
+            1u                                          //Array layer count
+        }
+    });
+    //Create sampler
+    m_sampler = s_device->createSampler(vk::SamplerCreateInfo{});
 }
 
 void Texture::transitionImageLayout(vk::CommandBuffer& commandBuffer, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
@@ -200,10 +224,10 @@ void Texture::transitionImageLayout(vk::CommandBuffer& commandBuffer, vk::ImageL
             m_image,
             vk::ImageSubresourceRange{
                 vk::ImageAspectFlagBits::eColor,
-                0u,                                         //Mip level
-                1u,                                         //Mip level count
-                0u,                                         //Base array layer
-                1u                                          //Array layer count
+                0u,                                     //Mip level
+                1u,                                     //Mip level count
+                0u,                                     //Base array layer
+                1u                                      //Array layer count
             }
         }
     );

@@ -7,11 +7,9 @@
 
 #include <vulkan/vulkan_raii.hpp>
 
+#include <glm/vec4.hpp>
+
 #include <RealEngine/rendering/PerFrameInFlight.hpp>
-#include <RealEngine/rendering/internal_renderers/VK13Buffer.hpp>
-#include <RealEngine/rendering/internal_renderers/VK13DescriptorSet.hpp>
-#include <RealEngine/rendering/internal_renderers/VK13Pipeline.hpp>
-#include <RealEngine/rendering/internal_renderers/VK13Viewport.hpp>
 
 struct SDL_Window;
 
@@ -82,13 +80,7 @@ private:
     PerFrameInFlight<vk::raii::Fence> m_inFlightFences;
     bool m_recreteSwapchain = false;
     //Implementations
-    VK13Buffer m_bufferImpl;
-    VK13DescriptorSet m_descriptorSetImpl;
-    VK13Pipeline m_pipelineImpl;
-    ViewportState m_viewportState;
-    template<Renderer R>
     void assignImplementationReferences();
-    template<Renderer R>
     void clearImplementationReferences();
     //Create object helpers
     vk::raii::Instance createInstance();

@@ -22,7 +22,6 @@ enum class GlyphSortType {
     TEXTURE
 };
 
-template<Renderer R = RendererLateBind>
 class Glyph {
 public:
     Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color);
@@ -37,7 +36,6 @@ public:
     VertexPOCOUV botRight;
 };
 
-template<Renderer R = RendererLateBind>
 struct DrawBatch {
     DrawBatch(int offset, unsigned int count, TextureProxy tex) : offset(offset), count(count), tex(tex) {};
 
@@ -48,9 +46,7 @@ struct DrawBatch {
 
 /**
  * @brief Draws sprites, surfaces and other textures
- * @tparam R The renderer that will perform the commands
 */
-template<Renderer R = RendererLateBind>
 class SpriteBatch {
 public:
 
@@ -58,7 +54,7 @@ public:
      * @brief Constructs new SpriteBatch that will draw with given shaders
      * @details The pipeline created from the shaders is stored inside the sprite batch.
     */
-    SpriteBatch(const ShaderProgramSources& sources);
+    SpriteBatch(const PipelineSources& sources);
 
     void begin();
     void end(GlyphSortType sortType);
@@ -111,19 +107,19 @@ public:
     /**
      * @brief Draws the batch with the stored pipeline
     */
-    void draw(const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& descriptorSets);
+    void draw(const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets);
 
     /**
      * @brief Draws once with different pipeline  (the pipeline is not stored)
     */
-    void draw(const vk::ArrayProxyNoTemporaries<DescriptorSet<R>>& descriptorSets, const Pipeline<R>& pipeline);
+    void draw(const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets, const Pipeline& pipeline);
 
     /**
      * @brief Changes to a different pipeline that will be used for drawing
     */
-    void changePipeline(const ShaderProgramSources& sources);
+    void changePipeline(const PipelineSources& sources);
 
-    const Pipeline<R>& getPipeline() const { return m_pipeline; }
+    const Pipeline& getPipeline() const { return m_pipeline; }
 
 private:
 
@@ -132,18 +128,18 @@ private:
 
     using enum vk::BufferUsageFlagBits;
     using enum vk::MemoryPropertyFlagBits;
-    Buffer<R> m_vbo{sizeof(VertexPOCOUV) * 512, eVertexBuffer, eHostVisible | eHostCoherent};
+    Buffer m_vbo{sizeof(VertexPOCOUV) * 512, eVertexBuffer, eHostVisible | eHostCoherent};
 
-    std::vector<Glyph<R>*> m_glyphPointers;
-    std::vector<Glyph<R>> m_glyphs;
-    std::vector<DrawBatch<R>> m_drawBatches;
+    std::vector<Glyph*> m_glyphPointers;
+    std::vector<Glyph> m_glyphs;
+    std::vector<DrawBatch> m_drawBatches;
     VertexPOCOUV* m_vertices = nullptr;
 
-    static constexpr bool compareNegToPos(Glyph<R>* a, Glyph<R>* b) { return (a->depth > b->depth); }
-    static constexpr bool comparePosToNeg(Glyph<R>* a, Glyph<R>* b) { return (a->depth < b->depth); }
-    static constexpr bool compareTexture(Glyph<R>* a, Glyph<R>* b) { return (a->tex > b->tex); }
+    static constexpr bool compareNegToPos(Glyph* a, Glyph* b) { return (a->depth > b->depth); }
+    static constexpr bool comparePosToNeg(Glyph* a, Glyph* b) { return (a->depth < b->depth); }
+    static constexpr bool compareTexture(Glyph* a, Glyph* b) { return (a->tex > b->tex); }
 
-    Pipeline<R> m_pipeline;
+    Pipeline m_pipeline;
     vk::PipelineVertexInputStateCreateInfo createVertexInputStateInfo() const;
 
     static inline constexpr glm::vec4 UV_RECT = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);

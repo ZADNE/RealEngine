@@ -16,7 +16,7 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
     string(CONCAT hpp_preamble
         "//Automatically generated file by RealShaders\n"
         "#pragma once\n"
-        "#include <RealEngine/rendering/vertices/ShaderProgram.hpp>\n\n"
+        "#include <RealEngine/rendering/vertices/PipelineSources.hpp>\n\n"
         ${cpp_namespace_start})
 
     string(CONCAT folder_hpp
@@ -45,8 +45,6 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
                 "RE::ShaderSource ${shader_} ={\n"
                 "    .vk13 =\n"
                 "    #include <${path_rel}/${shader}.spv_vk13>\n"
-                "    ,.gl46 =\n"
-                "    #include <${path_rel}/${shader}.spv_gl46>\n"
                 "}\;\n"
                 ${cpp_namespace_end})
             file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.cpp" ${shader_cpp})

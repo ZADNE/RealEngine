@@ -11,14 +11,12 @@
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/cameras/View2D.hpp>
-#include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/rendering/basic_shaders/AllShaders.hpp>
 
  /**
   * @brief Room with the UI
  */
-template<RE::Renderer R>
 class MainMenuRoom : public RE::Room {
 public:
 
@@ -38,8 +36,8 @@ private:
     void save(const std::string& loc);
     void load(const std::string& filePath);
 
-    RE::SpriteBatch<R> m_sb{{.vert = RE::sprite_vert, .frag = RE::sprite_frag}};
-    RE::GeometryBatch<R> m_gb{{{}, vk::PrimitiveTopology::eLineList, false}, {.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
+    RE::SpriteBatch m_sb{{.vert = RE::sprite_vert, .frag = RE::sprite_frag}};
+    RE::GeometryBatch m_gb{{{}, vk::PrimitiveTopology::eLineList, false}, {.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
 
     //Texture
     std::optional<RE::Texture> m_texture;
@@ -55,24 +53,24 @@ private:
         alignas(256) glm::mat4 windowView;
     };
     struct DescriptorSets {
-        RE::DescriptorSet<R> texture;
-        RE::DescriptorSet<R> window;
+        RE::DescriptorSet geometry;
+        RE::DescriptorSet sprite;
     };
-    RE::PerFrameInFlight<RE::Buffer<R>> m_ubos{
-        RE::Buffer<R>{sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
+    RE::PerFrameInFlight<RE::Buffer> m_ubos{
+        RE::Buffer{sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
         vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent},
-        RE::Buffer<R>{sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
+        RE::Buffer{sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
         vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent}
     };
     RE::PerFrameInFlight<ViewMatrices*> m_mappedUbos{nullptr};
     RE::PerFrameInFlight<DescriptorSets> m_descSets{
         DescriptorSets{
-            .texture = RE::DescriptorSet<R>{m_gb.getPipeline()},
-            .window = RE::DescriptorSet<R>{m_gb.getPipeline()}
+            .geometry = RE::DescriptorSet{m_gb.getPipeline()},
+            .sprite = RE::DescriptorSet{m_sb.getPipeline()}
         },
         DescriptorSets{
-            .texture = RE::DescriptorSet<R>{m_gb.getPipeline()},
-            .window = RE::DescriptorSet<R>{m_gb.getPipeline()}
+            .geometry = RE::DescriptorSet{m_gb.getPipeline()},
+            .sprite = RE::DescriptorSet{m_sb.getPipeline()}
         }
     };
 

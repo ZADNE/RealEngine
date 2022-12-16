@@ -9,12 +9,12 @@
 #include <SDL2/SDL_vulkan.h>
 #include <ImGui/imgui_impl_sdl.h>
 #include <ImGui/imgui_impl_vulkan.h>
+#include <glm/common.hpp>
 
 #include <RealEngine/window/WindowSubsystems.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/DescriptorSet.hpp>
 #include <RealEngine/rendering/Pipeline.hpp>
-#include <RealEngine/rendering/output/Viewport.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
@@ -65,17 +65,9 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
     m_descriptorPool(createDescriptorPool()),
     m_imageAvailableSems(createSemaphores()),
     m_renderingFinishedSems(createSemaphores()),
-    m_inFlightFences(createFences()),
+    m_inFlightFences(createFences()) {
     //Implementations
-    m_bufferImpl(*m_physicalDevice, *m_device, *m_graphicsQueue, *m_commandPool),
-    m_descriptorSetImpl(*m_device, *m_descriptorPool),
-    m_pipelineImpl(*m_device, *m_pipelineCache, *m_renderPass) {
-    Texture::s_physicalDevice = &(*m_physicalDevice);
-    Texture::s_device = &(*m_device);
-    Texture::s_graphicsQueue = &(*m_graphicsQueue);
-    Texture::s_commandPool = &(*m_commandPool);
-    assignImplementationReferences<RendererLateBind>();
-    assignImplementationReferences<RendererVK13>();
+    assignImplementationReferences();
     setFramesInFlight(2);
     setFrame(m_frame++);
     //Initialize ImGui
@@ -101,8 +93,7 @@ VK13Fixture::~VK13Fixture() {
     m_device.waitIdle();
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplSDL2_Shutdown();
-    clearImplementationReferences<RendererLateBind>();
-    clearImplementationReferences<RendererVK13>();
+    clearImplementationReferences();
 }
 
 const vk::CommandBuffer& VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
@@ -140,9 +131,7 @@ const vk::CommandBuffer& VK13Fixture::prepareFrame(const glm::vec4& clearColor, 
     commandBuffer.begin({});
 
     //Set current commandbuffer
-    m_bufferImpl.setCommandBuffer(&(*commandBuffer));
-    m_descriptorSetImpl.setCommandBuffer(&(*commandBuffer));
-    m_pipelineImpl.setCommandBuffer(&(*commandBuffer));
+    Buffer::s_commandBuffer = DescriptorSet::s_commandBuffer = Pipeline::s_commandBuffer = &(*commandBuffer);
 
     //Begin renderpass
     const auto* clearColorPtr = reinterpret_cast<const std::array<float, 4u>*>(&clearColor);
@@ -526,20 +515,24 @@ void VK13Fixture::recreateImGuiFontTexture() {
     checkSuccess(m_device.waitForFences(*uploadFence, true, MAX_TIMEOUT));
 }
 
-template<Renderer R>
 void VK13Fixture::assignImplementationReferences() {
-    Buffer<R>::s_impl = &m_bufferImpl;
-    DescriptorSet<R>::s_impl = &m_descriptorSetImpl;
-    Pipeline<R>::s_impl = &m_pipelineImpl;
-    Viewport<R>::s_state = &m_viewportState;
+    Buffer::s_physicalDevice = Texture::s_physicalDevice = &(*m_physicalDevice);
+    Buffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = &(*m_device);
+    Buffer::s_graphicsQueue = Texture::s_graphicsQueue = &(*m_graphicsQueue);
+    Buffer::s_commandPool = Texture::s_commandPool = &(*m_commandPool);
+    DescriptorSet::s_descriptorPool = &(*m_descriptorPool);
+    Pipeline::s_pipelineCache = &(*m_pipelineCache);
+    Pipeline::s_renderPass = &(*m_renderPass);
 }
 
-template<Renderer R>
 void VK13Fixture::clearImplementationReferences() {
-    Buffer<R>::s_impl = nullptr;
-    DescriptorSet<R>::s_impl = nullptr;
-    Pipeline<R>::s_impl = nullptr;
-    Viewport<R>::s_state = nullptr;
+    Buffer::s_physicalDevice = Texture::s_physicalDevice = nullptr;
+    Buffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = nullptr;
+    Buffer::s_graphicsQueue = Texture::s_graphicsQueue = nullptr;
+    Buffer::s_commandPool = Texture::s_commandPool = nullptr;
+    DescriptorSet::s_descriptorPool = nullptr;
+    Pipeline::s_pipelineCache = nullptr;
+    Pipeline::s_renderPass = nullptr;
 }
 
 }

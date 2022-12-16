@@ -156,8 +156,10 @@ private:
 
     void init(const Raster& raster, const TextureParameters& params);
 
-    vk::Image m_image{};
     vk::DeviceMemory m_deviceMemory{};
+    vk::Image m_image{};
+    vk::ImageView m_imageView{};
+    vk::Sampler m_sampler{};
 
     TextureFlags m_flags{};     /**< Flags associated with the texture */
 

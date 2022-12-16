@@ -2,30 +2,25 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/rendering/internal_interfaces/IPipeline.hpp>
-#include <RealEngine/rendering/Renderer.hpp>
+#include <RealEngine/rendering/vertices/PipelineSources.hpp>
 
 namespace RE {
 
-template<Renderer> class DescriptorSet;
-
 /**
  * @brief Controls how vertices are rendered to screen.
- * @tparam R The renderer that will perform the commands
 */
-template<Renderer R = RendererLateBind>
 class Pipeline {
     friend class VK13Fixture;
-    friend class DescriptorSet<R>;
+    friend class DescriptorSet;
 public:
 
-    Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const ShaderProgramSources& srcs);
+    Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& srcs);
 
-    Pipeline(const Pipeline<R>&) = delete;
-    Pipeline(Pipeline<R>&& other) noexcept;
+    Pipeline(const Pipeline&) = delete;
+    Pipeline(Pipeline&& other) noexcept;
 
-    Pipeline<R>& operator=(const Pipeline<R>&) = delete;
-    Pipeline<R>& operator=(Pipeline<R>&& other) noexcept;
+    Pipeline& operator=(const Pipeline&) = delete;
+    Pipeline& operator=(Pipeline&& other) noexcept;
 
     ~Pipeline();
 
@@ -36,9 +31,16 @@ public:
 
 private:
 
-    PipelineID m_id;
+    void reflect(const ShaderSourceRef& src, vk::ShaderStageFlagBits st, std::vector<vk::DescriptorSetLayoutBinding>& dslbs) const;
 
-    static inline R::Pipeline* s_impl = nullptr;
+    vk::DescriptorSetLayout m_descriptorSetLayout{};
+    vk::PipelineLayout m_pipelineLayout{};
+    vk::Pipeline m_pipeline{};
+
+    static inline const vk::Device* s_device = nullptr;
+    static inline const vk::PipelineCache* s_pipelineCache = nullptr;
+    static inline const vk::RenderPass* s_renderPass = nullptr;
+    static inline const vk::CommandBuffer* s_commandBuffer = nullptr;
 };
 
 }

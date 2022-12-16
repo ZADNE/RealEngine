@@ -12,7 +12,6 @@
 #include <glm/common.hpp>
 
 #include <RealEngine/rooms/Room.hpp>
-#include <RealEngine/rendering/output/Viewport.hpp>
 
 namespace RE {
 
@@ -24,10 +23,7 @@ void MainProgram::initialize() {
 int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
     try {
         auto& inst = instance();
-        switch (inst.m_window.getUsedRenderer()) {
-        case RendererID::VULKAN13: return inst.doRun<RendererVK13>(roomName, args);
-        default: return 1;
-        }
+        inst.doRun(roomName, args);
     }
     catch (const std::exception& e) {
         fatalError(std::string("Exception: ") + e.what());
@@ -96,7 +92,6 @@ void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
     m_window.useImGui(s.usingImGui);
 }
 
-template<Renderer R>
 int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
     scheduleRoomTransition(roomName, args);
     doRoomTransitionIfScheduled();
@@ -129,13 +124,13 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
         }
 
         //Prepare for drawing
-        const auto& commandBuffer = m_window.prepareNewFrame<R>();
+        const auto& commandBuffer = m_window.prepareNewFrame();
 
         //Draw the frame
         render(commandBuffer, m_synchronizer.getDrawInterpolationFactor());
 
         //Finish the drawing
-        m_window.finishNewFrame<R>();
+        m_window.finishNewFrame();
 
         doRoomTransitionIfScheduled();
 
@@ -145,7 +140,7 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
 
     //Exit the program
     m_roomManager.getCurrentRoom()->sessionEnd();
-    m_window.prepareForDestructionOfRendererObjects<R>();
+    m_window.prepareForDestructionOfRendererObjects();
 
     return m_programExitCode;
 }
