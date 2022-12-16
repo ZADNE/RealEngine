@@ -182,11 +182,12 @@ void SpriteBatch::draw(const vk::ArrayProxyNoTemporaries<DescriptorSet>& descrip
 
 void SpriteBatch::draw(const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets, const Pipeline& pipeline) {
     pipeline.bind(vk::PipelineBindPoint::eGraphics);
+    m_vbo.bindAsVertexBuffer(0u, 0u);
+    for (const auto& set : descriptorSets) {
+        set.bind(vk::PipelineBindPoint::eGraphics, m_pipeline);
+    }
+    //TODO
     for (size_t i = 0u; i < m_drawBatches.size(); i++) {
-        m_drawBatches[i].tex.bind();
-        for (const auto& set : descriptorSets) {
-            set.bind(vk::PipelineBindPoint::eGraphics, m_pipeline);
-        }
         pipeline.draw(m_drawBatches[i].count, 1, m_drawBatches[i].offset, 0);
     }
 }

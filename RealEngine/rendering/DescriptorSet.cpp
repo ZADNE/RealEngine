@@ -45,6 +45,26 @@ void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Buffe
     );
 }
 
+void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Texture& tx) {
+    auto imageInfo = vk::DescriptorImageInfo{
+        tx.m_sampler,
+        tx.m_imageView,
+        vk::ImageLayout::eShaderReadOnlyOptimal
+    };
+    s_device->updateDescriptorSets(
+        vk::WriteDescriptorSet{
+            m_descriptorSet,
+            binding,
+            0u,
+            type,
+            imageInfo,
+            {},
+            {}
+        },
+        {}
+    );
+}
+
 void DescriptorSet::bind(vk::PipelineBindPoint bindPoint, const Pipeline& pl) const {
     s_commandBuffer->bindDescriptorSets(bindPoint, pl.m_pipelineLayout, 0u, m_descriptorSet, {});
 }

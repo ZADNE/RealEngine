@@ -79,6 +79,7 @@ private:
 */
 class Texture {
     friend class VK13Fixture;
+    friend class DescriptorSet;
 public:
 
     static inline constexpr TextureFlags DEFAULT_FLAGS{TextureFlags::RGBA8_NU_NEAR_NEAR_EDGE};

@@ -49,8 +49,7 @@ private:
     //View
     RE::View2D m_texView;
     struct ViewMatrices {
-        alignas(256) glm::mat4 textureView;
-        alignas(256) glm::mat4 windowView;
+        glm::mat4 textureView;
     };
     struct DescriptorSets {
         RE::DescriptorSet geometry;

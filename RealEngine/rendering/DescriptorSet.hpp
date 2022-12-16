@@ -6,7 +6,7 @@
 
 #include <RealEngine/rendering/Pipeline.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
-#include <RealEngine/rendering/Renderer.hpp>
+#include <RealEngine/rendering/textures/Texture.hpp>
 
 namespace RE {
 
@@ -25,6 +25,7 @@ public:
     ~DescriptorSet();
 
     void write(vk::DescriptorType type, uint32_t binding, const Buffer& bf, vk::DeviceSize offset, vk::DeviceSize range);
+    void write(vk::DescriptorType type, uint32_t binding, const Texture& tx);
 
     void bind(vk::PipelineBindPoint bindPoint, const Pipeline& pl) const;
 

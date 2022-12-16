@@ -36,7 +36,7 @@ MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
     });
     for (int i = 0; i < RE::MAX_FRAMES_IN_FLIGHT; i++) {
         m_descSets[i].geometry.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, textureView), sizeof(glm::mat4));
-        m_descSets[i].sprite.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, windowView), sizeof(glm::mat4));
+        m_descSets[i].sprite.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, textureView), sizeof(glm::mat4));
     }
 
     engine().setWindowTitle("RTICreator v3.0.0");
@@ -128,9 +128,6 @@ void MainMenuRoom::render(const vk::CommandBuffer& commandBuffer, double interpo
 
 void MainMenuRoom::windowResizedCallback(const glm::ivec2& oldSize, const glm::ivec2& newSize) {
     m_texView.resizeView(newSize);
-    std::for_each(m_mappedUbos.cbegin(), m_mappedUbos.cend(), [&](ViewMatrices* mapped) {
-        mapped->windowView = glm::ortho(0.0f, static_cast<float>(newSize.x), 0.0f, static_cast<float>(newSize.y));
-    });
 }
 
 void MainMenuRoom::parametersGUI() {
@@ -206,6 +203,10 @@ void MainMenuRoom::load(const std::string& loc) {
         return;
     }
 
+    std::for_each(m_descSets.begin(), m_descSets.end(), [&](DescriptorSets& sets) {
+        sets.sprite.write(vk::DescriptorType::eCombinedImageSampler, 1u, *m_texture);
+    });
+
     //Save texture's location
     m_textureLoc = loc;
 
@@ -234,10 +235,10 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
         1.0f + m_overlap * 2.0f
     };
 
-    /*m_sb.begin();
+    m_sb.begin();
     m_sb.add(posSizeRect, uvRect, *m_texture, 0);
     m_sb.end(RE::GlyphSortType::POS_TOP);
-    m_sb.draw(RE::current(m_descSets).sprite);*/
+    m_sb.draw(RE::current(m_descSets).sprite);
 
     m_gb.begin();
     std::vector<RE::VertexPOCO> vertices;
