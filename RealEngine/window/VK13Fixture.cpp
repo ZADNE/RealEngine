@@ -16,6 +16,7 @@
 #include <RealEngine/rendering/DescriptorSet.hpp>
 #include <RealEngine/rendering/Pipeline.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
+#include <RealEngine/rendering/CommandBuffer.hpp>
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
 using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
@@ -24,6 +25,7 @@ using enum vk::ImageUsageFlagBits;
 using enum vk::CompositeAlphaFlagBitsKHR;
 using enum vk::PresentModeKHR;
 using enum vk::ImageViewType;
+using enum vk::CommandBufferLevel;
 
 namespace {
 constexpr auto MAX_TIMEOUT = std::numeric_limits<uint64_t>::max();
@@ -61,6 +63,7 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
     m_swapChainFramebuffers(createSwapchainFramebuffers()),
     m_commandPool(createCommandPool()),
     m_commandBuffers(createCommandBuffers()),
+    m_oneTimeSubmitCommandBuffer(std::move(vk::raii::CommandBuffers{m_device, {*m_commandPool, ePrimary, 1u}}.back())),
     m_pipelineCache(createPipelineCache()),
     m_descriptorPool(createDescriptorPool()),
     m_imageAvailableSems(createSemaphores()),
@@ -395,7 +398,7 @@ vk::raii::CommandPool VK13Fixture::createCommandPool() {
 }
 
 PerFrameInFlight<vk::raii::CommandBuffer> VK13Fixture::createCommandBuffers() {
-    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{*m_commandPool, vk::CommandBufferLevel::ePrimary, MAX_FRAMES_IN_FLIGHT};
+    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{*m_commandPool, ePrimary, MAX_FRAMES_IN_FLIGHT};
     vk::raii::CommandBuffers buffers{m_device, commandBufferAllocateInfo};
     assert(buffers.size() == MAX_FRAMES_IN_FLIGHT);
     return PerFrameInFlight<vk::raii::CommandBuffer>{std::move(buffers[0]), std::move(buffers[1])};
@@ -517,22 +520,22 @@ void VK13Fixture::recreateImGuiFontTexture() {
 
 void VK13Fixture::assignImplementationReferences() {
     Buffer::s_physicalDevice = Texture::s_physicalDevice = &(*m_physicalDevice);
-    Buffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = &(*m_device);
-    Buffer::s_graphicsQueue = Texture::s_graphicsQueue = &(*m_graphicsQueue);
-    Buffer::s_commandPool = Texture::s_commandPool = &(*m_commandPool);
+    Buffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = &(*m_device);
+    CommandBuffer::s_graphicsQueue = &(*m_graphicsQueue);
     DescriptorSet::s_descriptorPool = &(*m_descriptorPool);
     Pipeline::s_pipelineCache = &(*m_pipelineCache);
     Pipeline::s_renderPass = &(*m_renderPass);
+    CommandBuffer::s_oneTimeSubmitCommandBuffer = &(*m_oneTimeSubmitCommandBuffer);
 }
 
 void VK13Fixture::clearImplementationReferences() {
     Buffer::s_physicalDevice = Texture::s_physicalDevice = nullptr;
-    Buffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = nullptr;
-    Buffer::s_graphicsQueue = Texture::s_graphicsQueue = nullptr;
-    Buffer::s_commandPool = Texture::s_commandPool = nullptr;
+    Buffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = nullptr;
+    CommandBuffer::s_graphicsQueue = nullptr;
     DescriptorSet::s_descriptorPool = nullptr;
     Pipeline::s_pipelineCache = nullptr;
     Pipeline::s_renderPass = nullptr;
+    CommandBuffer::s_oneTimeSubmitCommandBuffer = nullptr;
 }
 
 }

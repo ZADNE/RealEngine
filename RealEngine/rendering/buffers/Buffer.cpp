@@ -5,6 +5,7 @@
 
 #include <cassert>
 
+#include <RealEngine/rendering/CommandBuffer.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 
@@ -24,7 +25,9 @@ Buffer::Buffer(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropert
         std::memcpy(s_device->mapMemory(stage.memory, 0, sizeInBytes), data, sizeInBytes);
         s_device->unmapMemory(stage.memory);
         //Copy from staging to final buffer
-        copyBetweenBuffers(stage.buffer, main.buffer, vk::BufferCopy{0u, 0u, sizeInBytes});
+        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
+            commandBuffer.copyBuffer(stage.buffer, main.buffer, vk::BufferCopy{0u, 0u, sizeInBytes});
+        });
         //Destruct the temporary stage
         s_device->destroyBuffer(stage.buffer);
         s_device->free(stage.memory);
@@ -55,6 +58,12 @@ Buffer::~Buffer() {
 
 void Buffer::unmap() const {
     s_device->unmapMemory(m_memory);
+}
+
+void Buffer::copyToBuffer(Buffer& dst, const vk::BufferCopy& info) const {
+    RE::CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
+        commandBuffer.copyBuffer(m_buffer, dst.m_buffer, info);
+    });
 }
 
 void Buffer::bindAsVertexBuffer(uint32_t binding, uint64_t offsetInBytes) const {
@@ -89,22 +98,6 @@ Buffer::BufferAndMemory Buffer::createBufferAndMemory(size_t sizeInBytes, vk::Bu
         });
     s_device->bindBufferMemory2(vk::BindBufferMemoryInfo{buffer, memory, 0u});
     return BufferAndMemory{.buffer = buffer, .memory = memory};
-}
-
-void Buffer::copyBetweenBuffers(const vk::Buffer& src, const vk::Buffer& dst, const vk::BufferCopy& copyInfo) const {
-    //Allocate temporary command buffer
-    auto commandBuffer = s_device->allocateCommandBuffers({
-        *s_commandPool, vk::CommandBufferLevel::ePrimary, 1u
-    }).front();
-    //Record the copy
-    commandBuffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-    commandBuffer.copyBuffer(src, dst, copyInfo);
-    commandBuffer.end();
-    //Submit the copy
-    s_graphicsQueue->submit(vk::SubmitInfo{nullptr, {}, commandBuffer});
-    //Free the temporary buffer
-    s_graphicsQueue->waitIdle();
-    s_device->freeCommandBuffers(*s_commandPool, commandBuffer);
 }
 
 void* Buffer::map(size_t offsetInBytes, size_t lengthInBytes) const {

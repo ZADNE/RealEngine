@@ -23,7 +23,7 @@ void MainProgram::initialize() {
 int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
     try {
         auto& inst = instance();
-        inst.doRun(roomName, args);
+        return inst.doRun(roomName, args);
     }
     catch (const std::exception& e) {
         fatalError(std::string("Exception: ") + e.what());

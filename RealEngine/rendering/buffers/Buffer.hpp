@@ -11,7 +11,6 @@ namespace RE {
 
 /**
  * @brief Is a continuous block of memory stored in the GPU's memory
- * @tparam R The renderer that will perform the commands
 */
 class Buffer {
     friend class VK13Fixture;
@@ -74,6 +73,8 @@ public:
     */
     void unmap() const;
 
+    void copyToBuffer(Buffer& dst, const vk::BufferCopy& info) const;
+
     void bindAsVertexBuffer(uint32_t binding, uint64_t offsetInBytes) const;
 
     void bindAsIndexBuffer(uint64_t offsetInBytes, vk::IndexType indexType) const;
@@ -88,16 +89,12 @@ protected:
         vk::DeviceMemory memory = nullptr;
     };
     BufferAndMemory createBufferAndMemory(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
-    void copyBetweenBuffers(const vk::Buffer& src, const vk::Buffer& dst, const vk::BufferCopy& copyInfo) const;
-
 
     vk::DeviceMemory m_memory{};
     vk::Buffer m_buffer{};
 
     static inline const vk::PhysicalDevice* s_physicalDevice = nullptr;
     static inline const vk::Device* s_device = nullptr;
-    static inline const vk::Queue* s_graphicsQueue = nullptr;
-    static inline const vk::CommandPool* s_commandPool = nullptr;
     static inline const vk::CommandBuffer* s_commandBuffer = nullptr;
 };
 

@@ -73,6 +73,7 @@ private:
     std::vector<vk::raii::Framebuffer> m_swapChainFramebuffers;
     vk::raii::CommandPool m_commandPool;
     PerFrameInFlight<vk::raii::CommandBuffer> m_commandBuffers;
+    vk::raii::CommandBuffer m_oneTimeSubmitCommandBuffer;
     vk::raii::PipelineCache m_pipelineCache;
     vk::raii::DescriptorPool m_descriptorPool;
     PerFrameInFlight<vk::raii::Semaphore> m_imageAvailableSems;

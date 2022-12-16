@@ -6,6 +6,7 @@ add_subdirectory(textures)
 add_subdirectory(vertices)
 
 target_sources(RealEngine PRIVATE
+    CommandBuffer.hpp           CommandBuffer.cpp
     DescriptorSet.hpp           DescriptorSet.cpp
     PerFrameInFlight.hpp        PerFrameInFlight.cpp
     Pipeline.hpp                Pipeline.cpp

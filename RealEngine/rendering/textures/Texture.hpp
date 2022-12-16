@@ -172,14 +172,12 @@ private:
 
     Color m_borderColor{};      /**< Border color of the texture */
 
-    void transitionImageLayout(vk::CommandBuffer& commandBuffer, vk::ImageLayout oldLayout, vk::ImageLayout newLayout);
+    void transitionImageLayout(const vk::CommandBuffer& commandBuffer, vk::ImageLayout oldLayout, vk::ImageLayout newLayout);
 
     //Static members \|/
 
     static inline const vk::PhysicalDevice* s_physicalDevice = nullptr;
     static inline const vk::Device* s_device = nullptr;
-    static inline const vk::Queue* s_graphicsQueue = nullptr;
-    static inline const vk::CommandPool* s_commandPool = nullptr;
     static inline const vk::CommandBuffer* s_commandBuffer = nullptr;
 
     static uint32_t selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);

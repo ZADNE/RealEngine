@@ -8,6 +8,7 @@
 #include <RealEngine/utility/Error.hpp>
 
 #include <RealEngine/rendering/buffers/Buffer.hpp>
+#include <RealEngine/rendering/CommandBuffer.hpp>
 
 namespace RE {
 
@@ -149,11 +150,8 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
     });
     s_device->bindImageMemory(m_image, m_deviceMemory, 0u);
     //Copy data from staging buffer to the image
-    auto commandBuffer = s_device->allocateCommandBuffers({
-        *s_commandPool, vk::CommandBufferLevel::ePrimary, 1u
-    }).front();
-    commandBuffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-    transitionImageLayout(commandBuffer, eUndefined, eTransferDstOptimal);
+    CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
+        transitionImageLayout(commandBuffer, eUndefined, eTransferDstOptimal);
     commandBuffer.copyBufferToImage(
         stagingBuffer.m_buffer,
         m_image,
@@ -171,10 +169,7 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
         }
     );
     transitionImageLayout(commandBuffer, eTransferDstOptimal, eReadOnlyOptimal);
-    commandBuffer.end();
-    s_graphicsQueue->submit(vk::SubmitInfo{nullptr, {}, commandBuffer});
-    s_graphicsQueue->waitIdle();
-    s_device->freeCommandBuffers(*s_commandPool, commandBuffer);
+    });
     //Create image view
     m_imageView = s_device->createImageView(vk::ImageViewCreateInfo{{},
         m_image,
@@ -193,7 +188,7 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
     m_sampler = s_device->createSampler(vk::SamplerCreateInfo{});
 }
 
-void Texture::transitionImageLayout(vk::CommandBuffer& commandBuffer, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
+void Texture::transitionImageLayout(const vk::CommandBuffer& commandBuffer, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
     vk::PipelineStageFlags sourceStage;
     vk::PipelineStageFlags destStage;
     vk::AccessFlags sourceAccess;
