@@ -27,11 +27,14 @@ public:
         s_oneTimeSubmitCommandBuffer->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
         op(*s_oneTimeSubmitCommandBuffer);
         s_oneTimeSubmitCommandBuffer->end();
-        s_graphicsQueue->submit(vk::SubmitInfo{nullptr, {}, *s_oneTimeSubmitCommandBuffer});
-        s_device->waitIdle();//TODO expensive operation, use fence instead
+        s_graphicsQueue->submit(vk::SubmitInfo{{}, {}, *s_oneTimeSubmitCommandBuffer});
+        s_device->waitIdle();//TODO expensive operation, use fence/semaphore instead
     }
 
+    void submitToGraphicsQueue() const;
+
     const vk::CommandBuffer& operator*() { return m_commandBuffer; }
+    const vk::CommandBuffer* operator->() { return &m_commandBuffer; }
 
 private:
 

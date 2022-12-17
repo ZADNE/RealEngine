@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/Pipeline.hpp>
+#include <RealEngine/rendering/pipelines/Pipeline.hpp>
 
 #include <spirv_glsl.hpp>
 
@@ -24,6 +24,7 @@ Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::P
     std::array<vk::ShaderModule, 6> modules;
     std::array<vk::PipelineShaderStageCreateInfo, 6> stages;
     std::vector<vk::DescriptorSetLayoutBinding> dslbs;
+    std::vector<vk::PushConstantRange> ranges;
     uint32_t shaderCount = 0;
     for (size_t st = 0; st < PipelineSources::NUM_STAGES; ++st) {
         if (!srcs[st].vk13.empty()) {
@@ -38,7 +39,7 @@ Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::P
                 modules[shaderCount],
                 "main"
             };
-            reflect(srcs[st], convert(st), dslbs);
+            reflect(srcs[st], convert(st), dslbs, ranges);
             shaderCount++;
         }
     }
@@ -83,7 +84,7 @@ Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::P
     });
     vk::PipelineDynamicStateCreateInfo dynamic{{}, dynamicStates};
     m_descriptorSetLayout = s_device->createDescriptorSetLayout(vk::DescriptorSetLayoutCreateInfo{{}, dslbs});
-    m_pipelineLayout = s_device->createPipelineLayout(vk::PipelineLayoutCreateInfo{{}, m_descriptorSetLayout});
+    m_pipelineLayout = s_device->createPipelineLayout(vk::PipelineLayoutCreateInfo{{}, m_descriptorSetLayout, ranges});
     //Create pipeline
     vk::GraphicsPipelineCreateInfo createInfo{vk::PipelineCreateFlags{},
         shaderCount, stages.data(),             //Shader modules
@@ -142,23 +143,31 @@ void Pipeline::drawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t
     s_commandBuffer->drawIndexed(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
-void Pipeline::reflect(const ShaderSourceRef& src, vk::ShaderStageFlagBits st, std::vector<vk::DescriptorSetLayoutBinding>& dslbs) const {
+void Pipeline::reflect(const ShaderSourceRef& src, vk::ShaderStageFlagBits st, std::vector<vk::DescriptorSetLayoutBinding>& dslbs, std::vector<vk::PushConstantRange>& ranges) const {
     auto compiler = spirv_cross::Compiler{src.vk13.data(), src.vk13.size()};
     auto resources = compiler.get_shader_resources();
-    for (const auto& ub : resources.uniform_buffers) {
+    for (const auto& res : resources.uniform_buffers) {
         dslbs.emplace_back(
-            compiler.get_decoration(ub.id, spv::DecorationBinding), //Binding
+            compiler.get_decoration(res.id, spv::DecorationBinding),//Binding
             vk::DescriptorType::eUniformBuffer,                     //Type
             1,                                                      //Count
             st                                                      //Stages
         );
     }
-    for (const auto& ub : resources.sampled_images) {
+    for (const auto& res : resources.sampled_images) {
         dslbs.emplace_back(
-            compiler.get_decoration(ub.id, spv::DecorationBinding), //Binding
+            compiler.get_decoration(res.id, spv::DecorationBinding),//Binding
             vk::DescriptorType::eCombinedImageSampler,              //Type
             1,                                                      //Count
             st                                                      //Stages
+        );
+    }
+    for (const auto& res : resources.push_constant_buffers) {
+        auto type = compiler.get_type(res.base_type_id);
+        ranges.emplace_back(
+            st,                                                     //Stages
+            0u,                                                     //Offset
+            compiler.get_declared_struct_size(type)                 //Size
         );
     }
 }

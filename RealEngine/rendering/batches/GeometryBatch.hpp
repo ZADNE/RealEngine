@@ -4,10 +4,9 @@
 #pragma once
 #include <vector>
 
-#include <RealEngine/rendering/batches/Circle.hpp>
-#include <RealEngine/rendering/Pipeline.hpp>
+#include <RealEngine/rendering/pipelines/Pipeline.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
-#include <RealEngine/rendering/vertices/Vertex.hpp>
+#include <RealEngine/rendering/pipelines/Vertex.hpp>
 #include <RealEngine/rendering/DescriptorSet.hpp>
 
 namespace RE {

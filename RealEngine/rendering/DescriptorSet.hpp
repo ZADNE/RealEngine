@@ -4,7 +4,7 @@
 #pragma once
 #include <vulkan/vulkan.hpp>
 
-#include <RealEngine/rendering/Pipeline.hpp>
+#include <RealEngine/rendering/pipelines/Pipeline.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 

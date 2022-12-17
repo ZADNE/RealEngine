@@ -153,6 +153,8 @@ public:
     */
     bool saveToFile(const std::string& filePathPNG, const TextureParameters& params);
 
+    const vk::Image& image() const { return m_image; }
+
 private:
 
     void init(const Raster& raster, const TextureParameters& params);

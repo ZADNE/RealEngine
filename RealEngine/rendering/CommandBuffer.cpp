@@ -24,4 +24,9 @@ CommandBuffer::~CommandBuffer() {
     s_device->freeCommandBuffers(*s_commandPool, m_commandBuffer);
 }
 
+void CommandBuffer::submitToGraphicsQueue() const {
+    s_graphicsQueue->submit(vk::SubmitInfo{{}, {}, m_commandBuffer});
+    s_device->waitIdle();//TODO
+}
+
 }

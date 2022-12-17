@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -9,7 +9,7 @@
 
 #include <RealEngine/rendering/textures/TextureGeometry.hpp>
 #include <RealEngine/rendering/textures/TextureFlags.hpp>
-#include <RealEngine/rendering/vertices/Vertex.hpp>
+#include <RealEngine/rendering/pipelines/Vertex.hpp>
 
 namespace RE {
 
@@ -48,7 +48,7 @@ public:
     * @param flags Flags of the parameters
     */
     constexpr TextureParameters(const TextureGeometry& geometry, TextureFlags flags) :
-        TextureParameters(geometry, flags, { 0u, 0u, 0u, 255u }) {}
+        TextureParameters(geometry, flags, {0u, 0u, 0u, 255u}) {}
 
     /**
     * @brief Constructs parameters with flags only.

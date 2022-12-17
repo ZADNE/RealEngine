@@ -14,7 +14,7 @@
 #include <RealEngine/window/WindowSubsystems.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/DescriptorSet.hpp>
-#include <RealEngine/rendering/Pipeline.hpp>
+#include <RealEngine/rendering/pipelines/Pipeline.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/rendering/CommandBuffer.hpp>
 
