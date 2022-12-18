@@ -60,10 +60,12 @@ private:
 #endif // !NDEBUG
     vk::raii::SurfaceKHR m_surface;
     uint32_t m_graphicsQueueFamilyIndex;
+    uint32_t m_computeQueueFamilyIndex;
     uint32_t m_presentationQueueFamilyIndex;
     vk::raii::PhysicalDevice m_physicalDevice;
     vk::raii::Device m_device;
     vk::raii::Queue m_graphicsQueue;
+    vk::raii::Queue m_computeQueue;
     vk::raii::Queue m_presentationQueue;
     uint32_t m_minImageCount;
     vk::Extent2D m_swapchainExtent;

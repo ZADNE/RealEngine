@@ -32,6 +32,7 @@ public:
     }
 
     void submitToGraphicsQueue() const;
+    void submitToComputeQueue() const;
 
     const vk::CommandBuffer& operator*() { return m_commandBuffer; }
     const vk::CommandBuffer* operator->() { return &m_commandBuffer; }
@@ -43,6 +44,7 @@ private:
     static inline const vk::Device* s_device = nullptr;
     static inline const vk::CommandPool* s_commandPool = nullptr;
     static inline const vk::Queue* s_graphicsQueue = nullptr;
+    static inline const vk::Queue* s_computeQueue = nullptr;
     static inline const vk::CommandBuffer* s_oneTimeSubmitCommandBuffer = nullptr;
 };
 

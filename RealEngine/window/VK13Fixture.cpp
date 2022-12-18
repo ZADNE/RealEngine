@@ -57,6 +57,7 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
     m_physicalDevice(createPhysicalDevice()),
     m_device(createDevice()),
     m_graphicsQueue(createQueue(m_graphicsQueueFamilyIndex)),
+    m_computeQueue(createQueue(m_computeQueueFamilyIndex)),
     m_presentationQueue(createQueue(m_presentationQueueFamilyIndex)),
     m_swapchain(createSwapchain()),
     m_swapchainImageViews(createSwapchainImageViews()),
@@ -288,6 +289,9 @@ vk::raii::Device VK13Fixture::createDevice() {
     if (m_graphicsQueueFamilyIndex != m_presentationQueueFamilyIndex) {
         deviceQueueCreateInfos.emplace_back(vk::DeviceQueueCreateFlags{}, m_presentationQueueFamilyIndex, 1, &deviceQueuePriority);
     }
+    if (m_graphicsQueueFamilyIndex != m_computeQueueFamilyIndex) {
+        deviceQueueCreateInfos.emplace_back(vk::DeviceQueueCreateFlags{}, m_computeQueueFamilyIndex, 1, &deviceQueuePriority);
+    }
     vk::PhysicalDeviceUniformBufferStandardLayoutFeatures std430UniformBuffers{true};
     return vk::raii::Device{m_physicalDevice, {{}, deviceQueueCreateInfos, {}, DEVICE_EXTENSIONS, {}, &std430UniformBuffers}};
 }
@@ -486,6 +490,7 @@ bool VK13Fixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physicalD
 
 bool VK13Fixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice) {
     bool graphicsQueueFound = false;
+    bool computeQueueFound = false;
     bool presentQueueFound = false;
     std::vector<vk::QueueFamilyProperties> queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
     for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size()); i++) {//Iterate over all queue families
@@ -493,11 +498,15 @@ bool VK13Fixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physica
             m_graphicsQueueFamilyIndex = i;
             graphicsQueueFound = true;
         }
+        if (queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eCompute) {
+            m_computeQueueFamilyIndex = i;
+            computeQueueFound = true;
+        }
         if (physicalDevice.getSurfaceSupportKHR(i, *m_surface)) {
             m_presentationQueueFamilyIndex = i;
             presentQueueFound = true;
         }
-        if (graphicsQueueFound && presentQueueFound) {
+        if (graphicsQueueFound && computeQueueFound && presentQueueFound) {
             return true;
         }
     }
@@ -527,6 +536,7 @@ void VK13Fixture::assignImplementationReferences() {
     Buffer::s_physicalDevice = Texture::s_physicalDevice = &(*m_physicalDevice);
     Buffer::s_device = CommandBuffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = &(*m_device);
     CommandBuffer::s_graphicsQueue = &(*m_graphicsQueue);
+    CommandBuffer::s_computeQueue = &(*m_computeQueue);
     CommandBuffer::s_commandPool = &(*m_commandPool);
     DescriptorSet::s_descriptorPool = &(*m_descriptorPool);
     Pipeline::s_pipelineCache = &(*m_pipelineCache);
@@ -538,6 +548,7 @@ void VK13Fixture::clearImplementationReferences() {
     Buffer::s_physicalDevice = Texture::s_physicalDevice = nullptr;
     Buffer::s_device = CommandBuffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = nullptr;
     CommandBuffer::s_graphicsQueue = nullptr;
+    CommandBuffer::s_computeQueue = nullptr;
     CommandBuffer::s_commandPool = nullptr;
     DescriptorSet::s_descriptorPool = nullptr;
     Pipeline::s_pipelineCache = nullptr;

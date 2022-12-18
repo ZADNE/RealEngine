@@ -37,6 +37,7 @@ public:
     void draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const;
     void drawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance) const;
 
+    const vk::Pipeline& pipeline() const { return m_pipeline; }
     const vk::PipelineLayout& pipelineLayout() const { return m_pipelineLayout; }
 
 private:

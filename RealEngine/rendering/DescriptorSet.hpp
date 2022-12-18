@@ -29,6 +29,8 @@ public:
 
     void bind(vk::PipelineBindPoint bindPoint, const Pipeline& pl) const;
 
+    const vk::DescriptorSet& descriptorSet() const { return m_descriptorSet; }
+
 private:
 
     vk::DescriptorSet m_descriptorSet{};

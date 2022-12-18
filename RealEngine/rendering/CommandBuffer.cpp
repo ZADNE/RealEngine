@@ -29,4 +29,9 @@ void CommandBuffer::submitToGraphicsQueue() const {
     s_device->waitIdle();//TODO
 }
 
+void CommandBuffer::submitToComputeQueue() const {
+    s_computeQueue->submit(vk::SubmitInfo{{}, {}, m_commandBuffer});
+    s_device->waitIdle();//TODO
+}
+
 }
