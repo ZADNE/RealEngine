@@ -14,7 +14,15 @@ class Pipeline {
     friend class DescriptorSet;
 public:
 
+    /**
+     * @brief Constructs graphics pipeline
+    */
     Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& srcs);
+
+    /**
+     * @brief Constructs compute pipeline
+    */
+    Pipeline(const ShaderSourceRef& compute);
 
     Pipeline(const Pipeline&) = delete;
     Pipeline(Pipeline&& other) noexcept;

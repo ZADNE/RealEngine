@@ -116,19 +116,6 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
     m_flags = TextureFlags{params};
     m_trueDims = raster.getDims();
     m_borderColor = params.getBorderColor();
-    //Create a staging buffer
-    vk::DeviceSize nBytes = m_trueDims.x * m_trueDims.y * 4u;
-    Buffer stagingBuffer{
-        nBytes,
-        vk::BufferUsageFlagBits::eTransferSrc,
-        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
-    };
-    //Copy texels to the staging buffer
-    {
-        auto* mapped = stagingBuffer.map<unsigned char>(0u, nBytes);
-        std::memcpy(mapped, raster.getTexels().data(), nBytes);
-        stagingBuffer.unmap();
-    }
     //Create the image
     using enum vk::ImageUsageFlagBits;
     m_image = s_device->createImage(vk::ImageCreateInfo{{},
@@ -149,6 +136,42 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
         selectMemoryType(memReq.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
     });
     s_device->bindImageMemory(m_image, m_deviceMemory, 0u);
+    //Initialize texels of the image
+    if (raster.getTexels().data()) {
+        initializeTexels(raster);
+    }
+    //Create image view
+    m_imageView = s_device->createImageView(vk::ImageViewCreateInfo{{},
+        m_image,
+        vk::ImageViewType::e2D,
+        vk::Format::eR8G8B8A8Unorm,
+        vk::ComponentMapping{},                         //Component mapping (= identity)
+        vk::ImageSubresourceRange{
+            vk::ImageAspectFlagBits::eColor,
+            0u,                                         //Mip level
+            1u,                                         //Mip level count
+            0u,                                         //Base array layer
+            1u                                          //Array layer count
+        }
+    });
+    //Create sampler
+    m_sampler = s_device->createSampler(vk::SamplerCreateInfo{});
+}
+
+void Texture::initializeTexels(const Raster& raster) {
+    //Create a staging buffer
+    vk::DeviceSize nBytes = m_trueDims.x * m_trueDims.y * 4u;
+    Buffer stagingBuffer{
+        nBytes,
+        vk::BufferUsageFlagBits::eTransferSrc,
+        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
+    };
+    //Copy texels to the staging buffer
+    {
+        auto* mapped = stagingBuffer.map<unsigned char>(0u, nBytes);
+        std::memcpy(mapped, raster.getTexels().data(), nBytes);
+        stagingBuffer.unmap();
+    }
     //Copy data from staging buffer to the image
     CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
         transitionImageLayout(commandBuffer, eUndefined, eTransferDstOptimal);
@@ -170,22 +193,6 @@ void Texture::init(const Raster& raster, const TextureParameters& params) {
     );
     transitionImageLayout(commandBuffer, eTransferDstOptimal, eReadOnlyOptimal);
     });
-    //Create image view
-    m_imageView = s_device->createImageView(vk::ImageViewCreateInfo{{},
-        m_image,
-        vk::ImageViewType::e2D,
-        vk::Format::eR8G8B8A8Unorm,
-        vk::ComponentMapping{},                         //Component mapping (= identity)
-        vk::ImageSubresourceRange{
-            vk::ImageAspectFlagBits::eColor,
-            0u,                                         //Mip level
-            1u,                                         //Mip level count
-            0u,                                         //Base array layer
-            1u                                          //Array layer count
-        }
-    });
-    //Create sampler
-    m_sampler = s_device->createSampler(vk::SamplerCreateInfo{});
 }
 
 void Texture::transitionImageLayout(const vk::CommandBuffer& commandBuffer, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {

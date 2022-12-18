@@ -16,7 +16,7 @@ using enum vk::BufferUsageFlagBits;
 
 constexpr auto HOST_MEM = eHostVisible | eHostCoherent;
 
-Buffer::Buffer(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data/* = nullptr*/) {
+Buffer::Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data/* = nullptr*/) {
     BufferAndMemory main{};
     if (data && (memProperty & HOST_MEM) != HOST_MEM) {//If initial data are provided or stage is requested
         auto stage = createBufferAndMemory(sizeInBytes, eTransferSrc, HOST_MEM);
@@ -84,7 +84,7 @@ uint32_t Buffer::selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags p
     throw Exception{"Could not find memory that suits the buffer!"};
 }
 
-Buffer::BufferAndMemory Buffer::createBufferAndMemory(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const {
+Buffer::BufferAndMemory Buffer::createBufferAndMemory(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const {
     vk::BufferCreateInfo createInfo{{},
         sizeInBytes,
         usage,
@@ -93,7 +93,7 @@ Buffer::BufferAndMemory Buffer::createBufferAndMemory(size_t sizeInBytes, vk::Bu
     auto buffer = s_device->createBuffer(createInfo);
     auto memReq = s_device->getBufferMemoryRequirements2({buffer}).memoryRequirements;
     auto memory = s_device->allocateMemory({
-        std::max(sizeInBytes, memReq.alignment),
+        memReq.size,
         selectMemoryType(memReq.memoryTypeBits, properties)
         });
     s_device->bindBufferMemory2(vk::BindBufferMemoryInfo{buffer, memory, 0u});

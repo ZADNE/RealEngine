@@ -34,7 +34,7 @@ struct ShaderSourceRef {
 */
 struct PipelineSources {
 
-    static constexpr size_t NUM_STAGES = 6;
+    static constexpr size_t NUM_STAGES = 5;
 
     ShaderSourceRef operator[](size_t type) const {
         switch (type) {
@@ -43,7 +43,7 @@ struct PipelineSources {
         case 2: return tese;
         case 3: return geom;
         case 4: return frag;
-        case 5: return comp;
+            //case 5: return comp;
         default: throw Exception{"Tried to access invalid shader type"};
         }
     }
@@ -56,7 +56,7 @@ struct PipelineSources {
         case eTessellationEvaluation: return tese;
         case eGeometry: return geom;
         case eFragment: return frag;
-        case eCompute: return comp;
+            //case eCompute: return comp;
         default: throw Exception{"Tried to access invalid shader type"};
         }
     }
@@ -66,7 +66,7 @@ struct PipelineSources {
     ShaderSourceRef tese{};/**< Tesselation evaluation stage of the program */
     ShaderSourceRef geom{};/**< Geometry shader stage of the program */
     ShaderSourceRef frag{};/**< Fragment shader stage of the program */
-    ShaderSourceRef comp{};/**< Copute shader stage of the program */
+    //ShaderSourceRef comp{};/**< Copute shader stage of the program */
 };
 
 }

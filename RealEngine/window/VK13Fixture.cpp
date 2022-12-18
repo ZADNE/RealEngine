@@ -36,7 +36,8 @@ void checkSuccessImGui(VkResult res) { checkSuccess(vk::Result{res}); }
 namespace RE {
 
 constexpr std::array DEVICE_EXTENSIONS = {
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME
 };
 
 constexpr vk::SurfaceFormatKHR SURFACE_FORMAT{
@@ -287,7 +288,8 @@ vk::raii::Device VK13Fixture::createDevice() {
     if (m_graphicsQueueFamilyIndex != m_presentationQueueFamilyIndex) {
         deviceQueueCreateInfos.emplace_back(vk::DeviceQueueCreateFlags{}, m_presentationQueueFamilyIndex, 1, &deviceQueuePriority);
     }
-    return vk::raii::Device{m_physicalDevice, vk::DeviceCreateInfo{vk::DeviceCreateFlags{}, deviceQueueCreateInfos, {}, DEVICE_EXTENSIONS}};
+    vk::PhysicalDeviceUniformBufferStandardLayoutFeatures std430UniformBuffers{true};
+    return vk::raii::Device{m_physicalDevice, {{}, deviceQueueCreateInfos, {}, DEVICE_EXTENSIONS, {}, &std430UniformBuffers}};
 }
 
 vk::raii::Queue VK13Fixture::createQueue(uint32_t familyIndex) {
@@ -447,7 +449,10 @@ vk::raii::DescriptorPool VK13Fixture::createDescriptorPool() {
 }
 
 VkBool32 VK13Fixture::debugMessengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT sev, VkDebugUtilsMessageTypeFlagsEXT type, const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData) {
-    std::cerr << callbackData->pMessage << '\n';
+    if (sev != VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT && strcmp(callbackData->pMessageIdName, "Loader Message") != 0) {
+        std::cerr << callbackData->pMessage << '\n';
+        int stop = 5;
+    }
     return false;
 }
 
@@ -520,8 +525,9 @@ void VK13Fixture::recreateImGuiFontTexture() {
 
 void VK13Fixture::assignImplementationReferences() {
     Buffer::s_physicalDevice = Texture::s_physicalDevice = &(*m_physicalDevice);
-    Buffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = &(*m_device);
+    Buffer::s_device = CommandBuffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = &(*m_device);
     CommandBuffer::s_graphicsQueue = &(*m_graphicsQueue);
+    CommandBuffer::s_commandPool = &(*m_commandPool);
     DescriptorSet::s_descriptorPool = &(*m_descriptorPool);
     Pipeline::s_pipelineCache = &(*m_pipelineCache);
     Pipeline::s_renderPass = &(*m_renderPass);
@@ -530,8 +536,9 @@ void VK13Fixture::assignImplementationReferences() {
 
 void VK13Fixture::clearImplementationReferences() {
     Buffer::s_physicalDevice = Texture::s_physicalDevice = nullptr;
-    Buffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = nullptr;
+    Buffer::s_device = CommandBuffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = nullptr;
     CommandBuffer::s_graphicsQueue = nullptr;
+    CommandBuffer::s_commandPool = nullptr;
     DescriptorSet::s_descriptorPool = nullptr;
     Pipeline::s_pipelineCache = nullptr;
     Pipeline::s_renderPass = nullptr;

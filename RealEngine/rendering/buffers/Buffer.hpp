@@ -3,6 +3,7 @@
  */
 #pragma once
 #include <vector>
+#include <type_traits>
 
 #include <vulkan/vulkan.hpp>
 
@@ -25,27 +26,11 @@ public:
      * @param data  If a valid pointer is provided, it is used to initialize the contents of the buffer.
      *              If the nullptr is provided, the contents of the buffer are undefined.
     */
-    Buffer(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data = nullptr);
+    Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data = nullptr);
 
-    /**
-     * @brief Contruct buffer as a storage for given type
-     * @tparam T The type that the buffer will store (used to determine buffer's size)
-     * @param usage Restrict usage of the buffer
-     * @param data The instance of the type that the buffer will be initialized with
-    */
-    template<typename T>
-    Buffer(vk::BufferUsageFlags usage, const T& data) :
-        Buffer(sizeof(T), usage, &data) {}
-
-    /**
-     * @brief Contructs buffer as an array
-     * @tparam T Element type of the array
-     * @param usage Restrict usage of the buffer
-     * @param data Array (provided as a vector) that determines the size and initial contents of the buffer
-    */
-    template<typename T>
-    Buffer(vk::BufferUsageFlags usage, const std::vector<T>& data) :
-        Buffer(data.size() * sizeof(T), usage, data.data()) {}
+    template<typename T, typename = std::enable_if_t<!std::is_pointer_v<T>>>
+    Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const T& data) :
+        Buffer(sizeInBytes, usage, memProperty, &data) {}
 
     Buffer(const Buffer&) = delete;
     Buffer(Buffer&& other) noexcept;
@@ -88,7 +73,7 @@ protected:
         vk::Buffer buffer = nullptr;
         vk::DeviceMemory memory = nullptr;
     };
-    BufferAndMemory createBufferAndMemory(size_t sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
+    BufferAndMemory createBufferAndMemory(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
 
     vk::DeviceMemory m_memory{};
     vk::Buffer m_buffer{};

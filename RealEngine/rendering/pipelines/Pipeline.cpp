@@ -21,20 +21,18 @@ static vk::ShaderStageFlagBits convert(size_t st) {
 
 Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& srcs) {
     //Create shader modules
-    std::array<vk::ShaderModule, 6> modules;
-    std::array<vk::PipelineShaderStageCreateInfo, 6> stages;
+    std::array<vk::ShaderModule, PipelineSources::NUM_STAGES> modules;
+    std::array<vk::PipelineShaderStageCreateInfo, PipelineSources::NUM_STAGES> stages;
     std::vector<vk::DescriptorSetLayoutBinding> dslbs;
     std::vector<vk::PushConstantRange> ranges;
     uint32_t shaderCount = 0;
     for (size_t st = 0; st < PipelineSources::NUM_STAGES; ++st) {
         if (!srcs[st].vk13.empty()) {
-            modules[shaderCount] = s_device->createShaderModule({
-                vk::ShaderModuleCreateFlags{},
+            modules[shaderCount] = s_device->createShaderModule({{},
                 srcs[st].vk13.size() * 4,
                 srcs[st].vk13.data()}
             );
-            stages[shaderCount] = vk::PipelineShaderStageCreateInfo{
-                vk::PipelineShaderStageCreateFlags{},
+            stages[shaderCount] = vk::PipelineShaderStageCreateInfo{{},
                 convert(st),
                 modules[shaderCount],
                 "main"
@@ -83,7 +81,9 @@ Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::P
         vk::DynamicState::eScissor
     });
     vk::PipelineDynamicStateCreateInfo dynamic{{}, dynamicStates};
+    //Create descriptor set
     m_descriptorSetLayout = s_device->createDescriptorSetLayout(vk::DescriptorSetLayoutCreateInfo{{}, dslbs});
+    //Create pipeline layout
     m_pipelineLayout = s_device->createPipelineLayout(vk::PipelineLayoutCreateInfo{{}, m_descriptorSetLayout, ranges});
     //Create pipeline
     vk::GraphicsPipelineCreateInfo createInfo{vk::PipelineCreateFlags{},
@@ -107,6 +107,36 @@ Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::P
     for (uint32_t i = 0; i < shaderCount; i++) {
         s_device->destroyShaderModule(modules[i]);
     }
+}
+
+Pipeline::Pipeline(const ShaderSourceRef& compute) {
+    //Create compute shader module
+    vk::ShaderModule compShader = s_device->createShaderModule(
+        vk::ShaderModuleCreateInfo{{},
+            compute.vk13.size() * 4,
+            compute.vk13.data()
+        }
+    );
+    std::vector<vk::DescriptorSetLayoutBinding> dslbs;
+    std::vector<vk::PushConstantRange> ranges;
+    reflect(compute, vk::ShaderStageFlagBits::eCompute, dslbs, ranges);
+    //Create descriptor set
+    m_descriptorSetLayout = s_device->createDescriptorSetLayout(vk::DescriptorSetLayoutCreateInfo{{}, dslbs});
+    //Create pipeline layout
+    m_pipelineLayout = s_device->createPipelineLayout(vk::PipelineLayoutCreateInfo{{}, m_descriptorSetLayout, ranges});
+    //Create pipeline
+    vk::ComputePipelineCreateInfo createInfo{{},
+        vk::PipelineShaderStageCreateInfo{{},
+            vk::ShaderStageFlagBits::eCompute,
+            compShader,
+            "main"
+        },
+        m_pipelineLayout,
+        nullptr, -1                             //No base pipeline
+    };
+    m_pipeline = s_device->createComputePipeline(*s_pipelineCache, createInfo).value;
+    //Destroy compute shader module
+    s_device->destroyShaderModule(compShader);
 }
 
 Pipeline::Pipeline(Pipeline&& other) noexcept :
@@ -145,29 +175,28 @@ void Pipeline::drawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t
 
 void Pipeline::reflect(const ShaderSourceRef& src, vk::ShaderStageFlagBits st, std::vector<vk::DescriptorSetLayoutBinding>& dslbs, std::vector<vk::PushConstantRange>& ranges) const {
     auto compiler = spirv_cross::Compiler{src.vk13.data(), src.vk13.size()};
+    auto reflectResources = [&](const spirv_cross::SmallVector<spirv_cross::Resource>& resources, vk::DescriptorType descType) {
+        for (const auto& res : resources) {
+            const auto& type = compiler.get_type(res.type_id);
+            dslbs.emplace_back(
+                compiler.get_decoration(res.id, spv::DecorationBinding),    //Binding
+                descType,                                                   //Type
+                type.array.empty() ? 1 : type.array[0],                     //Count
+                st                                                          //Stages
+            );
+        }
+    };
     auto resources = compiler.get_shader_resources();
-    for (const auto& res : resources.uniform_buffers) {
-        dslbs.emplace_back(
-            compiler.get_decoration(res.id, spv::DecorationBinding),//Binding
-            vk::DescriptorType::eUniformBuffer,                     //Type
-            1,                                                      //Count
-            st                                                      //Stages
-        );
-    }
-    for (const auto& res : resources.sampled_images) {
-        dslbs.emplace_back(
-            compiler.get_decoration(res.id, spv::DecorationBinding),//Binding
-            vk::DescriptorType::eCombinedImageSampler,              //Type
-            1,                                                      //Count
-            st                                                      //Stages
-        );
-    }
-    for (const auto& res : resources.push_constant_buffers) {
-        auto type = compiler.get_type(res.base_type_id);
+    reflectResources(resources.uniform_buffers, vk::DescriptorType::eUniformBuffer);
+    reflectResources(resources.storage_buffers, vk::DescriptorType::eStorageBuffer);
+    reflectResources(resources.sampled_images, vk::DescriptorType::eCombinedImageSampler);
+    reflectResources(resources.storage_images, vk::DescriptorType::eStorageImage);
+    for (const auto& res : resources.push_constant_buffers) {               //Push constants
+        const auto& type = compiler.get_type(res.base_type_id);
         ranges.emplace_back(
-            st,                                                     //Stages
-            0u,                                                     //Offset
-            compiler.get_declared_struct_size(type)                 //Size
+            st,                                                             //Stages
+            0u,                                                             //Offset
+            static_cast<uint32_t>(compiler.get_declared_struct_size(type))  //Size
         );
     }
 }

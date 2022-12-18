@@ -137,6 +137,7 @@ public:
     glm::vec2 getSubimageDims() const { return m_subimageDims; }
     glm::vec2 getPivot() const { return m_pivot; }
     glm::vec2 getSubimagesSpritesCount() const { return m_subimagesSpritesCount; }
+    glm::uvec2 getTrueDims() const { return m_trueDims; }
 
     /**
      * @brief Saves level 0 as a PNG file.
@@ -173,6 +174,8 @@ private:
     glm::uvec2 m_trueDims{};    /**< True dimensions of the texture */
 
     Color m_borderColor{};      /**< Border color of the texture */
+
+    void initializeTexels(const Raster& raster);
 
     void transitionImageLayout(const vk::CommandBuffer& commandBuffer, vk::ImageLayout oldLayout, vk::ImageLayout newLayout);
 
