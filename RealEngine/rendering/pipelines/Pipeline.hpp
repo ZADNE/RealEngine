@@ -17,7 +17,7 @@ public:
     /**
      * @brief Constructs graphics pipeline
     */
-    Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& srcs);
+    Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& srcs, uint32_t patchControlPoints = 0);
 
     /**
      * @brief Constructs compute pipeline

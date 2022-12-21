@@ -7,12 +7,13 @@
 
 #include <glm/common.hpp>
 
+#include <RealEngine/rendering/batches/shaders/AllShaders.hpp>
+
+namespace RE {
 
 glm::vec2 rotatePoint(const glm::vec2& point, float radAngle) {
     return glm::vec2(point.x * cos(radAngle) - point.y * sin(radAngle), point.x * sin(radAngle) + point.y * cos(radAngle));
 }
-
-namespace RE {
 
 Glyph::Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color) :
     tex(tex),
@@ -34,8 +35,18 @@ Glyph::Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, in
 
 }
 
-SpriteBatch::SpriteBatch(const PipelineSources& sources) :
-    m_pipeline(createVertexInputStateInfo(), {{}, vk::PrimitiveTopology::eTriangleList, false}, sources) {
+SpriteBatch::SpriteBatch() :
+    m_pipeline(
+        {},
+        {{}, vk::PrimitiveTopology::ePatchList, false},
+        PipelineSources{
+            .vert = sprite_vert,
+            .tesc = sprite_tesc,
+            .tese = sprite_tese,
+            .frag = sprite_frag
+        },
+        1u                          //1 control point per patch
+    ) {
     m_vertices = m_vbo.map<VertexPOCOUV>(0u, sizeof(VertexPOCOUV) * 512);
 }
 

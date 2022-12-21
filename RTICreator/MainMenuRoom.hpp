@@ -12,7 +12,7 @@
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/cameras/View2D.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
-#include <RealEngine/rendering/basic_shaders/AllShaders.hpp>
+#include <RealEngine/rendering/batches/shaders/AllShaders.hpp>
 
  /**
   * @brief Room with the UI
@@ -36,7 +36,7 @@ private:
     void save(const std::string& loc);
     void load(const std::string& filePath);
 
-    RE::SpriteBatch m_sb{{.vert = RE::sprite_vert, .frag = RE::sprite_frag}};
+    RE::SpriteBatch m_sb{};
     RE::GeometryBatch m_gb{{{}, vk::PrimitiveTopology::eLineList, false}, {.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
 
     //Texture

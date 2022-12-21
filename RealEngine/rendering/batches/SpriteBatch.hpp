@@ -51,10 +51,9 @@ class SpriteBatch {
 public:
 
     /**
-     * @brief Constructs new SpriteBatch that will draw with given shaders
-     * @details The pipeline created from the shaders is stored inside the sprite batch.
+     * @brief Constructs SpriteBatch
     */
-    SpriteBatch(const PipelineSources& sources);
+    SpriteBatch();
 
     void begin();
     void end(GlyphSortType sortType);

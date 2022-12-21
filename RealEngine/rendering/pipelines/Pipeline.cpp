@@ -19,7 +19,7 @@ static vk::ShaderStageFlagBits convert(size_t st) {
     }
 }
 
-Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& srcs) {
+Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& srcs, uint32_t patchControlPoints/* = 0*/) {
     //Create shader modules
     std::array<vk::ShaderModule, PipelineSources::NUM_STAGES> modules;
     std::array<vk::PipelineShaderStageCreateInfo, PipelineSources::NUM_STAGES> stages;
@@ -41,6 +41,9 @@ Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::P
             shaderCount++;
         }
     }
+    vk::PipelineTessellationStateCreateInfo tessellation{{},
+        patchControlPoints,
+    };
     vk::PipelineViewportStateCreateInfo viewport{{},
         nullptr,                                //Viewport
         nullptr                                 //Scissor
@@ -90,7 +93,7 @@ Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::P
         shaderCount, stages.data(),             //Shader modules
         &vi,
         &ia,
-        nullptr,                                //Tesselation
+        &tessellation,                          //Tesselation
         &viewport,
         &rasterization,
         &multisample,

@@ -1,4 +1,6 @@
-﻿target_sources(RealEngine PRIVATE
+﻿add_subdirectory(shaders)
+
+target_sources(RealEngine PRIVATE
     GeometryBatch.hpp           GeometryBatch.cpp
     Sprite.hpp                  Sprite.cpp
     SpriteBatch.hpp             SpriteBatch.cpp

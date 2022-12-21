@@ -36,8 +36,7 @@ void checkSuccessImGui(VkResult res) { checkSuccess(vk::Result{res}); }
 namespace RE {
 
 constexpr std::array DEVICE_EXTENSIONS = {
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-    VK_KHR_UNIFORM_BUFFER_STANDARD_LAYOUT_EXTENSION_NAME
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
 constexpr vk::SurfaceFormatKHR SURFACE_FORMAT{
@@ -292,8 +291,15 @@ vk::raii::Device VK13Fixture::createDevice() {
     if (m_graphicsQueueFamilyIndex != m_computeQueueFamilyIndex) {
         deviceQueueCreateInfos.emplace_back(vk::DeviceQueueCreateFlags{}, m_computeQueueFamilyIndex, 1, &deviceQueuePriority);
     }
-    vk::PhysicalDeviceUniformBufferStandardLayoutFeatures std430UniformBuffers{true};
-    return vk::raii::Device{m_physicalDevice, {{}, deviceQueueCreateInfos, {}, DEVICE_EXTENSIONS, {}, &std430UniformBuffers}};
+    vk::PhysicalDeviceFeatures baseFeatures{};
+    baseFeatures.setTessellationShader(true);
+    auto createInfo = vk::StructureChain{
+        vk::DeviceCreateInfo{{}, deviceQueueCreateInfos, {}, DEVICE_EXTENSIONS, &baseFeatures},
+        vk::PhysicalDeviceUniformBufferStandardLayoutFeatures{true},
+        vk::PhysicalDeviceDescriptorIndexingFeatures{}
+    };
+    createInfo.get<vk::PhysicalDeviceDescriptorIndexingFeatures>().setRuntimeDescriptorArray(true);
+    return vk::raii::Device{m_physicalDevice, createInfo.get<>()};
 }
 
 vk::raii::Queue VK13Fixture::createQueue(uint32_t familyIndex) {

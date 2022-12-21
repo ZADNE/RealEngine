@@ -1,5 +1,4 @@
-﻿add_subdirectory(basic_shaders)
-add_subdirectory(batches)
+﻿add_subdirectory(batches)
 add_subdirectory(buffers)
 add_subdirectory(cameras)
 add_subdirectory(pipelines)
