@@ -33,7 +33,7 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
         }
     }
 
-    assert(m_usedRenderer == RendererID::VULKAN13 || m_usedRenderer == RendererID::OPENGL46);
+    assert(m_usedRenderer != RendererID::ANY);
 }
 
 Window::~Window() {
@@ -77,16 +77,6 @@ void Window::setVSync(bool vSync, bool save) {
     m_flags.vSync = vSync;
     if (m_usedRenderer == RendererID::VULKAN13) {
         m_vk13.changePresentation(m_flags.vSync);
-    } else if (m_usedRenderer == RendererID::OPENGL46) {
-        if (m_flags.vSync) {
-            if (SDL_GL_SetSwapInterval(-1)) {
-                //Cannot use adaptive vSync, use regular vSync
-                log(SDL_GetError());
-                SDL_GL_SetSwapInterval(1);
-            }
-        } else {
-            SDL_GL_SetSwapInterval(0);
-        }
     }
     if (save) this->save();
 }
@@ -125,7 +115,7 @@ void Window::initForVulkan13() {
         goto fail;
     }
 
-    //Create OpenGL 4.6 fixture
+    //Set up Vulkan 1.3 fixture
     try {
         new (&m_vk13) VK13Fixture(m_SDLwindow, (bool)m_flags.vSync);
     }

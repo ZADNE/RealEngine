@@ -7,10 +7,6 @@ include("cmake/RealShaders/RealShaders.cmake")
 #Find/fetch dependencies
     #Vulkan
     find_package(Vulkan REQUIRED COMPONENTS glslc)
-    #OpenGL
-    find_package(OpenGL REQUIRED)
-    #GLEW
-    find_package(GLEW 2.0 REQUIRED)
     #SDL2
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
     find_package(SDL2 REQUIRED)
@@ -31,8 +27,9 @@ include("cmake/RealShaders/RealShaders.cmake")
     )
     target_link_libraries(RealEngine PUBLIC
         ${CMAKE_DL_LIBS}
-        Vulkan::Vulkan spirv-cross-core spirv-cross-reflect
-        OpenGL::GL GLEW::GLEW
+        Vulkan::Vulkan
+        spirv-cross-core
+        spirv-cross-reflect
         SDL2::Main
         glm
         nlohmann_json::nlohmann_json

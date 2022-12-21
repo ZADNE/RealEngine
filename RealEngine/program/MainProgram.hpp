@@ -60,12 +60,9 @@ public:
     static void initialize();
 
     /**
-     * @brief Adds a late-bind Room to the management
+     * @brief Adds a Room to the management
      * @tparam RoomType A class derived from Room that will be instantiated.
      * @return Raw pointer to the created room
-     *
-     * Your room will use the default late-bind renderer which polymorphically
-     * calls the real renderer.
      *
      * Single type of room can be added multiple times, the only requirement is that
      * each room must have unique name.

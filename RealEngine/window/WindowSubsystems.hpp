@@ -36,7 +36,6 @@ constexpr int RE_VERSION = RE_VERSION_MAJOR * 1'000'000 + RE_VERSION_MINOR * 1'0
 */
 enum class RendererID {
     VULKAN13,       /**< Vulkan 1.3 renderer */
-    OPENGL46,       /**< Open Graphics Library 4.6 renderer */
     ANY
 };
 

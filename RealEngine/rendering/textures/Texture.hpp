@@ -7,11 +7,11 @@
 #include <vulkan/vulkan.hpp>
 
 #include <RealEngine/rendering/textures/Raster.hpp>
-#include <RealEngine/rendering/textures/TextureUnit.hpp>
-#include <RealEngine/rendering/textures/ImageUnit.hpp>
 
 
 namespace RE {
+
+class Texture;
 
 /**
  * @brief Holds a non-owning handle to a Texture
@@ -35,15 +35,6 @@ public:
      * Behaviour is undefined if the originating texture was destroyed.
     */
     void bind() const {};
-
-    /**
-     * @brief Binds the texture that this proxy represents to the given texture unit.
-     *
-     * Behaviour is undefined if the originating texture was destroyed.
-     *
-     * @param unit Texture unit to bind the texture to.
-    */
-    void bind(TextureUnit unit) const {};
 
     auto operator<=>(const TextureProxy&) const = default;
 

@@ -14,7 +14,6 @@ namespace RE {
 
 std::string to_string(RendererID r) {
     switch (r) {
-    case RendererID::OPENGL46:      return "OPENGL46";
     case RendererID::VULKAN13:      return "VULKAN13";
     case RendererID::ANY:           return "ANY";
     default:                        return "Unknown renderer";

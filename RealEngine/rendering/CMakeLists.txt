@@ -9,5 +9,4 @@ target_sources(RealEngine PRIVATE
     CommandBuffer.hpp           CommandBuffer.cpp
     DescriptorSet.hpp           DescriptorSet.cpp
     PerFrameInFlight.hpp        PerFrameInFlight.cpp
-    Renderer.hpp                
 )

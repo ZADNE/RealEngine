@@ -29,8 +29,6 @@ WindowSettings::WindowSettings() {
             auto renderStr = renderer->get<std::string>();
             if (renderStr == to_string(RendererID::VULKAN13)) {
                 m_preferredRenderer = RendererID::VULKAN13;
-            } else if (renderStr == to_string(RendererID::OPENGL46)) {
-                m_preferredRenderer = RendererID::OPENGL46;
             } else if (renderStr == to_string(RendererID::ANY)) {
                 m_preferredRenderer = RendererID::ANY;
             } else {

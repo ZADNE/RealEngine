@@ -10,7 +10,7 @@
 namespace RE {
 
 /**
- * @brief Is a Texture that can be shared across late-bind and renderer-specific Rooms
+ * @brief Is a Texture that can be shared across Rooms
 */
 using SharedTexture = std::shared_ptr<Texture>;
 
