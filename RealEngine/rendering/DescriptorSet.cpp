@@ -22,7 +22,7 @@ DescriptorSet& DescriptorSet::operator=(DescriptorSet&& other) noexcept {
 }
 
 DescriptorSet::~DescriptorSet() {
-    //No operation is required, destriptor sets are freed when their pool is freed
+    s_device->freeDescriptorSets(*s_descriptorPool, m_descriptorSet);
 }
 
 void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Buffer& bf, vk::DeviceSize offset, vk::DeviceSize range) {
@@ -45,17 +45,17 @@ void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Buffe
     );
 }
 
-void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Texture& tx) {
+void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex, const Texture& tex) {
     auto imageInfo = vk::DescriptorImageInfo{
-        tx.m_sampler,
-        tx.m_imageView,
+        tex.m_sampler,
+        tex.m_imageView,
         vk::ImageLayout::eShaderReadOnlyOptimal
     };
     s_device->updateDescriptorSets(
         vk::WriteDescriptorSet{
             m_descriptorSet,
             binding,
-            0u,
+            arrayIndex,
             type,
             imageInfo,
             {},
@@ -63,10 +63,6 @@ void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Textu
         },
         {}
     );
-}
-
-void DescriptorSet::bind(vk::PipelineBindPoint bindPoint, const Pipeline& pl) const {
-    s_commandBuffer->bindDescriptorSets(bindPoint, pl.m_pipelineLayout, 0u, m_descriptorSet, {});
 }
 
 }

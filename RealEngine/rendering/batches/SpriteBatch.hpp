@@ -6,6 +6,7 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 
 #include <RealEngine/rendering/pipelines/Pipeline.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
@@ -14,35 +15,6 @@
 #include <RealEngine/rendering/DescriptorSet.hpp>
 
 namespace RE {
-
-enum class GlyphSortType {
-    NONE,
-    NEG_TOP,
-    POS_TOP,
-    TEXTURE
-};
-
-class Glyph {
-public:
-    Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color);
-    Glyph(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, Color color, float radAngle, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));
-
-    TextureProxy tex;
-    int depth;
-
-    VertexPOCOUV topLeft;
-    VertexPOCOUV topRight;
-    VertexPOCOUV botLeft;
-    VertexPOCOUV botRight;
-};
-
-struct DrawBatch {
-    DrawBatch(int offset, unsigned int count, TextureProxy tex) : offset(offset), count(count), tex(tex) {};
-
-    int offset;
-    int count;
-    TextureProxy tex;
-};
 
 /**
  * @brief Draws sprites, surfaces and other textures
@@ -53,13 +25,18 @@ public:
     /**
      * @brief Constructs SpriteBatch
     */
-    SpriteBatch();
+    SpriteBatch(int maxSprites);
 
     void begin();
-    void end(GlyphSortType sortType);
+    void end();
+
+    /**
+     * @brief Draws the batch
+    */
+    void draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat);
 
     //UNCOLORED
-    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy tex, int depth);//Rotated to the right
+    void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, const Texture& tex, int depth);//Rotated to the right
     void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy tex, int depth, float radAngle, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));//Rotated based on the angle
     void add(const glm::vec4& posSizeRectangle, const glm::vec4& uvRectagle, TextureProxy tex, int depth, const glm::vec2& direction, const glm::vec2& origin = glm::vec2(0.0f, 0.0f));//Rotated based on the vector
     //COLORED
@@ -103,42 +80,26 @@ public:
     void addSubimage(const Texture& tex, const glm::vec2& position, int depth, Color color, float radAngle, const glm::vec2& subImg_Spr, const glm::vec2& scale = glm::vec2(1.0f, 1.0f));//Rotated based on the angle
     void addSubimage(const Texture& tex, const glm::vec2& position, int depth, Color color, const glm::vec2& direction, const glm::vec2& subImg_Spr, const glm::vec2& scale);//Rotated based on the vector
 
-    /**
-     * @brief Draws the batch with the stored pipeline
-    */
-    void draw(const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets);
-
-    /**
-     * @brief Draws once with different pipeline  (the pipeline is not stored)
-    */
-    void draw(const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets, const Pipeline& pipeline);
-
-    /**
-     * @brief Changes to a different pipeline that will be used for drawing
-    */
-    void changePipeline(const PipelineSources& sources);
-
-    const Pipeline& getPipeline() const { return m_pipeline; }
+    const Pipeline& pipeline() const { return m_pipeline; }
 
 private:
 
-    void sortGlyphs(GlyphSortType sortType);
-    void createDrawBatches();
-
     using enum vk::BufferUsageFlagBits;
     using enum vk::MemoryPropertyFlagBits;
-    Buffer m_vbo{sizeof(VertexPOCOUV) * 512, eVertexBuffer, eHostVisible | eHostCoherent};
 
-    std::vector<Glyph*> m_glyphPointers;
-    std::vector<Glyph> m_glyphs;
-    std::vector<DrawBatch> m_drawBatches;
-    VertexPOCOUV* m_vertices = nullptr;
-
-    static constexpr bool compareNegToPos(Glyph* a, Glyph* b) { return (a->depth > b->depth); }
-    static constexpr bool comparePosToNeg(Glyph* a, Glyph* b) { return (a->depth < b->depth); }
-    static constexpr bool compareTexture(Glyph* a, Glyph* b) { return (a->tex > b->tex); }
+    struct alignas(16) Sprite {
+        glm::vec4 pos;
+        glm::vec4 uvs;
+        glm::uint tex;
+        RE::Color col;
+    };
+    Buffer m_spritesBuf;
+    Sprite* m_spritesMapped = nullptr;
+    int m_maxSprites;
+    int m_spriteCount = 0;
 
     Pipeline m_pipeline;
+    DescriptorSet m_descSet{m_pipeline};
     vk::PipelineVertexInputStateCreateInfo createVertexInputStateInfo() const;
 
     static inline constexpr glm::vec4 UV_RECT = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);

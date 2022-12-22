@@ -21,7 +21,7 @@ public:
      * @brief Constructs new GeometryBatch
      * @param sources Sources used to construct the shader program that will be used for drawing
     */
-    GeometryBatch(const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& sources);
+    GeometryBatch(vk::PrimitiveTopology topology, const PipelineSources& sources);
 
     void begin();
     void end();
@@ -33,12 +33,7 @@ public:
     */
     void draw(const vk::CommandBuffer& commandBuffer, const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets);
 
-    /**
-     * @brief Changes to a different pipeline that will be used for drawing
-    */
-    void changePipeline(const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& sources);
-
-    const Pipeline& getPipeline() const { return m_pipeline; }
+    const Pipeline& pipeline() const { return m_pipeline; }
 
 private:
     using enum vk::BufferUsageFlagBits;

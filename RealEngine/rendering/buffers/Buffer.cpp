@@ -66,14 +66,6 @@ void Buffer::copyToBuffer(Buffer& dst, const vk::BufferCopy& info) const {
     });
 }
 
-void Buffer::bindAsVertexBuffer(uint32_t binding, uint64_t offsetInBytes) const {
-    s_commandBuffer->bindVertexBuffers(binding, m_buffer, offsetInBytes);
-}
-
-void Buffer::bindAsIndexBuffer(uint64_t offsetInBytes, vk::IndexType indexType) const {
-    s_commandBuffer->bindIndexBuffer(m_buffer, offsetInBytes, indexType);
-}
-
 uint32_t Buffer::selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const {
     auto memProperties = s_physicalDevice->getMemoryProperties2().memoryProperties;
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {

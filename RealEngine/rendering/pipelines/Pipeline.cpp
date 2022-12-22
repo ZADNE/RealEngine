@@ -19,7 +19,7 @@ static vk::ShaderStageFlagBits convert(size_t st) {
     }
 }
 
-Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& srcs, uint32_t patchControlPoints/* = 0*/) {
+Pipeline::Pipeline(const PipelineCreateInfo& createInfo, const PipelineSources& srcs) {
     //Create shader modules
     std::array<vk::ShaderModule, PipelineSources::NUM_STAGES> modules;
     std::array<vk::PipelineShaderStageCreateInfo, PipelineSources::NUM_STAGES> stages;
@@ -41,8 +41,12 @@ Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::P
             shaderCount++;
         }
     }
+    vk::PipelineInputAssemblyStateCreateInfo inputAssembly{{},
+        createInfo.topology,
+        createInfo.enablePrimitiveRestart
+    };
     vk::PipelineTessellationStateCreateInfo tessellation{{},
-        patchControlPoints,
+        createInfo.patchControlPoints
     };
     vk::PipelineViewportStateCreateInfo viewport{{},
         nullptr,                                //Viewport
@@ -85,15 +89,22 @@ Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::P
     });
     vk::PipelineDynamicStateCreateInfo dynamic{{}, dynamicStates};
     //Create descriptor set
-    m_descriptorSetLayout = s_device->createDescriptorSetLayout(vk::DescriptorSetLayoutCreateInfo{{}, dslbs});
+    m_descriptorSetLayout = s_device->createDescriptorSetLayout(vk::StructureChain{
+        vk::DescriptorSetLayoutCreateInfo{{},
+            dslbs
+        },
+        vk::DescriptorSetLayoutBindingFlagsCreateInfo{
+            createInfo.descriptorBindingFlags
+        }
+    }.get<>());
     //Create pipeline layout
     m_pipelineLayout = s_device->createPipelineLayout(vk::PipelineLayoutCreateInfo{{}, m_descriptorSetLayout, ranges});
     //Create pipeline
-    vk::GraphicsPipelineCreateInfo createInfo{vk::PipelineCreateFlags{},
+    m_pipeline = s_device->createGraphicsPipeline(*s_pipelineCache, vk::GraphicsPipelineCreateInfo{{},
         shaderCount, stages.data(),             //Shader modules
-        &vi,
-        &ia,
-        &tessellation,                          //Tesselation
+        &createInfo.vertexInput,
+        &inputAssembly,
+        &tessellation,
         &viewport,
         &rasterization,
         &multisample,
@@ -104,8 +115,7 @@ Pipeline::Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::P
         *s_renderPass,
         0u,                                     //Subpass index
         nullptr, -1                             //No base pipeline
-    };
-    m_pipeline = s_device->createGraphicsPipeline(*s_pipelineCache, createInfo).value;
+    }).value;
     //Destroy shader modules
     for (uint32_t i = 0; i < shaderCount; i++) {
         s_device->destroyShaderModule(modules[i]);
@@ -164,19 +174,12 @@ Pipeline::~Pipeline() {
     s_device->destroyDescriptorSetLayout(m_descriptorSetLayout);
 }
 
-void Pipeline::bind(vk::PipelineBindPoint bindPoint) const {
-    s_commandBuffer->bindPipeline(bindPoint, m_pipeline);
-}
-
-void Pipeline::draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const {
-    s_commandBuffer->draw(vertexCount, instanceCount, firstVertex, firstInstance);
-}
-
-void Pipeline::drawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance) const {
-    s_commandBuffer->drawIndexed(indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
-}
-
-void Pipeline::reflect(const ShaderSourceRef& src, vk::ShaderStageFlagBits st, std::vector<vk::DescriptorSetLayoutBinding>& dslbs, std::vector<vk::PushConstantRange>& ranges) const {
+void Pipeline::reflect(
+    const ShaderSourceRef& src,
+    vk::ShaderStageFlagBits st,
+    std::vector<vk::DescriptorSetLayoutBinding>& dslbs,
+    std::vector<vk::PushConstantRange>& ranges
+) const {
     auto compiler = spirv_cross::Compiler{src.vk13.data(), src.vk13.size()};
     auto reflectResources = [&](const spirv_cross::SmallVector<spirv_cross::Resource>& resources, vk::DescriptorType descType) {
         for (const auto& res : resources) {

@@ -298,7 +298,10 @@ vk::raii::Device VK13Fixture::createDevice() {
         vk::PhysicalDeviceUniformBufferStandardLayoutFeatures{true},
         vk::PhysicalDeviceDescriptorIndexingFeatures{}
     };
-    createInfo.get<vk::PhysicalDeviceDescriptorIndexingFeatures>().setRuntimeDescriptorArray(true);
+    auto& descIndexing = createInfo.get<vk::PhysicalDeviceDescriptorIndexingFeatures>();
+    descIndexing.setShaderSampledImageArrayNonUniformIndexing(true);
+    descIndexing.setDescriptorBindingUpdateUnusedWhilePending(true);
+    descIndexing.setDescriptorBindingPartiallyBound(true);
     return vk::raii::Device{m_physicalDevice, createInfo.get<>()};
 }
 
@@ -356,20 +359,20 @@ vk::raii::RenderPass VK13Fixture::createRenderPass() {
     vk::AttachmentDescription attachmentDescription{{},
         SURFACE_FORMAT.format,
         vk::SampleCountFlagBits::e1,
-        vk::AttachmentLoadOp::eClear,       //Color
-        vk::AttachmentStoreOp::eStore,      //Color
-        vk::AttachmentLoadOp::eDontCare,    //Stencil
-        vk::AttachmentStoreOp::eDontCare,   //Stencil
-        vk::ImageLayout::eUndefined,        //Initial
-        vk::ImageLayout::ePresentSrcKHR     //Final
+        vk::AttachmentLoadOp::eClear,                       //Color
+        vk::AttachmentStoreOp::eStore,                      //Color
+        vk::AttachmentLoadOp::eDontCare,                    //Stencil
+        vk::AttachmentStoreOp::eDontCare,                   //Stencil
+        vk::ImageLayout::eUndefined,                        //Initial
+        vk::ImageLayout::ePresentSrcKHR                     //Final
     };
     vk::AttachmentReference attachmentRef{
         0, vk::ImageLayout::eColorAttachmentOptimal
     };
     vk::SubpassDescription subpassDescription{{},
         vk::PipelineBindPoint::eGraphics,
-        {},                 //Input attachments
-        attachmentRef       //Color attachments
+        {},                                                 //Input attachments
+        attachmentRef                                       //Color attachments
     };
     vk::SubpassDependency subpassDependency{
         VK_SUBPASS_EXTERNAL,                                //Src subpass

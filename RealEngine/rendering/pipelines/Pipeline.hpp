@@ -6,6 +6,14 @@
 
 namespace RE {
 
+struct PipelineCreateInfo {
+    vk::PipelineVertexInputStateCreateInfo vertexInput{};
+    vk::PrimitiveTopology topology = vk::PrimitiveTopology::eTriangleList;
+    bool enablePrimitiveRestart = false;
+    uint32_t patchControlPoints = 0;
+    std::vector<vk::DescriptorBindingFlags> descriptorBindingFlags{};
+};
+
 /**
  * @brief Controls how vertices are rendered to screen.
 */
@@ -17,7 +25,7 @@ public:
     /**
      * @brief Constructs graphics pipeline
     */
-    Pipeline(const vk::PipelineVertexInputStateCreateInfo& vi, const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& srcs, uint32_t patchControlPoints = 0);
+    Pipeline(const PipelineCreateInfo& createInfo, const PipelineSources& srcs);
 
     /**
      * @brief Constructs compute pipeline
@@ -32,17 +40,20 @@ public:
 
     ~Pipeline();
 
-    void bind(vk::PipelineBindPoint bindPoint) const;
-
-    void draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) const;
-    void drawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance) const;
+    const vk::Pipeline& operator*() { return m_pipeline; }
+    const vk::Pipeline* operator->() { return &m_pipeline; }
 
     const vk::Pipeline& pipeline() const { return m_pipeline; }
     const vk::PipelineLayout& pipelineLayout() const { return m_pipelineLayout; }
 
 private:
 
-    void reflect(const ShaderSourceRef& src, vk::ShaderStageFlagBits st, std::vector<vk::DescriptorSetLayoutBinding>& dslbs, std::vector<vk::PushConstantRange>& ranges) const;
+    void reflect(
+        const ShaderSourceRef& src,
+        vk::ShaderStageFlagBits st,
+        std::vector<vk::DescriptorSetLayoutBinding>& dslbs,
+        std::vector<vk::PushConstantRange>& ranges
+    ) const;
 
     vk::DescriptorSetLayout m_descriptorSetLayout{};
     vk::PipelineLayout m_pipelineLayout{};

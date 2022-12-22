@@ -1,20 +1,21 @@
 #version 460
-#include <RealEngine/rendering/batches/shaders/sprite.glsl>
-
 layout(location = 0) out        vec2 o_uvs;
 layout(location = 1) out flat   uint o_tex;
 layout(location = 2) out flat   uint o_col;
 
 layout(quads, equal_spacing) in;
-layout(location = 0) patch in Sprite i_sprite;
+layout(location = 0) patch in   vec4 i_pos;
+layout(location = 1) patch in   vec4 i_uvs;
+layout(location = 2) patch in   uint i_tex;
+layout(location = 3) patch in   uint i_col;
 
 layout(std430, push_constant) uniform PushConstants {
-    mat4 u_projMat;
+    mat4 u_mvpMat;
 };
 
 void main() {
-    gl_Position = u_projMat * vec4(i_sprite.pos.xy + i_sprite.pos.zw * gl_TessCoord.xy, 0.0, 1.0);
-    o_uvs = i_sprite.uvs.xy + i_sprite.uvs.zw * gl_TessCoord.xy;
-    o_tex = i_sprite.tex;
-    o_col = i_sprite.col;
+    gl_Position = u_mvpMat * vec4(i_pos.xy + i_pos.zw * gl_TessCoord.xy, 0.0, 1.0);
+    o_uvs = i_uvs.xy + i_uvs.zw * gl_TessCoord.xy;
+    o_tex = i_tex;
+    o_col = i_col;
 }

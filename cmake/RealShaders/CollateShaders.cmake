@@ -33,9 +33,11 @@ function(RealShaders_CollateShaders target)
             get_filename_component(shader_bin_dir_abs ${shader_bin_abs} DIRECTORY)
             file(MAKE_DIRECTORY ${shader_bin_dir_abs})
             add_custom_command(
-                OUTPUT "${shader_bin_abs}_vk13"
+                OUTPUT "${shader_bin_abs}_vk13" "${shader_bin_abs}_vk13.txt"
                 COMMAND ${Vulkan_GLSLC_EXECUTABLE} -MD -mfmt=c -MF ${shader_dep_abs} ${shader_source_abs}
                         -o "${shader_bin_abs}_vk13" --target-env=vulkan1.2 ${glslc_flags} "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
+                COMMAND ${Vulkan_GLSLC_EXECUTABLE} -S ${shader_source_abs}
+                        -o "${shader_bin_abs}_vk13.txt" --target-env=vulkan1.2 ${glslc_flags} "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
                 DEPENDS ${shader_source_abs}
                 BYPRODUCTS ${shader_dep_abs}
                 COMMENT "Compiling shader: ${shader_source_rel}"

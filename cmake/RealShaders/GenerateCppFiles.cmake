@@ -41,8 +41,16 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
                 ${cpp_preamble}
                 "#include <${path_rel}/${shader_}.hpp>\n\n"
                 ${cpp_namespace_start}
-                "//Generated from file: ${path_rel}/${shader}\n"
-                "RE::ShaderSource ${shader_} ={\n"
+                "#if 0\n"
+                "//Navigation section - use #includes to jump to files (Visual Studio):\n"
+                "//Source file:\n"
+                "   #include <${path_rel}/${shader}>\n"
+                "//Dependency file:\n"
+                "   #include <${path_rel}/${shader}.d>\n"
+                "//Disassembly file:\n"
+                "   #include <${path_rel}/${shader}.spv_vk13.txt>\n"
+                "#endif // 0 (navigation section)\n\n"
+                "RE::ShaderSource ${shader_}{\n"
                 "    .vk13 =\n"
                 "    #include <${path_rel}/${shader}.spv_vk13>\n"
                 "}\;\n"

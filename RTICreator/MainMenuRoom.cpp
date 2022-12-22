@@ -36,7 +36,6 @@ MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
     });
     for (int i = 0; i < RE::MAX_FRAMES_IN_FLIGHT; i++) {
         m_descSets[i].geometry.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, textureView), sizeof(glm::mat4));
-        m_descSets[i].sprite.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, textureView), sizeof(glm::mat4));
     }
 
     engine().setWindowTitle("RTICreator v3.0.0");
@@ -63,13 +62,12 @@ void MainMenuRoom::sessionEnd() {
 }
 
 void MainMenuRoom::step() {
-    auto cursorPos = (glm::vec2)engine().getCursorAbs();
-
-    if (engine().isKeyDown(RE::Key::MMB) && m_texture) {
-        m_texView.shiftPosition((glm::vec2{m_cursorPosPrev - cursorPos} / m_drawScale));
-    }
-
     if (m_texture) {
+        //Handle input
+        auto cursorPos = (glm::vec2)engine().getCursorAbs();
+        if (engine().isKeyDown(RE::Key::MMB) && m_texture) {
+            m_texView.shiftPosition((glm::vec2{m_cursorPosPrev - cursorPos} / m_drawScale));
+        }
         if (engine().wasKeyPressed(RE::Key::UMW)) {
             m_texView.zoom({1.5f, 1.5f});
             m_drawScale *= 1.5f;
@@ -78,11 +76,10 @@ void MainMenuRoom::step() {
             m_texView.zoom({0.66666666f, 0.66666666f});
             m_drawScale *= 0.66666666f;
         }
-    }
-    m_cursorPosPrev = cursorPos;
-
-    if (engine().wasKeyReleased(RE::Key::R)) {
-        resetView();
+        if (engine().wasKeyReleased(RE::Key::R)) {
+            resetView();
+        }
+        m_cursorPosPrev = cursorPos;
     }
 }
 
@@ -203,10 +200,6 @@ void MainMenuRoom::load(const std::string& loc) {
         return;
     }
 
-    std::for_each(m_descSets.begin(), m_descSets.end(), [&](DescriptorSets& sets) {
-        sets.sprite.write(vk::DescriptorType::eCombinedImageSampler, 1u, *m_texture);
-    });
-
     //Save texture's location
     m_textureLoc = loc;
 
@@ -237,8 +230,8 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
 
     m_sb.begin();
     m_sb.add(posSizeRect, uvRect, *m_texture, 0);
-    m_sb.end(RE::GlyphSortType::POS_TOP);
-    m_sb.draw(RE::current(m_descSets).sprite);
+    m_sb.end();
+    m_sb.draw(commandBuffer, m_texView.getViewMatrix());
 
     m_gb.begin();
     std::vector<RE::VertexPOCO> vertices;

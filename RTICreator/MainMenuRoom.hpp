@@ -36,8 +36,8 @@ private:
     void save(const std::string& loc);
     void load(const std::string& filePath);
 
-    RE::SpriteBatch m_sb{};
-    RE::GeometryBatch m_gb{{{}, vk::PrimitiveTopology::eLineList, false}, {.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
+    RE::SpriteBatch m_sb{1};
+    RE::GeometryBatch m_gb{vk::PrimitiveTopology::eLineList, {.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
 
     //Texture
     std::optional<RE::Texture> m_texture;
@@ -53,7 +53,6 @@ private:
     };
     struct DescriptorSets {
         RE::DescriptorSet geometry;
-        RE::DescriptorSet sprite;
     };
     RE::PerFrameInFlight<RE::Buffer> m_ubos{
         RE::Buffer{sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
@@ -64,12 +63,10 @@ private:
     RE::PerFrameInFlight<ViewMatrices*> m_mappedUbos{nullptr};
     RE::PerFrameInFlight<DescriptorSets> m_descSets{
         DescriptorSets{
-            .geometry = RE::DescriptorSet{m_gb.getPipeline()},
-            .sprite = RE::DescriptorSet{m_sb.getPipeline()}
+            .geometry = RE::DescriptorSet{m_gb.pipeline()},
         },
         DescriptorSets{
-            .geometry = RE::DescriptorSet{m_gb.getPipeline()},
-            .sprite = RE::DescriptorSet{m_sb.getPipeline()}
+            .geometry = RE::DescriptorSet{m_gb.pipeline()},
         }
     };
 

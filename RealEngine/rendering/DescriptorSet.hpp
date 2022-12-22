@@ -25,9 +25,10 @@ public:
     ~DescriptorSet();
 
     void write(vk::DescriptorType type, uint32_t binding, const Buffer& bf, vk::DeviceSize offset, vk::DeviceSize range);
-    void write(vk::DescriptorType type, uint32_t binding, const Texture& tx);
+    void write(vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex, const Texture& tex);
 
-    void bind(vk::PipelineBindPoint bindPoint, const Pipeline& pl) const;
+    const vk::DescriptorSet& operator*() const { return m_descriptorSet; }
+    const vk::DescriptorSet* operator->() const { return &m_descriptorSet; }
 
     const vk::DescriptorSet& descriptorSet() const { return m_descriptorSet; }
 

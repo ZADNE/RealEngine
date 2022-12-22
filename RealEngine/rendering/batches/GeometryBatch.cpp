@@ -9,8 +9,14 @@
 
 namespace RE {
 
-GeometryBatch::GeometryBatch(const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& sources) :
-    m_pipeline(createVertexInputStateInfo(), ia, sources) {
+GeometryBatch::GeometryBatch(vk::PrimitiveTopology topology, const PipelineSources& sources) :
+    m_pipeline(
+        PipelineCreateInfo{
+            .vertexInput = createVertexInputStateInfo(),
+            .topology = topology
+        },
+        sources
+    ) {
 }
 
 void GeometryBatch::begin() {
@@ -36,17 +42,11 @@ void GeometryBatch::addVertices(uint32_t first, uint32_t countVer, const VertexP
 }
 
 void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets) {
-    m_pipeline.bind(vk::PipelineBindPoint::eGraphics);
-    m_vbo.bindAsVertexBuffer(0u, 0ull);
-    m_ibo.bindAsIndexBuffer(0ull, vk::IndexType::eUint32);
-    for (const auto& set : descriptorSets) {
-        set.bind(vk::PipelineBindPoint::eGraphics, m_pipeline);
-    }
-    m_pipeline.drawIndexed(m_indexCount, 1u, 0u, 0, 0u);
-}
-
-void GeometryBatch::changePipeline(const vk::PipelineInputAssemblyStateCreateInfo& ia, const PipelineSources& sources) {
-    m_pipeline = Pipeline{createVertexInputStateInfo(), ia, sources};
+    commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
+    commandBuffer.bindVertexBuffers(0u, *m_vbo, 0ull);
+    commandBuffer.bindIndexBuffer(*m_ibo, 0ull, vk::IndexType::eUint32);
+    commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_pipeline.pipelineLayout(), 0u, *descriptorSets.back(), {});//TODO
+    commandBuffer.drawIndexed(m_indexCount, 1u, 0u, 0, 0u);
 }
 
 vk::PipelineVertexInputStateCreateInfo GeometryBatch::createVertexInputStateInfo() const {

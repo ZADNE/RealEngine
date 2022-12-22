@@ -60,9 +60,8 @@ public:
 
     void copyToBuffer(Buffer& dst, const vk::BufferCopy& info) const;
 
-    void bindAsVertexBuffer(uint32_t binding, uint64_t offsetInBytes) const;
-
-    void bindAsIndexBuffer(uint64_t offsetInBytes, vk::IndexType indexType) const;
+    const vk::Buffer& operator*() { return m_buffer; }
+    const vk::Buffer* operator->() { return &m_buffer; }
 
 protected:
 
