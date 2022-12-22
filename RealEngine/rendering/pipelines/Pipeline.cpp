@@ -35,9 +35,10 @@ Pipeline::Pipeline(const PipelineCreateInfo& createInfo, const PipelineSources& 
             stages[shaderCount] = vk::PipelineShaderStageCreateInfo{{},
                 convert(st),
                 modules[shaderCount],
-                "main"
+                "main",
+                &createInfo.specializationInfo
             };
-            reflect(srcs[st], convert(st), dslbs, ranges);
+            reflect(srcs[st], convert(st), createInfo.specializationInfo, dslbs, ranges);
             shaderCount++;
         }
     }
@@ -132,7 +133,7 @@ Pipeline::Pipeline(const ShaderSourceRef& compute) {
     );
     std::vector<vk::DescriptorSetLayoutBinding> dslbs;
     std::vector<vk::PushConstantRange> ranges;
-    reflect(compute, vk::ShaderStageFlagBits::eCompute, dslbs, ranges);
+    reflect(compute, vk::ShaderStageFlagBits::eCompute, vk::SpecializationInfo{}, dslbs, ranges);
     //Create descriptor set
     m_descriptorSetLayout = s_device->createDescriptorSetLayout(vk::DescriptorSetLayoutCreateInfo{{}, dslbs});
     //Create pipeline layout
@@ -177,17 +178,36 @@ Pipeline::~Pipeline() {
 void Pipeline::reflect(
     const ShaderSourceRef& src,
     vk::ShaderStageFlagBits st,
+    const vk::SpecializationInfo& specInfo,
     std::vector<vk::DescriptorSetLayoutBinding>& dslbs,
     std::vector<vk::PushConstantRange>& ranges
 ) const {
+    //Run compiler
     auto compiler = spirv_cross::Compiler{src.vk13.data(), src.vk13.size()};
+    //Override specialization constants
+    auto constants = compiler.get_specialization_constants();
+    const char* specData = reinterpret_cast<const char*>(specInfo.pData);
+    for (const auto& constant : constants) {                                //For each spec constant in the SPIRV
+        for (int i = 0; i < specInfo.mapEntryCount; i++) {                  //Search its override entry
+            const auto& map = specInfo.pMapEntries[i];
+            if (constant.constant_id == map.constantID) {                   //If it is the override entry
+                auto& c = compiler.get_constant(constant.id);
+                std::memcpy(&c.m.c[0].r, &specData[map.offset], map.size);  //Override the constant
+                break;
+            }
+        }
+    }
+    //Build descriptor layout
     auto reflectResources = [&](const spirv_cross::SmallVector<spirv_cross::Resource>& resources, vk::DescriptorType descType) {
         for (const auto& res : resources) {
             const auto& type = compiler.get_type(res.type_id);
+            uint32_t count = type.array.empty() ? 1 :                       //Not array
+                (type.array_size_literal[0] ? type.array[0] :               //Array with literal size
+                compiler.get_constant(type.array[0]).m.c[0].r->u32);        //Array with spec const size
             dslbs.emplace_back(
                 compiler.get_decoration(res.id, spv::DecorationBinding),    //Binding
                 descType,                                                   //Type
-                type.array.empty() ? 1 : type.array[0],                     //Count
+                count,                                                      //Count
                 st                                                          //Stages
             );
         }
@@ -197,6 +217,7 @@ void Pipeline::reflect(
     reflectResources(resources.storage_buffers, vk::DescriptorType::eStorageBuffer);
     reflectResources(resources.sampled_images, vk::DescriptorType::eCombinedImageSampler);
     reflectResources(resources.storage_images, vk::DescriptorType::eStorageImage);
+    //Build push constant range
     for (const auto& res : resources.push_constant_buffers) {               //Push constants
         const auto& type = compiler.get_type(res.base_type_id);
         ranges.emplace_back(

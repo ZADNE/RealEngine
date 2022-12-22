@@ -18,28 +18,16 @@ glm::vec2 rotatePoint(const glm::vec2& point, float radAngle) {
     return glm::vec2(point.x * cos(radAngle) - point.y * sin(radAngle), point.x * sin(radAngle) + point.y * cos(radAngle));
 }
 
-SpriteBatch::SpriteBatch(int maxSprites) :
+SpriteBatch::SpriteBatch(int maxSprites, int maxTextures) :
     m_spritesBuf(MAX_FRAMES_IN_FLIGHT* maxSprites * sizeof(Sprite), eVertexBuffer, eHostVisible | eHostCoherent),
     m_spritesMapped(m_spritesBuf.map<Sprite>(0u, MAX_FRAMES_IN_FLIGHT* maxSprites * sizeof(Sprite))),
     m_maxSprites(maxSprites),
-    m_pipeline(
-        PipelineCreateInfo{
-            .vertexInput = createVertexInputStateInfo(),
-            .topology = vk::PrimitiveTopology::ePatchList,
-            .patchControlPoints = 1u,
-            .descriptorBindingFlags = {eUpdateUnusedWhilePending | ePartiallyBound}
-        },
-        PipelineSources{
-            .vert = sprite_vert,
-            .tesc = sprite_tesc,
-            .tese = sprite_tese,
-            .frag = sprite_frag
-        }
-    ) {
+    m_maxTextures(maxTextures),
+    m_pipeline(createPipeline(maxTextures)) {
 }
 
 void SpriteBatch::begin() {
-    m_spriteCount = 0;
+    m_nextSpriteIndex = m_maxSprites * NEXT_FRAME;
 }
 
 void SpriteBatch::end() {
@@ -51,13 +39,13 @@ void SpriteBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& 
     commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_pipeline.pipelineLayout(), 0u, *m_descSet, {});
     commandBuffer.bindVertexBuffers(0u, *m_spritesBuf, 0ull);
     commandBuffer.pushConstants<glm::mat4>(m_pipeline.pipelineLayout(), vk::ShaderStageFlagBits::eTessellationEvaluation, 0u, mvpMat);
-    commandBuffer.draw(m_spriteCount, 1u, m_maxSprites * CURRENT_FRAME, 0u);
+    commandBuffer.draw(m_nextSpriteIndex - m_maxSprites * NEXT_FRAME, 1u, m_maxSprites * CURRENT_FRAME, 0u);
 }
 
 //UNCOLORED
 void SpriteBatch::add(const glm::vec4& posSize, const glm::vec4& uv, const Texture& tex, int depth) {
-    glm::uint texIndex = 32 * NEXT_FRAME;
-    m_spritesMapped[m_maxSprites * NEXT_FRAME + m_spriteCount++] = Sprite{.pos = posSize, .uvs = uv, .tex = texIndex, .col = WHITE};
+    glm::uint texIndex = m_maxTextures * NEXT_FRAME;
+    m_spritesMapped[m_nextSpriteIndex++] = Sprite{.pos = posSize, .uvs = uv, .tex = texIndex, .col = WHITE};
     m_descSet.write(vk::DescriptorType::eCombinedImageSampler, 0u, texIndex, tex);
 }
 void SpriteBatch::add(const glm::vec4& posSize, const glm::vec4& uv, TextureProxy tex, int depth, float radAngle, const glm::vec2& origin) {
@@ -179,7 +167,8 @@ void SpriteBatch::addSubimage(const Texture& tex, const glm::vec2& position, int
     //m_glyphs.emplace_back(glm::vec4(position, tex.getSubimageDims() * scale), glm::vec4(glm::floor(subImg_Spr) / tex.getSubimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.getSubimagesSpritesCount()), TextureProxy{tex}, depth, color, radAngle, tex.getPivot() * scale);
 }
 
-vk::PipelineVertexInputStateCreateInfo SpriteBatch::createVertexInputStateInfo() const {
+Pipeline SpriteBatch::createPipeline(int maxTextures) const {
+    //Vertex input
     static constexpr std::array bindings = std::to_array<vk::VertexInputBindingDescription>({{
         0u,                             //Binding index
         sizeof(Sprite),                 //Stride
@@ -206,7 +195,23 @@ vk::PipelineVertexInputStateCreateInfo SpriteBatch::createVertexInputStateInfo()
         vk::Format::eR32Uint,           //Format
         offsetof(Sprite, col)           //Relative offset
     }});
-    return vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes};
+    //Specialization constants
+    static constexpr vk::SpecializationMapEntry SPEC_MAP_ENTRY{0u, 0u, 4ull};
+    int totalTextures = maxTextures * MAX_FRAMES_IN_FLIGHT;
+    return Pipeline{
+        PipelineCreateInfo{
+            .vertexInput = vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes},
+            .topology = vk::PrimitiveTopology::ePatchList,
+            .patchControlPoints = 1u,
+            .descriptorBindingFlags = {eUpdateUnusedWhilePending | ePartiallyBound},
+            .specializationInfo = vk::SpecializationInfo{1u, &SPEC_MAP_ENTRY, sizeof(totalTextures), &totalTextures}
+        }, PipelineSources{
+            .vert = sprite_vert,
+            .tesc = sprite_tesc,
+            .tese = sprite_tese,
+            .frag = sprite_frag
+        }
+    };
 }
 
 }

@@ -36,7 +36,7 @@ private:
     void save(const std::string& loc);
     void load(const std::string& filePath);
 
-    RE::SpriteBatch m_sb{1};
+    RE::SpriteBatch m_sb{1, 1};
     RE::GeometryBatch m_gb{vk::PrimitiveTopology::eLineList, {.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
 
     //Texture

@@ -25,7 +25,7 @@ public:
     /**
      * @brief Constructs SpriteBatch
     */
-    SpriteBatch(int maxSprites);
+    SpriteBatch(int maxSprites, int maxTextures);
 
     void begin();
     void end();
@@ -96,11 +96,12 @@ private:
     Buffer m_spritesBuf;
     Sprite* m_spritesMapped = nullptr;
     int m_maxSprites;
-    int m_spriteCount = 0;
+    int m_maxTextures;
+    int m_nextSpriteIndex = 0;
 
     Pipeline m_pipeline;
     DescriptorSet m_descSet{m_pipeline};
-    vk::PipelineVertexInputStateCreateInfo createVertexInputStateInfo() const;
+    Pipeline createPipeline(int maxTextures) const;
 
     static inline constexpr glm::vec4 UV_RECT = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
     static inline constexpr glm::vec4 SUV_RECT = glm::vec4(0.0f, 1.0f, 1.0f, -1.0f);//Used for drawing surfaces

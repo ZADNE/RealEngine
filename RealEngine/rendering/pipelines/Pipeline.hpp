@@ -12,6 +12,7 @@ struct PipelineCreateInfo {
     bool enablePrimitiveRestart = false;
     uint32_t patchControlPoints = 0;
     std::vector<vk::DescriptorBindingFlags> descriptorBindingFlags{};
+    vk::SpecializationInfo specializationInfo{};
 };
 
 /**
@@ -51,6 +52,7 @@ private:
     void reflect(
         const ShaderSourceRef& src,
         vk::ShaderStageFlagBits st,
+        const vk::SpecializationInfo& specInfo,
         std::vector<vk::DescriptorSetLayoutBinding>& dslbs,
         std::vector<vk::PushConstantRange>& ranges
     ) const;

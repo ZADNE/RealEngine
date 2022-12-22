@@ -22,7 +22,8 @@ DescriptorSet& DescriptorSet::operator=(DescriptorSet&& other) noexcept {
 }
 
 DescriptorSet::~DescriptorSet() {
-    s_device->freeDescriptorSets(*s_descriptorPool, m_descriptorSet);
+    //Do not free the descriptor, it is 'freed' when the pool it was created from is destroyed
+    //s_device->freeDescriptorSets(*s_descriptorPool, m_descriptorSet);
 }
 
 void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Buffer& bf, vk::DeviceSize offset, vk::DeviceSize range) {
