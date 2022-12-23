@@ -3,50 +3,48 @@
  */
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 
-#include <cmath>
-
-#include <glm/gtc/constants.hpp>
+#include <RealEngine/rendering/PerFrameInFlight.hpp>
+#include <RealEngine/rendering/batches/shaders/AllShaders.hpp>
 
 namespace RE {
 
-GeometryBatch::GeometryBatch(vk::PrimitiveTopology topology, const PipelineSources& sources) :
+using enum vk::BufferUsageFlagBits;
+using enum vk::MemoryPropertyFlagBits;
+
+GeometryBatch::GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVertices) :
+    m_verticesBuf(sizeof(VertexPOCO)* maxVertices* MAX_FRAMES_IN_FLIGHT, eVertexBuffer, eHostVisible | eHostCoherent),
+    m_verticesMapped(m_verticesBuf.map<VertexPOCO>(0, sizeof(VertexPOCO)* maxVertices* MAX_FRAMES_IN_FLIGHT)),
+    m_maxVertices(maxVertices),
     m_pipeline(
         PipelineCreateInfo{
             .vertexInput = createVertexInputStateInfo(),
             .topology = topology
         },
-        sources
+        PipelineSources{
+            .vert = geometry_vert,
+            .frag = geometry_frag
+        }
     ) {
 }
 
 void GeometryBatch::begin() {
-    m_vertexCount = 0u;
-    m_indexCount = 0u;
+    m_nextVertexIndex = m_maxVertices * NEXT_FRAME;
 }
 
 void GeometryBatch::end() {
     //Nothing to do :-)
 }
 
-void GeometryBatch::addVertices(uint32_t first, uint32_t countVer, const VertexPOCO* data, bool separate/* = true*/) {
-    //Vertices
-    std::copy(&data[first], &data[first + countVer], &m_vertices[m_vertexCount]);
-    //Indices
-    for (uint32_t i = 0u; i < countVer; ++i) {
-        m_indices[m_indexCount++] = m_vertexCount++;
-    }
-    //Separator
-    if (separate) {
-        m_indices[m_indexCount++] = PRIMITIVE_RESTART_INDEX<uint32_t>();
-    }
+void GeometryBatch::addVertices(uint32_t first, uint32_t countVer, const VertexPOCO* data) {
+    std::memcpy(&m_verticesMapped[m_nextVertexIndex], &data[first], sizeof(VertexPOCO) * countVer);
+    m_nextVertexIndex += countVer;
 }
 
-void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets) {
+void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat) {
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
-    commandBuffer.bindVertexBuffers(0u, *m_vbo, 0ull);
-    commandBuffer.bindIndexBuffer(*m_ibo, 0ull, vk::IndexType::eUint32);
-    commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_pipeline.pipelineLayout(), 0u, *descriptorSets.back(), {});//TODO
-    commandBuffer.drawIndexed(m_indexCount, 1u, 0u, 0, 0u);
+    commandBuffer.bindVertexBuffers(0u, *m_verticesBuf, 0ull);
+    commandBuffer.pushConstants<glm::mat4>(m_pipeline.pipelineLayout(), vk::ShaderStageFlagBits::eVertex, 0u, mvpMat);
+    commandBuffer.draw(m_nextVertexIndex - m_maxVertices * NEXT_FRAME, 1u, 0u, 0u);
 }
 
 vk::PipelineVertexInputStateCreateInfo GeometryBatch::createVertexInputStateInfo() const {

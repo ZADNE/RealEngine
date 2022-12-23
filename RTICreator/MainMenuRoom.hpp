@@ -6,13 +6,9 @@
 
 #include <RealEngine/rooms/Room.hpp>
 #include <RealEngine/program/CommandLineArguments.hpp>
-#include <RealEngine/rendering/buffers/Buffer.hpp>
-#include <RealEngine/rendering/DescriptorSet.hpp>
 #include <RealEngine/rendering/batches/SpriteBatch.hpp>
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/cameras/View2D.hpp>
-#include <RealEngine/rendering/textures/Texture.hpp>
-#include <RealEngine/rendering/batches/shaders/AllShaders.hpp>
 
  /**
   * @brief Room with the UI
@@ -37,7 +33,7 @@ private:
     void load(const std::string& filePath);
 
     RE::SpriteBatch m_sb{1, 1};
-    RE::GeometryBatch m_gb{vk::PrimitiveTopology::eLineList, {.vert = RE::geometry_vert, .frag = RE::geometry_frag}};
+    RE::GeometryBatch m_gb{vk::PrimitiveTopology::eLineList, 128};
 
     //Texture
     std::optional<RE::Texture> m_texture;
@@ -48,27 +44,6 @@ private:
 
     //View
     RE::View2D m_texView;
-    struct ViewMatrices {
-        glm::mat4 textureView;
-    };
-    struct DescriptorSets {
-        RE::DescriptorSet geometry;
-    };
-    RE::PerFrameInFlight<RE::Buffer> m_ubos{
-        RE::Buffer{sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
-        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent},
-        RE::Buffer{sizeof(ViewMatrices), vk::BufferUsageFlagBits::eUniformBuffer,
-        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent}
-    };
-    RE::PerFrameInFlight<ViewMatrices*> m_mappedUbos{nullptr};
-    RE::PerFrameInFlight<DescriptorSets> m_descSets{
-        DescriptorSets{
-            .geometry = RE::DescriptorSet{m_gb.pipeline()},
-        },
-        DescriptorSets{
-            .geometry = RE::DescriptorSet{m_gb.pipeline()},
-        }
-    };
 
     glm::vec2 m_overlap = glm::vec2(0.2f, 0.2f);
     glm::vec3 m_backgroundColor = glm::vec3(0.1f, 0.1f, 0.1f);

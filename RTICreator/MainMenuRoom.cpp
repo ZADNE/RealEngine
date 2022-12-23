@@ -9,15 +9,9 @@
 #if not defined(WIN32) && not defined(_WIN32) && not defined(__WIN32__)
 #error "Since this tool requires file selection dialog window and I did not want another library dependency, it is a Windows-only tool. Sorry!"
 #endif
-
 #define NOMINMAX 1
 #include <Windows.h>
-
-#include <glm/gtc/matrix_transform.hpp>
-
 #include <ImGui/imgui.h>
-#include <RealEngine/rendering/batches/GeometryBatch.hpp>
-#include <RealEngine/rendering/batches/SpriteBatch.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 #include <RTICreator/ComboConstants.hpp>
@@ -31,12 +25,6 @@ constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
 MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
     Room(0, INITIAL_DISPLAY_SETTINGS),
     m_texView(engine().getWindowDims()) {
-    std::transform(m_ubos.cbegin(), m_ubos.cend(), m_mappedUbos.begin(), [](const RE::Buffer& buf) {
-        return buf.map<ViewMatrices>(0u, sizeof(ViewMatrices));
-    });
-    for (int i = 0; i < RE::MAX_FRAMES_IN_FLIGHT; i++) {
-        m_descSets[i].geometry.write(vk::DescriptorType::eUniformBuffer, 0u, m_ubos[i], offsetof(ViewMatrices, textureView), sizeof(glm::mat4));
-    }
 
     engine().setWindowTitle("RTICreator v3.0.0");
 
@@ -84,9 +72,6 @@ void MainMenuRoom::step() {
 }
 
 void MainMenuRoom::render(const vk::CommandBuffer& commandBuffer, double interpolationFactor) {
-    auto mat = m_texView.getViewMatrix();
-    RE::current(m_mappedUbos)->textureView = mat;
-
     //Texture
     if (m_texture) {
         drawTexture(commandBuffer);
@@ -229,7 +214,7 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
     };
 
     m_sb.begin();
-    m_sb.add(posSizeRect, uvRect, *m_texture, 0);
+    m_sb.add(posSizeRect, uvRect, *m_texture);
     m_sb.end();
     m_sb.draw(commandBuffer, m_texView.getViewMatrix());
 
@@ -251,7 +236,7 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
         vertices.emplace_back(coord + glm::vec2(texDims.x, 0.0f), color);
     }
     if (vertices.size() > 0u) {
-        m_gb.addVertices(0u, vertices.size(), vertices.data(), false);
+        m_gb.addVertices(0u, vertices.size(), vertices.data());
         vertices.clear();
     }
     //Pivots
@@ -268,7 +253,7 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
         }
     }
 
-    m_gb.addVertices(0u, vertices.size(), vertices.data(), false);
+    m_gb.addVertices(0u, vertices.size(), vertices.data());
     vertices.clear();
     //Whole image
     color = {255u, 0u, 0u, 255u};
@@ -280,10 +265,10 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
     vertices.emplace_back(botLeft + glm::vec2(0.0f, texDims.y), color);
     vertices.emplace_back(botLeft + glm::vec2(0.0f, texDims.y), color);
     vertices.emplace_back(botLeft, color);
-    m_gb.addVertices(0u, vertices.size(), vertices.data(), false);
+    m_gb.addVertices(0u, vertices.size(), vertices.data());
 
     m_gb.end();
-    m_gb.draw(commandBuffer, RE::current(m_descSets).geometry);
+    m_gb.draw(commandBuffer, m_texView.getViewMatrix());
 }
 
 void MainMenuRoom::resetView() {

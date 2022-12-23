@@ -2,12 +2,11 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <vector>
+#include <glm/mat4x4.hpp>
 
 #include <RealEngine/rendering/pipelines/Pipeline.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/pipelines/Vertex.hpp>
-#include <RealEngine/rendering/DescriptorSet.hpp>
 
 namespace RE {
 
@@ -18,32 +17,40 @@ class GeometryBatch {
 public:
 
     /**
-     * @brief Constructs new GeometryBatch
-     * @param sources Sources used to construct the shader program that will be used for drawing
+     * @brief Constructs GeometryBatch
+     * @param topology The topology that the batch will draw
+     * @param maxVertices Maximum number of vertices that can be in the batch
     */
-    GeometryBatch(vk::PrimitiveTopology topology, const PipelineSources& sources);
-
-    void begin();
-    void end();
-
-    void addVertices(uint32_t first, uint32_t count, const VertexPOCO* data, bool separate = true);
+    GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVertices);
 
     /**
-     * @brief Draws the batch with stored shader program
+     * @brief Begins new batch
+     * @detail All vertices have to be added between begin() and end()
     */
-    void draw(const vk::CommandBuffer& commandBuffer, const vk::ArrayProxyNoTemporaries<DescriptorSet>& descriptorSets);
+    void begin();
 
-    const Pipeline& pipeline() const { return m_pipeline; }
+    /**
+     * @brief Ends the batch
+     * @detail All vertices have to be added between begin() and end()
+    */
+    void end();
+
+    void addVertices(uint32_t first, uint32_t count, const VertexPOCO* data);
+
+    /**
+     * @brief Draws the batch
+     * @detail The whole geometry is drawn in the order it was added in
+     * @param commandBuffer Command buffer used for rendering
+     * @param mvpMat Transformation matrix applied to the sprites
+    */
+    void draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat);
 
 private:
-    using enum vk::BufferUsageFlagBits;
-    using enum vk::MemoryPropertyFlagBits;
-    Buffer m_vbo{sizeof(VertexPOCO) * 512, eVertexBuffer, eHostVisible | eHostCoherent};
-    Buffer m_ibo{sizeof(uint32_t) * 512, eIndexBuffer, eHostVisible | eHostCoherent};
-    VertexPOCO* m_vertices = m_vbo.map<VertexPOCO>(0u, sizeof(VertexPOCO) * 512);
-    uint32_t* m_indices = m_ibo.map<uint32_t>(0u, sizeof(uint32_t) * 512);
-    uint32_t m_vertexCount = 0u;
-    uint32_t m_indexCount = 0u;
+
+    Buffer m_verticesBuf;
+    VertexPOCO* m_verticesMapped = nullptr;
+    uint32_t m_nextVertexIndex;
+    uint32_t m_maxVertices;
     Pipeline m_pipeline;
     vk::PipelineVertexInputStateCreateInfo createVertexInputStateInfo() const;
 };
