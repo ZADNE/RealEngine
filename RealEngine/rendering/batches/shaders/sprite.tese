@@ -1,3 +1,6 @@
+/*!
+ *  @author    Dubsky Tomas
+ */
 #version 460
 layout(location = 0) out        vec2 o_uvs;
 layout(location = 1) out flat   uint o_tex;

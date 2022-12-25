@@ -188,7 +188,7 @@ void Pipeline::reflect(
     auto constants = compiler.get_specialization_constants();
     const char* specData = reinterpret_cast<const char*>(specInfo.pData);
     for (const auto& constant : constants) {                                //For each spec constant in the SPIRV
-        for (int i = 0; i < specInfo.mapEntryCount; i++) {                  //Search its override entry
+        for (uint32_t i = 0; i < specInfo.mapEntryCount; i++) {             //Search its override entry
             const auto& map = specInfo.pMapEntries[i];
             if (constant.constant_id == map.constantID) {                   //If it is the override entry
                 auto& c = compiler.get_constant(constant.id);

@@ -1,3 +1,6 @@
+/*!
+ *  @author    Dubsky Tomas
+ */
 #version 460
 layout(location = 0) in         vec2 i_uvs;
 layout(location = 1) in flat    uint i_tex;

@@ -11,7 +11,7 @@ SharedTexture TextureCache::texture(const std::string& filePathPNG) {
     if (mapIterator != m_textureMap.end() && (stored = mapIterator->second.lock())) {
         return stored;
     } else {//Texture never accessed before or it has expired
-        auto made = std::make_shared<Texture>(TextureSeed{.file = filePathPNG});
+        auto made = std::make_shared<TextureShaped>(filePathPNG);
         m_textureMap.insert_or_assign(filePathPNG, made);
         return made;
     }

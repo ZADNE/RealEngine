@@ -36,7 +36,7 @@ private:
     RE::GeometryBatch m_gb{vk::PrimitiveTopology::eLineList, 128};
 
     //Texture
-    std::optional<RE::Texture> m_texture;
+    std::optional<RE::TextureShaped> m_texture;
     std::string m_textureLoc;
     std::string m_lastVisitedLoc;
 
@@ -49,17 +49,10 @@ private:
     glm::vec3 m_backgroundColor = glm::vec3(0.1f, 0.1f, 0.1f);
 
     //Texture parameters
-    size_t m_minFilter = 0u;
-    size_t m_magFilter = 0u;
-    size_t m_wrapStyleX = 0u;
-    size_t m_wrapStyleY = 0u;
     glm::ivec2 m_subimagesSprites{};
     glm::vec2 m_subimageDims{1.0f};
     glm::vec2 m_pivot{};
-    glm::vec4 m_borderColor{0.0f, 0.0f, 0.0f, 1.0f};
 
-
-    glm::vec2 m_offset = glm::vec2(0.0f, 0.0f);
     void drawTexture(const vk::CommandBuffer& commandBuffer);
     void resetView();
 

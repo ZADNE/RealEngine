@@ -1,3 +1,6 @@
+/*!
+ *  @author    Dubsky Tomas
+ */
 #version 460
 layout(vertices = 1) out;
 layout(location = 0) patch out  vec4 o_pos;

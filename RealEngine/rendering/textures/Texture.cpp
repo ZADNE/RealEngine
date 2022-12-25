@@ -3,40 +3,82 @@
  */
 #include <RealEngine/rendering/textures/Texture.hpp>
 
-#include <RealEngine/rendering/textures/TextureFlagsToString.hpp>
-#include <RealEngine/resources/PNGLoader.hpp>
-#include <RealEngine/utility/Error.hpp>
-
-#include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/CommandBuffer.hpp>
+#include <RealEngine/rendering/buffers/Buffer.hpp>
+#include <RealEngine/utility/Error.hpp>
 
 namespace RE {
 
 using enum vk::ImageLayout;
 using enum vk::PipelineStageFlagBits;
 
-glm::vec4 colorToFloatColor(Color color, TextureFormat type) {
-    glm::vec4 borderRGBA = glm::vec4{color.r, color.g, color.b, color.a};
-    switch (type) {
-    case TextureFormat::NORMALIZED_UNSIGNED: borderRGBA = borderRGBA / 255.0f; break;
-    case TextureFormat::NORMALIZED_SIGNED: borderRGBA = (borderRGBA / 255.0f) * 2.0f - 1.0f; break;
-    case TextureFormat::INTEGRAL_UNSIGNED: break;
-    case TextureFormat::INTEGRAL_SIGNED: borderRGBA = borderRGBA - 128.0f; break;
+vk::ImageViewType imageViewType(vk::ImageType imageType, uint32_t layers) {
+    if (layers > 0) {
+        switch (imageType) {
+        case vk::ImageType::e1D: return vk::ImageViewType::e1DArray;
+        case vk::ImageType::e2D: return vk::ImageViewType::e2DArray;
+        }
+    } else {
+        switch (imageType) {
+        case vk::ImageType::e1D: return vk::ImageViewType::e1D;
+        case vk::ImageType::e2D: return vk::ImageViewType::e2D;
+        case vk::ImageType::e3D: return vk::ImageViewType::e3D;
+        }
     }
-    return borderRGBA;
+    throw Exception{"Unsupported image type"};
+}
+
+Texture::Texture(const TextureCreateInfo& createInfo) {
+    //Create the image
+    using enum vk::MemoryPropertyFlagBits;
+    using enum vk::ImageUsageFlagBits;
+    auto HOST = eHostCoherent | eHostVisible;
+    bool requiresStagingBuffer = !createInfo.texels.empty() && ((createInfo.memory & HOST) != HOST);
+    m_image = s_device->createImage(vk::ImageCreateInfo{{},
+        createInfo.type,
+        createInfo.format,
+        createInfo.extent,
+        1u,                                             //Mip level count
+        createInfo.layers,
+        vk::SampleCountFlagBits::e1,
+        vk::ImageTiling::eOptimal,
+        createInfo.usage | (requiresStagingBuffer ? eTransferDst : vk::ImageUsageFlagBits{}),
+        vk::SharingMode::eExclusive
+    });
+    //Allocate memory for the image
+    auto memReq = s_device->getImageMemoryRequirements2({m_image}).memoryRequirements;
+    m_deviceMemory = s_device->allocateMemory(vk::MemoryAllocateInfo{
+        memReq.size,
+        selectMemoryType(memReq.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
+    });
+    s_device->bindImageMemory(m_image, m_deviceMemory, 0u);
+    //Initialize texels of the image
+    if (!createInfo.texels.empty()) {
+        initializeTexels(createInfo);
+    }
+    //Create image view
+    m_imageView = s_device->createImageView(vk::ImageViewCreateInfo{{},
+        m_image,
+        imageViewType(createInfo.type, createInfo.layers),
+        createInfo.format,
+        vk::ComponentMapping{},                         //Component mapping (= identity)
+        vk::ImageSubresourceRange{
+            vk::ImageAspectFlagBits::eColor,
+            0u,                                         //Mip level
+            1u,                                         //Mip level count
+            0u,                                         //Base array layer
+            createInfo.layers                           //Array layer count
+        }
+    });
+    //Create sampler
+    m_sampler = s_device->createSampler(vk::SamplerCreateInfo{});
 }
 
 Texture::Texture(Texture&& other) noexcept :
     m_image(other.m_image),
     m_deviceMemory(other.m_deviceMemory),
     m_imageView(other.m_imageView),
-    m_sampler(other.m_sampler),
-    m_flags(other.m_flags),
-    m_subimageDims(other.m_subimageDims),
-    m_pivot(other.m_pivot),
-    m_subimagesSpritesCount(other.m_subimagesSpritesCount),
-    m_trueDims(other.m_trueDims),
-    m_borderColor(other.m_borderColor) {
+    m_sampler(other.m_sampler) {
     other.m_image = nullptr;
     other.m_deviceMemory = nullptr;
     other.m_imageView = nullptr;
@@ -48,31 +90,7 @@ Texture& Texture::operator=(Texture&& other) noexcept {
     std::swap(m_deviceMemory, other.m_deviceMemory);
     std::swap(m_imageView, other.m_imageView);
     std::swap(m_sampler, other.m_sampler);
-    m_flags = other.m_flags;
-    m_trueDims = other.m_trueDims;
-    m_subimageDims = other.m_subimageDims;
-    m_pivot = other.m_pivot;
-    m_subimagesSpritesCount = other.m_subimagesSpritesCount;
-    m_borderColor = other.m_borderColor;
     return *this;
-}
-
-Texture::Texture(const std::string& filePathPNG, const TextureParameters& defParams) {
-    PNGLoader::PNGData pngData{
-        .params = defParams
-    };
-
-    if (PNGLoader::load(filePathPNG, pngData) == 0) {
-        init(Raster{pngData.dims, pngData.params.getChannels(), pngData.pixels}, pngData.params);
-    }
-}
-
-Texture::Texture(const TextureSeed& seed) :
-    Texture(seed.toFullPath(), DEFAULT_PARAMETERS) {
-}
-
-Texture::Texture(const Raster& raster, const TextureParameters& params/* = DEFAULT_PARAMETERS*/) {
-    init(raster, params);
 }
 
 Texture::~Texture() {
@@ -82,94 +100,17 @@ Texture::~Texture() {
     s_device->free(m_deviceMemory);
 }
 
-TextureParameters Texture::getParameters() const {
-    return TextureParameters{TextureGeometry{m_subimageDims, m_pivot, m_subimagesSpritesCount}, m_flags, m_borderColor};
-}
-
-bool Texture::saveToFile(const std::string& filePathPNG) {
-    return saveToFile(filePathPNG, getParameters());
-}
-
-bool Texture::saveToFile(const std::string& filePathPNG, const TextureParameters& params) {
-    /*PNGLoader::PNGData pngData{
-        .dims = m_trueDims,
-        .params = params
-    };
-    pngData.pixels.resize(Raster::minimumRequiredMemory(m_trueDims, params.getChannels()));
-    //Download pixels
-    getTexels(pngData.pixels.size(), pngData.pixels.data());
-    return PNGLoader::save(filePathPNG, pngData) == 0;*/
-    //TODO
-    return false;
-}
-
-void Texture::init(const Raster& raster, const TextureParameters& params) {
-    if (params.isGeometryDefinedByImage()) {//Geometry defined by image
-        m_subimageDims = raster.getDims();
-        m_pivot = glm::vec2{0.0f, 0.0f};
-        m_subimagesSpritesCount = glm::vec2{1.0f, 1.0f};
-    } else {//Geometry defined by parameters
-        m_subimageDims = params.getSubimageDims();
-        m_pivot = params.getPivot();
-        m_subimagesSpritesCount = params.getSubimagesSpritesCount();
-    }
-    m_flags = TextureFlags{params};
-    m_trueDims = raster.getDims();
-    m_borderColor = params.getBorderColor();
-    //Create the image
-    using enum vk::ImageUsageFlagBits;
-    m_image = s_device->createImage(vk::ImageCreateInfo{{},
-        vk::ImageType::e2D,                             //Type
-        vk::Format::eR8G8B8A8Unorm,                     //Format
-        vk::Extent3D{m_trueDims.x, m_trueDims.y, 1},    //Size
-        1u,                                             //Mip level count
-        1u,                                             //Array layer count
-        vk::SampleCountFlagBits::e1,
-        vk::ImageTiling::eOptimal,
-        eTransferDst | eSampled,                        //Usage
-        vk::SharingMode::eExclusive
-    });
-    //Allocate memory for the image
-    auto memReq = s_device->getImageMemoryRequirements2({m_image}).memoryRequirements;
-    m_deviceMemory = s_device->allocateMemory(vk::MemoryAllocateInfo{
-        memReq.size,
-        selectMemoryType(memReq.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
-    });
-    s_device->bindImageMemory(m_image, m_deviceMemory, 0u);
-    //Initialize texels of the image
-    if (raster.getTexels().data()) {
-        initializeTexels(raster);
-    }
-    //Create image view
-    m_imageView = s_device->createImageView(vk::ImageViewCreateInfo{{},
-        m_image,
-        vk::ImageViewType::e2D,
-        vk::Format::eR8G8B8A8Unorm,
-        vk::ComponentMapping{},                         //Component mapping (= identity)
-        vk::ImageSubresourceRange{
-            vk::ImageAspectFlagBits::eColor,
-            0u,                                         //Mip level
-            1u,                                         //Mip level count
-            0u,                                         //Base array layer
-            1u                                          //Array layer count
-        }
-    });
-    //Create sampler
-    m_sampler = s_device->createSampler(vk::SamplerCreateInfo{});
-}
-
-void Texture::initializeTexels(const Raster& raster) {
+void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
     //Create a staging buffer
-    vk::DeviceSize nBytes = m_trueDims.x * m_trueDims.y * 4u;
     Buffer stagingBuffer{
-        nBytes,
+        createInfo.texels.size(),
         vk::BufferUsageFlagBits::eTransferSrc,
         vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
     };
     //Copy texels to the staging buffer
     {
-        auto* mapped = stagingBuffer.map<unsigned char>(0u, nBytes);
-        std::memcpy(mapped, raster.getTexels().data(), nBytes);
+        auto* mapped = stagingBuffer.map<unsigned char>(0u, createInfo.texels.size());
+        std::memcpy(mapped, createInfo.texels.data(), createInfo.texels.size());
         stagingBuffer.unmap();
     }
     //Copy data from staging buffer to the image
@@ -188,7 +129,7 @@ void Texture::initializeTexels(const Raster& raster) {
                 1u                                      //Array layer count
             },
             vk::Offset3D{0u, 0u, 0u},
-            vk::Extent3D{m_trueDims.x, m_trueDims.y, 1u}
+            createInfo.extent
         }
     );
     transitionImageLayout(commandBuffer, eTransferDstOptimal, eReadOnlyOptimal);

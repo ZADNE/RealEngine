@@ -1,16 +1,16 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <string>
 #include <vector>
 
-#include <RealEngine/rendering/textures/TextureParameters.hpp>
+#include <RealEngine/rendering/textures/TextureShape.hpp>
 
 namespace RE {
 
 /**
- * @brief Loads/saves texture pixels and parameters from/to PNG file
+ * @brief Loads/saves texels and parameters from/to PNG file
 */
 class PNGLoader {
 public:
@@ -19,21 +19,21 @@ public:
      * @brief Is POD structure of data that can be stored in a PNG file
     */
     struct PNGData {
-        std::vector<unsigned char> pixels;
+        std::vector<unsigned char> texels;
         glm::uvec2 dims;
-        TextureParameters params;
+        TextureShape shape;
     };
 
     /**
-     * @brief Loads texture pixels and parameters from PNG file
+     * @brief Loads texels and parameters from PNG file
      * @return 0 on success, other on failure
      *
      * Failing to load parameters is not considered a failure.
     */
-    static unsigned int load(const std::string& filePathPNG, PNGData& data);
+    static PNGData load(const std::string& filePathPNG);
 
     /**
-     * @brief Saves texture pixels and parameters to PNG file
+     * @brief Saves texels and parameters to PNG file
      * @return 0 on success, other on failure
      *
      * Overwrites existing file without notice.

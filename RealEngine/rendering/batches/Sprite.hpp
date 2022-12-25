@@ -4,7 +4,8 @@
 #pragma once
 #include <glm/vec2.hpp>
 
-#include <RealEngine/rendering/textures/Texture.hpp>
+#include <RealEngine/rendering/textures/TextureShaped.hpp>
+#include <RealEngine/rendering/pipelines/Vertex.hpp>
 
 namespace RE {
 
@@ -17,21 +18,21 @@ public:
     /**
      * @warning Sprite does not hold ownership of the Texture!
     */
-    SpriteStatic(const Texture& tex, float sprite, float subimage = 0.0f);
+    SpriteStatic(const TextureShaped& tex, float sprite, float subimage = 0.0f);
 
-    virtual float getSpeed() const;
-    virtual Color getColor() const;
-    virtual glm::vec2 getScale() const;
-    virtual glm::vec2 getSubimageSprite() const;
+    virtual float speed() const;
+    virtual Color color() const;
+    virtual glm::vec2 scale() const;
+    virtual glm::vec2 subimageSprite() const;
 
     virtual void step();
 
-    const Texture& getTexture() const { return *m_tex; };
+    const TextureShaped& texture() const { return *m_tex; };
 
 protected:
 
     glm::vec2 m_subimageSprite;//X = subimage of the sprite, Y = sprite of the texture
-    const Texture* m_tex;
+    const TextureShaped* m_tex;
 };
 
 /**
@@ -40,13 +41,13 @@ protected:
 class SpriteAnimated : public SpriteStatic {
 public:
 
-    SpriteAnimated(const Texture& tex, float sprite, float subimage = 0.0f, float imageSpeed = 1.0f);
+    SpriteAnimated(const TextureShaped& tex, float sprite, float subimage = 0.0f, float imageSpeed = 1.0f);
 
     void step() override;
 
     void setSpeed(float newSpeed);
 
-    float getSpeed() const override;
+    float speed() const override;
 
 protected:
 
@@ -59,13 +60,13 @@ protected:
 class SpriteComplex : public SpriteAnimated {
 public:
 
-    SpriteComplex(const Texture& tex, float sprite, float subimage, float imageSpeed, Color color, const glm::vec2& scale);
+    SpriteComplex(const TextureShaped& tex, float sprite, float subimage, float imageSpeed, Color color, const glm::vec2& scale);
 
     void setColor(Color color);
     void setScale(const glm::vec2& scale);
 
-    Color getColor() const override;
-    glm::vec2 getScale() const override;
+    Color color() const override;
+    glm::vec2 scale() const override;
 
 protected:
 

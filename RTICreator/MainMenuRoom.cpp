@@ -14,8 +14,6 @@
 #include <ImGui/imgui.h>
 #include <RealEngine/utility/Error.hpp>
 
-#include <RTICreator/ComboConstants.hpp>
-
 constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
     .clearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
     .framesPerSecondLimit = 144,
@@ -78,7 +76,7 @@ void MainMenuRoom::render(const vk::CommandBuffer& commandBuffer, double interpo
     }
 
     //Menu
-    if (ImGui::Begin("RTICreator v3.0.0")) {
+    if (ImGui::Begin("RTICreator v4.0.0")) {
         if (ImGui::BeginTabBar("##TabBar")) {
             if (ImGui::BeginTabItem("File")) {
                 if (ImGui::Button("Load a texture")) selectAndLoad();
@@ -113,18 +111,6 @@ void MainMenuRoom::windowResizedCallback(const glm::ivec2& oldSize, const glm::i
 }
 
 void MainMenuRoom::parametersGUI() {
-    /*if (imguiCombo("Minification filter", m_minFilter, MIN_FILTERS_LABELS)) {
-        m_texture->setMinFilter(MIN_FILTERS[m_minFilter]);
-    }
-    if (imguiCombo("Magnification filter", m_magFilter, MAG_FILTERS_LABELS)) {
-        m_texture->setMagFilter(MAG_FILTERS[m_magFilter]);
-    }
-    if (imguiCombo("Wrap style of X axis", m_wrapStyleX, WRAP_STYLES_LABELS)) {
-        m_texture->setWrapStyleX(WRAP_STYLES[m_wrapStyleX]);
-    }
-    if (imguiCombo("Wrap style of Y axis", m_wrapStyleY, WRAP_STYLES_LABELS)) {
-        m_texture->setWrapStyleY(WRAP_STYLES[m_wrapStyleY]);
-    }
     if (ImGui::InputInt("Number of subimages", &m_subimagesSprites.x)) {
         m_texture->setSubimagesSpritesCount(m_subimagesSprites);
     }
@@ -142,13 +128,6 @@ void MainMenuRoom::parametersGUI() {
         m_pivot = m_subimageDims * 0.5f;
         m_texture->setPivot(m_pivot);
     }
-
-
-    if ((WRAP_STYLES[m_wrapStyleY] == RE::TextureWrapStyle::CLAMP_TO_BORDER ||
-        WRAP_STYLES[m_wrapStyleX] == RE::TextureWrapStyle::CLAMP_TO_BORDER)
-        && ImGui::ColorPicker4("Border color", &m_borderColor.x)) {
-        m_texture->setBorderColor(m_borderColor);
-    }*/
 }
 
 void MainMenuRoom::selectAndLoad() {
@@ -179,7 +158,7 @@ void MainMenuRoom::save(const std::string& loc) {
 void MainMenuRoom::load(const std::string& loc) {
     if (loc.empty()) { return; }
     try {
-        m_texture = RE::Texture{loc, RE::Texture::DEFAULT_PARAMETERS};
+        m_texture = RE::TextureShaped{loc};
     }
     catch (...) {
         return;
@@ -189,19 +168,14 @@ void MainMenuRoom::load(const std::string& loc) {
     m_textureLoc = loc;
 
     //Init GUI
-    /*m_minFilter = findSelectedFromCombo(m_texture->getMinFilter(), MIN_FILTERS);
-    m_magFilter = findSelectedFromCombo(m_texture->getMagFilter(), MAG_FILTERS);
-    m_wrapStyleX = findSelectedFromCombo(m_texture->getWrapStyleX(), WRAP_STYLES);
-    m_wrapStyleY = findSelectedFromCombo(m_texture->getWrapStyleY(), WRAP_STYLES);
-    m_subimagesSprites = m_texture->getSubimagesSpritesCount();
-    m_subimageDims = m_texture->getSubimageDims();
-    m_pivot = m_texture->getPivot();
-    m_borderColor = glm::vec4(m_texture->getBorderColor()) / 255.0f;*/
+    m_subimagesSprites = m_texture->subimagesSpritesCount();
+    m_subimageDims = m_texture->subimageDims();
+    m_pivot = m_texture->pivot();;
 }
 
 void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
     glm::vec2 windowDims = glm::vec2(engine().getWindowDims());
-    auto texDims = m_texture->getSubimagesSpritesCount() * m_texture->getSubimageDims();
+    auto texDims = m_texture->subimagesSpritesCount() * m_texture->subimageDims();
     auto botLeft = -texDims * 0.5f;
 
     glm::vec4 posSizeRect = {
@@ -214,16 +188,16 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
     };
 
     m_sb.begin();
-    m_sb.add(posSizeRect, uvRect, *m_texture);
+    m_sb.add(*m_texture, posSizeRect, uvRect);
     m_sb.end();
     m_sb.draw(commandBuffer, m_texView.getViewMatrix());
 
     m_gb.begin();
     std::vector<RE::VertexPOCO> vertices;
-    glm::vec2 subimageSprite = m_texture->getSubimagesSpritesCount();
+    glm::vec2 subimageSprite = m_texture->subimagesSpritesCount();
     vertices.reserve((size_t)(subimageSprite.x * subimageSprite.y) * 4u);
     RE::Color color{0, 255u, 0u, 255u};
-    auto subimageDims = m_texture->getSubimageDims();
+    auto subimageDims = m_texture->subimageDims();
     //Subimages
     for (float x = 1.0f; x < subimageSprite.x; ++x) {
         glm::vec2 coord = botLeft + glm::vec2(x, 0.0f) * subimageDims;
@@ -241,10 +215,10 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
     }
     //Pivots
     color = {0u, 0u, 255u, 255u};
-    glm::vec2 pivotOffset = m_texture->getPivot();
+    glm::vec2 pivotOffset = m_texture->pivot();
     float pivotMarkRadius = glm::min(subimageDims.x, subimageDims.y) * 0.45f;
-    for (float x = 0.0f; x < m_texture->getSubimagesSpritesCount().x; ++x) {
-        for (float y = 0.0f; y < m_texture->getSubimagesSpritesCount().y; ++y) {
+    for (float x = 0.0f; x < m_texture->subimagesSpritesCount().x; ++x) {
+        for (float y = 0.0f; y < m_texture->subimagesSpritesCount().y; ++y) {
             glm::vec2 pivotPos = botLeft + glm::vec2(x, y) * subimageDims + pivotOffset;
             vertices.emplace_back(pivotPos + glm::vec2(pivotMarkRadius, pivotMarkRadius), color);
             vertices.emplace_back(pivotPos + glm::vec2(-pivotMarkRadius, -pivotMarkRadius), color);
