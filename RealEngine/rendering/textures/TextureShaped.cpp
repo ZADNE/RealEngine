@@ -29,17 +29,4 @@ TextureShaped& TextureShaped::operator=(TextureShaped&& other) noexcept {
     return *this;
 }
 
-bool TextureShaped::saveToFile(const std::string& filePathPNG) {
-    /*PNGLoader::PNGData pngData{
-        .dims = m_trueDims,
-        .params = params
-    };
-    pngData.pixels.resize(Raster::minimumRequiredMemory(m_trueDims, params.getChannels()));
-    //Download pixels
-    getTexels(pngData.pixels.size(), pngData.pixels.data());
-    return PNGLoader::save(filePathPNG, pngData) == 0;*/
-    //TODO
-    return false;
-}
-
 }

@@ -25,20 +25,27 @@ public:
     };
 
     /**
-     * @brief Loads texels and parameters from PNG file
-     * @return 0 on success, other on failure
-     *
-     * Failing to load parameters is not considered a failure.
+     * @brief   Loads texels and parameters from PNG file
+     * @return  0 on success, other on failure
+     * @throws  Throws when the file cannot be opened/decoded
+     * @details Failing to load parameters is not considered a failure
     */
     static PNGData load(const std::string& filePathPNG);
 
     /**
-     * @brief Saves texels and parameters to PNG file
-     * @return 0 on success, other on failure
-     *
-     * Overwrites existing file without notice.
+     * @brief   Saves texels and parameters to PNG file
+     * @return  0 on success, other on failure
+     * @details Overwrites existing file without notice
+     * @throws  Throws when the file cannot be saved/encoded
     */
-    static unsigned int save(const std::string& filePathPNG, const PNGData& data);
+    static void save(const std::string& filePathPNG, const PNGData& data);
+
+    /**
+     * @brief   Replaces parameters inside PNG file
+     * @return  0 on success, other on failure
+     * @throws  Throws when the file cannot be opened/decoded
+    */
+    static void replaceParameters(const std::string& filePathPNG, const TextureShape& shape);
 };
 
 }

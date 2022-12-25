@@ -79,7 +79,7 @@ PNGLoader::PNGData PNGLoader::load(const std::string& filePathPNG) {
     return decoded;//Could not load RTI but that is still ok
 }
 
-unsigned int PNGLoader::save(const std::string& filePathPNG, const PNGData& data) {
+void PNGLoader::save(const std::string& filePathPNG, const PNGData& data) {
     //Create RTI chunk
     lodepng::State state{};
     unsigned int code;
@@ -89,7 +89,7 @@ unsigned int PNGLoader::save(const std::string& filePathPNG, const PNGData& data
         &state.info_png.unknown_chunks_size[0],
         static_cast<unsigned int>(rti.size()),
         "reAl", rti.data())) {
-        return code;//Chunk creation failed
+        throw Exception{lodepng_error_text(code)};//Chunk creation failed
     }
 
     //Encode and save PNG
@@ -97,10 +97,14 @@ unsigned int PNGLoader::save(const std::string& filePathPNG, const PNGData& data
     state.encoder.auto_convert = 0;
     std::vector<unsigned char> png;
     if ((code = lodepng::encode(png, data.texels, data.dims.x, data.dims.y, state)) || (code = lodepng::save_file(png, filePathPNG))) {
-        return code;//Encoding or saving failed
+        throw Exception{lodepng_error_text(code)};//Encoding or saving failed
     }
+}
 
-    return 0;
+void PNGLoader::replaceParameters(const std::string& filePathPNG, const TextureShape& shape) {
+    auto saved = load(filePathPNG);
+    saved.shape = shape;
+    save(filePathPNG, saved);
 }
 
 }

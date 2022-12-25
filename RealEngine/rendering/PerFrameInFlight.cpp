@@ -1,5 +1,4 @@
-﻿#include "PerFrameInFlight.hpp"
-/*!
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/rendering/PerFrameInFlight.hpp>

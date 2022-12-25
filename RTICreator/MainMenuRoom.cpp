@@ -11,7 +11,6 @@
 #endif
 #define NOMINMAX 1
 #include <Windows.h>
-#include <ImGui/imgui.h>
 #include <RealEngine/utility/Error.hpp>
 
 constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
@@ -24,7 +23,7 @@ MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
     Room(0, INITIAL_DISPLAY_SETTINGS),
     m_texView(engine().getWindowDims()) {
 
-    engine().setWindowTitle("RTICreator v3.0.0");
+    engine().setWindowTitle("RTICreator v4.0.0");
 
     //Set last visited location to location of this executable
     m_lastVisitedLoc = args[0];
@@ -152,7 +151,11 @@ void MainMenuRoom::selectAndLoad() {
 
 void MainMenuRoom::save(const std::string& loc) {
     if (loc.empty()) { return; }
-    m_texture->saveToFile(loc);
+    RE::PNGLoader::replaceParameters(loc, RE::TextureShape{
+        .subimageDims = m_subimageDims,
+        .pivot = m_pivot,
+        .subimagesSpritesCount = m_subimagesSprites
+    });
 }
 
 void MainMenuRoom::load(const std::string& loc) {

@@ -67,14 +67,6 @@ public:
     void setPivot(const glm::vec2& pivot) { m_shape.pivot = pivot; }
     void setSubimagesSpritesCount(const glm::vec2& subimagesSpritesCount) { m_shape.subimagesSpritesCount = subimagesSpritesCount; }
 
-    /**
-     * @brief   Saves level 0 of the texture as a PNG file
-     * @param   filePathPNG Filepath to save, existing file will be overwritten without warnings
-     * @details Also encodes its shape.
-     * @return  True if saved succesfully, false otherwise
-    */
-    bool saveToFile(const std::string& filePathPNG);
-
 private:
 
     TextureShaped(PNGLoader::PNGData&& pngData);
