@@ -17,6 +17,7 @@ struct TextureCreateInfo {
     vk::Extent3D extent = vk::Extent3D{0u, 1u, 1u};
     uint32_t layers = 1u;
     vk::ImageUsageFlags usage = vk::ImageUsageFlagBits::eSampled;
+    vk::ImageLayout initialLayout = vk::ImageLayout::eReadOnlyOptimal;
     //Memory-related
     vk::MemoryPropertyFlagBits memory = vk::MemoryPropertyFlagBits::eDeviceLocal;
     //Raster-related

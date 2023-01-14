@@ -11,7 +11,7 @@ namespace RE {
 using enum vk::BufferUsageFlagBits;
 using enum vk::MemoryPropertyFlagBits;
 
-GeometryBatch::GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVertices) :
+GeometryBatch::GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVertices):
     m_verticesBuf(sizeof(VertexPOCO)* maxVertices* MAX_FRAMES_IN_FLIGHT, eVertexBuffer, eHostVisible | eHostCoherent),
     m_verticesMapped(m_verticesBuf.map<VertexPOCO>(0, sizeof(VertexPOCO)* maxVertices* MAX_FRAMES_IN_FLIGHT)),
     m_maxVertices(maxVertices),
@@ -54,12 +54,12 @@ vk::PipelineVertexInputStateCreateInfo GeometryBatch::createVertexInputStateInfo
         vk::VertexInputRate::eVertex    //Input rate
     }});
     static constexpr std::array attributes = std::to_array<vk::VertexInputAttributeDescription>({{
-        ATTR_POSITION,                  //Location
+        0u,                             //Location
         0u,                             //Binding index
         vk::Format::eR32G32B32A32Sfloat,//Format
         offsetof(VertexPOCO, position)  //Relative offset
     },{
-        ATTR_COLOR,                     //Location
+        1u,                             //Location
         0u,                             //Binding index
         vk::Format::eR8G8B8A8Unorm,     //Format
         offsetof(VertexPOCO, color)     //Relative offset

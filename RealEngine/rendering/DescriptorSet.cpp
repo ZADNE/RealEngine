@@ -5,13 +5,13 @@
 
 namespace RE {
 
-DescriptorSet::DescriptorSet(const Pipeline& pl) :
+DescriptorSet::DescriptorSet(const Pipeline& pl):
     m_descriptorSet(s_device->allocateDescriptorSets(vk::DescriptorSetAllocateInfo{
         *s_descriptorPool, pl.m_descriptorSetLayout
-        }).back()) {
+                    }).back()) {
 }
 
-DescriptorSet::DescriptorSet(DescriptorSet&& other) noexcept :
+DescriptorSet::DescriptorSet(DescriptorSet&& other) noexcept:
     m_descriptorSet(other.m_descriptorSet) {
     other.m_descriptorSet = nullptr;
 }
@@ -46,11 +46,11 @@ void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Buffe
     );
 }
 
-void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex, const Texture& tex) {
+void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex, const Texture& tex, vk::ImageLayout layout/* = vk::ImageLayout::eShaderReadOnlyOptimal*/) {
     auto imageInfo = vk::DescriptorImageInfo{
         tex.m_sampler,
         tex.m_imageView,
-        vk::ImageLayout::eShaderReadOnlyOptimal
+        layout
     };
     s_device->updateDescriptorSets(
         vk::WriteDescriptorSet{

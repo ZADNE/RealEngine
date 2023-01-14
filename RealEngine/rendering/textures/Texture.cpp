@@ -43,13 +43,15 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         vk::SampleCountFlagBits::e1,
         vk::ImageTiling::eOptimal,
         createInfo.usage | (requiresStagingBuffer ? eTransferDst : vk::ImageUsageFlagBits{}),
-        vk::SharingMode::eExclusive
+        vk::SharingMode::eExclusive,
+        {},
+        createInfo.texels.empty() ? createInfo.initialLayout : eUndefined
     });
     //Allocate memory for the image
     auto memReq = s_device->getImageMemoryRequirements2({m_image}).memoryRequirements;
     m_deviceMemory = s_device->allocateMemory(vk::MemoryAllocateInfo{
         memReq.size,
-        selectMemoryType(memReq.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
+        selectMemoryType(memReq.memoryTypeBits, createInfo.memory)
     });
     s_device->bindImageMemory(m_image, m_deviceMemory, 0u);
     //Initialize texels of the image
@@ -74,7 +76,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
     m_sampler = s_device->createSampler(vk::SamplerCreateInfo{});
 }
 
-Texture::Texture(Texture&& other) noexcept :
+Texture::Texture(Texture&& other) noexcept:
     m_image(other.m_image),
     m_deviceMemory(other.m_deviceMemory),
     m_imageView(other.m_imageView),
@@ -114,15 +116,15 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
         stagingBuffer.unmap();
     }
     //Copy data from staging buffer to the image
-    CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
+    auto copyLambda = [&](const vk::CommandBuffer& commandBuffer) {
         transitionImageLayout(commandBuffer, eUndefined, eTransferDstOptimal);
-    commandBuffer.copyBufferToImage(
-        stagingBuffer.m_buffer,
-        m_image,
-        eTransferDstOptimal,
-        vk::BufferImageCopy{
-            0u, 0u, 0u,
-            vk::ImageSubresourceLayers{
+        commandBuffer.copyBufferToImage(
+            stagingBuffer.m_buffer,
+            m_image,
+            eTransferDstOptimal,
+            vk::BufferImageCopy{
+                0u, 0u, 0u,
+                vk::ImageSubresourceLayers{
                 vk::ImageAspectFlagBits::eColor,
                 0u,                                     //Mip level
                 0u,                                     //Base array layer
@@ -130,10 +132,11 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
             },
             vk::Offset3D{0u, 0u, 0u},
             createInfo.extent
-        }
-    );
-    transitionImageLayout(commandBuffer, eTransferDstOptimal, eReadOnlyOptimal);
-    });
+            }
+        );
+        transitionImageLayout(commandBuffer, eTransferDstOptimal, createInfo.initialLayout);
+    };
+    CommandBuffer::doOneTimeSubmit(copyLambda);
 }
 
 void Texture::transitionImageLayout(const vk::CommandBuffer& commandBuffer, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {

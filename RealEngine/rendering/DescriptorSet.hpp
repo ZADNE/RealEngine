@@ -25,7 +25,7 @@ public:
     ~DescriptorSet();
 
     void write(vk::DescriptorType type, uint32_t binding, const Buffer& bf, vk::DeviceSize offset, vk::DeviceSize range);
-    void write(vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex, const Texture& tex);
+    void write(vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex, const Texture& tex, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
 
     const vk::DescriptorSet& operator*() const { return m_descriptorSet; }
     const vk::DescriptorSet* operator->() const { return &m_descriptorSet; }
