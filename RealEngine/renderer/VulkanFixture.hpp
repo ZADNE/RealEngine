@@ -9,6 +9,7 @@
 
 #include <glm/vec4.hpp>
 
+#include <RealEngine/renderer/VulkanDeletionQueue.hpp>
 #include <RealEngine/rendering/PerFrameInFlight.hpp>
 
 struct SDL_Window;
@@ -16,28 +17,28 @@ struct SDL_Window;
 namespace RE {
 
 /**
-* @brief Enforces use of Vulkan 1.3 graphics backend.
+* @brief Enforces use of Vulkan graphics backend.
 *
 * This is used internally when the RealEngine starts.
 *
 * @warning Never use this class directly!
 */
-class VK13Fixture {
+class VulkanFixture {
 public:
 
     /**
-     * @brief Sets up for Vulkan 1.3 rendering
+     * @brief Sets up for Vulkan rendering
      * @throws If anything fails
     */
-    VK13Fixture(SDL_Window* sdlWindow, bool vSync);
+    VulkanFixture(SDL_Window* sdlWindow, bool vSync);
 
-    VK13Fixture(const VK13Fixture&) = delete;
-    VK13Fixture& operator=(const VK13Fixture&) = delete;
+    VulkanFixture(const VulkanFixture&) = delete;
+    VulkanFixture& operator=(const VulkanFixture&) = delete;
 
-    VK13Fixture(VK13Fixture&&) = default;
-    VK13Fixture& operator=(VK13Fixture&&) = default;
+    VulkanFixture(VulkanFixture&&) = default;
+    VulkanFixture& operator=(VulkanFixture&&) = default;
 
-    ~VK13Fixture();
+    ~VulkanFixture();
 
     const vk::CommandBuffer& prepareFrame(const glm::vec4& clearColor, bool useImGui);
     void finishFrame(bool useImGui);
@@ -82,6 +83,7 @@ private:
     PerFrameInFlight<vk::raii::Semaphore> m_renderingFinishedSems;
     PerFrameInFlight<vk::raii::Fence> m_inFlightFences;
     bool m_recreteSwapchain = false;
+    VulkanDeletionQueue m_deletionQueue{*m_device};
     //Implementations
     void assignImplementationReferences();
     void clearImplementationReferences();

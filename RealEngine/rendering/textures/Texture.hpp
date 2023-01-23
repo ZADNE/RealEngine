@@ -4,6 +4,8 @@
 #pragma once
 #include <vulkan/vulkan.hpp>
 
+#include <RealEngine/renderer/VulkanDeletionQueue.hpp>
+
 
 namespace RE {
 
@@ -28,7 +30,7 @@ struct TextureCreateInfo {
  * @brief Represents one (or more) images
 */
 class Texture {
-    friend class VK13Fixture;
+    friend class VulkanFixture;
     friend class DescriptorSet;
 public:
 
@@ -64,6 +66,7 @@ protected:
     static inline const vk::PhysicalDevice* s_physicalDevice = nullptr;
     static inline const vk::Device* s_device = nullptr;
     static inline const vk::CommandBuffer* s_commandBuffer = nullptr;
+    static inline VulkanDeletionQueue* s_deletionQueue = nullptr;
 
     static uint32_t selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
 };

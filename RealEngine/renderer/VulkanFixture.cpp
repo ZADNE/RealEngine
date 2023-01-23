@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/window/VK13Fixture.hpp>
+#include <RealEngine/renderer/VulkanFixture.hpp>
 
 #include <bitset>
 #include <iostream>
@@ -44,7 +44,7 @@ constexpr vk::SurfaceFormatKHR SURFACE_FORMAT{
     vk::ColorSpaceKHR::eSrgbNonlinear
 };
 
-VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
+VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync) :
     m_sdlWindow(sdlWindow),
     m_vSync(vSync),
     //Vulkan objects
@@ -93,16 +93,19 @@ VK13Fixture::VK13Fixture(SDL_Window* sdlWindow, bool vSync) :
     }
 }
 
-VK13Fixture::~VK13Fixture() {
+VulkanFixture::~VulkanFixture() {
     m_device.waitIdle();
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     clearImplementationReferences();
 }
 
-const vk::CommandBuffer& VK13Fixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
+const vk::CommandBuffer& VulkanFixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
     //Wait for the previous frame to finish
     checkSuccess(m_device.waitForFences(*current(m_inFlightFences), true, MAX_TIMEOUT));
+
+    m_deletionQueue.deleteNextGroup();
+    m_deletionQueue.beginNewGroup();
 
     //Recreate swapchain if required
     if (m_recreteSwapchain) {
@@ -170,7 +173,7 @@ const vk::CommandBuffer& VK13Fixture::prepareFrame(const glm::vec4& clearColor, 
     return (*commandBuffer);
 }
 
-void VK13Fixture::finishFrame(bool useImGui) {
+void VulkanFixture::finishFrame(bool useImGui) {
     auto& commandBuffer = current(m_commandBuffers);
     if (useImGui) {
         ImGui::Render();
@@ -206,16 +209,16 @@ void VK13Fixture::finishFrame(bool useImGui) {
     setFrame(m_frame++);
 }
 
-void VK13Fixture::changePresentation(bool vSync) {
+void VulkanFixture::changePresentation(bool vSync) {
     m_vSync = vSync;
     m_recreteSwapchain = true;
 }
 
-void VK13Fixture::prepareForDestructionOfRendererObjects() {
+void VulkanFixture::prepareForDestructionOfRendererObjects() {
     m_device.waitIdle();
 }
 
-vk::raii::Instance VK13Fixture::createInstance() {
+vk::raii::Instance VulkanFixture::createInstance() {
     //Prepare default layers and extensions
     std::vector<const char*> extensions = {
 #ifndef NDEBUG
@@ -244,21 +247,21 @@ vk::raii::Instance VK13Fixture::createInstance() {
     vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo{{},
         /*eVerbose | eInfo |*/ eWarning | eError,
         eGeneral | eValidation | ePerformance,
-        &VK13Fixture::debugMessengerCallback
+        &VulkanFixture::debugMessengerCallback
     };
     return vk::raii::Instance{m_context, vk::InstanceCreateInfo{{}, &applicationInfo, validationLayers, extensions, &debugMessengerCreateInfo}};
 }
 
-vk::raii::DebugUtilsMessengerEXT VK13Fixture::createDebugUtilsMessenger() {
+vk::raii::DebugUtilsMessengerEXT VulkanFixture::createDebugUtilsMessenger() {
     vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo{{},
         /*eVerbose | eInfo |*/ eWarning | eError,
         eGeneral | eValidation | ePerformance,
-        &VK13Fixture::debugMessengerCallback
+        &VulkanFixture::debugMessengerCallback
     };
     return vk::raii::DebugUtilsMessengerEXT{m_instance, debugMessengerCreateInfo};
 }
 
-vk::raii::SurfaceKHR VK13Fixture::createSurface() {
+vk::raii::SurfaceKHR VulkanFixture::createSurface() {
     VkSurfaceKHR surface;
     if (!SDL_Vulkan_CreateSurface(m_sdlWindow, *m_instance, &surface)) {
         throw std::runtime_error("SDL2 could not create Vulkan surface!");
@@ -266,7 +269,7 @@ vk::raii::SurfaceKHR VK13Fixture::createSurface() {
     return vk::raii::SurfaceKHR{m_instance, surface};
 }
 
-vk::raii::PhysicalDevice VK13Fixture::createPhysicalDevice() {
+vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice() {
     for (const auto& physicalDevice : vk::raii::PhysicalDevices{m_instance}) {//Iterate over all physical device
         if (areExtensionsSupported(physicalDevice) && isSwapchainSupported(physicalDevice) && findQueueFamilyIndices(physicalDevice)) {
             auto props = physicalDevice.getProperties2();
@@ -282,7 +285,7 @@ vk::raii::PhysicalDevice VK13Fixture::createPhysicalDevice() {
     throw std::runtime_error("No physical device is suitable!");
 }
 
-vk::raii::Device VK13Fixture::createDevice() {
+vk::raii::Device VulkanFixture::createDevice() {
     float deviceQueuePriority = 1.0f;
     std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos;
     deviceQueueCreateInfos.emplace_back(vk::DeviceQueueCreateFlags{}, m_graphicsQueueFamilyIndex, 1, &deviceQueuePriority);
@@ -306,11 +309,11 @@ vk::raii::Device VK13Fixture::createDevice() {
     return vk::raii::Device{m_physicalDevice, createInfo.get<>()};
 }
 
-vk::raii::Queue VK13Fixture::createQueue(uint32_t familyIndex) {
+vk::raii::Queue VulkanFixture::createQueue(uint32_t familyIndex) {
     return vk::raii::Queue{m_device, familyIndex, 0u};
 }
 
-vk::raii::SwapchainKHR VK13Fixture::createSwapchain() {
+vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
     auto caps = m_physicalDevice.getSurfaceCapabilitiesKHR(*m_surface);
     //Minimum image count
     m_minImageCount = glm::clamp(
@@ -343,7 +346,7 @@ vk::raii::SwapchainKHR VK13Fixture::createSwapchain() {
     return vk::raii::SwapchainKHR{m_device, createInfo};
 }
 
-std::vector<vk::raii::ImageView> VK13Fixture::createSwapchainImageViews() {
+std::vector<vk::raii::ImageView> VulkanFixture::createSwapchainImageViews() {
     auto images = m_swapchain.getImages();
     std::vector<vk::raii::ImageView> imageViews;
     imageViews.reserve(images.size());
@@ -356,7 +359,7 @@ std::vector<vk::raii::ImageView> VK13Fixture::createSwapchainImageViews() {
     return imageViews;
 }
 
-vk::raii::RenderPass VK13Fixture::createRenderPass() {
+vk::raii::RenderPass VulkanFixture::createRenderPass() {
     vk::AttachmentDescription attachmentDescription{{},
         SURFACE_FORMAT.format,
         vk::SampleCountFlagBits::e1,
@@ -391,7 +394,7 @@ vk::raii::RenderPass VK13Fixture::createRenderPass() {
     return vk::raii::RenderPass{m_device, createInfo};
 }
 
-std::vector<vk::raii::Framebuffer> VK13Fixture::createSwapchainFramebuffers() {
+std::vector<vk::raii::Framebuffer> VulkanFixture::createSwapchainFramebuffers() {
     vk::FramebufferCreateInfo createInfo{{},
         *m_renderPass, {},
         m_swapchainExtent.width, m_swapchainExtent.height, 1
@@ -405,7 +408,7 @@ std::vector<vk::raii::Framebuffer> VK13Fixture::createSwapchainFramebuffers() {
     return vec;
 }
 
-vk::raii::CommandPool VK13Fixture::createCommandPool() {
+vk::raii::CommandPool VulkanFixture::createCommandPool() {
     vk::CommandPoolCreateInfo createInfo{
         vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
         m_graphicsQueueFamilyIndex
@@ -413,14 +416,14 @@ vk::raii::CommandPool VK13Fixture::createCommandPool() {
     return vk::raii::CommandPool{m_device, createInfo};
 }
 
-PerFrameInFlight<vk::raii::CommandBuffer> VK13Fixture::createCommandBuffers() {
+PerFrameInFlight<vk::raii::CommandBuffer> VulkanFixture::createCommandBuffers() {
     vk::CommandBufferAllocateInfo commandBufferAllocateInfo{*m_commandPool, ePrimary, MAX_FRAMES_IN_FLIGHT};
     vk::raii::CommandBuffers buffers{m_device, commandBufferAllocateInfo};
     assert(buffers.size() == MAX_FRAMES_IN_FLIGHT);
     return PerFrameInFlight<vk::raii::CommandBuffer>{std::move(buffers[0]), std::move(buffers[1])};
 }
 
-PerFrameInFlight<vk::raii::Semaphore> VK13Fixture::createSemaphores() {
+PerFrameInFlight<vk::raii::Semaphore> VulkanFixture::createSemaphores() {
     vk::SemaphoreCreateInfo createInfo{};
     return {
         vk::raii::Semaphore{m_device, createInfo},
@@ -428,7 +431,7 @@ PerFrameInFlight<vk::raii::Semaphore> VK13Fixture::createSemaphores() {
     };
 }
 
-PerFrameInFlight<vk::raii::Fence> VK13Fixture::createFences() {
+PerFrameInFlight<vk::raii::Fence> VulkanFixture::createFences() {
     vk::FenceCreateInfo createInfo{vk::FenceCreateFlagBits::eSignaled};
     return {
         vk::raii::Fence{m_device, createInfo},
@@ -436,11 +439,11 @@ PerFrameInFlight<vk::raii::Fence> VK13Fixture::createFences() {
     };
 }
 
-vk::raii::PipelineCache VK13Fixture::createPipelineCache() {
+vk::raii::PipelineCache VulkanFixture::createPipelineCache() {
     return vk::raii::PipelineCache{m_device, vk::PipelineCacheCreateInfo{}};
 }
 
-vk::raii::DescriptorPool VK13Fixture::createDescriptorPool() {
+vk::raii::DescriptorPool VulkanFixture::createDescriptorPool() {
     using enum vk::DescriptorType;
     constexpr std::array poolSizes = std::to_array<vk::DescriptorPoolSize>({
         {eSampler, 128},
@@ -462,19 +465,19 @@ vk::raii::DescriptorPool VK13Fixture::createDescriptorPool() {
     return vk::raii::DescriptorPool{m_device, createInfo};
 }
 
-VkBool32 VK13Fixture::debugMessengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT sev, VkDebugUtilsMessageTypeFlagsEXT type, const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData) {
-    if (sev != VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT && strcmp(callbackData->pMessageIdName, "Loader Message") != 0) {
+VkBool32 VulkanFixture::debugMessengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT sev, VkDebugUtilsMessageTypeFlagsEXT type, const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData) {
+    if (sev != VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT && std::strcmp(callbackData->pMessageIdName, "Loader Message") != 0) {
         std::cerr << callbackData->pMessage << '\n';
         int stop = 5;
     }
     return false;
 }
 
-bool VK13Fixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice) {
+bool VulkanFixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice) {
     std::bitset<DEVICE_EXTENSIONS.size()> supported{};
     for (const auto& extensionProperties : physicalDevice.enumerateDeviceExtensionProperties()) {
         for (size_t i = 0; i < DEVICE_EXTENSIONS.size(); ++i) {
-            if (strcmp(extensionProperties.extensionName.data(), DEVICE_EXTENSIONS[i]) == 0) {
+            if (std::strcmp(extensionProperties.extensionName.data(), DEVICE_EXTENSIONS[i]) == 0) {
                 supported[i] = true;
             }
         }
@@ -482,7 +485,7 @@ bool VK13Fixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physica
     return supported.all();
 }
 
-bool VK13Fixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice) {
+bool VulkanFixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice) {
     bool formatSupported = false;
     for (const auto& format : physicalDevice.getSurfaceFormatsKHR(*m_surface)) {
         if (format == SURFACE_FORMAT) {
@@ -498,7 +501,7 @@ bool VK13Fixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physicalD
     return formatSupported && mailboxSupported;
 }
 
-bool VK13Fixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice) {
+bool VulkanFixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice) {
     bool graphicsQueueFound = false;
     bool computeQueueFound = false;
     bool presentQueueFound = false;
@@ -523,7 +526,7 @@ bool VK13Fixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physica
     return false;
 }
 
-void VK13Fixture::recreateSwapchain() {
+void VulkanFixture::recreateSwapchain() {
     m_device.waitIdle();
     m_swapChainFramebuffers.~vector();
     m_swapchainImageViews.~vector();
@@ -533,7 +536,7 @@ void VK13Fixture::recreateSwapchain() {
     new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers){createSwapchainFramebuffers()};
 }
 
-void VK13Fixture::recreateImGuiFontTexture() {
+void VulkanFixture::recreateImGuiFontTexture() {
     vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
     current(m_commandBuffers).begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
     ImGui_ImplVulkan_CreateFontsTexture(*current(m_commandBuffers));
@@ -542,7 +545,7 @@ void VK13Fixture::recreateImGuiFontTexture() {
     checkSuccess(m_device.waitForFences(*uploadFence, true, MAX_TIMEOUT));
 }
 
-void VK13Fixture::assignImplementationReferences() {
+void VulkanFixture::assignImplementationReferences() {
     Buffer::s_physicalDevice = Texture::s_physicalDevice = &(*m_physicalDevice);
     Buffer::s_device = CommandBuffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = &(*m_device);
     CommandBuffer::s_graphicsQueue = &(*m_graphicsQueue);
@@ -552,9 +555,10 @@ void VK13Fixture::assignImplementationReferences() {
     Pipeline::s_pipelineCache = &(*m_pipelineCache);
     Pipeline::s_renderPass = &(*m_renderPass);
     CommandBuffer::s_oneTimeSubmitCommandBuffer = &(*m_oneTimeSubmitCommandBuffer);
+    Buffer::s_deletionQueue = Texture::s_deletionQueue = &m_deletionQueue;
 }
 
-void VK13Fixture::clearImplementationReferences() {
+void VulkanFixture::clearImplementationReferences() {
     Buffer::s_physicalDevice = Texture::s_physicalDevice = nullptr;
     Buffer::s_device = CommandBuffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = nullptr;
     CommandBuffer::s_graphicsQueue = nullptr;
@@ -564,6 +568,7 @@ void VK13Fixture::clearImplementationReferences() {
     Pipeline::s_pipelineCache = nullptr;
     Pipeline::s_renderPass = nullptr;
     CommandBuffer::s_oneTimeSubmitCommandBuffer = nullptr;
+    Buffer::s_deletionQueue = Texture::s_deletionQueue = nullptr;
 }
 
 }

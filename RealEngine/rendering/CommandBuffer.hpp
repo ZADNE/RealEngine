@@ -9,7 +9,7 @@
 namespace RE {
 
 class CommandBuffer {
-    friend class VK13Fixture;
+    friend class VulkanFixture;
 public:
 
     CommandBuffer(vk::CommandBufferLevel level);

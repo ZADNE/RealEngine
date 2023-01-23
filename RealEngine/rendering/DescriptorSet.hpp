@@ -11,7 +11,7 @@
 namespace RE {
 
 class DescriptorSet {
-    friend class VK13Fixture;
+    friend class VulkanFixture;
 public:
 
     DescriptorSet(const Pipeline& pl);

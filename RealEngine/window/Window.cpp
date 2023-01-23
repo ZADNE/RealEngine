@@ -39,7 +39,7 @@ Window::Window(const WindowSettings& settings, const std::string& title) :
 Window::~Window() {
     switch (m_usedRenderer) {
     case RendererID::VULKAN13:
-        m_vk13.~VK13Fixture(); break;
+        m_vk13.~VulkanFixture(); break;
     }
     SDL_DestroyWindow(m_SDLwindow);
 }
@@ -117,7 +117,7 @@ void Window::initForVulkan13() {
 
     //Set up Vulkan 1.3 fixture
     try {
-        new (&m_vk13) VK13Fixture(m_SDLwindow, (bool)m_flags.vSync);
+        new (&m_vk13) VulkanFixture(m_SDLwindow, (bool)m_flags.vSync);
     }
     catch (std::exception& e) {
         std::cerr << e.what();

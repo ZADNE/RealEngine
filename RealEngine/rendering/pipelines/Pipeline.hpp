@@ -19,7 +19,7 @@ struct PipelineCreateInfo {
  * @brief Controls how vertices are rendered to screen.
 */
 class Pipeline {
-    friend class VK13Fixture;
+    friend class VulkanFixture;
     friend class DescriptorSet;
 public:
 

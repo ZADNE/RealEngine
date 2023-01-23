@@ -9,7 +9,7 @@
 
 #include <RealEngine/window/WindowSubsystems.hpp>
 #include <RealEngine/window/WindowSettings.hpp>
-#include <RealEngine/window/VK13Fixture.hpp>
+#include <RealEngine/renderer/VulkanFixture.hpp>
 
 union SDL_Event;
 
@@ -147,7 +147,7 @@ private:
     SDL_Window* m_SDLwindow = nullptr;
 
     union {
-        VK13Fixture m_vk13;
+        VulkanFixture m_vk13;
     };
     RendererID m_usedRenderer;              /**< The actual renderer (may be different from the preferred one) */
     std::string m_windowTitle;              /**< Title of the window */

@@ -96,10 +96,10 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 }
 
 Texture::~Texture() {
-    s_device->destroySampler(m_sampler);
-    s_device->destroyImageView(m_imageView);
-    s_device->destroyImage(m_image);
-    s_device->free(m_deviceMemory);
+    s_deletionQueue->enqueueDeletion(m_sampler);
+    s_deletionQueue->enqueueDeletion(m_imageView);
+    s_deletionQueue->enqueueDeletion(m_image);
+    s_deletionQueue->enqueueDeletion(m_deviceMemory);
 }
 
 void Texture::initializeTexels(const TextureCreateInfo& createInfo) {

@@ -7,6 +7,8 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <RealEngine/renderer/VulkanDeletionQueue.hpp>
+
 
 namespace RE {
 
@@ -14,7 +16,7 @@ namespace RE {
  * @brief Is a continuous block of memory stored in the GPU's memory
 */
 class Buffer {
-    friend class VK13Fixture;
+    friend class VulkanFixture;
     friend class DescriptorSet;
     friend class Texture;
 public:
@@ -80,6 +82,7 @@ protected:
     static inline const vk::PhysicalDevice* s_physicalDevice = nullptr;
     static inline const vk::Device* s_device = nullptr;
     static inline const vk::CommandBuffer* s_commandBuffer = nullptr;
+    static inline VulkanDeletionQueue* s_deletionQueue = nullptr;
 };
 
 }

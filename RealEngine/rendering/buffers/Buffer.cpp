@@ -52,8 +52,8 @@ Buffer& Buffer::operator=(Buffer&& other) noexcept {
 }
 
 Buffer::~Buffer() {
-    s_device->destroyBuffer(m_buffer);
-    s_device->free(m_memory);
+    s_deletionQueue->enqueueDeletion(m_buffer);
+    s_deletionQueue->enqueueDeletion(m_memory);
 }
 
 void Buffer::unmap() const {
