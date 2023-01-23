@@ -50,8 +50,8 @@ Pipeline::Pipeline(const PipelineCreateInfo& createInfo, const PipelineSources& 
         createInfo.patchControlPoints
     };
     vk::PipelineViewportStateCreateInfo viewport{{},
-        nullptr,                                //Viewport
-        nullptr                                 //Scissor
+        1u, nullptr,                            //Viewport
+        1u, nullptr                             //Scissor
     };
     vk::PipelineRasterizationStateCreateInfo rasterization{
         vk::PipelineRasterizationStateCreateFlags{},

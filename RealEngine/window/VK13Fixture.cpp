@@ -272,8 +272,9 @@ vk::raii::PhysicalDevice VK13Fixture::createPhysicalDevice() {
             auto props = physicalDevice.getProperties2();
             auto major = VK_API_VERSION_MAJOR(props.properties.apiVersion);
             auto minor = VK_API_VERSION_MINOR(props.properties.apiVersion);
-            if (major >= 1 && minor >= 2) {
-                std::cout << "Vulkan:       " << major << '.' << minor << std::endl;
+            auto patch = VK_API_VERSION_PATCH(props.properties.apiVersion);
+            if (major == 1 && minor >= 3) {
+                std::cout << "Vulkan:       " << major << '.' << minor << '.' << patch << std::endl;
                 return physicalDevice;
             }
         }
