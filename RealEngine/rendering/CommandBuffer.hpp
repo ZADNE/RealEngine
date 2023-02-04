@@ -28,7 +28,7 @@ public:
         op(*s_oneTimeSubmitCommandBuffer);
         s_oneTimeSubmitCommandBuffer->end();
         s_graphicsQueue->submit(vk::SubmitInfo{{}, {}, *s_oneTimeSubmitCommandBuffer});
-        s_device->waitIdle();//TODO expensive operation, use fence/semaphore instead
+        s_device->waitIdle();//TODO expensive operation, use fence instead or use outside main loop
     }
 
     void submitToGraphicsQueue() const;

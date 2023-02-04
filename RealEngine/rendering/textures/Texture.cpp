@@ -13,7 +13,7 @@ using enum vk::ImageLayout;
 using enum vk::PipelineStageFlagBits;
 
 vk::ImageViewType imageViewType(vk::ImageType imageType, uint32_t layers) {
-    if (layers > 0) {
+    if (layers > 1) {
         switch (imageType) {
         case vk::ImageType::e1D: return vk::ImageViewType::e1DArray;
         case vk::ImageType::e2D: return vk::ImageViewType::e2DArray;
@@ -45,7 +45,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         createInfo.usage | (requiresStagingBuffer ? eTransferDst : vk::ImageUsageFlagBits{}),
         vk::SharingMode::eExclusive,
         {},
-        createInfo.texels.empty() ? createInfo.initialLayout : eUndefined
+        eUndefined
     });
     //Allocate memory for the image
     auto memReq = s_device->getImageMemoryRequirements2({m_image}).memoryRequirements;
@@ -54,9 +54,19 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         selectMemoryType(memReq.memoryTypeBits, createInfo.memory)
     });
     s_device->bindImageMemory(m_image, m_deviceMemory, 0u);
-    //Initialize texels of the image
     if (!createInfo.texels.empty()) {
+        //Initialize texels of the image and transit to initial layout
         initializeTexels(createInfo);
+    } else {
+        //Only transit to initial layout
+        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
+            pipelineImageBarrier(
+                commandBuffer,
+                eUndefined, createInfo.initialLayout,       //Image layouts
+                eTopOfPipe, eTransfer,                      //Pipeline stage
+                {}, {}
+            );
+        });
     }
     //Create image view
     m_imageView = s_device->createImageView(vk::ImageViewCreateInfo{{},
@@ -116,8 +126,13 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
         stagingBuffer.unmap();
     }
     //Copy data from staging buffer to the image
-    auto copyLambda = [&](const vk::CommandBuffer& commandBuffer) {
-        transitionImageLayout(commandBuffer, eUndefined, eTransferDstOptimal);
+    CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
+        pipelineImageBarrier(
+            commandBuffer,
+            eUndefined, eTransferDstOptimal,            //Image layouts
+            eTopOfPipe, eTransfer,                      //Pipeline stage
+            {}, vk::AccessFlagBits::eTransferWrite
+        );
         commandBuffer.copyBufferToImage(
             stagingBuffer.m_buffer,
             m_image,
@@ -125,45 +140,37 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
             vk::BufferImageCopy{
                 0u, 0u, 0u,
                 vk::ImageSubresourceLayers{
-                vk::ImageAspectFlagBits::eColor,
-                0u,                                     //Mip level
-                0u,                                     //Base array layer
-                1u                                      //Array layer count
-            },
-            vk::Offset3D{0u, 0u, 0u},
-            createInfo.extent
+                    vk::ImageAspectFlagBits::eColor,
+                    0u,                                 //Mip level
+                    0u,                                 //Base array layer
+                    1u                                  //Array layer count
+                },
+                vk::Offset3D{0u, 0u, 0u},
+                createInfo.extent
             }
         );
-        transitionImageLayout(commandBuffer, eTransferDstOptimal, createInfo.initialLayout);
-    };
-    CommandBuffer::doOneTimeSubmit(copyLambda);
+        pipelineImageBarrier(
+            commandBuffer,
+            eTransferDstOptimal, createInfo.initialLayout,//Image layouts
+            eTransfer, eFragmentShader,                 //Pipeline stage
+            vk::AccessFlagBits::eTransferWrite, vk::AccessFlagBits::eShaderRead
+        );
+    });
 }
 
-void Texture::transitionImageLayout(const vk::CommandBuffer& commandBuffer, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
-    vk::PipelineStageFlags sourceStage;
-    vk::PipelineStageFlags destStage;
-    vk::AccessFlags sourceAccess;
-    vk::AccessFlags destAccess;
-    if (oldLayout == eUndefined && newLayout == eTransferDstOptimal) {
-        sourceStage = eTopOfPipe;
-        destStage = eTransfer;
-        sourceAccess = {};
-        destAccess = vk::AccessFlagBits::eTransferWrite;
-    } else if (oldLayout == eTransferDstOptimal && newLayout == eReadOnlyOptimal) {
-        sourceStage = eTransfer;
-        destStage = eFragmentShader;
-        sourceAccess = vk::AccessFlagBits::eTransferWrite;
-        destAccess = vk::AccessFlagBits::eShaderRead;
-    } else {
-        throw Exception{"Unsupported layout transition!"};
-    }
+void Texture::pipelineImageBarrier(
+    const vk::CommandBuffer& commandBuffer,
+    vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
+    vk::PipelineStageFlags srcStage, vk::PipelineStageFlags dstStage,
+    vk::AccessFlags srcAccess, vk::AccessFlags dstAccess
+) {
     commandBuffer.pipelineBarrier(
-        sourceStage, destStage,
+        srcStage, dstStage,
         vk::DependencyFlags{},
         {},                                             //Memory barriers
         {},                                             //Buffer memory barrier
         vk::ImageMemoryBarrier{
-            sourceAccess, destAccess,
+            srcAccess, dstAccess,
             oldLayout, newLayout,
             VK_QUEUE_FAMILY_IGNORED,                    //Source queue family index
             VK_QUEUE_FAMILY_IGNORED,                    //Dest queue family index

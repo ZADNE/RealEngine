@@ -138,7 +138,7 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(const glm::vec4& clearColor
     commandBuffer.begin({});
 
     //Set current commandbuffer
-    Buffer::s_commandBuffer = DescriptorSet::s_commandBuffer = Pipeline::s_commandBuffer = &(*commandBuffer);
+    Buffer::s_commandBuffer = DescriptorSet::s_commandBuffer = Pipeline::s_commandBuffer = Texture::s_commandBuffer = &(*commandBuffer);
 
     //Begin renderpass
     const auto* clearColorPtr = reinterpret_cast<const std::array<float, 4u>*>(&clearColor);
@@ -467,8 +467,7 @@ vk::raii::DescriptorPool VulkanFixture::createDescriptorPool() {
 
 VkBool32 VulkanFixture::debugMessengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT sev, VkDebugUtilsMessageTypeFlagsEXT type, const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData) {
     if (sev != VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT && std::strcmp(callbackData->pMessageIdName, "Loader Message") != 0) {
-        std::cerr << callbackData->pMessage << '\n';
-        int stop = 5;
+        error(callbackData->pMessage);
     }
     return false;
 }

@@ -59,7 +59,12 @@ protected:
 
     void initializeTexels(const TextureCreateInfo& createInfo);
 
-    void transitionImageLayout(const vk::CommandBuffer& commandBuffer, vk::ImageLayout oldLayout, vk::ImageLayout newLayout);
+    void pipelineImageBarrier(
+        const vk::CommandBuffer& commandBuffer,
+        vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
+        vk::PipelineStageFlags srcStage, vk::PipelineStageFlags dstStage,
+        vk::AccessFlags srcAccess, vk::AccessFlags dstAccess
+    );
 
     //Static members \|/
 
