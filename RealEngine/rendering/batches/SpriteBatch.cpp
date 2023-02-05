@@ -19,7 +19,17 @@ SpriteBatch::SpriteBatch(unsigned int maxSprites, unsigned int maxTextures) :
     m_spritesMapped(m_spritesBuf.map<Sprite>(0u, MAX_FRAMES_IN_FLIGHT* maxSprites * sizeof(Sprite))),
     m_maxSprites(maxSprites),
     m_maxTextures(maxTextures),
-    m_pipeline(createPipeline(maxTextures)) {
+    m_pipelineLayout(
+        PipelineLayoutCreateInfo{
+
+        }, PipelineGraphicsSources{
+            .vert = sprite_vert,
+            .tesc = sprite_tesc,
+            .tese = sprite_tese,
+            .frag = sprite_frag
+        }
+    ),
+    m_pipeline(createPipeline(m_pipelineLayout, maxTextures)) {
     m_texToIndex.reserve(maxTextures);
 }
 
@@ -35,9 +45,9 @@ void SpriteBatch::end() {
 
 void SpriteBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat) {
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
-    commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, m_pipeline.pipelineLayout(), 0u, *m_descSet, {});
+    commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *m_pipelineLayout, 0u, *m_descSet, {});
     commandBuffer.bindVertexBuffers(0u, *m_spritesBuf, 0ull);
-    commandBuffer.pushConstants<glm::mat4>(m_pipeline.pipelineLayout(), vk::ShaderStageFlagBits::eTessellationEvaluation, 0u, mvpMat);
+    commandBuffer.pushConstants<glm::mat4>(*m_pipelineLayout, vk::ShaderStageFlagBits::eTessellationEvaluation, 0u, mvpMat);
     commandBuffer.draw(m_nextSpriteIndex - m_maxSprites * NEXT_FRAME, 1u, m_maxSprites * CURRENT_FRAME, 0u);
 }
 
@@ -90,7 +100,26 @@ unsigned int SpriteBatch::texToIndex(const Texture& tex) {
     }
 }
 
-Pipeline SpriteBatch::createPipeline(unsigned int maxTextures) const {
+PipelineLayout SpriteBatch::createPipelineLayout(unsigned int maxTextures) {
+    //Specialization constants
+    static constexpr vk::SpecializationMapEntry SPEC_MAP_ENTRY{0u, 0u, 4ull};
+    unsigned int totalTextures = maxTextures * MAX_FRAMES_IN_FLIGHT;
+    static constexpr vk::DescriptorBindingFlags bindingFlags = {eUpdateUnusedWhilePending | ePartiallyBound};
+    auto bindingFlagsArray = vk::ArrayProxy<vk::DescriptorBindingFlags>(bindingFlags);
+    return PipelineLayout{
+        PipelineLayoutCreateInfo{
+            .descriptorBindingFlags = {bindingFlagsArray},
+            .specializationInfo = vk::SpecializationInfo{1u, &SPEC_MAP_ENTRY, sizeof(totalTextures), &totalTextures}
+        }, PipelineGraphicsSources{
+            .vert = sprite_vert,
+            .tesc = sprite_tesc,
+            .tese = sprite_tese,
+            .frag = sprite_frag
+        }
+    };
+}
+
+Pipeline SpriteBatch::createPipeline(const PipelineLayout& pipelineLayout, unsigned int maxTextures) {
     //Vertex input
     static constexpr std::array bindings = std::to_array<vk::VertexInputBindingDescription>({{
         0u,                             //Binding index
@@ -122,13 +151,13 @@ Pipeline SpriteBatch::createPipeline(unsigned int maxTextures) const {
     static constexpr vk::SpecializationMapEntry SPEC_MAP_ENTRY{0u, 0u, 4ull};
     unsigned int totalTextures = maxTextures * MAX_FRAMES_IN_FLIGHT;
     return Pipeline{
-        PipelineCreateInfo{
+        PipelineGraphicsCreateInfo{
+            .pipelineLayout = *pipelineLayout,
             .vertexInput = vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes},
             .topology = vk::PrimitiveTopology::ePatchList,
             .patchControlPoints = 1u,
-            .descriptorBindingFlags = {eUpdateUnusedWhilePending | ePartiallyBound},
             .specializationInfo = vk::SpecializationInfo{1u, &SPEC_MAP_ENTRY, sizeof(totalTextures), &totalTextures}
-        }, PipelineSources{
+        }, PipelineGraphicsSources{
             .vert = sprite_vert,
             .tesc = sprite_tesc,
             .tese = sprite_tese,

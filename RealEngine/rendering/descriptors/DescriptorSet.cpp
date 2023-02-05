@@ -1,14 +1,14 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/DescriptorSet.hpp>
+#include <RealEngine/rendering/descriptors/DescriptorSet.hpp>
 
 namespace RE {
 
-DescriptorSet::DescriptorSet(const Pipeline& pl):
-    m_descriptorSet(s_device->allocateDescriptorSets(vk::DescriptorSetAllocateInfo{
-        *s_descriptorPool, pl.m_descriptorSetLayout
-                    }).back()) {
+DescriptorSet::DescriptorSet(const PipelineLayout& pipelineLayout, uint32_t setIndex):
+    m_descriptorSet(device().allocateDescriptorSets(vk::DescriptorSetAllocateInfo{
+        descriptorPool(), pipelineLayout.descriptorSetLayout(setIndex)
+    }).back()) {
 }
 
 DescriptorSet::DescriptorSet(DescriptorSet&& other) noexcept:
@@ -23,16 +23,16 @@ DescriptorSet& DescriptorSet::operator=(DescriptorSet&& other) noexcept {
 
 DescriptorSet::~DescriptorSet() {
     //Do not free the descriptor, it is 'freed' when the pool it was created from is destroyed
-    //s_device->freeDescriptorSets(*s_descriptorPool, m_descriptorSet);
+    //device().freeDescriptorSets(descriptorPool(), m_descriptorSet);
 }
 
 void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Buffer& bf, vk::DeviceSize offset, vk::DeviceSize range) {
     auto bufferInfo = vk::DescriptorBufferInfo{
-        bf.m_buffer,
+        bf.buffer(),
         offset,
         range
     };
-    s_device->updateDescriptorSets(
+    device().updateDescriptorSets(
         vk::WriteDescriptorSet{
             m_descriptorSet,
             binding,
@@ -48,11 +48,11 @@ void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Buffe
 
 void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex, const Texture& tex, vk::ImageLayout layout/* = vk::ImageLayout::eShaderReadOnlyOptimal*/) {
     auto imageInfo = vk::DescriptorImageInfo{
-        tex.m_sampler,
-        tex.m_imageView,
+        tex.sampler(),
+        tex.imageView(),
         layout
     };
-    s_device->updateDescriptorSets(
+    device().updateDescriptorSets(
         vk::WriteDescriptorSet{
             m_descriptorSet,
             binding,

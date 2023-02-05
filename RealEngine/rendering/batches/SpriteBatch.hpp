@@ -8,10 +8,11 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
+#include <RealEngine/rendering/pipelines/PipelineLayout.hpp>
 #include <RealEngine/rendering/pipelines/Pipeline.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/batches/Sprite.hpp>
-#include <RealEngine/rendering/DescriptorSet.hpp>
+#include <RealEngine/rendering/descriptors/DescriptorSet.hpp>
 
 namespace RE {
 
@@ -80,9 +81,12 @@ private:
 
     unsigned int texToIndex(const Texture& tex);
 
+    PipelineLayout m_pipelineLayout;
+    static PipelineLayout createPipelineLayout(unsigned int maxTextures);
     Pipeline m_pipeline;
-    DescriptorSet m_descSet{m_pipeline};
-    Pipeline createPipeline(unsigned int maxTextures) const;
+    static Pipeline createPipeline(const PipelineLayout& pipelineLayout, unsigned int maxTextures);
+
+    DescriptorSet m_descSet{m_pipelineLayout, 0u};
 
     static inline constexpr glm::vec4 UV_RECT = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
     static inline constexpr glm::vec4 SUV_RECT = glm::vec4(0.0f, 1.0f, 1.0f, -1.0f);

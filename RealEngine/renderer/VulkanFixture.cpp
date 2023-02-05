@@ -13,7 +13,7 @@
 
 #include <RealEngine/window/WindowSubsystems.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
-#include <RealEngine/rendering/DescriptorSet.hpp>
+#include <RealEngine/rendering/descriptors/DescriptorSet.hpp>
 #include <RealEngine/rendering/pipelines/Pipeline.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/rendering/CommandBuffer.hpp>
@@ -545,29 +545,29 @@ void VulkanFixture::recreateImGuiFontTexture() {
 }
 
 void VulkanFixture::assignImplementationReferences() {
-    Buffer::s_physicalDevice = Texture::s_physicalDevice = &(*m_physicalDevice);
-    Buffer::s_device = CommandBuffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = &(*m_device);
-    CommandBuffer::s_graphicsQueue = &(*m_graphicsQueue);
-    CommandBuffer::s_computeQueue = &(*m_computeQueue);
-    CommandBuffer::s_commandPool = &(*m_commandPool);
-    DescriptorSet::s_descriptorPool = &(*m_descriptorPool);
-    Pipeline::s_pipelineCache = &(*m_pipelineCache);
-    Pipeline::s_renderPass = &(*m_renderPass);
-    CommandBuffer::s_oneTimeSubmitCommandBuffer = &(*m_oneTimeSubmitCommandBuffer);
-    Buffer::s_deletionQueue = Texture::s_deletionQueue = &m_deletionQueue;
+    VulkanObject::s_physicalDevice = &(*m_physicalDevice);
+    VulkanObject::s_device = &(*m_device);
+    VulkanObject::s_graphicsQueue = &(*m_graphicsQueue);
+    VulkanObject::s_computeQueue = &(*m_computeQueue);
+    VulkanObject::s_commandPool = &(*m_commandPool);
+    VulkanObject::s_descriptorPool = &(*m_descriptorPool);
+    VulkanObject::s_pipelineCache = &(*m_pipelineCache);
+    VulkanObject::s_renderPass = &(*m_renderPass);
+    VulkanObject::s_oneTimeSubmitCommandBuffer = &(*m_oneTimeSubmitCommandBuffer);
+    VulkanObject::s_deletionQueue = &m_deletionQueue;
 }
 
 void VulkanFixture::clearImplementationReferences() {
-    Buffer::s_physicalDevice = Texture::s_physicalDevice = nullptr;
-    Buffer::s_device = CommandBuffer::s_device = Texture::s_device = DescriptorSet::s_device = Pipeline::s_device = CommandBuffer::s_device = nullptr;
-    CommandBuffer::s_graphicsQueue = nullptr;
-    CommandBuffer::s_computeQueue = nullptr;
-    CommandBuffer::s_commandPool = nullptr;
-    DescriptorSet::s_descriptorPool = nullptr;
-    Pipeline::s_pipelineCache = nullptr;
-    Pipeline::s_renderPass = nullptr;
-    CommandBuffer::s_oneTimeSubmitCommandBuffer = nullptr;
-    Buffer::s_deletionQueue = Texture::s_deletionQueue = nullptr;
+    VulkanObject::s_physicalDevice = nullptr;
+    VulkanObject::s_device = nullptr;
+    VulkanObject::s_graphicsQueue = nullptr;
+    VulkanObject::s_computeQueue = nullptr;
+    VulkanObject::s_commandPool = nullptr;
+    VulkanObject::s_descriptorPool = nullptr;
+    VulkanObject::s_pipelineCache = nullptr;
+    VulkanObject::s_renderPass = nullptr;
+    VulkanObject::s_oneTimeSubmitCommandBuffer = nullptr;
+    VulkanObject::s_deletionQueue = nullptr;
 }
 
 }

@@ -22,15 +22,15 @@ Buffer::Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::Memor
         auto stage = createBufferAndMemory(sizeInBytes, eTransferSrc, HOST_MEM);
         main = createBufferAndMemory(sizeInBytes, usage | eTransferDst, memProperty);
         //Copy from data to staging buffer
-        std::memcpy(s_device->mapMemory(stage.memory, 0, sizeInBytes), data, sizeInBytes);
-        s_device->unmapMemory(stage.memory);
+        std::memcpy(device().mapMemory(stage.memory, 0, sizeInBytes), data, sizeInBytes);
+        device().unmapMemory(stage.memory);
         //Copy from staging to final buffer
         CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
             commandBuffer.copyBuffer(stage.buffer, main.buffer, vk::BufferCopy{0u, 0u, sizeInBytes});
         });
         //Destruct the temporary stage
-        s_device->destroyBuffer(stage.buffer);
-        s_device->free(stage.memory);
+        device().destroyBuffer(stage.buffer);
+        device().free(stage.memory);
     } else {//If no initial data are provided
         main = createBufferAndMemory(sizeInBytes, usage, memProperty);
     }
@@ -52,12 +52,12 @@ Buffer& Buffer::operator=(Buffer&& other) noexcept {
 }
 
 Buffer::~Buffer() {
-    s_deletionQueue->enqueueDeletion(m_buffer);
-    s_deletionQueue->enqueueDeletion(m_memory);
+    deletionQueue().enqueueDeletion(m_buffer);
+    deletionQueue().enqueueDeletion(m_memory);
 }
 
 void Buffer::unmap() const {
-    s_device->unmapMemory(m_memory);
+    device().unmapMemory(m_memory);
 }
 
 void Buffer::copyToBuffer(Buffer& dst, const vk::BufferCopy& info) const {
@@ -67,7 +67,7 @@ void Buffer::copyToBuffer(Buffer& dst, const vk::BufferCopy& info) const {
 }
 
 uint32_t Buffer::selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const {
-    auto memProperties = s_physicalDevice->getMemoryProperties2().memoryProperties;
+    auto memProperties = physicalDevice().getMemoryProperties2().memoryProperties;
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
         if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
             return i;
@@ -82,18 +82,18 @@ Buffer::BufferAndMemory Buffer::createBufferAndMemory(vk::DeviceSize sizeInBytes
         usage,
         vk::SharingMode::eExclusive
     };
-    auto buffer = s_device->createBuffer(createInfo);
-    auto memReq = s_device->getBufferMemoryRequirements2({buffer}).memoryRequirements;
-    auto memory = s_device->allocateMemory({
+    auto buffer = device().createBuffer(createInfo);
+    auto memReq = device().getBufferMemoryRequirements2({buffer}).memoryRequirements;
+    auto memory = device().allocateMemory({
         memReq.size,
         selectMemoryType(memReq.memoryTypeBits, properties)
         });
-    s_device->bindBufferMemory2(vk::BindBufferMemoryInfo{buffer, memory, 0u});
+    device().bindBufferMemory2(vk::BindBufferMemoryInfo{buffer, memory, 0u});
     return BufferAndMemory{.buffer = buffer, .memory = memory};
 }
 
 void* Buffer::map(size_t offsetInBytes, size_t lengthInBytes) const {
-    return s_device->mapMemory(m_memory, offsetInBytes, lengthInBytes);
+    return device().mapMemory(m_memory, offsetInBytes, lengthInBytes);
 }
 
 }

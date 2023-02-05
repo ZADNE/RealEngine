@@ -4,6 +4,7 @@
 #pragma once
 #include <glm/mat4x4.hpp>
 
+#include <RealEngine/rendering/pipelines/PipelineLayout.hpp>
 #include <RealEngine/rendering/pipelines/Pipeline.hpp>
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/pipelines/Vertex.hpp>
@@ -51,6 +52,7 @@ private:
     VertexPOCO* m_verticesMapped = nullptr;
     uint32_t m_nextVertexIndex;
     uint32_t m_maxVertices;
+    PipelineLayout m_pipelineLayout;
     Pipeline m_pipeline;
     vk::PipelineVertexInputStateCreateInfo createVertexInputStateInfo() const;
 };

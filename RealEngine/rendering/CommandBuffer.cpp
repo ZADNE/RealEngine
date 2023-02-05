@@ -7,7 +7,7 @@
 namespace RE {
 
 CommandBuffer::CommandBuffer(vk::CommandBufferLevel level) :
-    m_commandBuffer(s_device->allocateCommandBuffers(vk::CommandBufferAllocateInfo{*s_commandPool, level, 1u}).back()) {
+    m_commandBuffer(device().allocateCommandBuffers(vk::CommandBufferAllocateInfo{commandPool(), level, 1u}).back()) {
 }
 
 CommandBuffer::CommandBuffer(CommandBuffer&& other) noexcept :
@@ -21,17 +21,17 @@ CommandBuffer& CommandBuffer::operator=(CommandBuffer&& other) noexcept {
 }
 
 CommandBuffer::~CommandBuffer() {
-    s_device->freeCommandBuffers(*s_commandPool, m_commandBuffer);
+    device().freeCommandBuffers(commandPool(), m_commandBuffer);
 }
 
 void CommandBuffer::submitToGraphicsQueue() const {
-    s_graphicsQueue->submit(vk::SubmitInfo{{}, {}, m_commandBuffer});
-    s_device->waitIdle();//TODO
+    graphicsQueue().submit(vk::SubmitInfo{{}, {}, m_commandBuffer});
+    device().waitIdle();//TODO
 }
 
 void CommandBuffer::submitToComputeQueue() const {
-    s_computeQueue->submit(vk::SubmitInfo{{}, {}, m_commandBuffer});
-    s_device->waitIdle();//TODO
+    computeQueue().submit(vk::SubmitInfo{{}, {}, m_commandBuffer});
+    device().waitIdle();//TODO
 }
 
 }

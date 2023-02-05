@@ -34,7 +34,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
     using enum vk::ImageUsageFlagBits;
     auto HOST = eHostCoherent | eHostVisible;
     bool requiresStagingBuffer = !createInfo.texels.empty() && ((createInfo.memory & HOST) != HOST);
-    m_image = s_device->createImage(vk::ImageCreateInfo{{},
+    m_image = device().createImage(vk::ImageCreateInfo{{},
         createInfo.type,
         createInfo.format,
         createInfo.extent,
@@ -48,12 +48,12 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         eUndefined
     });
     //Allocate memory for the image
-    auto memReq = s_device->getImageMemoryRequirements2({m_image}).memoryRequirements;
-    m_deviceMemory = s_device->allocateMemory(vk::MemoryAllocateInfo{
+    auto memReq = device().getImageMemoryRequirements2({m_image}).memoryRequirements;
+    m_deviceMemory = device().allocateMemory(vk::MemoryAllocateInfo{
         memReq.size,
         selectMemoryType(memReq.memoryTypeBits, createInfo.memory)
     });
-    s_device->bindImageMemory(m_image, m_deviceMemory, 0u);
+    device().bindImageMemory(m_image, m_deviceMemory, 0u);
     if (!createInfo.texels.empty()) {
         //Initialize texels of the image and transit to initial layout
         initializeTexels(createInfo);
@@ -69,7 +69,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         });
     }
     //Create image view
-    m_imageView = s_device->createImageView(vk::ImageViewCreateInfo{{},
+    m_imageView = device().createImageView(vk::ImageViewCreateInfo{{},
         m_image,
         imageViewType(createInfo.type, createInfo.layers),
         createInfo.format,
@@ -83,7 +83,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         }
     });
     //Create sampler
-    m_sampler = s_device->createSampler(vk::SamplerCreateInfo{});
+    m_sampler = device().createSampler(vk::SamplerCreateInfo{});
 }
 
 Texture::Texture(Texture&& other) noexcept:
@@ -106,10 +106,10 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 }
 
 Texture::~Texture() {
-    s_deletionQueue->enqueueDeletion(m_sampler);
-    s_deletionQueue->enqueueDeletion(m_imageView);
-    s_deletionQueue->enqueueDeletion(m_image);
-    s_deletionQueue->enqueueDeletion(m_deviceMemory);
+    deletionQueue().enqueueDeletion(m_sampler);
+    deletionQueue().enqueueDeletion(m_imageView);
+    deletionQueue().enqueueDeletion(m_image);
+    deletionQueue().enqueueDeletion(m_deviceMemory);
 }
 
 void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
@@ -134,7 +134,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
             {}, vk::AccessFlagBits::eTransferWrite
         );
         commandBuffer.copyBufferToImage(
-            stagingBuffer.m_buffer,
+            *stagingBuffer,
             m_image,
             eTransferDstOptimal,
             vk::BufferImageCopy{
@@ -187,7 +187,7 @@ void Texture::pipelineImageBarrier(
 }
 
 uint32_t Texture::selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) {
-    auto memProperties = s_physicalDevice->getMemoryProperties2().memoryProperties;
+    auto memProperties = physicalDevice().getMemoryProperties2().memoryProperties;
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
         if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
             return i;

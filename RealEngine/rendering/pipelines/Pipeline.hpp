@@ -2,42 +2,46 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <RealEngine/renderer/VulkanObject.hpp>
 #include <RealEngine/rendering/pipelines/PipelineSources.hpp>
 
 namespace RE {
 
-struct PipelineCreateInfo {
+struct PipelineGraphicsCreateInfo {
+    vk::PipelineLayout pipelineLayout = nullptr;
     vk::PipelineVertexInputStateCreateInfo vertexInput{};
     vk::PrimitiveTopology topology = vk::PrimitiveTopology::eTriangleList;
     bool enablePrimitiveRestart = false;
     uint32_t patchControlPoints = 0;
-    std::vector<vk::DescriptorBindingFlags> descriptorBindingFlags{};
     vk::SpecializationInfo specializationInfo{};
+};
+
+struct PipelineComputeCreateInfo {
+    vk::PipelineLayout pipelineLayout = nullptr;
 };
 
 /**
  * @brief Controls how vertices are rendered to screen.
 */
-class Pipeline {
-    friend class VulkanFixture;
+class Pipeline : public VulkanObject {
     friend class DescriptorSet;
 public:
 
     /**
      * @brief Constructs graphics pipeline
     */
-    Pipeline(const PipelineCreateInfo& createInfo, const PipelineSources& srcs);
+    Pipeline(const PipelineGraphicsCreateInfo& createInfo, const PipelineGraphicsSources& srcs);
 
     /**
      * @brief Constructs compute pipeline
     */
-    Pipeline(const ShaderSourceRef& compute);
+    Pipeline(const PipelineComputeCreateInfo& createInfo, const PipelineComputeSources& srcs);
 
-    Pipeline(const Pipeline&) = delete;
-    Pipeline(Pipeline&& other) noexcept;
+    Pipeline(const Pipeline&) = delete;                         /**< Noncopyable */
+    Pipeline& operator=(const Pipeline&) = delete;              /**< Noncopyable */
 
-    Pipeline& operator=(const Pipeline&) = delete;
-    Pipeline& operator=(Pipeline&& other) noexcept;
+    Pipeline(Pipeline&& other) noexcept;                        /**< Movable */
+    Pipeline& operator=(Pipeline&& other) noexcept;             /**< Movable */
 
     ~Pipeline();
 
@@ -45,26 +49,10 @@ public:
     const vk::Pipeline* operator->() { return &m_pipeline; }
 
     const vk::Pipeline& pipeline() const { return m_pipeline; }
-    const vk::PipelineLayout& pipelineLayout() const { return m_pipelineLayout; }
 
 private:
 
-    void reflect(
-        const ShaderSourceRef& src,
-        vk::ShaderStageFlagBits st,
-        const vk::SpecializationInfo& specInfo,
-        std::vector<vk::DescriptorSetLayoutBinding>& dslbs,
-        std::vector<vk::PushConstantRange>& ranges
-    ) const;
-
-    vk::DescriptorSetLayout m_descriptorSetLayout{};
-    vk::PipelineLayout m_pipelineLayout{};
     vk::Pipeline m_pipeline{};
-
-    static inline const vk::Device* s_device = nullptr;
-    static inline const vk::PipelineCache* s_pipelineCache = nullptr;
-    static inline const vk::RenderPass* s_renderPass = nullptr;
-    static inline const vk::CommandBuffer* s_commandBuffer = nullptr;
 };
 
 }

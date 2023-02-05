@@ -9,7 +9,7 @@
 
 #include <glm/vec4.hpp>
 
-#include <RealEngine/renderer/VulkanDeletionQueue.hpp>
+#include <RealEngine/renderer/VulkanObject.hpp>
 #include <RealEngine/rendering/PerFrameInFlight.hpp>
 
 struct SDL_Window;

@@ -22,17 +22,17 @@ struct ShaderSource {
  * @brief Represents a non-owning handle to source codes of a shader stage
 */
 struct ShaderSourceRef {
-    ShaderSourceRef() {}
-    ShaderSourceRef(const ShaderSource& source) :
+    constexpr ShaderSourceRef() {}
+    constexpr ShaderSourceRef(const ShaderSource& source) :
         vk13(source.vk13) {}
 
     std::basic_string_view<uint32_t> vk13{};
 };
 
 /**
-* @brief POD representing source codes for all shaders within a pipeline
+* @brief POD representing source codes for all shaders within a graphics pipeline
 */
-struct PipelineSources {
+struct PipelineGraphicsSources {
 
     static constexpr size_t NUM_STAGES = 5;
 
@@ -56,7 +56,6 @@ struct PipelineSources {
         case eTessellationEvaluation: return tese;
         case eGeometry: return geom;
         case eFragment: return frag;
-            //case eCompute: return comp;
         default: throw Exception{"Tried to access invalid shader type"};
         }
     }
@@ -66,7 +65,31 @@ struct PipelineSources {
     ShaderSourceRef tese{};/**< Tesselation evaluation stage of the program */
     ShaderSourceRef geom{};/**< Geometry shader stage of the program */
     ShaderSourceRef frag{};/**< Fragment shader stage of the program */
-    //ShaderSourceRef comp{};/**< Copute shader stage of the program */
+};
+
+/**
+* @brief POD representing source codes for all shaders within a compute pipeline
+*/
+struct PipelineComputeSources {
+
+    static constexpr size_t NUM_STAGES = 1;
+
+    ShaderSourceRef operator[](size_t type) const {
+        switch (type) {
+        case 0: return comp;
+        default: throw Exception{"Tried to access invalid shader type"};
+        }
+    }
+
+    ShaderSourceRef operator[](vk::ShaderStageFlagBits type) const {
+        using enum vk::ShaderStageFlagBits;
+        switch (type) {
+        case eCompute: return comp;
+        default: throw Exception{"Tried to access invalid shader type"};
+        }
+    }
+
+    ShaderSourceRef comp{};/**< Copute shader stage of the program */
 };
 
 }

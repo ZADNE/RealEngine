@@ -5,8 +5,7 @@
 #include <vector>
 #include <type_traits>
 
-#include <vulkan/vulkan.hpp>
-
+#include <RealEngine/renderer/VulkanObject.hpp>
 #include <RealEngine/renderer/VulkanDeletionQueue.hpp>
 
 
@@ -15,10 +14,7 @@ namespace RE {
 /**
  * @brief Is a continuous block of memory stored in the GPU's memory
 */
-class Buffer {
-    friend class VulkanFixture;
-    friend class DescriptorSet;
-    friend class Texture;
+class Buffer: public VulkanObject {
 public:
 
     /**
@@ -62,8 +58,10 @@ public:
 
     void copyToBuffer(Buffer& dst, const vk::BufferCopy& info) const;
 
-    const vk::Buffer& operator*() { return m_buffer; }
-    const vk::Buffer* operator->() { return &m_buffer; }
+    const vk::Buffer& operator*() const { return m_buffer; }
+    const vk::Buffer* operator->() const { return &m_buffer; }
+
+    const vk::Buffer& buffer() const { return m_buffer; }
 
 protected:
 
@@ -78,11 +76,6 @@ protected:
 
     vk::DeviceMemory m_memory{};
     vk::Buffer m_buffer{};
-
-    static inline const vk::PhysicalDevice* s_physicalDevice = nullptr;
-    static inline const vk::Device* s_device = nullptr;
-    static inline const vk::CommandBuffer* s_commandBuffer = nullptr;
-    static inline VulkanDeletionQueue* s_deletionQueue = nullptr;
 };
 
 }

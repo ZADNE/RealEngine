@@ -2,9 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <vulkan/vulkan.hpp>
-
-#include <RealEngine/renderer/VulkanDeletionQueue.hpp>
+#include <RealEngine/renderer/VulkanObject.hpp>
 
 
 namespace RE {
@@ -29,9 +27,7 @@ struct TextureCreateInfo {
 /**
  * @brief Represents one (or more) images
 */
-class Texture {
-    friend class VulkanFixture;
-    friend class DescriptorSet;
+class Texture: public VulkanObject {
 public:
 
     /**
@@ -49,6 +45,8 @@ public:
     ~Texture();
 
     const vk::Image& image() const { return m_image; }
+    const vk::ImageView& imageView() const { return m_imageView; }
+    const vk::Sampler& sampler() const { return m_sampler; }
 
 protected:
 
@@ -67,11 +65,6 @@ protected:
     );
 
     //Static members \|/
-
-    static inline const vk::PhysicalDevice* s_physicalDevice = nullptr;
-    static inline const vk::Device* s_device = nullptr;
-    static inline const vk::CommandBuffer* s_commandBuffer = nullptr;
-    static inline VulkanDeletionQueue* s_deletionQueue = nullptr;
 
     static uint32_t selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
 };
