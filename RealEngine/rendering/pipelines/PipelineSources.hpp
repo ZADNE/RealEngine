@@ -23,8 +23,9 @@ struct ShaderSource {
 */
 struct ShaderSourceRef {
     constexpr ShaderSourceRef() {}
-    constexpr ShaderSourceRef(const ShaderSource& source) :
-        vk13(source.vk13) {}
+    constexpr ShaderSourceRef(const ShaderSource& source):
+        vk13(source.vk13) {
+    }
 
     std::basic_string_view<uint32_t> vk13{};
 };
@@ -43,7 +44,18 @@ struct PipelineGraphicsSources {
         case 2: return tese;
         case 3: return geom;
         case 4: return frag;
-            //case 5: return comp;
+        default: throw Exception{"Tried to access invalid shader type"};
+        }
+    }
+
+    static vk::ShaderStageFlagBits stageFlags(size_t type) {
+        using enum vk::ShaderStageFlagBits;
+        switch (type) {
+        case 0: return eVertex;
+        case 1: return eTessellationControl;
+        case 2: return eTessellationEvaluation;
+        case 3: return eGeometry;
+        case 4: return eFragment;
         default: throw Exception{"Tried to access invalid shader type"};
         }
     }
@@ -77,6 +89,14 @@ struct PipelineComputeSources {
     ShaderSourceRef operator[](size_t type) const {
         switch (type) {
         case 0: return comp;
+        default: throw Exception{"Tried to access invalid shader type"};
+        }
+    }
+
+    static vk::ShaderStageFlagBits stageFlags(size_t type) {
+        using enum vk::ShaderStageFlagBits;
+        switch (type) {
+        case 0: return eCompute;
         default: throw Exception{"Tried to access invalid shader type"};
         }
     }

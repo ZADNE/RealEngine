@@ -36,11 +36,11 @@ public:
     */
     Texture(const TextureCreateInfo& createInfo);
 
-    Texture(const Texture&) = delete;
-    Texture(Texture&& other) noexcept;
+    Texture(const Texture&) = delete;                           /**< Noncopyable */
+    Texture& operator=(const Texture&) = delete;                /**< Noncopyable */
 
-    Texture& operator=(const Texture&) = delete;
-    Texture& operator=(Texture&& other) noexcept;
+    Texture(Texture&& other) noexcept;                          /**< Movable */
+    Texture& operator=(Texture&& other) noexcept;               /**< Movable */
 
     ~Texture();
 

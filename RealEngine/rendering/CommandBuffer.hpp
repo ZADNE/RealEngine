@@ -36,8 +36,10 @@ public:
     void submitToGraphicsQueue() const;
     void submitToComputeQueue() const;
 
-    const vk::CommandBuffer& operator*() { return m_commandBuffer; }
-    const vk::CommandBuffer* operator->() { return &m_commandBuffer; }
+    const vk::CommandBuffer& operator*() const { return m_commandBuffer; }
+    const vk::CommandBuffer* operator->() const { return &m_commandBuffer; }
+
+    const vk::CommandBuffer& commandBuffer() const { return m_commandBuffer; }
 
 private:
 

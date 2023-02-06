@@ -20,10 +20,11 @@ public:
 
     VulkanDeletionQueue(const vk::Device& device): m_device(device) {}
 
-    VulkanDeletionQueue(const VulkanDeletionQueue&) = delete;
-    VulkanDeletionQueue& operator=(const VulkanDeletionQueue&) = delete;
-    VulkanDeletionQueue(VulkanDeletionQueue&&) = delete;
-    VulkanDeletionQueue& operator=(VulkanDeletionQueue&&) = delete;
+    VulkanDeletionQueue(const VulkanDeletionQueue&) = delete;           /**< Noncopyable */
+    VulkanDeletionQueue& operator=(const VulkanDeletionQueue&) = delete;/**< Noncopyable */
+
+    VulkanDeletionQueue(VulkanDeletionQueue&&) = delete;                /**< Nonmovable */
+    VulkanDeletionQueue& operator=(VulkanDeletionQueue&&) = delete;     /**< Nonmovable */
 
     ~VulkanDeletionQueue();
 
@@ -60,7 +61,7 @@ private:
     };
 
     std::queue<DeletionRecord> m_queue;
-    const vk::Device& m_device = nullptr;
+    const vk::Device& m_device;
 };
 
 }

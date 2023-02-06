@@ -130,7 +130,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
         pipelineImageBarrier(
             commandBuffer,
             eUndefined, eTransferDstOptimal,            //Image layouts
-            eTopOfPipe, eTransfer,                      //Pipeline stage
+            eAllCommands, eAllCommands,                 //Pipeline stage
             {}, vk::AccessFlagBits::eTransferWrite
         );
         commandBuffer.copyBufferToImage(

@@ -23,8 +23,7 @@ struct PipelineComputeCreateInfo {
 /**
  * @brief Controls how vertices are rendered to screen.
 */
-class Pipeline : public VulkanObject {
-    friend class DescriptorSet;
+class Pipeline: public VulkanObject {
 public:
 
     /**
@@ -45,8 +44,8 @@ public:
 
     ~Pipeline();
 
-    const vk::Pipeline& operator*() { return m_pipeline; }
-    const vk::Pipeline* operator->() { return &m_pipeline; }
+    const vk::Pipeline& operator*() const { return m_pipeline; }
+    const vk::Pipeline* operator->() const { return &m_pipeline; }
 
     const vk::Pipeline& pipeline() const { return m_pipeline; }
 

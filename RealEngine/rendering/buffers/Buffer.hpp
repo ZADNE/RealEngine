@@ -27,14 +27,15 @@ public:
     Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data = nullptr);
 
     template<typename T, typename = std::enable_if_t<!std::is_pointer_v<T>>>
-    Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const T& data) :
-        Buffer(sizeInBytes, usage, memProperty, &data) {}
+    Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const T& data):
+        Buffer(sizeInBytes, usage, memProperty, &data) {
+    }
 
-    Buffer(const Buffer&) = delete;
-    Buffer(Buffer&& other) noexcept;
+    Buffer(const Buffer&) = delete;                             /**< Noncopyable */
+    Buffer& operator=(const Buffer&) = delete;                  /**< Noncopyable */
 
-    Buffer& operator=(const Buffer&) = delete;
-    Buffer& operator=(Buffer&& other) noexcept;
+    Buffer(Buffer&& other) noexcept;                            /**< Movable */
+    Buffer& operator=(Buffer&& other) noexcept;                 /**< Movable */
 
     /**
      * @brief Frees the backing memory block on the GPU and destructs the buffer.

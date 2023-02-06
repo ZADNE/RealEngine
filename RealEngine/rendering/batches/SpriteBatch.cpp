@@ -19,16 +19,7 @@ SpriteBatch::SpriteBatch(unsigned int maxSprites, unsigned int maxTextures) :
     m_spritesMapped(m_spritesBuf.map<Sprite>(0u, MAX_FRAMES_IN_FLIGHT* maxSprites * sizeof(Sprite))),
     m_maxSprites(maxSprites),
     m_maxTextures(maxTextures),
-    m_pipelineLayout(
-        PipelineLayoutCreateInfo{
-
-        }, PipelineGraphicsSources{
-            .vert = sprite_vert,
-            .tesc = sprite_tesc,
-            .tese = sprite_tese,
-            .frag = sprite_frag
-        }
-    ),
+    m_pipelineLayout(createPipelineLayout(maxTextures)),
     m_pipeline(createPipeline(m_pipelineLayout, maxTextures)) {
     m_texToIndex.reserve(maxTextures);
 }

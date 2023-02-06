@@ -15,7 +15,7 @@ struct PipelineLayoutCreateInfo {
 /**
  * @brief Creates interface between pipeline and other resources (textures, buffers, etc)
 */
-class PipelineLayout : public VulkanObject {
+class PipelineLayout: public VulkanObject {
 public:
 
     /**
@@ -44,18 +44,6 @@ public:
 
 private:
 
-    static vk::ShaderStageFlagBits convert(size_t st) {
-        switch (st) {
-        case 0: return vk::ShaderStageFlagBits::eVertex;
-        case 1: return vk::ShaderStageFlagBits::eTessellationControl;
-        case 2: return vk::ShaderStageFlagBits::eTessellationEvaluation;
-        case 3: return vk::ShaderStageFlagBits::eGeometry;
-        case 4: return vk::ShaderStageFlagBits::eFragment;
-        case 5: return vk::ShaderStageFlagBits::eCompute;
-        default: throw Exception{"Unknown shader type"};
-        }
-    }
-
     struct ReflectionResult {
         std::vector<std::vector<vk::DescriptorSetLayoutBinding>> bindings;
         std::vector<vk::PushConstantRange> ranges;
@@ -74,7 +62,7 @@ private:
         ReflectionResult reflection;
         for (size_t st = 0; st < PipelineSources::NUM_STAGES; ++st) {
             if (!srcs[st].vk13.empty()) {
-                reflectSource(srcs[st], convert(st), specInfo, reflection);
+                reflectSource(srcs[st], PipelineSources::stageFlags(st), specInfo, reflection);
             }
         }
         return reflection;
