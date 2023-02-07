@@ -31,15 +31,13 @@ public:
     */
     Room(size_t name, RoomDisplaySettings initialSettings = RoomDisplaySettings{});
 
-    /**
-     * @brief Destructs a room.
-     *
-     * This happens when the program ends.
-    */
-    virtual ~Room() = default;
+    Room(const Room&) = delete;                                 /**< Noncopyable */
+    Room& operator=(const Room&) = delete;                      /**< Noncopyable */
 
-    Room(const Room&) = delete;
-    Room& operator=(const Room&) = delete;
+    Room(Room&&) = default;                                     /**< Movable */
+    Room& operator=(Room&&) = default;                          /**< Movable */
+
+    virtual ~Room() = default;
 
     /**
      * @brief Informs the room that a new session happens inside it.

@@ -61,7 +61,8 @@ protected:
         const vk::CommandBuffer& commandBuffer,
         vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
         vk::PipelineStageFlags srcStage, vk::PipelineStageFlags dstStage,
-        vk::AccessFlags srcAccess, vk::AccessFlags dstAccess
+        vk::AccessFlags srcAccess, vk::AccessFlags dstAccess,
+        uint32_t layerCount
     );
 
     //Static members \|/

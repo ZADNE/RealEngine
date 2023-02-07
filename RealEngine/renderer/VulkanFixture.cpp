@@ -11,12 +11,8 @@
 #include <ImGui/imgui_impl_vulkan.h>
 #include <glm/common.hpp>
 
+#include <RealEngine/utility/Error.hpp>
 #include <RealEngine/window/WindowSubsystems.hpp>
-#include <RealEngine/rendering/buffers/Buffer.hpp>
-#include <RealEngine/rendering/descriptors/DescriptorSet.hpp>
-#include <RealEngine/rendering/pipelines/Pipeline.hpp>
-#include <RealEngine/rendering/textures/Texture.hpp>
-#include <RealEngine/rendering/CommandBuffer.hpp>
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
 using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
@@ -44,7 +40,7 @@ constexpr vk::SurfaceFormatKHR SURFACE_FORMAT{
     vk::ColorSpaceKHR::eSrgbNonlinear
 };
 
-VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync) :
+VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync):
     m_sdlWindow(sdlWindow),
     m_vSync(vSync),
     //Vulkan objects
@@ -135,10 +131,10 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(const glm::vec4& clearColor
     //Restart command buffer
     auto& commandBuffer = current(m_commandBuffers);
     commandBuffer.reset();
-    commandBuffer.begin({});
+    commandBuffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 
     //Set current commandbuffer
-    Buffer::s_commandBuffer = DescriptorSet::s_commandBuffer = Pipeline::s_commandBuffer = Texture::s_commandBuffer = &(*commandBuffer);
+    VulkanObject::s_commandBuffer = &(*commandBuffer);
 
     //Begin renderpass
     const auto* clearColorPtr = reinterpret_cast<const std::array<float, 4u>*>(&clearColor);
@@ -164,11 +160,11 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(const glm::vec4& clearColor
         0.0f, extent.y,                                     //X, Y
         extent.x, -extent.y,                                //Width, height
         0.0f, 1.0f                                          //MinDepth, MaxDepth
-        });
+    });
     commandBuffer.setScissor(0u, vk::Rect2D{
         {0, 0},                                             //X, Y
         {m_swapchainExtent.width, m_swapchainExtent.height} //Width, height
-        });
+    });
 
     return (*commandBuffer);
 }
@@ -201,8 +197,7 @@ void VulkanFixture::finishFrame(bool useImGui) {
 
     try {
         checkSuccess(m_presentationQueue.presentKHR(presentInfo));
-    }
-    catch (vk::OutOfDateKHRError&) {
+    } catch (vk::OutOfDateKHRError&) {
         recreateSwapchain();
     }
 
@@ -227,7 +222,8 @@ vk::raii::Instance VulkanFixture::createInstance() {
     };
     std::vector<const char*> validationLayers = {
 #ifndef NDEBUG
-        "VK_LAYER_KHRONOS_validation"
+        "VK_LAYER_KHRONOS_validation",
+        "VK_LAYER_KHRONOS_synchronization2"
 #endif // !NDEBUG
     };
 
@@ -300,7 +296,8 @@ vk::raii::Device VulkanFixture::createDevice() {
     auto createInfo = vk::StructureChain{
         vk::DeviceCreateInfo{{}, deviceQueueCreateInfos, {}, DEVICE_EXTENSIONS, &baseFeatures},
         vk::PhysicalDeviceUniformBufferStandardLayoutFeatures{true},
-        vk::PhysicalDeviceDescriptorIndexingFeatures{}
+        vk::PhysicalDeviceDescriptorIndexingFeatures{},
+        vk::PhysicalDeviceSynchronization2Features{true}
     };
     auto& descIndexing = createInfo.get<vk::PhysicalDeviceDescriptorIndexingFeatures>();
     descIndexing.setShaderSampledImageArrayNonUniformIndexing(true);
@@ -351,7 +348,8 @@ std::vector<vk::raii::ImageView> VulkanFixture::createSwapchainImageViews() {
     std::vector<vk::raii::ImageView> imageViews;
     imageViews.reserve(images.size());
     for (const auto& image : images) {
-        imageViews.emplace_back(m_device, vk::ImageViewCreateInfo{{},
+        imageViews.emplace_back(
+            m_device, vk::ImageViewCreateInfo{{},
             image, e2D, SURFACE_FORMAT.format, {},
             vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0u, 1u, 0u, 1u}}
         );

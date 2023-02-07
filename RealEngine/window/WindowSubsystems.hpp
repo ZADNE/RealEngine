@@ -84,8 +84,11 @@ private:
 
         SDL2_RAII();
 
-        SDL2_RAII(const SDL2_RAII&) = delete;
-        SDL2_RAII& operator=(const SDL2_RAII&) = delete;
+        SDL2_RAII(const SDL2_RAII&) = delete;                   /**< Noncopyable */
+        SDL2_RAII& operator=(const SDL2_RAII&) = delete;        /**< Noncopyable */
+
+        SDL2_RAII(SDL2_RAII&&) = delete;                        /**< Nonmovablee */
+        SDL2_RAII& operator=(SDL2_RAII&&) = delete;             /**< Nonmovablee */
 
         ~SDL2_RAII();
 

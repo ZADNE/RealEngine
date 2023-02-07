@@ -64,7 +64,8 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
                 commandBuffer,
                 eUndefined, createInfo.initialLayout,       //Image layouts
                 eTopOfPipe, eTransfer,                      //Pipeline stage
-                {}, {}
+                {}, {},
+                createInfo.layers
             );
         });
     }
@@ -131,7 +132,8 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
             commandBuffer,
             eUndefined, eTransferDstOptimal,            //Image layouts
             eAllCommands, eAllCommands,                 //Pipeline stage
-            {}, vk::AccessFlagBits::eTransferWrite
+            {}, vk::AccessFlagBits::eTransferWrite,     //Access flags
+            createInfo.layers                           //Array layer count
         );
         commandBuffer.copyBufferToImage(
             *stagingBuffer,
@@ -149,11 +151,13 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
                 createInfo.extent
             }
         );
+        using enum vk::AccessFlagBits;
         pipelineImageBarrier(
             commandBuffer,
             eTransferDstOptimal, createInfo.initialLayout,//Image layouts
             eTransfer, eFragmentShader,                 //Pipeline stage
-            vk::AccessFlagBits::eTransferWrite, vk::AccessFlagBits::eShaderRead
+            eTransferWrite, eShaderRead,                //Access flags
+            createInfo.layers                           //Array layer count
         );
     });
 }
@@ -162,7 +166,8 @@ void Texture::pipelineImageBarrier(
     const vk::CommandBuffer& commandBuffer,
     vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
     vk::PipelineStageFlags srcStage, vk::PipelineStageFlags dstStage,
-    vk::AccessFlags srcAccess, vk::AccessFlags dstAccess
+    vk::AccessFlags srcAccess, vk::AccessFlags dstAccess,
+    uint32_t layerCount
 ) {
     commandBuffer.pipelineBarrier(
         srcStage, dstStage,
@@ -180,7 +185,7 @@ void Texture::pipelineImageBarrier(
                 0u,                                     //Mip level
                 1u,                                     //Mip level count
                 0u,                                     //Base array layer
-                1u                                      //Array layer count
+                layerCount                              //Array layer count
             }
         }
     );

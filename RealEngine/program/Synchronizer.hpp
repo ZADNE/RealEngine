@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -10,16 +10,17 @@ class MainProgram;
 
 /**
  * @brief Ensures that steps happen at a constant rate per second.
- * 
+ *
  * Optionally, limits the number of frames per second.
 */
 class Synchronizer {
     friend class MainProgram;
 public:
+
     using TimePoint = std::chrono::steady_clock::time_point;/**< Time point type alias */
     using Duration = std::chrono::steady_clock::duration;   /**< Time duration type alias */
 
-    const static unsigned int DO_NOT_LIMIT_FRAMES_PER_SECOND = 0u;/**< Constant which denotes that frames per second should not be limited */
+    constexpr static unsigned int DO_NOT_LIMIT_FRAMES_PER_SECOND = 0u;/**< Constant which denotes that frames per second should not be limited */
 
     /**
      * @brief Constructs new synchronizer.
@@ -86,6 +87,7 @@ public:
      * @return Maximum frame time in the last second
     */
     Duration getMaxFrameTime() const;
+
 private:
 
     /**

@@ -50,8 +50,11 @@ struct DisplayInfo {
 class MainProgram final {
 public:
 
-    MainProgram(const MainProgram&) = delete;
-    void operator=(const MainProgram&) = delete;
+    MainProgram(const MainProgram&) = delete;                   /**< Noncopyable */
+    MainProgram& operator=(const MainProgram&) = delete;        /**< Noncopyable */
+
+    MainProgram(MainProgram&&) = delete;                        /**< Nonmovable */
+    MainProgram& operator=(MainProgram&&) = delete;             /**< Nonmovable */
 
     /**
      * @brief Must be called before any Room is added
