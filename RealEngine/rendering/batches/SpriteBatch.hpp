@@ -17,7 +17,9 @@
 namespace RE {
 
 /**
- * @brief Draws 2D sprites efficiently
+ * @brief   Draws 2D sprites efficiently
+ * @detail  Can draw multiple batches per frame.
+ *          Each batch has its own transformation matrix
 */
 class SpriteBatch {
 public:
@@ -30,24 +32,24 @@ public:
     SpriteBatch(unsigned int maxSprites, unsigned int maxTextures);
 
     /**
+     * @brief Resets the sprite batch, also begins first batch
+     * @detail Call this at the beginning of each frame.
+    */
+    void clearAndBeginFirstBatch();
+
+    /**
      * @brief Begins new batch
-     * @detail All sprites have to be added between begin() and end()
+     * @detail There can be multiple batches in a frame, this function separates them
     */
-    void begin();
+    void nextBatch();
 
     /**
-     * @brief Ends the batch
-     * @detail All sprites have to be added between begin() and end()
-    */
-    void end();
-
-    /**
-     * @brief Draws the batch
-     * @detail All sprites are drawn in the order they were added in
+     * @brief Draws the last batch
+     * @detail Sprite in the batch are drawn in the order they were added in
      * @param commandBuffer Command buffer used for rendering
-     * @param mvpMat Transformation matrix applied to the sprites
+     * @param mvpMat Transformation matrix applied to the batch
     */
-    void draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat);
+    void drawBatch(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat);
 
 
     void add(const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect);
@@ -77,6 +79,7 @@ private:
     unsigned int m_maxSprites;
     unsigned int m_maxTextures;
     unsigned int m_nextSpriteIndex = 0;
+    unsigned int m_batchFirstSpriteIndex = 0;
     unsigned int m_nextTextureIndex = 0;
 
     unsigned int texToIndex(const Texture& tex);

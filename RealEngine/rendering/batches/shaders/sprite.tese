@@ -19,6 +19,7 @@ layout(std430, push_constant) uniform PushConstants {
 void main() {
     gl_Position = u_mvpMat * vec4(i_pos.xy + i_pos.zw * gl_TessCoord.xy, 0.0, 1.0);
     o_uvs = i_uvs.xy + i_uvs.zw * gl_TessCoord.xy;
+    o_uvs.y = 1.0 - o_uvs.y;// :-)
     o_tex = i_tex;
     o_col = i_col;
 }

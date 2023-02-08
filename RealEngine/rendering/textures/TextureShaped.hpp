@@ -33,7 +33,7 @@ private:
 /**
  * @brief Is a 2D texture with associated shape
 */
-class TextureShaped : public Texture {
+class TextureShaped: public Texture {
 public:
 
     /**
@@ -43,25 +43,30 @@ public:
      * @details Shape of the texture is also loaded from the chunk,
      *          or if that cannot be done, default shape is used instead.
     */
-    TextureShaped(const std::string& filePathPNG) :
-        TextureShaped(PNGLoader::load(filePathPNG)) {}
+    TextureShaped(const std::string& filePathPNG):
+        TextureShaped(PNGLoader::load(filePathPNG)) {
+    }
 
     /**
      * @brief   Constructs texture from seed
      * @details TextureSeed is converted to full path which is used to load the texture
     */
-    TextureShaped(const TextureSeed& seed) :
-        TextureShaped(seed.toFullPath()) {}
+    TextureShaped(const TextureSeed& seed):
+        TextureShaped(seed.toFullPath()) {
+    }
 
-    TextureShaped(const TextureShaped&) = delete;
-    TextureShaped(TextureShaped&& other) noexcept;
+    TextureShaped(const TextureShaped&) = delete;               /**< Noncopyable */
+    TextureShaped& operator=(const TextureShaped&) = delete;    /**< Noncopyable */
 
-    TextureShaped& operator=(const TextureShaped&) = delete;
-    TextureShaped& operator=(TextureShaped&& other) noexcept;
+    TextureShaped(TextureShaped&& other) noexcept;              /**< Movable */
+    TextureShaped& operator=(TextureShaped&& other) noexcept;   /**< Movable */
+
+    ~TextureShaped() = default;
 
     glm::vec2 subimageDims() const { return m_shape.subimageDims; }
     glm::vec2 pivot() const { return m_shape.pivot; }
     glm::vec2 subimagesSpritesCount() const { return m_shape.subimagesSpritesCount; }
+    glm::uvec2 trueDims() const { return m_trueDims; }
 
     void setSubimageDims(const glm::vec2& subimageDims) { m_shape.subimageDims = subimageDims; }
     void setPivot(const glm::vec2& pivot) { m_shape.pivot = pivot; }
@@ -72,5 +77,8 @@ private:
     TextureShaped(PNGLoader::PNGData&& pngData);
 
     TextureShape m_shape{};
+
+    glm::uvec2 m_trueDims{};
 };
+
 }

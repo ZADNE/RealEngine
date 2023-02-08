@@ -14,7 +14,7 @@ using enum vk::DescriptorBindingFlagBits;
 
 namespace RE {
 
-SpriteBatch::SpriteBatch(unsigned int maxSprites, unsigned int maxTextures) :
+SpriteBatch::SpriteBatch(unsigned int maxSprites, unsigned int maxTextures):
     m_spritesBuf(MAX_FRAMES_IN_FLIGHT* maxSprites * sizeof(Sprite), eVertexBuffer, eHostVisible | eHostCoherent),
     m_spritesMapped(m_spritesBuf.map<Sprite>(0u, MAX_FRAMES_IN_FLIGHT* maxSprites * sizeof(Sprite))),
     m_maxSprites(maxSprites),
@@ -24,22 +24,23 @@ SpriteBatch::SpriteBatch(unsigned int maxSprites, unsigned int maxTextures) :
     m_texToIndex.reserve(maxTextures);
 }
 
-void SpriteBatch::begin() {
+void SpriteBatch::clearAndBeginFirstBatch() {
     m_nextSpriteIndex = m_maxSprites * NEXT_FRAME;
     m_nextTextureIndex = m_maxTextures * NEXT_FRAME;
     m_texToIndex.clear();
+    nextBatch();
 }
 
-void SpriteBatch::end() {
-    //Nothing to do :-)
+void SpriteBatch::nextBatch() {
+    m_batchFirstSpriteIndex = m_nextSpriteIndex;
 }
 
-void SpriteBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat) {
+void SpriteBatch::drawBatch(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat) {
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
     commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *m_pipelineLayout, 0u, *m_descSet, {});
     commandBuffer.bindVertexBuffers(0u, *m_spritesBuf, 0ull);
     commandBuffer.pushConstants<glm::mat4>(*m_pipelineLayout, vk::ShaderStageFlagBits::eTessellationEvaluation, 0u, mvpMat);
-    commandBuffer.draw(m_nextSpriteIndex - m_maxSprites * NEXT_FRAME, 1u, m_maxSprites * CURRENT_FRAME, 0u);
+    commandBuffer.draw(m_nextSpriteIndex - m_batchFirstSpriteIndex, 1u, m_batchFirstSpriteIndex, 0u);
 }
 
 void SpriteBatch::add(const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect) {
@@ -64,7 +65,7 @@ void SpriteBatch::addSprite(const SpriteStatic& sprite, const glm::vec2& pos) {
 void SpriteBatch::addSprite(const SpriteComplex& sprite, const glm::vec2& pos) {
     const auto& tex = sprite.texture();
     m_spritesMapped[m_nextSpriteIndex++] = Sprite{
-        .pos = glm::vec4(pos - tex.pivot(), tex.subimageDims() * sprite.scale()),
+        .pos = glm::vec4(pos - tex.pivot() * sprite.scale(), tex.subimageDims() * sprite.scale()),
         .uvs = glm::vec4(glm::floor(sprite.subimageSprite()) / tex.subimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.subimagesSpritesCount()),
         .tex = texToIndex(tex),
         .col = WHITE

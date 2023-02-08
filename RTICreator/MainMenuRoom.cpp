@@ -19,7 +19,7 @@ constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
     .usingImGui = true
 };
 
-MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args) :
+MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args):
     Room(0, INITIAL_DISPLAY_SETTINGS),
     m_texView(engine().getWindowDims()) {
 
@@ -75,7 +75,7 @@ void MainMenuRoom::render(const vk::CommandBuffer& commandBuffer, double interpo
     }
 
     //Menu
-    if (ImGui::Begin("RTICreator v4.0.0")) {
+    if (ImGui::Begin("RTICreator v4.0.0", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         if (ImGui::BeginTabBar("##TabBar")) {
             if (ImGui::BeginTabItem("File")) {
                 if (ImGui::Button("Load a texture")) selectAndLoad();
@@ -117,6 +117,11 @@ void MainMenuRoom::parametersGUI() {
         m_texture->setSubimagesSpritesCount(m_subimagesSprites);
     }
     if (ImGui::InputFloat2("Subimage dims", &m_subimageDims.x)) {
+        m_texture->setSubimageDims(m_subimageDims);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Match")) {
+        m_subimageDims = static_cast<glm::vec2>(m_texture->trueDims()) / m_texture->subimagesSpritesCount();
         m_texture->setSubimageDims(m_subimageDims);
     }
     if (ImGui::InputFloat2("Pivot offset", &m_pivot.x)) {
@@ -162,8 +167,7 @@ void MainMenuRoom::load(const std::string& loc) {
     if (loc.empty()) { return; }
     try {
         m_texture = RE::TextureShaped{loc};
-    }
-    catch (...) {
+    } catch (...) {
         return;
     }
 
@@ -190,10 +194,9 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
         1.0f + m_overlap * 2.0f
     };
 
-    m_sb.begin();
+    m_sb.clearAndBeginFirstBatch();
     m_sb.add(*m_texture, posSizeRect, uvRect);
-    m_sb.end();
-    m_sb.draw(commandBuffer, m_texView.getViewMatrix());
+    m_sb.drawBatch(commandBuffer, m_texView.getViewMatrix());
 
     m_gb.begin();
     std::vector<RE::VertexPOCO> vertices;
