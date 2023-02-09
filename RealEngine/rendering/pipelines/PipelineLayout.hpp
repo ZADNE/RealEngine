@@ -12,6 +12,11 @@ struct PipelineLayoutCreateInfo {
     vk::SpecializationInfo specializationInfo{};
 };
 
+struct PipelineLayoutDescription {
+    std::vector<std::vector<vk::DescriptorSetLayoutBinding>> bindings;
+    std::vector<vk::PushConstantRange> ranges;
+};
+
 /**
  * @brief Creates interface between pipeline and other resources (textures, buffers, etc)
 */
@@ -19,14 +24,19 @@ class PipelineLayout: public VulkanObject {
 public:
 
     /**
-     * @brief Constructs pipeline layout for graphics pipelines
+     * @brief Constructs pipeline layout by reflecting graphics pipeline sources
     */
     PipelineLayout(const PipelineLayoutCreateInfo& createInfo, const PipelineGraphicsSources& srcs);
 
     /**
-     * @brief Constructs pipeline layout for compute pipelines
+     * @brief Constructs pipeline layout by reflecting compute pipeline sources
     */
     PipelineLayout(const PipelineLayoutCreateInfo& createInfo, const PipelineComputeSources& srcs);
+
+    /**
+     * @brief Constructs pipeline layout from given description
+    */
+    PipelineLayout(const PipelineLayoutCreateInfo& createInfo, const PipelineLayoutDescription& description);
 
     PipelineLayout(const PipelineLayout&) = delete;             /**< Noncopyable */
     PipelineLayout& operator=(const PipelineLayout&) = delete;  /**< Noncopyable */
@@ -44,22 +54,15 @@ public:
 
 private:
 
-    struct ReflectionResult {
-        std::vector<std::vector<vk::DescriptorSetLayoutBinding>> bindings;
-        std::vector<vk::PushConstantRange> ranges;
-    };
-
-    PipelineLayout(const PipelineLayoutCreateInfo& createInfo, const ReflectionResult& reflection);
-
     /**
      * @brief Reflects all shaders
     */
     template<typename PipelineSources>
-    ReflectionResult reflectSources(
+    PipelineLayoutDescription reflectSources(
         const PipelineSources& srcs,
         const vk::SpecializationInfo& specInfo
     ) const {
-        ReflectionResult reflection;
+        PipelineLayoutDescription reflection;
         for (size_t st = 0; st < PipelineSources::NUM_STAGES; ++st) {
             if (!srcs[st].vk13.empty()) {
                 reflectSource(srcs[st], PipelineSources::stageFlags(st), specInfo, reflection);
@@ -75,7 +78,7 @@ private:
         const ShaderSourceRef& src,
         vk::ShaderStageFlagBits st,
         const vk::SpecializationInfo& specInfo,
-        ReflectionResult& reflection
+        PipelineLayoutDescription& description
     ) const;
 
     std::vector<vk::DescriptorSetLayout> m_descriptorSetLayouts{};

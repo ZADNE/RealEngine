@@ -15,10 +15,10 @@ PipelineLayout::PipelineLayout(const PipelineLayoutCreateInfo& createInfo, const
     : PipelineLayout(createInfo, reflectSources(srcs, createInfo.specializationInfo)) {
 }
 
-PipelineLayout:: PipelineLayout(const PipelineLayoutCreateInfo& createInfo, const ReflectionResult& reflection) {
+PipelineLayout::PipelineLayout(const PipelineLayoutCreateInfo& createInfo, const PipelineLayoutDescription& description) {
     //Create descriptor sets
-    m_descriptorSetLayouts.reserve(reflection.bindings.size());
-    for (size_t i = 0; i < reflection.bindings.size(); i++) {
+    m_descriptorSetLayouts.reserve(description.bindings.size());
+    for (size_t i = 0; i < description.bindings.size(); i++) {
         //Gets flags for this descriptor set
         uint32_t flagsCount = 0u;
         const vk::DescriptorBindingFlags* flags = nullptr;
@@ -32,7 +32,7 @@ PipelineLayout:: PipelineLayout(const PipelineLayoutCreateInfo& createInfo, cons
         m_descriptorSetLayouts.emplace_back(device().createDescriptorSetLayout(
             vk::StructureChain{
                 vk::DescriptorSetLayoutCreateInfo{{},
-                    reflection.bindings[i]
+                    description.bindings[i]
                 },
                 vk::DescriptorSetLayoutBindingFlagsCreateInfo{
                     flagsCount,
@@ -42,10 +42,10 @@ PipelineLayout:: PipelineLayout(const PipelineLayoutCreateInfo& createInfo, cons
         );
     }
     //Create pipeline layout
-    m_pipelineLayout = device().createPipelineLayout(vk::PipelineLayoutCreateInfo{{}, m_descriptorSetLayouts, reflection.ranges});
+    m_pipelineLayout = device().createPipelineLayout(vk::PipelineLayoutCreateInfo{{}, m_descriptorSetLayouts, description.ranges});
 }
 
-PipelineLayout::PipelineLayout(PipelineLayout&& other) noexcept :
+PipelineLayout::PipelineLayout(PipelineLayout&& other) noexcept:
     m_descriptorSetLayouts(other.m_descriptorSetLayouts),
     m_pipelineLayout(other.m_pipelineLayout) {
     other.m_descriptorSetLayouts.clear();
@@ -69,7 +69,7 @@ void PipelineLayout::reflectSource(
     const ShaderSourceRef& src,
     vk::ShaderStageFlagBits st,
     const vk::SpecializationInfo& specInfo,
-    ReflectionResult& reflection
+    PipelineLayoutDescription& description
 ) const {
     //Run compiler
     auto compiler = spirv_cross::Compiler{src.vk13.data(), src.vk13.size()};
@@ -94,10 +94,10 @@ void PipelineLayout::reflectSource(
                 (type.array_size_literal[0] ? type.array[0] :               //Array with literal size
                 compiler.get_constant(type.array[0]).m.c[0].r->u32);        //Array with spec const size
             auto set = compiler.get_decoration(res.id, spv::DecorationDescriptorSet);
-            while (set >= reflection.bindings.size()) {                     //Emplace empty descriptor set layout
-                reflection.bindings.emplace_back();
+            while (set >= description.bindings.size()) {                     //Emplace empty descriptor set layout
+                description.bindings.emplace_back();
             }
-            reflection.bindings[set].emplace_back(                          //Emplace binding to correct set layout
+            description.bindings[set].emplace_back(                          //Emplace binding to correct set layout
                 compiler.get_decoration(res.id, spv::DecorationBinding),    //Binding
                 descType,                                                   //Type
                 count,                                                      //Count
@@ -113,7 +113,7 @@ void PipelineLayout::reflectSource(
     //Build push constant range
     for (const auto& res : resources.push_constant_buffers) {               //Push constants
         const auto& type = compiler.get_type(res.base_type_id);
-        reflection.ranges.emplace_back(
+        description.ranges.emplace_back(
             st,                                                             //Stages
             0u,                                                             //Offset
             static_cast<uint32_t>(compiler.get_declared_struct_size(type))  //Size
