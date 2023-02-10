@@ -37,7 +37,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
     m_image = device().createImage(vk::ImageCreateInfo{{},
         createInfo.type,
         createInfo.format,
-        createInfo.extent,
+        {createInfo.extent.x, createInfo.extent.y, createInfo.extent.z},
         1u,                                             //Mip level count
         createInfo.layers,
         vk::SampleCountFlagBits::e1,
@@ -148,7 +148,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
                     1u                                  //Array layer count
                 },
                 vk::Offset3D{0u, 0u, 0u},
-                createInfo.extent
+                {createInfo.extent.x, createInfo.extent.y, createInfo.extent.z}
             }
         );
         using enum vk::AccessFlagBits;

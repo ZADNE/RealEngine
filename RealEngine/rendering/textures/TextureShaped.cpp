@@ -7,7 +7,7 @@ namespace RE {
 
 TextureShaped::TextureShaped(PNGLoader::PNGData&& pngData):
     Texture(TextureCreateInfo{
-        .extent = vk::Extent3D{pngData.dims.x, pngData.dims.y, 1u},
+        .extent = {pngData.dims, 1u},
         .texels = std::move(pngData.texels)
     }),
     m_shape(TextureShape{

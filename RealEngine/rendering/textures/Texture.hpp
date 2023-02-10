@@ -2,6 +2,8 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <glm/vec3.hpp>
+
 #include <RealEngine/renderer/VulkanObject.hpp>
 
 
@@ -14,7 +16,7 @@ struct TextureCreateInfo {
     //Image-related
     vk::ImageType type = vk::ImageType::e2D;
     vk::Format format = vk::Format::eR8G8B8A8Unorm;
-    vk::Extent3D extent = vk::Extent3D{0u, 1u, 1u};
+    glm::uvec3 extent{};
     uint32_t layers = 1u;
     vk::ImageUsageFlags usage = vk::ImageUsageFlagBits::eSampled;
     vk::ImageLayout initialLayout = vk::ImageLayout::eReadOnlyOptimal;
