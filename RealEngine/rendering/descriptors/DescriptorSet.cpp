@@ -8,7 +8,7 @@ namespace RE {
 DescriptorSet::DescriptorSet(const PipelineLayout& pipelineLayout, uint32_t setIndex):
     m_descriptorSet(device().allocateDescriptorSets(vk::DescriptorSetAllocateInfo{
         descriptorPool(), pipelineLayout.descriptorSetLayout(setIndex)
-    }).back()) {
+                                                    }).back()) {
 }
 
 DescriptorSet::DescriptorSet(DescriptorSet&& other) noexcept:
@@ -26,9 +26,9 @@ DescriptorSet::~DescriptorSet() {
     //device().freeDescriptorSets(descriptorPool(), m_descriptorSet);
 }
 
-void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Buffer& bf, vk::DeviceSize offset, vk::DeviceSize range) {
+void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex, const Buffer& buf, vk::DeviceSize offset, vk::DeviceSize range) {
     auto bufferInfo = vk::DescriptorBufferInfo{
-        bf.buffer(),
+        buf.buffer(),
         offset,
         range
     };
@@ -36,7 +36,7 @@ void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Buffe
         vk::WriteDescriptorSet{
             m_descriptorSet,
             binding,
-            0u,
+            arrayIndex,
             type,
             {},
             bufferInfo,
@@ -46,7 +46,7 @@ void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, const Buffe
     );
 }
 
-void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex, const Texture& tex, vk::ImageLayout layout/* = vk::ImageLayout::eShaderReadOnlyOptimal*/) {
+void DescriptorSet::write(vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex, const Texture& tex, vk::ImageLayout layout) {
     auto imageInfo = vk::DescriptorImageInfo{
         tex.sampler(),
         tex.imageView(),

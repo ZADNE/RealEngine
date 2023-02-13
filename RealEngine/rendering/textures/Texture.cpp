@@ -84,7 +84,11 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         }
     });
     //Create sampler
-    m_sampler = device().createSampler(vk::SamplerCreateInfo{});
+    m_sampler = device().createSampler(vk::SamplerCreateInfo{{},
+        createInfo.magFilter,
+        createInfo.minFilter,
+        createInfo.mipmapMode
+    });
 }
 
 Texture::Texture(Texture&& other) noexcept:

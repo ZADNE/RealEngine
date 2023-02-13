@@ -87,7 +87,7 @@ unsigned int SpriteBatch::texToIndex(const Texture& tex) {
         return it->second;
     } else {
         m_texToIndex.emplace(&tex, m_nextTextureIndex);
-        m_descSet.write(vk::DescriptorType::eCombinedImageSampler, 0u, m_nextTextureIndex, tex);
+        m_descSet.write(vk::DescriptorType::eCombinedImageSampler, 0u, m_nextTextureIndex, tex, vk::ImageLayout::eReadOnlyOptimal);
         return m_nextTextureIndex++;
     }
 }

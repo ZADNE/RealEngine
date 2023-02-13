@@ -22,6 +22,10 @@ struct TextureCreateInfo {
     vk::ImageLayout initialLayout = vk::ImageLayout::eReadOnlyOptimal;
     //Memory-related
     vk::MemoryPropertyFlagBits memory = vk::MemoryPropertyFlagBits::eDeviceLocal;
+    //Sampler-related
+    vk::Filter magFilter = vk::Filter::eNearest;
+    vk::Filter minFilter = vk::Filter::eNearest;
+    vk::SamplerMipmapMode mipmapMode = vk::SamplerMipmapMode::eNearest;
     //Raster-related
     std::vector<unsigned char> texels;
 };
