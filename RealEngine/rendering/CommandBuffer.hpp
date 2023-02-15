@@ -33,8 +33,8 @@ public:
         device().waitIdle();//TODO expensive operation, use fence instead or use outside main loop
     }
 
-    void submitToGraphicsQueue() const;
-    void submitToComputeQueue() const;
+    void submitToGraphicsQueue(bool waitIdle) const;
+    void submitToComputeQueue(bool waitIdle) const;
 
     const vk::CommandBuffer& operator*() const { return m_commandBuffer; }
     const vk::CommandBuffer* operator->() const { return &m_commandBuffer; }

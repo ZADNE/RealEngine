@@ -38,7 +38,7 @@ Buffer::Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::Memor
     m_buffer = main.buffer;
 }
 
-Buffer::Buffer(Buffer&& other) noexcept :
+Buffer::Buffer(Buffer&& other) noexcept:
     m_memory(other.m_memory),
     m_buffer(other.m_buffer) {
     other.m_memory = nullptr;
@@ -58,12 +58,6 @@ Buffer::~Buffer() {
 
 void Buffer::unmap() const {
     device().unmapMemory(m_memory);
-}
-
-void Buffer::copyToBuffer(Buffer& dst, const vk::BufferCopy& info) const {
-    RE::CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
-        commandBuffer.copyBuffer(m_buffer, dst.m_buffer, info);
-    });
 }
 
 uint32_t Buffer::selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const {
@@ -87,7 +81,7 @@ Buffer::BufferAndMemory Buffer::createBufferAndMemory(vk::DeviceSize sizeInBytes
     auto memory = device().allocateMemory({
         memReq.size,
         selectMemoryType(memReq.memoryTypeBits, properties)
-        });
+    });
     device().bindBufferMemory2(vk::BindBufferMemoryInfo{buffer, memory, 0u});
     return BufferAndMemory{.buffer = buffer, .memory = memory};
 }

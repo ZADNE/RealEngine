@@ -57,8 +57,6 @@ public:
     */
     void unmap() const;
 
-    void copyToBuffer(Buffer& dst, const vk::BufferCopy& info) const;
-
     const vk::Buffer& operator*() const { return m_buffer; }
     const vk::Buffer* operator->() const { return &m_buffer; }
 
