@@ -293,6 +293,7 @@ vk::raii::Device VulkanFixture::createDevice() {
     }
     vk::PhysicalDeviceFeatures baseFeatures{};
     baseFeatures.setTessellationShader(true);
+    baseFeatures.setWideLines(true);
     auto createInfo = vk::StructureChain{
         vk::DeviceCreateInfo{{}, deviceQueueCreateInfos, {}, DEVICE_EXTENSIONS, &baseFeatures},
         vk::PhysicalDeviceUniformBufferStandardLayoutFeatures{true},

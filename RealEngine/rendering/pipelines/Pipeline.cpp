@@ -59,7 +59,7 @@ Pipeline::Pipeline(const PipelineGraphicsCreateInfo& createInfo, const PipelineG
         0.0f,                                   //Depth bias constant factor
         0.0f,                                   //Depth bias clamp
         0.0f,                                   //Depth bias slope factor
-        1.0f,                                   //Line width
+        createInfo.lineWidth                    //Line width
     };
     vk::PipelineMultisampleStateCreateInfo multisample{};
     using enum vk::BlendFactor;

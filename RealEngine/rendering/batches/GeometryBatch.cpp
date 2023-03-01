@@ -11,7 +11,7 @@ namespace RE {
 using enum vk::BufferUsageFlagBits;
 using enum vk::MemoryPropertyFlagBits;
 
-GeometryBatch::GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVertices):
+GeometryBatch::GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVertices, float lineWidth):
     m_verticesBuf(sizeof(VertexPOCO)* maxVertices* MAX_FRAMES_IN_FLIGHT, eVertexBuffer, eHostVisible | eHostCoherent),
     m_verticesMapped(m_verticesBuf.map<VertexPOCO>(0, sizeof(VertexPOCO)* maxVertices* MAX_FRAMES_IN_FLIGHT)),
     m_maxVertices(maxVertices),
@@ -26,7 +26,8 @@ GeometryBatch::GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVer
         PipelineGraphicsCreateInfo{
             .pipelineLayout = *m_pipelineLayout,
             .vertexInput = createVertexInputStateInfo(),
-            .topology = topology
+            .topology = topology,
+            .lineWidth = lineWidth
         },
         PipelineGraphicsSources{
             .vert = geometry_vert,

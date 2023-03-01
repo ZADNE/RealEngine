@@ -14,6 +14,7 @@ struct PipelineGraphicsCreateInfo {
     bool enablePrimitiveRestart = false;
     uint32_t patchControlPoints = 0;
     vk::SpecializationInfo specializationInfo{};
+    float lineWidth = 1.0f;
 };
 
 struct PipelineComputeCreateInfo {

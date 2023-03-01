@@ -21,8 +21,10 @@ public:
      * @brief Constructs GeometryBatch
      * @param topology The topology that the batch will draw
      * @param maxVertices Maximum number of vertices that can be in the batch
+     * @param lineWidth Width of the lines, in pixels
+                        (relevant only if the topology is a part of the line class)
     */
-    GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVertices);
+    GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVertices, float lineWidth);
 
     /**
      * @brief Begins new batch
