@@ -232,8 +232,10 @@ void MainProgram::pollEvents() {
     SDL_Event evnt;
     if (m_window.isImGuiUsed()) {
         while (SDL_PollEvent(&evnt)) {
-            m_window.passSDLEvent(evnt);
-            processEvent(&evnt);
+            if (!m_window.passSDLEvent(evnt)) {
+                //Pass the event to main application if it has not been consumed by ImGui
+                processEvent(&evnt);
+            }
         }
     } else {
         while (SDL_PollEvent(&evnt)) {

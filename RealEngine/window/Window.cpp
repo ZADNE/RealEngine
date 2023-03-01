@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <SDL2/SDL_video.h>
+#include <SDL2/SDL_events.h>
 #include <ImGui/imgui_impl_sdl.h>
 
 #include <RealEngine/utility/Error.hpp>
@@ -13,7 +14,7 @@
 
 namespace RE {
 
-Window::Window(const WindowSettings& settings, const std::string& title) :
+Window::Window(const WindowSettings& settings, const std::string& title):
     WindowSettings(settings), m_subsystems(), m_windowTitle(title), m_usedRenderer(RendererID::ANY) {
 
     m_subsystems.printRealEngineVersion();
@@ -56,8 +57,21 @@ void Window::prepareForDestructionOfRendererObjects() {
     m_vk13.prepareForDestructionOfRendererObjects();
 }
 
-void Window::passSDLEvent(SDL_Event& evnt) {
+bool Window::passSDLEvent(const SDL_Event& evnt) {
     ImGui_ImplSDL2_ProcessEvent(&evnt);
+    auto& io = ImGui::GetIO();
+    switch (evnt.type) {
+    case SDL_KEYUP:
+    case SDL_KEYDOWN:
+        return io.WantCaptureKeyboard;
+    case SDL_MOUSEBUTTONDOWN:
+    case SDL_MOUSEBUTTONUP:
+    case SDL_MOUSEMOTION:
+    case SDL_MOUSEWHEEL:
+        return io.WantCaptureMouse;
+    default:
+        return false;
+    }
 }
 
 void Window::setFullscreen(bool fullscreen, bool save) {
@@ -118,8 +132,7 @@ void Window::initForVulkan13() {
     //Set up Vulkan 1.3 fixture
     try {
         new (&m_vk13) VulkanFixture(m_SDLwindow, (bool)m_flags.vSync);
-    }
-    catch (std::exception& e) {
+    } catch (std::exception& e) {
         std::cerr << e.what();
         goto fail_SDLWindow;
     }

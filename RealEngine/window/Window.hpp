@@ -25,7 +25,7 @@ class MainProgram;
  *
  * The window initializes all subsystems of the RealEngine (SDL2, renderer, ImGui, ...).
 */
-class Window : public WindowSettings {
+class Window: public WindowSettings {
 public:
 
     /**
@@ -59,8 +59,9 @@ public:
 
     /**
      * @brief Passes SDL event to ImGui
+     * @return True if the event has been consumed, false otherwise
     */
-    void passSDLEvent(SDL_Event& evnt);
+    bool passSDLEvent(const SDL_Event& evnt);
 
     /**
      * @brief Set the color that the default framebuffer is cleared with at the start of each frame
