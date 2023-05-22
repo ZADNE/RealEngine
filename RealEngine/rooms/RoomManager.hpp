@@ -31,7 +31,7 @@ public:
      * @brief Gets the current room, that is the room which has active session.
      * @return Pointer to current room, nullptr before first room is entered.
     */
-    Room* getCurrentRoom() const;
+    Room* currentRoom() const;
 
     /**
      * @brief Changes the current room.

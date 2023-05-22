@@ -14,7 +14,7 @@
   *  int main(int argc, char* argv[]) {
   *      RE::MainProgram::initialize();
   *      auto* myRoom = RE::MainProgram::addRoom<MyDerivedRoom>(constructorArgs);
-  *      return RE::MainProgram::run(myRoom->getName(), transitionparameters);
+  *      return RE::MainProgram::run(myRoom->name(), transitionparameters);
   *  }
   * \endcode
  */
@@ -58,7 +58,7 @@ public:
      * @brief Gets human readable string with the version of RealEngine
      * @return Human readable version string
     */
-    static const std::string& getVersion() {
+    static const std::string& RealEngineVersionString() {
         using namespace std::string_literals;
         const static std::string str = "RealEngine:   "s
             + std::to_string(k_versionMajor) + "."s
@@ -84,8 +84,8 @@ private:
         SDL2_RAII(const SDL2_RAII&) = delete;                   /**< Noncopyable */
         SDL2_RAII& operator=(const SDL2_RAII&) = delete;        /**< Noncopyable */
 
-        SDL2_RAII(SDL2_RAII&&) = delete;                        /**< Nonmovablee */
-        SDL2_RAII& operator=(SDL2_RAII&&) = delete;             /**< Nonmovablee */
+        SDL2_RAII(SDL2_RAII&&) = delete;                        /**< Nonmovable */
+        SDL2_RAII& operator=(SDL2_RAII&&) = delete;             /**< Nonmovable */
 
         ~SDL2_RAII();
 

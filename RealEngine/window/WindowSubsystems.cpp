@@ -27,7 +27,7 @@ WindowSubsystems::WindowSubsystems() :
 }
 
 void WindowSubsystems::printRealEngineVersion() {
-    log(getVersion());
+    log(RealEngineVersionString());
 }
 
 void WindowSubsystems::printSubsystemsVersions() const {

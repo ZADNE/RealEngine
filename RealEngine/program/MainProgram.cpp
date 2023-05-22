@@ -50,7 +50,7 @@ void MainProgram::pollEventsInMainThread(bool poll) {
     mainProgram.m_inputManager.update();
 }
 
-std::vector<DisplayInfo> MainProgram::getDisplays() const {
+std::vector<DisplayInfo> MainProgram::searchDisplays() const {
     std::vector<DisplayInfo> infos;
     int numberOfDisplays = SDL_GetNumVideoDisplays();
     if (numberOfDisplays < 0) { return infos; }
@@ -95,12 +95,12 @@ void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
 int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
     scheduleRoomTransition(roomName, args);
     doRoomTransitionIfScheduled();
-    if (!m_roomManager.getCurrentRoom()) {
+    if (!m_roomManager.currentRoom()) {
         throw std::runtime_error("Initial room was not set");
     }
 
     //Adopt display settings of the first room
-    adoptRoomDisplaySettings(m_roomManager.getCurrentRoom()->getDisplaySettings());
+    adoptRoomDisplaySettings(m_roomManager.currentRoom()->displaySettings());
 
     m_programShouldRun = true;
     m_synchronizer.resumeSteps();
@@ -127,7 +127,7 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
         const auto& commandBuffer = m_window.prepareNewFrame();
 
         //Draw the frame
-        render(commandBuffer, m_synchronizer.getDrawInterpolationFactor());
+        render(commandBuffer, m_synchronizer.drawInterpolationFactor());
 
         //Finish the drawing
         m_window.finishNewFrame();
@@ -139,18 +139,18 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
     std::cout << "Leaving main loop!" << std::endl;
 
     //Exit the program
-    m_roomManager.getCurrentRoom()->sessionEnd();
+    m_roomManager.currentRoom()->sessionEnd();
     m_window.prepareForDestructionOfRendererObjects();
 
     return m_programExitCode;
 }
 
 void MainProgram::step() {
-    m_roomManager.getCurrentRoom()->step();
+    m_roomManager.currentRoom()->step();
 }
 
 void MainProgram::render(const vk::CommandBuffer& commandBuffer, double interpolationFactor) {
-    m_roomManager.getCurrentRoom()->render(commandBuffer, interpolationFactor);
+    m_roomManager.currentRoom()->render(commandBuffer, interpolationFactor);
 }
 
 void MainProgram::processEvent(SDL_Event* evnt) {
@@ -187,7 +187,7 @@ void MainProgram::processEvent(SDL_Event* evnt) {
         //Coords also have to be clamped to window dims
         //because SDL reports coords outside of the window when a key is held
         m_inputManager.setCursor(
-            glm::clamp({evnt->motion.x, m_window.getDims().y - evnt->motion.y - 1}, glm::ivec2(0), m_window.getDims() - 1),
+            glm::clamp({evnt->motion.x, m_window.dims().y - evnt->motion.y - 1}, glm::ivec2(0), m_window.dims() - 1),
             {evnt->motion.xrel, -evnt->motion.yrel}
         );
         break;
@@ -208,11 +208,11 @@ void MainProgram::doRoomTransitionIfScheduled() {
     if (m_nextRoomName == k_noNextRoom) return;
 
     m_synchronizer.pauseSteps();
-    auto prev = m_roomManager.getCurrentRoom();
+    auto prev = m_roomManager.currentRoom();
     auto current = m_roomManager.goToRoom(m_nextRoomName, m_roomTransitionArgs);
     if (prev != current) {//If successfully changed the room
         //Adopt the display settings of the entered room
-        adoptRoomDisplaySettings(current->getDisplaySettings());
+        adoptRoomDisplaySettings(current->displaySettings());
         //Pressed/released events belong to the previous room
         m_inputManager.update();
         //Ensure at least one step before the first frame is rendered

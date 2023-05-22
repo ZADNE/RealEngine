@@ -46,12 +46,12 @@ public:
     /**
      * @brief Gets absolute position of the cursor.
     */
-    glm::ivec2 getCursorAbs() const;
+    glm::ivec2 cursorAbs() const;
 
     /**
      * @brief Gets position of the cursor relative to previous step.
     */
-    glm::ivec2 getCursorRel() const;
+    glm::ivec2 cursorRel() const;
 
     //Setters
     void setCursor(const glm::ivec2& abs, const glm::ivec2& rel);

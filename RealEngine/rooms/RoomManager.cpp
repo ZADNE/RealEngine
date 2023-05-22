@@ -12,13 +12,13 @@ RoomManager::RoomManager() {
 
 }
 
-Room* RoomManager::getCurrentRoom() const {
+Room* RoomManager::currentRoom() const {
     return m_currentRoom;
 }
 
 Room* RoomManager::goToRoom(size_t name, const RoomTransitionArguments& args) {
     for (auto& room : m_rooms) {//If name is valid
-        if (room->getName() == name) {
+        if (room->name() == name) {
             if (m_currentRoom) {
                 m_currentRoom->sessionEnd();//End session of the current room
             }

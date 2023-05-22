@@ -33,7 +33,7 @@ private:
     void load(const std::string& filePath);
 
     RE::SpriteBatch m_sb{1, 1};
-    RE::GeometryBatch m_gb{vk::PrimitiveTopology::eLineList, 128};
+    RE::GeometryBatch m_gb{vk::PrimitiveTopology::eLineList, 128u, 1.0f};
 
     //Texture
     std::optional<RE::TextureShaped> m_texture;

@@ -20,7 +20,7 @@ Window::Window(const WindowSettings& settings, const std::string& title):
     m_subsystems.printRealEngineVersion();
     m_subsystems.printSubsystemsVersions();
 
-    initForRenderer(settings.getPreferredRenderer());
+    initForRenderer(settings.preferredRenderer());
 
     if (m_usedRenderer == RendererID::Any) {//If the preferred renderer could not be initialized
         for (size_t i = 0; i < static_cast<size_t>(RendererID::Any); i++) {//Try to init any other
@@ -98,10 +98,6 @@ void Window::setVSync(bool vSync, bool save) {
 void Window::setTitle(const std::string& title) {
     m_windowTitle = title;
     SDL_SetWindowTitle(m_SDLwindow, title.c_str());
-}
-
-const std::string& Window::getTitle() const {
-    return m_windowTitle;
 }
 
 void Window::setPreferredRenderer(RendererID renderer, bool save) {

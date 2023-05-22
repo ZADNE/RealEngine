@@ -72,21 +72,21 @@ public:
      * a step and value close to 1 means that it happens close to the next step, linearly.
      * @return Interpolation factor of the next frame.
     */
-    double getDrawInterpolationFactor() const;
+    double drawInterpolationFactor() const;
 
     /**
      * @brief Gets number of frames drawn last second (usually refered to as FPS).
      * This is the most basic metric for any real-time application.
      * @return Current frames per second
     */
-    unsigned int getFramesPerSecond() const;
+    unsigned int framesPerSecond() const;
 
     /**
      * @brief Gets maximum frame time in the last second
      * This metric can be used to detect lag spikes.
      * @return Maximum frame time in the last second
     */
-    Duration getMaxFrameTime() const;
+    Duration maxFrameTime() const;
 
 private:
 

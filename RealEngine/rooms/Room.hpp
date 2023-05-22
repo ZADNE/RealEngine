@@ -100,12 +100,12 @@ public:
     /**
      * @brief Gets the settings that should be used for this room
     */
-    RoomDisplaySettings getDisplaySettings() const;
+    const RoomDisplaySettings& displaySettings() const { return m_displaySettings; }
 
     /**
      * @brief Gets unique identifier of the room
     */
-    size_t getName() const;
+    size_t name() const { return m_name; }
 
     /**
      * @brief This is set by the MainProgram at startup
@@ -122,7 +122,7 @@ protected:
     /**
      * @brief Dynamically changes the room's display settings
     */
-    void setDisplaySettings(RoomDisplaySettings displaySettings);
+    void setDisplaySettings(const RoomDisplaySettings& displaySettings);
 
 private:
 

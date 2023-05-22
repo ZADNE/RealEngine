@@ -115,9 +115,9 @@ public:
     static void pollEventsInMainThread(bool poll);
 
     /**
-     * @brief Gets displays that can be drawn to
+     * @brief Searches displays that can be drawn to
     */
-    std::vector<DisplayInfo> getDisplays() const;
+    std::vector<DisplayInfo> searchDisplays() const;
 
     void setRelativeCursorMode(bool relative);
 
@@ -146,7 +146,7 @@ private:
     void pollEvents();
     void processEvent(SDL_Event* evnt);
 
-    Window m_window{WindowSettings{}, WindowSubsystems::getVersion()};/**< Window also creates and initializes renderer backends */
+    Window m_window{WindowSettings{}, WindowSubsystems::RealEngineVersionString()};/**< Window also creates and initializes renderer backends */
     RoomManager m_roomManager;                  /**< Manages rooms - you have to add at least 1 room to run the program */
     InputManager m_inputManager;                /**< Records key presses/releases, mouse movement etc. */
     Synchronizer m_synchronizer{50u, 50u};      /**< Maintains constant speed of simulation, can also limit FPS */

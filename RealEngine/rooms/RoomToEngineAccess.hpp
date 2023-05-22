@@ -63,14 +63,14 @@ public:
     int wasKeyReleased(Key keyID) const;
 
     /**
-     * @copydoc InputManager::getCursorAbs
+     * @copydoc InputManager::cursorAbs
     */
-    glm::ivec2 getCursorAbs() const;
+    glm::ivec2 cursorAbs() const;
 
     /**
-     * @copydoc InputManager::getCursorRel
+     * @copydoc InputManager::cursorRel
     */
-    glm::ivec2 getCursorRel() const;
+    glm::ivec2 cursorRel() const;
 
 #pragma endregion
 
@@ -87,23 +87,23 @@ public:
     void resumeSteps();
 
     /**
-     * @copydoc Synchronizer::getFramesPerSecond
+     * @copydoc Synchronizer::framesPerSecond
     */
-    unsigned int getFramesPerSecond() const;
+    unsigned int framesPerSecond() const;
 
     /**
-     * @copydoc Synchronizer::getMaxFrameTime
+     * @copydoc Synchronizer::maxFrameTime
     */
-    Synchronizer::Duration getMaxFrameTime() const;
+    Synchronizer::Duration maxFrameTime() const;
 
 #pragma endregion
 
 #pragma region Window
 
     /**
-     * @copydoc Window::getFlags
+     * @copydoc Window::flags
     */
-    WindowFlags getWindowFlags() const;
+    WindowFlags windowFlags() const;
 
     /**
      * @copydoc Window::setFullscreen
@@ -141,9 +141,9 @@ public:
     void setWindowTitle(const std::string& title);
 
     /**
-     * @copydoc Window::getTitle
+     * @copydoc Window::title
     */
-    const std::string& getWindowTitle() const;
+    const std::string& windowTitle() const;
 
     /**
      * @copydoc Window::setDims
@@ -151,9 +151,9 @@ public:
     void setWindowDims(const glm::ivec2& newDims, bool save);
 
     /**
-     * @copydoc Window::getDims
+     * @copydoc Window::dims
     */
-    glm::ivec2 getWindowDims() const;
+    glm::ivec2 windowDims() const;
 
     /**
      * @copydoc Window::setPreferredRenderer
@@ -161,14 +161,14 @@ public:
     void setPreferredRenderer(RendererID renderer, bool save);
 
     /**
-     * @copydoc Window::getPreferredRenderer
+     * @copydoc Window::preferredRenderer
     */
-    RendererID getPreferredRenderer() const;
+    RendererID preferredRenderer() const;
 
     /**
-     * @copydoc Window::getUsedRenderer
+     * @copydoc Window::usedRenderer
     */
-    RendererID getUsedRenderer() const;
+    RendererID usedRenderer() const;
 
     /**
      * @copydoc WindowSettings::save

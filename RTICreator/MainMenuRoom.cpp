@@ -13,15 +13,15 @@
 #include <Windows.h>
 #include <RealEngine/utility/Error.hpp>
 
-constexpr RE::RoomDisplaySettings INITIAL_DISPLAY_SETTINGS{
+constexpr RE::RoomDisplaySettings k_initialSettings{
     .clearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
     .framesPerSecondLimit = 144,
     .usingImGui = true
 };
 
 MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args):
-    Room(0, INITIAL_DISPLAY_SETTINGS),
-    m_texView(engine().getWindowDims()) {
+    Room(0, k_initialSettings),
+    m_texView(engine().windowDims()) {
 
     engine().setWindowTitle("RTICreator v4.0.0");
 
@@ -34,7 +34,7 @@ MainMenuRoom::MainMenuRoom(RE::CommandLineArguments args):
     }
 
     //Initialize window view matrices
-    auto window = engine().getWindowDims();
+    auto window = engine().windowDims();
     windowResizedCallback(window, window);
 }
 
@@ -49,7 +49,7 @@ void MainMenuRoom::sessionEnd() {
 void MainMenuRoom::step() {
     if (m_texture) {
         //Handle input
-        auto cursorPos = (glm::vec2)engine().getCursorAbs();
+        auto cursorPos = (glm::vec2)engine().cursorAbs();
         if (engine().isKeyDown(RE::Key::MMB) && m_texture) {
             m_texView.shiftPosition((glm::vec2{m_cursorPosPrev - cursorPos} / m_drawScale));
         }
@@ -92,9 +92,9 @@ void MainMenuRoom::render(const vk::CommandBuffer& commandBuffer, double interpo
                     if (ImGui::Button("Reset view"))
                         resetView();
                     if (ImGui::ColorPicker3("Background color", &m_backgroundColor.x)) {
-                        auto displaySettings = getDisplaySettings();
-                        displaySettings.clearColor = glm::vec4(m_backgroundColor, 1.0f);
-                        setDisplaySettings(displaySettings);
+                        auto ds = displaySettings();
+                        ds.clearColor = glm::vec4(m_backgroundColor, 1.0f);
+                        setDisplaySettings(ds);
                     }
                     ImGui::EndTabItem();
                 }
@@ -181,7 +181,7 @@ void MainMenuRoom::load(const std::string& loc) {
 }
 
 void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
-    glm::vec2 windowDims = glm::vec2(engine().getWindowDims());
+    glm::vec2 windowDims = glm::vec2(engine().windowDims());
     auto texDims = m_texture->subimagesSpritesCount() * m_texture->subimageDims();
     auto botLeft = -texDims * 0.5f;
 
@@ -196,7 +196,7 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
 
     m_sb.clearAndBeginFirstBatch();
     m_sb.add(*m_texture, posSizeRect, uvRect);
-    m_sb.drawBatch(commandBuffer, m_texView.getViewMatrix());
+    m_sb.drawBatch(commandBuffer, m_texView.viewMatrix());
 
     m_gb.begin();
     std::vector<RE::VertexPOCO> vertices;
@@ -248,7 +248,7 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
     m_gb.addVertices(0u, vertices.size(), vertices.data());
 
     m_gb.end();
-    m_gb.draw(commandBuffer, m_texView.getViewMatrix());
+    m_gb.draw(commandBuffer, m_texView.viewMatrix());
 }
 
 void MainMenuRoom::resetView() {

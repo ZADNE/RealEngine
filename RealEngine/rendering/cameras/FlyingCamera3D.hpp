@@ -27,7 +27,10 @@ public:
     */
     void move(const glm::vec3& rightUpForward);
 
-    const glm::mat4& getViewMat() const;
+    /**
+     * @brief Gets the projection matrix of the view
+    */
+    const glm::mat4& viewMat() const;
 
 private:
 

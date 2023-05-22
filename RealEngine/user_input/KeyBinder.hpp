@@ -100,7 +100,7 @@ public:
         i >> j;
 
         for (auto item = j.begin(); item != j.end(); item++) {
-            auto binding = getBindingEnum(item.key());
+            auto binding = searchBindingEnum(item.key());
             if (binding.has_value()) {
                 m_bindings[static_cast<size_t>(*binding)] = stringToKey(item.value().get<std::string>());
             }
@@ -162,7 +162,7 @@ public:
 
 private:
 
-    std::optional<KeyBindings> getBindingEnum(std::string_view name) {
+    std::optional<KeyBindings> searchBindingEnum(std::string_view name) {
         for (size_t i = 0; i < infoList.size(); i++) {
             if (infoList[i].name == name) {
                 return static_cast<KeyBindings>(i);//Found the enum

@@ -36,13 +36,16 @@ public:
     */
     Window(const WindowSettings& settings, const std::string& title);
 
+    Window(const Window&) = delete;             /**< Noncopyable */
+    void operator=(const Window&) = delete;     /**< Noncopyable */
+
+    Window(Window&&) = delete;                  /**< Nonmovable */
+    void operator=(Window&&) = delete;          /**< Nonmovable */
+
     /**
      * @brief Destroys the window
     */
     ~Window();
-
-    Window(const Window&) = delete;
-    void operator=(const Window&) = delete;
 
     /**
      * @brief Prepares for rendering of new frame
@@ -108,7 +111,7 @@ public:
     /**
      * @brief Gets current title of the window
     */
-    const std::string& getTitle() const;
+    const std::string& title() const { return m_windowTitle; }
 
     /**
      * @brief Resizes the window.
@@ -120,7 +123,7 @@ public:
     /**
      * @brief Gets current dimensions of the window
     */
-    glm::ivec2 getDims() const { return m_dims; }
+    glm::ivec2 dims() const { return m_dims; }
 
     /**
      * @brief       Sets the preferred renderer.
@@ -135,7 +138,7 @@ public:
     /**
      * @brief Gets the used renderer (this can be different from the requested one)
     */
-    RendererID getUsedRenderer() const { return m_usedRenderer; }
+    RendererID usedRenderer() const { return m_usedRenderer; }
 
 private:
 

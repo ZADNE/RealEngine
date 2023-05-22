@@ -115,11 +115,11 @@ int InputManager::wasReleased(Key keyID) const {
     return 0;
 }
 
-glm::ivec2 InputManager::getCursorAbs() const {
+glm::ivec2 InputManager::cursorAbs() const {
     return m_cursorAbs;
 }
 
-glm::ivec2 InputManager::getCursorRel() const {
+glm::ivec2 InputManager::cursorRel() const {
     return m_cursorRel;
 }
 

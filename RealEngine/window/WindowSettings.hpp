@@ -43,13 +43,13 @@ public:
     /**
      * @brief Gets a copy of the window flags
     */
-    WindowFlags getFlags() const { return m_flags; }
+    WindowFlags flags() const { return m_flags; }
 
     bool isFullscreen() const { return m_flags.fullscreen; }
     bool isBorderless() const { return m_flags.borderless; }
     bool isVSynced() const { return m_flags.vSync; }
 
-    RendererID getPreferredRenderer() const { return m_preferredRenderer; }
+    RendererID preferredRenderer() const { return m_preferredRenderer; }
 
     /**
      * @brief Save current settings to a file.

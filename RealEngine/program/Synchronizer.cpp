@@ -40,15 +40,15 @@ void Synchronizer::resumeSteps() {
     m_stepsPaused = false;
 }
 
-double Synchronizer::getDrawInterpolationFactor() const {
+double Synchronizer::drawInterpolationFactor() const {
     return static_cast<double>(m_stepTimeAccumulator.count()) / static_cast<double>(m_timePerStep.count());
 }
 
-unsigned int Synchronizer::getFramesPerSecond() const {
+unsigned int Synchronizer::framesPerSecond() const {
     return m_framesPerSecond;
 }
 
-Synchronizer::Duration Synchronizer::getMaxFrameTime() const {
+Synchronizer::Duration Synchronizer::maxFrameTime() const {
     return m_maxFrameTime;
 }
 
