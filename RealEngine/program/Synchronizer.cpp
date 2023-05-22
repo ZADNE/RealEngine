@@ -24,7 +24,7 @@ void Synchronizer::setStepsPerSecond(unsigned int stepsPerSecond) {
 }
 
 void Synchronizer::setFramesPerSecondLimit(unsigned int framesPerSecondLimit) {
-    m_timePerFrame = framesPerSecondLimit == DO_NOT_LIMIT_FRAMES_PER_SECOND ? Duration::zero() : 1'000'000'000ns / framesPerSecondLimit;
+    m_timePerFrame = framesPerSecondLimit == k_doNotLimitFramesPerSecond ? Duration::zero() : 1'000'000'000ns / framesPerSecondLimit;
     resumeSteps();
 }
 

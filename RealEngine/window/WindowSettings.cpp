@@ -27,16 +27,16 @@ WindowSettings::WindowSettings() {
         auto renderer = j["window"].find("preferred_renderer");
         if (renderer != j["window"].end()) {
             auto renderStr = renderer->get<std::string>();
-            if (renderStr == to_string(RendererID::VULKAN13)) {
-                m_preferredRenderer = RendererID::VULKAN13;
-            } else if (renderStr == to_string(RendererID::ANY)) {
-                m_preferredRenderer = RendererID::ANY;
+            if (renderStr == to_string(RendererID::Vulkan13)) {
+                m_preferredRenderer = RendererID::Vulkan13;
+            } else if (renderStr == to_string(RendererID::Any)) {
+                m_preferredRenderer = RendererID::Any;
             } else {
-                m_preferredRenderer = RendererID::ANY;
+                m_preferredRenderer = RendererID::Any;
                 save();
             }
         } else {
-            m_preferredRenderer = RendererID::ANY;
+            m_preferredRenderer = RendererID::Any;
             save();
         }
     }
@@ -60,7 +60,7 @@ WindowSettings::WindowSettings(const glm::ivec2& dims, WindowFlags flags, Render
 void WindowSettings::reset() {
     m_dims = glm::vec2(1280.0f, 1000.0f);
     m_flags = WindowFlags{};
-    m_preferredRenderer = RendererID::ANY;
+    m_preferredRenderer = RendererID::Any;
 }
 
 void WindowSettings::save() {

@@ -63,7 +63,7 @@ private:
         const vk::SpecializationInfo& specInfo
     ) const {
         PipelineLayoutDescription reflection;
-        for (size_t st = 0; st < PipelineSources::NUM_STAGES; ++st) {
+        for (size_t st = 0; st < PipelineSources::k_numStages; ++st) {
             if (!srcs[st].vk13.empty()) {
                 reflectSource(srcs[st], PipelineSources::stageFlags(st), specInfo, reflection);
             }

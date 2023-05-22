@@ -159,8 +159,8 @@ private:
 
     void doRoomTransitionIfScheduled();
 
-    static constexpr size_t NO_NEXT_ROOM = std::numeric_limits<size_t>::max();
-    size_t m_nextRoomName = NO_NEXT_ROOM;
+    static constexpr size_t k_noNextRoom = std::numeric_limits<size_t>::max();
+    size_t m_nextRoomName = k_noNextRoom;
     RoomTransitionArguments m_roomTransitionArgs;
 };
 

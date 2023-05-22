@@ -15,31 +15,31 @@
 namespace RE {
 
 Window::Window(const WindowSettings& settings, const std::string& title):
-    WindowSettings(settings), m_subsystems(), m_windowTitle(title), m_usedRenderer(RendererID::ANY) {
+    WindowSettings(settings), m_subsystems(), m_windowTitle(title), m_usedRenderer(RendererID::Any) {
 
     m_subsystems.printRealEngineVersion();
     m_subsystems.printSubsystemsVersions();
 
     initForRenderer(settings.getPreferredRenderer());
 
-    if (m_usedRenderer == RendererID::ANY) {//If the preferred renderer could not be initialized
-        for (size_t i = 0; i < static_cast<size_t>(RendererID::ANY); i++) {//Try to init any other
+    if (m_usedRenderer == RendererID::Any) {//If the preferred renderer could not be initialized
+        for (size_t i = 0; i < static_cast<size_t>(RendererID::Any); i++) {//Try to init any other
             initForRenderer(static_cast<RendererID>(i));
-            if (m_usedRenderer != RendererID::ANY) break;
+            if (m_usedRenderer != RendererID::Any) break;
         }
 
-        if (m_usedRenderer == RendererID::ANY) {//If no renderer could be initialized
+        if (m_usedRenderer == RendererID::Any) {//If no renderer could be initialized
             //There is nothing more we can do
             fatalError("No renderer could be initialized!");
         }
     }
 
-    assert(m_usedRenderer != RendererID::ANY);
+    assert(m_usedRenderer != RendererID::Any);
 }
 
 Window::~Window() {
     switch (m_usedRenderer) {
-    case RendererID::VULKAN13:
+    case RendererID::Vulkan13:
         m_vk13.~VulkanFixture(); break;
     }
     SDL_DestroyWindow(m_SDLwindow);
@@ -89,7 +89,7 @@ void Window::setBorderless(bool borderless, bool save) {
 
 void Window::setVSync(bool vSync, bool save) {
     m_flags.vSync = vSync;
-    if (m_usedRenderer == RendererID::VULKAN13) {
+    if (m_usedRenderer == RendererID::Vulkan13) {
         m_vk13.changePresentation(m_flags.vSync);
     }
     if (save) this->save();
@@ -118,14 +118,14 @@ void Window::setDims(const glm::ivec2& newDims, bool save) {
 
 void Window::initForRenderer(RendererID renderer) {
     switch (renderer) {
-    case RendererID::VULKAN13:      initForVulkan13(); break;
+    case RendererID::Vulkan13:      initForVulkan13(); break;
     default:                        break;
     }
 }
 
 void Window::initForVulkan13() {
     //Create SDL window
-    if (!createSDLWindow(RendererID::VULKAN13)) {
+    if (!createSDLWindow(RendererID::Vulkan13)) {
         goto fail;
     }
 
@@ -137,21 +137,21 @@ void Window::initForVulkan13() {
         goto fail_SDLWindow;
     }
 
-    m_usedRenderer = RendererID::VULKAN13;
+    m_usedRenderer = RendererID::Vulkan13;
     return;
 
 fail_SDLWindow:
     SDL_DestroyWindow(m_SDLwindow);
     m_SDLwindow = nullptr;
 fail:
-    m_usedRenderer = RendererID::ANY;
+    m_usedRenderer = RendererID::Any;
 }
 
 bool Window::createSDLWindow(RendererID renderer) {
     //Prepare window flags
     Uint32 SDL_flags = 0;
     switch (renderer) {
-    case RendererID::VULKAN13: SDL_flags |= SDL_WINDOW_VULKAN; break;
+    case RendererID::Vulkan13: SDL_flags |= SDL_WINDOW_VULKAN; break;
     }
     if (m_flags.invisible) SDL_flags |= SDL_WINDOW_HIDDEN;
     if (m_flags.fullscreen) SDL_flags |= SDL_WINDOW_FULLSCREEN;

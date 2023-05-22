@@ -38,7 +38,16 @@ public:
     */
     void end();
 
+    /**
+     * @brief Adds vertices that will be rendered
+     * @detail Must be called between begin() and end().
+    */
     void addVertices(uint32_t first, uint32_t count, const VertexPOCO* data);
+
+    template<size_t size>
+    void addVertices(const std::array<VertexPOCO, size>& vertices) {
+        addVertices(0u, size, vertices.data());
+    }
 
     /**
      * @brief Draws the batch

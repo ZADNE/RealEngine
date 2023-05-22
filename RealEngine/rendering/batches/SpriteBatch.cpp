@@ -15,8 +15,8 @@ using enum vk::DescriptorBindingFlagBits;
 namespace RE {
 
 SpriteBatch::SpriteBatch(unsigned int maxSprites, unsigned int maxTextures):
-    m_spritesBuf(MAX_FRAMES_IN_FLIGHT* maxSprites * sizeof(Sprite), eVertexBuffer, eHostVisible | eHostCoherent),
-    m_spritesMapped(m_spritesBuf.map<Sprite>(0u, MAX_FRAMES_IN_FLIGHT* maxSprites * sizeof(Sprite))),
+    m_spritesBuf(k_maxFramesInFlight* maxSprites * sizeof(Sprite), eVertexBuffer, eHostVisible | eHostCoherent),
+    m_spritesMapped(m_spritesBuf.map<Sprite>(0u, k_maxFramesInFlight* maxSprites * sizeof(Sprite))),
     m_maxSprites(maxSprites),
     m_maxTextures(maxTextures),
     m_pipelineLayout(createPipelineLayout(maxTextures)),
@@ -25,8 +25,8 @@ SpriteBatch::SpriteBatch(unsigned int maxSprites, unsigned int maxTextures):
 }
 
 void SpriteBatch::clearAndBeginFirstBatch() {
-    m_nextSpriteIndex = m_maxSprites * NEXT_FRAME;
-    m_nextTextureIndex = m_maxTextures * NEXT_FRAME;
+    m_nextSpriteIndex = m_maxSprites * nextFrame;
+    m_nextTextureIndex = m_maxTextures * nextFrame;
     m_texToIndex.clear();
     nextBatch();
 }
@@ -48,7 +48,7 @@ void SpriteBatch::add(const Texture& tex, const glm::vec4& posSizeRect, const gl
         .pos = posSizeRect,
         .uvs = uvsSizeRect,
         .tex = texToIndex(tex),
-        .col = WHITE
+        .col = k_white
     };
 }
 
@@ -58,7 +58,7 @@ void SpriteBatch::addSprite(const SpriteStatic& sprite, const glm::vec2& pos) {
         .pos = glm::vec4(pos - tex.pivot(), tex.subimageDims()),
         .uvs = glm::vec4(glm::floor(sprite.subimageSprite()) / tex.subimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.subimagesSpritesCount()),
         .tex = texToIndex(tex),
-        .col = WHITE
+        .col = k_white
     };
 }
 
@@ -68,7 +68,7 @@ void SpriteBatch::addSprite(const SpriteComplex& sprite, const glm::vec2& pos) {
         .pos = glm::vec4(pos - tex.pivot() * sprite.scale(), tex.subimageDims() * sprite.scale()),
         .uvs = glm::vec4(glm::floor(sprite.subimageSprite()) / tex.subimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.subimagesSpritesCount()),
         .tex = texToIndex(tex),
-        .col = WHITE
+        .col = k_white
     };
 }
 
@@ -77,7 +77,7 @@ void SpriteBatch::addSubimage(const TextureShaped& tex, const glm::vec2& pos, co
         .pos = glm::vec4(pos - tex.pivot(), tex.subimageDims()),
         .uvs = glm::vec4(glm::floor(subImg_Spr) / tex.subimagesSpritesCount(), glm::vec2(1.0f, 1.0f) / tex.subimagesSpritesCount()),
         .tex = texToIndex(tex),
-        .col = WHITE
+        .col = k_white
     };
 }
 
@@ -94,14 +94,14 @@ unsigned int SpriteBatch::texToIndex(const Texture& tex) {
 
 PipelineLayout SpriteBatch::createPipelineLayout(unsigned int maxTextures) {
     //Specialization constants
-    static constexpr vk::SpecializationMapEntry SPEC_MAP_ENTRY{0u, 0u, 4ull};
-    unsigned int totalTextures = maxTextures * MAX_FRAMES_IN_FLIGHT;
+    static constexpr vk::SpecializationMapEntry specMapEntry{0u, 0u, 4ull};
+    unsigned int totalTextures = maxTextures * k_maxFramesInFlight;
     static constexpr vk::DescriptorBindingFlags bindingFlags = {eUpdateUnusedWhilePending | ePartiallyBound};
     auto bindingFlagsArray = vk::ArrayProxy<vk::DescriptorBindingFlags>(bindingFlags);
     return PipelineLayout{
         PipelineLayoutCreateInfo{
             .descriptorBindingFlags = {bindingFlagsArray},
-            .specializationInfo = vk::SpecializationInfo{1u, &SPEC_MAP_ENTRY, sizeof(totalTextures), &totalTextures}
+            .specializationInfo = vk::SpecializationInfo{1u, &specMapEntry, sizeof(totalTextures), &totalTextures}
         }, PipelineGraphicsSources{
             .vert = sprite_vert,
             .tesc = sprite_tesc,
@@ -141,7 +141,7 @@ Pipeline SpriteBatch::createPipeline(const PipelineLayout& pipelineLayout, unsig
     }});
     //Specialization constants
     static constexpr vk::SpecializationMapEntry SPEC_MAP_ENTRY{0u, 0u, 4ull};
-    unsigned int totalTextures = maxTextures * MAX_FRAMES_IN_FLIGHT;
+    unsigned int totalTextures = maxTextures * k_maxFramesInFlight;
     return Pipeline{
         PipelineGraphicsCreateInfo{
             .pipelineLayout = *pipelineLayout,

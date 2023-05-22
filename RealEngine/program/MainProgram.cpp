@@ -154,31 +154,31 @@ void MainProgram::render(const vk::CommandBuffer& commandBuffer, double interpol
 }
 
 void MainProgram::processEvent(SDL_Event* evnt) {
-    Key key = Key::UNKNOWN;
+    Key key = Key::UnknownKey;
     switch (evnt->type) {
     case SDL_KEYDOWN:
         key = SDLKToREKey(evnt->key.keysym.sym);
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(Key::ANY_KEY);
+            m_inputManager.press(Key::AnyKey);
             m_inputManager.press(key);
         }
         break;
     case SDL_KEYUP:
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(Key::ANY_KEY, -1);
+            m_inputManager.press(Key::AnyKey, -1);
             m_inputManager.release(SDLKToREKey(evnt->key.keysym.sym));
         }
         break;
     case SDL_MOUSEBUTTONDOWN:
         if (evnt->key.repeat == 0) {
             auto key = SDLKToREKey(evnt->button.button);
-            m_inputManager.press(Key::ANY_KEY);
+            m_inputManager.press(Key::AnyKey);
             m_inputManager.press(key, evnt->button.clicks);
         }
         break;
     case SDL_MOUSEBUTTONUP:
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(Key::ANY_KEY, -1);
+            m_inputManager.press(Key::AnyKey, -1);
             m_inputManager.release(SDLKToREKey(evnt->button.button));
         }
         break;
@@ -205,7 +205,7 @@ void MainProgram::processEvent(SDL_Event* evnt) {
 }
 
 void MainProgram::doRoomTransitionIfScheduled() {
-    if (m_nextRoomName == NO_NEXT_ROOM) return;
+    if (m_nextRoomName == k_noNextRoom) return;
 
     m_synchronizer.pauseSteps();
     auto prev = m_roomManager.getCurrentRoom();
@@ -218,7 +218,7 @@ void MainProgram::doRoomTransitionIfScheduled() {
         //Ensure at least one step before the first frame is rendered
         step();
     }
-    m_nextRoomName = NO_NEXT_ROOM;
+    m_nextRoomName = k_noNextRoom;
 
     m_synchronizer.resumeSteps();
 }

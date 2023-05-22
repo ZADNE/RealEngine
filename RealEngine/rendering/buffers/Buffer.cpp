@@ -14,12 +14,12 @@ namespace RE {
 using enum vk::MemoryPropertyFlagBits;
 using enum vk::BufferUsageFlagBits;
 
-constexpr auto HOST_MEM = eHostVisible | eHostCoherent;
+constexpr auto k_hostMem = eHostVisible | eHostCoherent;
 
 Buffer::Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data/* = nullptr*/) {
     BufferAndMemory main{};
-    if (data && (memProperty & HOST_MEM) != HOST_MEM) {//If initial data are provided or stage is requested
-        auto stage = createBufferAndMemory(sizeInBytes, eTransferSrc, HOST_MEM);
+    if (data && (memProperty & k_hostMem) != k_hostMem) {//If initial data are provided or stage is requested
+        auto stage = createBufferAndMemory(sizeInBytes, eTransferSrc, k_hostMem);
         main = createBufferAndMemory(sizeInBytes, usage | eTransferDst, memProperty);
         //Copy from data to staging buffer
         std::memcpy(device().mapMemory(stage.memory, 0, sizeInBytes), data, sizeInBytes);

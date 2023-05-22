@@ -69,7 +69,7 @@ private:
 
     int m_keysHeld = 0u;
     int m_keysHeldPrevious = 0u;
-    Key m_longestHeld = Key::UNKNOWN;
+    Key m_longestHeld = Key::UnknownKey;
     int m_noKeyHeld = 0u;
     int m_noKeyHeldPrevious = 0u;
 };

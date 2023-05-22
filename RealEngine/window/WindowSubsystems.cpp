@@ -14,8 +14,8 @@ namespace RE {
 
 std::string to_string(RendererID r) {
     switch (r) {
-    case RendererID::VULKAN13:      return "VULKAN13";
-    case RendererID::ANY:           return "ANY";
+    case RendererID::Vulkan13:      return "Vulkan13";
+    case RendererID::Any:           return "Any";
     default:                        return "Unknown renderer";
     }
 }

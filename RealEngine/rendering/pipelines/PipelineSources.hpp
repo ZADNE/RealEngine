@@ -35,7 +35,7 @@ struct ShaderSourceRef {
 */
 struct PipelineGraphicsSources {
 
-    static constexpr size_t NUM_STAGES = 5;
+    static constexpr size_t k_numStages = 5;
 
     ShaderSourceRef operator[](size_t type) const {
         switch (type) {
@@ -84,7 +84,7 @@ struct PipelineGraphicsSources {
 */
 struct PipelineComputeSources {
 
-    static constexpr size_t NUM_STAGES = 1;
+    static constexpr size_t k_numStages = 1;
 
     ShaderSourceRef operator[](size_t type) const {
         switch (type) {

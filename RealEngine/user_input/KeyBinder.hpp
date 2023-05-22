@@ -19,7 +19,7 @@
 namespace RE {
 
 template<typename KeyBindings, typename KeyBindingInfo>
-using KeyBindingInfoList = std::array<KeyBindingInfo, static_cast<size_t>(KeyBindings::COUNT)>;
+using KeyBindingInfoList = std::array<KeyBindingInfo, static_cast<size_t>(KeyBindings::Count)>;
 
 /**
  * @brief Provides a mechanism for user-changeable key bindings
@@ -108,7 +108,7 @@ public:
 
         bool returnVal = false;
         for (size_t i = 0; i < infoList.size(); i++) {
-            if (m_bindings[i] == Key::NO_KEY) {
+            if (m_bindings[i] == Key::NoKey) {
                 m_bindings[i] = infoList[i].defaultValue;
                 returnVal = true;
             }
@@ -121,7 +121,7 @@ public:
      * @param permanently If true, the reset bindings are saved
     */
     void resetBindings(bool permanently) {
-        for (size_t i = 0; i < static_cast<size_t>(KeyBindings::COUNT); i++) {
+        for (size_t i = 0; i < static_cast<size_t>(KeyBindings::Count); i++) {
             m_bindings[i] = infoList[i].defaultValue;
         }
         if (permanently) { saveCurrentBindings(); }
@@ -133,7 +133,7 @@ public:
     void saveCurrentBindings() {
         nlohmann::ordered_json j;
 
-        for (size_t i = 0; i < static_cast<size_t>(KeyBindings::COUNT); i++) {
+        for (size_t i = 0; i < static_cast<size_t>(KeyBindings::Count); i++) {
             j[infoList[i].name] = keyToString(m_bindings[i]);
         }
 
@@ -182,12 +182,12 @@ private:
     template<typename CallbackReceiver, void (CallbackReceiver::* func)(Key)>
     static int listenForKey(void* ptr) {
         SDL_Event evnt;
-        Key newKey = Key::UNKNOWN;
+        Key newKey = Key::UnknownKey;
         MainProgram::pollEventsInMainThread(false);
         ListeningInfo<CallbackReceiver>* info = reinterpret_cast<ListeningInfo<CallbackReceiver>*>(ptr);
         int rval = 0;
 
-        while (newKey == Key::UNKNOWN) {//Until a key is pressed
+        while (newKey == Key::UnknownKey) {//Until a key is pressed
             while (SDL_WaitEventTimeout(&evnt, 10)) {//Wait for events
                 switch (evnt.type) {//Extract the pressed key (if it is one)
                 case SDL_KEYDOWN:
@@ -224,7 +224,7 @@ private:
 
     std::string m_bindingFileName = "bindings.json";
 
-    std::array<Key, static_cast<size_t>(KeyBindings::COUNT)> m_bindings;
+    std::array<Key, static_cast<size_t>(KeyBindings::Count)> m_bindings;
 };
 
 }

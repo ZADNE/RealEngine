@@ -9,21 +9,21 @@
 
 namespace RE {
 
-extern const int& FRAMES_IN_FLIGHT;
-extern const int& CURRENT_FRAME;
-extern const int& NEXT_FRAME;
+extern const int& framesInFlight;
+extern const int& currentFrame;
+extern const int& nextFrame;
 
 void setFramesInFlight(int framesInFLight);
 void setFrame(int totalFrame);
 
-constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+constexpr int k_maxFramesInFlight = 2;
 template<typename T>
-using PerFrameInFlight = std::array<T, MAX_FRAMES_IN_FLIGHT>;
+using PerFrameInFlight = std::array<T, k_maxFramesInFlight>;
 
 
 template<typename T>
 T& current(PerFrameInFlight<T>& perFrameInFlight) {
-    return perFrameInFlight[CURRENT_FRAME];
+    return perFrameInFlight[currentFrame];
 }
 
 }

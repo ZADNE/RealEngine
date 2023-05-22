@@ -19,10 +19,10 @@ static vk::ShaderStageFlagBits convert(size_t st) {
 
 Pipeline::Pipeline(const PipelineGraphicsCreateInfo& createInfo, const PipelineGraphicsSources& srcs) {
     //Create shader modules
-    std::array<vk::ShaderModule, PipelineGraphicsSources::NUM_STAGES> modules;
-    std::array<vk::PipelineShaderStageCreateInfo, PipelineGraphicsSources::NUM_STAGES> stages;
+    std::array<vk::ShaderModule, PipelineGraphicsSources::k_numStages> modules;
+    std::array<vk::PipelineShaderStageCreateInfo, PipelineGraphicsSources::k_numStages> stages;
     uint32_t shaderCount = 0;
-    for (size_t st = 0; st < PipelineGraphicsSources::NUM_STAGES; ++st) {
+    for (size_t st = 0; st < PipelineGraphicsSources::k_numStages; ++st) {
         if (!srcs[st].vk13.empty()) {
             modules[shaderCount] = device().createShaderModule({{},
                 srcs[st].vk13.size() * 4,

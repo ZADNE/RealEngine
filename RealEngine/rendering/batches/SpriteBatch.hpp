@@ -91,9 +91,7 @@ private:
 
     DescriptorSet m_descSet{m_pipelineLayout, 0u};
 
-    static inline constexpr glm::vec4 UV_RECT = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-    static inline constexpr glm::vec4 SUV_RECT = glm::vec4(0.0f, 1.0f, 1.0f, -1.0f);
-    static inline constexpr Color WHITE{255, 255, 255, 255};
+    static inline constexpr Color k_white{255, 255, 255, 255};
 };
 
 }

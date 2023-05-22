@@ -24,18 +24,18 @@ using enum vk::ImageViewType;
 using enum vk::CommandBufferLevel;
 
 namespace {
-constexpr auto MAX_TIMEOUT = std::numeric_limits<uint64_t>::max();
+constexpr auto k_maxTimeout = std::numeric_limits<uint64_t>::max();
 void checkSuccess(vk::Result res) { assert(res == vk::Result::eSuccess); }
 void checkSuccessImGui(VkResult res) { checkSuccess(vk::Result{res}); }
 }
 
 namespace RE {
 
-constexpr std::array DEVICE_EXTENSIONS = {
+constexpr std::array k_deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-constexpr vk::SurfaceFormatKHR SURFACE_FORMAT{
+constexpr vk::SurfaceFormatKHR k_surfaceFormat{
     vk::Format::eB8G8R8A8Unorm,
     vk::ColorSpaceKHR::eSrgbNonlinear
 };
@@ -98,7 +98,7 @@ VulkanFixture::~VulkanFixture() {
 
 const vk::CommandBuffer& VulkanFixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
     //Wait for the previous frame to finish
-    checkSuccess(m_device.waitForFences(*current(m_inFlightFences), true, MAX_TIMEOUT));
+    checkSuccess(m_device.waitForFences(*current(m_inFlightFences), true, k_maxTimeout));
 
     m_deletionQueue.deleteNextGroup();
     m_deletionQueue.beginNewGroup();
@@ -114,7 +114,7 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(const glm::vec4& clearColor
     //Acquire next image
     vk::AcquireNextImageInfoKHR acquireNextImageInfo{
         *m_swapchain,
-        MAX_TIMEOUT,
+        k_maxTimeout,
         *current(m_imageAvailableSems),
         nullptr,
         1u
@@ -239,7 +239,7 @@ vk::raii::Instance VulkanFixture::createInstance() {
     }
 
     //Create Vulkan instance
-    vk::ApplicationInfo applicationInfo("RealEngine", 1, "RealEngine", RE_VERSION, VK_API_VERSION_1_3);
+    vk::ApplicationInfo applicationInfo("RealEngine", 1, "RealEngine", k_version, VK_API_VERSION_1_3);
     vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo{{},
         /*eVerbose | eInfo |*/ eWarning | eError,
         eGeneral | eValidation | ePerformance,
@@ -295,7 +295,7 @@ vk::raii::Device VulkanFixture::createDevice() {
     baseFeatures.setTessellationShader(true);
     baseFeatures.setWideLines(true);
     auto createInfo = vk::StructureChain{
-        vk::DeviceCreateInfo{{}, deviceQueueCreateInfos, {}, DEVICE_EXTENSIONS, &baseFeatures},
+        vk::DeviceCreateInfo{{}, deviceQueueCreateInfos, {}, k_deviceExtensions, &baseFeatures},
         vk::PhysicalDeviceUniformBufferStandardLayoutFeatures{true},
         vk::PhysicalDeviceDescriptorIndexingFeatures{},
         vk::PhysicalDeviceSynchronization2Features{true}
@@ -335,7 +335,7 @@ vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
     auto sharingMode = oneQueueFamily ? eExclusive : eConcurrent;
     std::array queueFamilyIndices = {m_graphicsQueueFamilyIndex, m_presentationQueueFamilyIndex};
     vk::SwapchainCreateInfoKHR createInfo{{}, *m_surface, m_minImageCount,
-        SURFACE_FORMAT.format, SURFACE_FORMAT.colorSpace,
+        k_surfaceFormat.format, k_surfaceFormat.colorSpace,
         m_swapchainExtent, 1u, eColorAttachment,
         sharingMode, oneQueueFamily ? vk::ArrayProxyNoTemporaries<const uint32_t>{} : queueFamilyIndices,
         caps.currentTransform, eOpaque,
@@ -351,7 +351,7 @@ std::vector<vk::raii::ImageView> VulkanFixture::createSwapchainImageViews() {
     for (const auto& image : images) {
         imageViews.emplace_back(
             m_device, vk::ImageViewCreateInfo{{},
-            image, e2D, SURFACE_FORMAT.format, {},
+            image, e2D, k_surfaceFormat.format, {},
             vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0u, 1u, 0u, 1u}}
         );
     }
@@ -360,7 +360,7 @@ std::vector<vk::raii::ImageView> VulkanFixture::createSwapchainImageViews() {
 
 vk::raii::RenderPass VulkanFixture::createRenderPass() {
     vk::AttachmentDescription attachmentDescription{{},
-        SURFACE_FORMAT.format,
+        k_surfaceFormat.format,
         vk::SampleCountFlagBits::e1,
         vk::AttachmentLoadOp::eClear,                       //Color
         vk::AttachmentStoreOp::eStore,                      //Color
@@ -416,9 +416,9 @@ vk::raii::CommandPool VulkanFixture::createCommandPool() {
 }
 
 PerFrameInFlight<vk::raii::CommandBuffer> VulkanFixture::createCommandBuffers() {
-    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{*m_commandPool, ePrimary, MAX_FRAMES_IN_FLIGHT};
+    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{*m_commandPool, ePrimary, k_maxFramesInFlight};
     vk::raii::CommandBuffers buffers{m_device, commandBufferAllocateInfo};
-    assert(buffers.size() == MAX_FRAMES_IN_FLIGHT);
+    assert(buffers.size() == k_maxFramesInFlight);
     return PerFrameInFlight<vk::raii::CommandBuffer>{std::move(buffers[0]), std::move(buffers[1])};
 }
 
@@ -472,10 +472,10 @@ VkBool32 VulkanFixture::debugMessengerCallback(VkDebugUtilsMessageSeverityFlagBi
 }
 
 bool VulkanFixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice) {
-    std::bitset<DEVICE_EXTENSIONS.size()> supported{};
+    std::bitset<k_deviceExtensions.size()> supported{};
     for (const auto& extensionProperties : physicalDevice.enumerateDeviceExtensionProperties()) {
-        for (size_t i = 0; i < DEVICE_EXTENSIONS.size(); ++i) {
-            if (std::strcmp(extensionProperties.extensionName.data(), DEVICE_EXTENSIONS[i]) == 0) {
+        for (size_t i = 0; i < k_deviceExtensions.size(); ++i) {
+            if (std::strcmp(extensionProperties.extensionName.data(), k_deviceExtensions[i]) == 0) {
                 supported[i] = true;
             }
         }
@@ -486,7 +486,7 @@ bool VulkanFixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physi
 bool VulkanFixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice) {
     bool formatSupported = false;
     for (const auto& format : physicalDevice.getSurfaceFormatsKHR(*m_surface)) {
-        if (format == SURFACE_FORMAT) {
+        if (format == k_surfaceFormat) {
             formatSupported = true; break;
         }
     }
@@ -540,7 +540,7 @@ void VulkanFixture::recreateImGuiFontTexture() {
     ImGui_ImplVulkan_CreateFontsTexture(*current(m_commandBuffers));
     current(m_commandBuffers).end();
     m_graphicsQueue.submit(vk::SubmitInfo{{}, {}, *current(m_commandBuffers)}, *uploadFence);
-    checkSuccess(m_device.waitForFences(*uploadFence, true, MAX_TIMEOUT));
+    checkSuccess(m_device.waitForFences(*uploadFence, true, k_maxTimeout));
 }
 
 void VulkanFixture::assignImplementationReferences() {

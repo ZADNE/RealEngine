@@ -12,9 +12,11 @@ namespace RE {
  * @brief Every input (mouse/keyboard) key that can used.
 */
 enum class Key {
-    NO_KEY,
-    ANY_KEY,
-    KEY_UNBOUND,
+    NoKey,
+    AnyKey,
+    KeyUnbound,
+    UnknownKey,
+
     Backspace,
     Tab,
     Return,
@@ -133,9 +135,7 @@ enum class Key {
     UMW,
     DMW,
     LMW,
-    RMW,
-
-    UNKNOWN
+    RMW
 };
 
 Key SDLKToREKey(SDL_Keycode key);

@@ -22,11 +22,10 @@
 
 namespace RE {
 
-constexpr int RE_VERSION_MAJOR = 1;
-constexpr int RE_VERSION_MINOR = 9;
-constexpr int RE_VERSION_PATCH = 1;
+constexpr int k_versionMajor = 1;
+constexpr int k_versionMinor = 9;
+constexpr int k_versionPatch = 1;
 
-constexpr int RE_VERSION = RE_VERSION_MAJOR * 1'000'000 + RE_VERSION_MINOR * 1'000 + RE_VERSION_PATCH;
 
 /**
  * @brief Lists all renderers known to RealEngine
@@ -35,11 +34,12 @@ constexpr int RE_VERSION = RE_VERSION_MAJOR * 1'000'000 + RE_VERSION_MINOR * 1'0
  * (or if it fails during initialization).
 */
 enum class RendererID {
-    VULKAN13,       /**< Vulkan 1.3 renderer */
-    ANY
+    Vulkan13,       /**< Vulkan 1.3 renderer */
+    Any
 };
 
 std::string to_string(RendererID r);
+constexpr int k_version = k_versionMajor * 1'000'000 + k_versionMinor * 1'000 + k_versionPatch;
 
 /**
  * @brief Represents RealEngine's subsystems
@@ -54,9 +54,6 @@ public:
     */
     WindowSubsystems();
 
-    WindowSubsystems(const WindowSubsystems&) = delete;
-    WindowSubsystems& operator=(const WindowSubsystems&) = delete;
-
     /**
      * @brief Gets human readable string with the version of RealEngine
      * @return Human readable version string
@@ -64,9 +61,9 @@ public:
     static const std::string& getVersion() {
         using namespace std::string_literals;
         const static std::string str = "RealEngine:   "s
-            + std::to_string(RE_VERSION_MAJOR) + "."s
-            + std::to_string(RE_VERSION_MINOR) + "."s
-            + std::to_string(RE_VERSION_PATCH);
+            + std::to_string(k_versionMajor) + "."s
+            + std::to_string(k_versionMinor) + "."s
+            + std::to_string(k_versionPatch);
         return str;
     }
 

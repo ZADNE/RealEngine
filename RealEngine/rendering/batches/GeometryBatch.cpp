@@ -12,8 +12,8 @@ using enum vk::BufferUsageFlagBits;
 using enum vk::MemoryPropertyFlagBits;
 
 GeometryBatch::GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVertices, float lineWidth):
-    m_verticesBuf(sizeof(VertexPOCO)* maxVertices* MAX_FRAMES_IN_FLIGHT, eVertexBuffer, eHostVisible | eHostCoherent),
-    m_verticesMapped(m_verticesBuf.map<VertexPOCO>(0, sizeof(VertexPOCO)* maxVertices* MAX_FRAMES_IN_FLIGHT)),
+    m_verticesBuf(sizeof(VertexPOCO)* maxVertices* k_maxFramesInFlight, eVertexBuffer, eHostVisible | eHostCoherent),
+    m_verticesMapped(m_verticesBuf.map<VertexPOCO>(0, sizeof(VertexPOCO)* maxVertices* k_maxFramesInFlight)),
     m_maxVertices(maxVertices),
     m_pipelineLayout(
         PipelineLayoutCreateInfo{},
@@ -37,7 +37,7 @@ GeometryBatch::GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVer
 }
 
 void GeometryBatch::begin() {
-    m_nextVertexIndex = m_maxVertices * NEXT_FRAME;
+    m_nextVertexIndex = m_maxVertices * nextFrame;
 }
 
 void GeometryBatch::end() {
@@ -53,7 +53,7 @@ void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
     commandBuffer.bindVertexBuffers(0u, *m_verticesBuf, 0ull);
     commandBuffer.pushConstants<glm::mat4>(*m_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0u, mvpMat);
-    commandBuffer.draw(m_nextVertexIndex - m_maxVertices * NEXT_FRAME, 1u, 0u, 0u);
+    commandBuffer.draw(m_nextVertexIndex - m_maxVertices * nextFrame, 1u, 0u, 0u);
 }
 
 vk::PipelineVertexInputStateCreateInfo GeometryBatch::createVertexInputStateInfo() const {

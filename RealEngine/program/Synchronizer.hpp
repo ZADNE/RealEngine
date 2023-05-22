@@ -20,14 +20,14 @@ public:
     using TimePoint = std::chrono::steady_clock::time_point;/**< Time point type alias */
     using Duration = std::chrono::steady_clock::duration;   /**< Time duration type alias */
 
-    constexpr static unsigned int DO_NOT_LIMIT_FRAMES_PER_SECOND = 0u;/**< Constant which denotes that frames per second should not be limited */
+    constexpr static unsigned int k_doNotLimitFramesPerSecond = 0u;/**< Constant which denotes that frames per second should not be limited */
 
     /**
      * @brief Constructs new synchronizer.
      *
      * @param stepsPerSecond        Number of steps per second, steps will happen at this constant rate per second
      * @param framesPerSecondLimit  Maximum number of frames per second (frame draws will happen at most at this constant rate per second),
-     *                              or use DO_NOT_LIMIT_FRAMES_PER_SECOND to not limit frames per second.
+     *                              or use k_doNotLimitFramesPerSecond to not limit frames per second.
      * @param beginResumed          If true, steps will be resumed from the beginning.
     */
     Synchronizer(unsigned int stepsPerSecond, unsigned int framesPerSecondLimit, bool beginResumed = false);
@@ -42,10 +42,10 @@ public:
 
     /**
      * @brief Sets new limit for frames to be drawn per second.
-     * Or use DO_NOT_LIMIT_FRAMES_PER_SECOND to not limit frames per second.
+     * Or use k_doNotLimitFramesPerSecond to not limit frames per second.
      *
      * @param framesPerSecondLimit  Maximum number of frames to be drawn per second,
-     *                              or use DO_NOT_LIMIT_FRAMES_PER_SECOND to not limit this
+     *                              or use k_doNotLimitFramesPerSecond to not limit this
     */
     void setFramesPerSecondLimit(unsigned int framesPerSecondLimit);
 
