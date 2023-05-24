@@ -18,7 +18,7 @@ public:
     /**
      * @brief Constructs set for given layout
      * @param pipelineLayout Array of set layouts to select from
-     * @param setIndex Index of the set leyout within the pipeline layout
+     * @param setIndex Index of the set layout within the pipeline layout
     */
     DescriptorSet(const PipelineLayout& pipelineLayout, uint32_t setIndex);
 

@@ -22,9 +22,9 @@
 
 namespace RE {
 
-constexpr int k_versionMajor = 1;
-constexpr int k_versionMinor = 9;
-constexpr int k_versionPatch = 1;
+constexpr int k_versionMajor = 2;
+constexpr int k_versionMinor = 0;
+constexpr int k_versionPatch = 0;
 
 
 /**
