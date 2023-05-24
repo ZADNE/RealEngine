@@ -11,12 +11,7 @@
 
 #include <glm/common.hpp>
 
-#include <ImGui/imgui_impl_sdl.h>
-#include <ImGui/imgui_impl_opengl3.h>
-
 #include <RealEngine/rooms/Room.hpp>
-#include <RealEngine/rendering/output/Viewport.hpp>
-#include <RealEngine/rendering/output/Framebuffer.hpp>
 
 namespace RE {
 
@@ -28,12 +23,7 @@ void MainProgram::initialize() {
 int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
     try {
         auto& inst = instance();
-        switch (inst.m_window.getRenderer()) {
-        case RendererID::OPENGL_46:
-            return inst.doRun<RendererGL46>(roomName, args);
-        default:
-            return 1;
-        }
+        return inst.doRun(roomName, args);
     }
     catch (const std::exception& e) {
         fatalError(std::string("Exception: ") + e.what());
@@ -60,8 +50,8 @@ void MainProgram::pollEventsInMainThread(bool poll) {
     mainProgram.m_inputManager.update();
 }
 
-std::vector<RE::DisplayInfo> MainProgram::getDisplays() const {
-    std::vector<RE::DisplayInfo> infos;
+std::vector<DisplayInfo> MainProgram::searchDisplays() const {
+    std::vector<DisplayInfo> infos;
     int numberOfDisplays = SDL_GetNumVideoDisplays();
     if (numberOfDisplays < 0) { return infos; }
     infos.reserve(numberOfDisplays);
@@ -96,22 +86,21 @@ void MainProgram::setRelativeCursorMode(bool relative) {
 }
 
 void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
-    m_clearColor = s.clearColor;
+    m_window.setClearColor(s.clearColor);
     m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
     m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
-    m_usingImGui = s.usingImGui;
+    m_window.useImGui(s.usingImGui);
 }
 
-template<Renderer R>
 int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
     scheduleRoomTransition(roomName, args);
     doRoomTransitionIfScheduled();
-    if (!m_roomManager.getCurrentRoom()) {
+    if (!m_roomManager.currentRoom()) {
         throw std::runtime_error("Initial room was not set");
     }
 
     //Adopt display settings of the first room
-    adoptRoomDisplaySettings(m_roomManager.getCurrentRoom()->getDisplaySettings());
+    adoptRoomDisplaySettings(m_roomManager.currentRoom()->displaySettings());
 
     m_programShouldRun = true;
     m_synchronizer.resumeSteps();
@@ -120,7 +109,6 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
     std::cout << "Entering main loop!" << std::endl;
     while (m_programShouldRun) {
         m_synchronizer.beginFrame();
-        DefaultFrameBuffer<R>::clearColor(m_clearColor);
 
         //Perform simulation steps to catch up the time
         while (m_synchronizer.shouldStepHappen()) {
@@ -135,10 +123,14 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
             step();
         }
 
-        //Draw frame
-        render(m_synchronizer.getDrawInterpolationFactor());
+        //Prepare for drawing
+        const auto& commandBuffer = m_window.prepareNewFrame();
 
-        m_window.swapBuffer();
+        //Draw the frame
+        render(commandBuffer, m_synchronizer.drawInterpolationFactor());
+
+        //Finish the drawing
+        m_window.finishNewFrame();
 
         doRoomTransitionIfScheduled();
 
@@ -147,56 +139,46 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
     std::cout << "Leaving main loop!" << std::endl;
 
     //Exit the program
-    m_roomManager.getCurrentRoom()->sessionEnd();
+    m_roomManager.currentRoom()->sessionEnd();
+    m_window.prepareForDestructionOfRendererObjects();
 
     return m_programExitCode;
 }
 
 void MainProgram::step() {
-    m_roomManager.getCurrentRoom()->step();
+    m_roomManager.currentRoom()->step();
 }
 
-void MainProgram::render(double interpolationFactor) {
-    if (m_usingImGui) {//ImGui frame start
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-    }
-
-    m_roomManager.getCurrentRoom()->render(interpolationFactor);
-
-    if (m_usingImGui) {//ImGui frame end
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }
+void MainProgram::render(const vk::CommandBuffer& commandBuffer, double interpolationFactor) {
+    m_roomManager.currentRoom()->render(commandBuffer, interpolationFactor);
 }
 
 void MainProgram::processEvent(SDL_Event* evnt) {
-    RE::Key key = RE::Key::UNKNOWN;
+    Key key = Key::UnknownKey;
     switch (evnt->type) {
     case SDL_KEYDOWN:
         key = SDLKToREKey(evnt->key.keysym.sym);
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(RE::Key::ANY_KEY);
+            m_inputManager.press(Key::AnyKey);
             m_inputManager.press(key);
         }
         break;
     case SDL_KEYUP:
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(RE::Key::ANY_KEY, -1);
+            m_inputManager.press(Key::AnyKey, -1);
             m_inputManager.release(SDLKToREKey(evnt->key.keysym.sym));
         }
         break;
     case SDL_MOUSEBUTTONDOWN:
         if (evnt->key.repeat == 0) {
             auto key = SDLKToREKey(evnt->button.button);
-            m_inputManager.press(RE::Key::ANY_KEY);
+            m_inputManager.press(Key::AnyKey);
             m_inputManager.press(key, evnt->button.clicks);
         }
         break;
     case SDL_MOUSEBUTTONUP:
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(RE::Key::ANY_KEY, -1);
+            m_inputManager.press(Key::AnyKey, -1);
             m_inputManager.release(SDLKToREKey(evnt->button.button));
         }
         break;
@@ -205,7 +187,7 @@ void MainProgram::processEvent(SDL_Event* evnt) {
         //Coords also have to be clamped to window dims
         //because SDL reports coords outside of the window when a key is held
         m_inputManager.setCursor(
-            glm::clamp({evnt->motion.x, m_window.getDims().y - evnt->motion.y - 1}, glm::ivec2(0), m_window.getDims() - 1),
+            glm::clamp({evnt->motion.x, m_window.dims().y - evnt->motion.y - 1}, glm::ivec2(0), m_window.dims() - 1),
             {evnt->motion.xrel, -evnt->motion.yrel}
         );
         break;
@@ -223,20 +205,20 @@ void MainProgram::processEvent(SDL_Event* evnt) {
 }
 
 void MainProgram::doRoomTransitionIfScheduled() {
-    if (m_nextRoomName == NO_NEXT_ROOM) return;
+    if (m_nextRoomName == k_noNextRoom) return;
 
     m_synchronizer.pauseSteps();
-    auto prev = m_roomManager.getCurrentRoom();
+    auto prev = m_roomManager.currentRoom();
     auto current = m_roomManager.goToRoom(m_nextRoomName, m_roomTransitionArgs);
     if (prev != current) {//If successfully changed the room
         //Adopt the display settings of the entered room
-        adoptRoomDisplaySettings(current->getDisplaySettings());
+        adoptRoomDisplaySettings(current->displaySettings());
         //Pressed/released events belong to the previous room
         m_inputManager.update();
         //Ensure at least one step before the first frame is rendered
         step();
     }
-    m_nextRoomName = NO_NEXT_ROOM;
+    m_nextRoomName = k_noNextRoom;
 
     m_synchronizer.resumeSteps();
 }
@@ -248,10 +230,12 @@ void MainProgram::scheduleRoomTransition(size_t name, const RoomTransitionArgume
 
 void MainProgram::pollEvents() {
     SDL_Event evnt;
-    if (m_usingImGui) {
+    if (m_window.isImGuiUsed()) {
         while (SDL_PollEvent(&evnt)) {
-            ImGui_ImplSDL2_ProcessEvent(&evnt);
-            processEvent(&evnt);
+            if (!m_window.passSDLEvent(evnt)) {
+                //Pass the event to main application if it has not been consumed by ImGui
+                processEvent(&evnt);
+            }
         }
     } else {
         while (SDL_PollEvent(&evnt)) {
@@ -271,7 +255,5 @@ MainProgram& MainProgram::instance() {
     static MainProgram mainProgram;
     return mainProgram;
 }
-
-template int MainProgram::doRun<RendererGL46>(size_t roomName, const RoomTransitionArguments& args);
 
 }

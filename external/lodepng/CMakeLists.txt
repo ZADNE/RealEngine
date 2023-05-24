@@ -1,3 +1,3 @@
-﻿target_sources(${PROJECT_NAME} PUBLIC
-	lodepng.hpp				lodepng.cpp
+﻿target_sources(${PROJECT_NAME} PRIVATE
+    lodepng.hpp                 lodepng.cpp
 )

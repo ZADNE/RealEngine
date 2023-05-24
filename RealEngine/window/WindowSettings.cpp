@@ -24,11 +24,20 @@ WindowSettings::WindowSettings() {
         m_flags.fullscreen = j["window"]["fullscreen"].get<bool>();
         m_flags.borderless = j["window"]["borderless"].get<bool>();
         m_flags.vSync = j["window"]["vsync"].get<bool>();
-        auto renderer = j["window"]["renderer"].get<std::string>();
-        if (renderer == to_string(RendererID::OPENGL_46)) {
-            m_renderer = RendererID::OPENGL_46;
+        auto renderer = j["window"].find("preferred_renderer");
+        if (renderer != j["window"].end()) {
+            auto renderStr = renderer->get<std::string>();
+            if (renderStr == to_string(RendererID::Vulkan13)) {
+                m_preferredRenderer = RendererID::Vulkan13;
+            } else if (renderStr == to_string(RendererID::Any)) {
+                m_preferredRenderer = RendererID::Any;
+            } else {
+                m_preferredRenderer = RendererID::Any;
+                save();
+            }
         } else {
-            throw std::exception("Unknown renderer");
+            m_preferredRenderer = RendererID::Any;
+            save();
         }
     }
     catch (...) {
@@ -43,15 +52,15 @@ WindowSettings::WindowSettings() {
     }
 }
 
-WindowSettings::WindowSettings(const glm::ivec2& dims, WindowFlags flags, RendererID renderer) :
-    m_dims(dims), m_flags(flags), m_renderer(renderer) {
+WindowSettings::WindowSettings(const glm::ivec2& dims, WindowFlags flags, RendererID preferredRenderer) :
+    m_dims(dims), m_flags(flags), m_preferredRenderer(preferredRenderer) {
 
 }
 
 void WindowSettings::reset() {
     m_dims = glm::vec2(1280.0f, 1000.0f);
     m_flags = WindowFlags{};
-    m_renderer = RendererID::OPENGL_46;
+    m_preferredRenderer = RendererID::Any;
 }
 
 void WindowSettings::save() {
@@ -62,7 +71,7 @@ void WindowSettings::save() {
             {"fullscreen", (bool)m_flags.fullscreen},
             {"borderless", (bool)m_flags.borderless},
             {"vsync", (bool)m_flags.vSync},
-            {"renderer", to_string(m_renderer)}
+            {"preferred_renderer", to_string(m_preferredRenderer)}
         }}
     };
 

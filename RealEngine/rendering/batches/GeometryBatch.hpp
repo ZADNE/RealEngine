@@ -2,73 +2,70 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <array>
-#include <vector>
+#include <glm/mat4x4.hpp>
 
-#include <RealEngine/rendering/batches/Circle.hpp>
-#include <RealEngine/rendering/vertices/ShaderProgram.hpp>
-#include <RealEngine/rendering/vertices/VertexArray.hpp>
+#include <RealEngine/rendering/pipelines/PipelineLayout.hpp>
+#include <RealEngine/rendering/pipelines/Pipeline.hpp>
+#include <RealEngine/rendering/buffers/Buffer.hpp>
+#include <RealEngine/rendering/pipelines/Vertex.hpp>
 
 namespace RE {
 
-enum class PRIM {
-    POINTS,
-    LINE_STRIP,
-    LINE_LOOP,
-    LINES,
-    TRIANGLE_STRIP,
-    TRIANGLE_FAN,
-    TRIANGLES
-};
-
-enum class SHAPE {
-    CIRCLE = (int)PRIM::TRIANGLES + 1,
-    DISC
-};
-
-constexpr size_t PRIMITIVES_COUNT = 7u;
-
-constexpr size_t SHAPES_COUNT = 2u;
-
 /**
- * @brief Draws lines, circles and other vector shapes
- * @tparam R The renderer that will perform the commands
+ * @brief Draws geometric primitives
 */
-template<Renderer R = RendererLateBind>
 class GeometryBatch {
 public:
 
     /**
-     * @brief Constructs new GeometryBatch
-     * @param sources Sources used to construct the shader program that will be used for drawing
+     * @brief Constructs GeometryBatch
+     * @param topology The topology that the batch will draw
+     * @param maxVertices Maximum number of vertices that can be in the batch
+     * @param lineWidth Width of the lines, in pixels
+                        (relevant only if the topology is a part of the line class)
     */
-    GeometryBatch(const ShaderProgramSources& sources);
+    GeometryBatch(vk::PrimitiveTopology topology, unsigned int maxVertices, float lineWidth);
 
+    /**
+     * @brief Begins new batch
+     * @detail All vertices have to be added between begin() and end()
+    */
     void begin();
+
+    /**
+     * @brief Ends the batch
+     * @detail All vertices have to be added between begin() and end()
+    */
     void end();
 
-    void addPrimitives(PRIM prim, size_t first, size_t count, const RE::VertexPOCO* data, bool separate = true);
+    /**
+     * @brief Adds vertices that will be rendered
+     * @detail Must be called between begin() and end().
+    */
+    void addVertices(uint32_t first, uint32_t count, const VertexPOCO* data);
 
-    void addCircles(size_t first, size_t count, const RE::CirclePOCO* data);
-    
+    template<size_t size>
+    void addVertices(const std::array<VertexPOCO, size>& vertices) {
+        addVertices(0u, size, vertices.data());
+    }
+
     /**
-     * @brief Draws the batch with stored shader program
+     * @brief Draws the batch
+     * @detail The whole geometry is drawn in the order it was added in
+     * @param commandBuffer Command buffer used for rendering
+     * @param mvpMat Transformation matrix applied to the sprites
     */
-    void draw();
-    
-    /**
-     * @brief Switches to a different program that will be used for drawing
-    */
-    void switchShaderProgram(const ShaderProgramSources& sources);
+    void draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat);
 
 private:
 
-    VertexArray<R> m_va;
-    Buffer<R> m_buf{BufferAccessFrequency::STREAM, BufferAccessNature::DRAW};
-    ShaderProgram<R> m_shaderProgram;
-
-    std::array<std::vector<RE::VertexPOCO>, PRIMITIVES_COUNT + SHAPES_COUNT> m_vertices;
-    std::array<std::vector<unsigned int>, PRIMITIVES_COUNT + SHAPES_COUNT> m_indices;
+    Buffer m_verticesBuf;
+    VertexPOCO* m_verticesMapped = nullptr;
+    uint32_t m_nextVertexIndex;
+    uint32_t m_maxVertices;
+    PipelineLayout m_pipelineLayout;
+    Pipeline m_pipeline;
+    vk::PipelineVertexInputStateCreateInfo createVertexInputStateInfo() const;
 };
 
 }

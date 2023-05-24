@@ -15,36 +15,33 @@ public:
 
     View2D(const glm::vec2& viewDimensions);
 
-    void resizeView(const glm::vec2& newDims);
-
     void setCursorAbs(const glm::vec2& cursorAbs);
 
-    //Cursor
     glm::vec2 convertAbsToRel(const glm::uvec2& abs);
-    glm::vec2 getCursorRel();
 
-
-    //Setters
+    void resizeView(const glm::vec2& newDims);
     void setPosition(const glm::vec2& newPosition) { m_position = newPosition; update(); }
     void setScale(const glm::vec2& newScale) { m_scale = newScale; update(); }
-
-    //Changers
     void shiftPosition(const glm::vec2& shiftPosition) { m_position += shiftPosition; update(); }
-    //Scale is multiplied by zoomVec
     void zoom(const glm::vec2& zoomVec) { m_scale *= zoomVec; update(); }
 
-    //Getters
+    glm::vec2 center() const { return m_position; };
+    glm::vec2 botLeft() const { return m_position - scaledDims() / 2.0f; };
+    glm::vec2 scale() const { return m_scale; };
+    glm::vec2 unscaledDims() const { return m_viewDimensions; }
+    glm::vec2 scaledDims() const { return m_viewDimensions / m_scale; };
 
-    //Center of the view
-    glm::vec2 getPosition() const { return m_position; };
-    //Bottom-left corner of the view
-    glm::vec2 getBotLeft() const { return m_position - getScaledDims() / 2.0f; };
-    glm::vec2 getScale() const { return m_scale; };
-    glm::vec2 getUnscaledDims() const { return m_viewDimensions; }
-    glm::vec2 getScaledDims() const { return m_viewDimensions / m_scale; };
-    glm::mat4 getViewMatrix() const { return m_viewMatrix; };
 
-    //View clipping
+    /**
+     * @brief Position of cursor relative to the view
+    */
+    glm::vec2 cursorRel() { return m_cursorRel; }
+
+    /**
+     * @brief Gets the projection matrix of the view
+    */
+    glm::mat4 viewMatrix() const { return m_viewMatrix; };
+
     void enableClipping(const glm::vec2& minXY, const glm::vec2& maxXY);
     void disableClipping();
 

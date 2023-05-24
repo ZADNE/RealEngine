@@ -3,14 +3,76 @@
  */
 #include <RealEngine/window/Window.hpp>
 
-#include <ImGui/imgui.h>
+#include <iostream>
+
+#include <SDL2/SDL_video.h>
+#include <SDL2/SDL_events.h>
 #include <ImGui/imgui_impl_sdl.h>
-#include <ImGui/imgui_impl_opengl3.h>
 
 #include <RealEngine/utility/Error.hpp>
-#include <RealEngine/rendering/output/Viewport.hpp>
+
 
 namespace RE {
+
+Window::Window(const WindowSettings& settings, const std::string& title):
+    WindowSettings(settings), m_subsystems(), m_windowTitle(title), m_usedRenderer(RendererID::Any) {
+
+    m_subsystems.printRealEngineVersion();
+    m_subsystems.printSubsystemsVersions();
+
+    initForRenderer(settings.preferredRenderer());
+
+    if (m_usedRenderer == RendererID::Any) {//If the preferred renderer could not be initialized
+        for (size_t i = 0; i < static_cast<size_t>(RendererID::Any); i++) {//Try to init any other
+            initForRenderer(static_cast<RendererID>(i));
+            if (m_usedRenderer != RendererID::Any) break;
+        }
+
+        if (m_usedRenderer == RendererID::Any) {//If no renderer could be initialized
+            //There is nothing more we can do
+            fatalError("No renderer could be initialized!");
+        }
+    }
+
+    assert(m_usedRenderer != RendererID::Any);
+}
+
+Window::~Window() {
+    switch (m_usedRenderer) {
+    case RendererID::Vulkan13:
+        m_vk13.~VulkanFixture(); break;
+    }
+    SDL_DestroyWindow(m_SDLwindow);
+}
+
+const vk::CommandBuffer& Window::prepareNewFrame() {
+    return m_vk13.prepareFrame(m_clearColor, m_usingImGui);
+}
+
+void Window::finishNewFrame() {
+    m_vk13.finishFrame(m_usingImGui);
+}
+
+void Window::prepareForDestructionOfRendererObjects() {
+    m_vk13.prepareForDestructionOfRendererObjects();
+}
+
+bool Window::passSDLEvent(const SDL_Event& evnt) {
+    ImGui_ImplSDL2_ProcessEvent(&evnt);
+    auto& io = ImGui::GetIO();
+    switch (evnt.type) {
+    case SDL_KEYUP:
+    case SDL_KEYDOWN:
+        return io.WantCaptureKeyboard;
+    case SDL_MOUSEBUTTONDOWN:
+    case SDL_MOUSEBUTTONUP:
+    case SDL_MOUSEMOTION:
+    case SDL_MOUSEWHEEL:
+        return io.WantCaptureMouse;
+    default:
+        return false;
+    }
+}
 
 void Window::setFullscreen(bool fullscreen, bool save) {
     m_flags.fullscreen = fullscreen;
@@ -27,14 +89,8 @@ void Window::setBorderless(bool borderless, bool save) {
 
 void Window::setVSync(bool vSync, bool save) {
     m_flags.vSync = vSync;
-    if (m_flags.vSync) {
-        if (SDL_GL_SetSwapInterval(-1)) {
-            //Cannot use adaptive vSync, use regular vSync
-            error(SDL_GetError());
-            SDL_GL_SetSwapInterval(1);
-        }
-    } else {
-        SDL_GL_SetSwapInterval(0);
+    if (m_usedRenderer == RendererID::Vulkan13) {
+        m_vk13.changePresentation(m_flags.vSync);
     }
     if (save) this->save();
 }
@@ -44,78 +100,67 @@ void Window::setTitle(const std::string& title) {
     SDL_SetWindowTitle(m_SDLwindow, title.c_str());
 }
 
-const std::string& Window::getTitle() const {
-    return m_windowTitle;
+void Window::setPreferredRenderer(RendererID renderer, bool save) {
+    m_preferredRenderer = renderer;
+    if (save) this->save();
 }
 
 void Window::setDims(const glm::ivec2& newDims, bool save) {
     SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
     SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
-
-    Viewport<>::s_state->windowSize = m_dims;
-    if (Viewport<>::s_state->trackingWindow) {
-        Viewport<>::setToWholeWindow();
-    }
     if (save) this->save();
 }
 
-Window::Window(const WindowSettings& settings, const std::string& title) :
-    WindowSettings(settings), m_subsystems(settings.getRenderer()), m_windowTitle(title) {
-    //Prepare flags
-    Uint32 SDL_flags = SDL_WINDOW_OPENGL;
-    if (m_flags.invisible)
-        SDL_flags |= SDL_WINDOW_HIDDEN;
-    if (m_flags.fullscreen)
-        SDL_flags |= SDL_WINDOW_FULLSCREEN;
-    if (m_flags.borderless)
-        SDL_flags |= SDL_WINDOW_BORDERLESS;
+void Window::initForRenderer(RendererID renderer) {
+    switch (renderer) {
+    case RendererID::Vulkan13:      initForVulkan13(); break;
+    default:                        break;
+    }
+}
 
-    //Create window
+void Window::initForVulkan13() {
+    //Create SDL window
+    if (!createSDLWindow(RendererID::Vulkan13)) {
+        goto fail;
+    }
+
+    //Set up Vulkan 1.3 fixture
+    try {
+        new (&m_vk13) VulkanFixture(m_SDLwindow, (bool)m_flags.vSync);
+    } catch (std::exception& e) {
+        std::cerr << e.what();
+        goto fail_SDLWindow;
+    }
+
+    m_usedRenderer = RendererID::Vulkan13;
+    return;
+
+fail_SDLWindow:
+    SDL_DestroyWindow(m_SDLwindow);
+    m_SDLwindow = nullptr;
+fail:
+    m_usedRenderer = RendererID::Any;
+}
+
+bool Window::createSDLWindow(RendererID renderer) {
+    //Prepare window flags
+    Uint32 SDL_flags = 0;
+    switch (renderer) {
+    case RendererID::Vulkan13: SDL_flags |= SDL_WINDOW_VULKAN; break;
+    }
+    if (m_flags.invisible) SDL_flags |= SDL_WINDOW_HIDDEN;
+    if (m_flags.fullscreen) SDL_flags |= SDL_WINDOW_FULLSCREEN;
+    if (m_flags.borderless) SDL_flags |= SDL_WINDOW_BORDERLESS;
+
+    //Create the window
     m_SDLwindow = SDL_CreateWindow(m_windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_dims.x, m_dims.y, SDL_flags);
     if (!m_SDLwindow) {
-        error(SDL_GetError());
-        fatalError("Could not create window");
+        log(SDL_GetError());
+        return false;
     }
 
-    //Create OpenGL context for the window
-    m_GLContext = SDL_GL_CreateContext(m_SDLwindow);
-    if (!m_GLContext) {
-        error(SDL_GetError());
-        fatalError("Could not create OpenGL context");
-    }
-
-    m_subsystems.initializeRenderer(getRenderer());
-
-    //Set vertical synchronisation
-    setVSync(m_flags.vSync, false);
-
-    Viewport<>::s_state->windowSize = m_dims;
-    Viewport<>::s_state->trackingWindow = true;
-
-    //Initialize ImGui
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-    ImGui_ImplSDL2_InitForOpenGL(m_SDLwindow, m_GLContext);
-    ImGui_ImplOpenGL3_Init("#version 460 core");
-}
-
-Window::~Window() {
-    //Shutdown ImGui
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
-
-    //Delete OpenGL context
-    SDL_GL_DeleteContext(m_GLContext);
-
-    //Destroy the SDL window
-    SDL_DestroyWindow(m_SDLwindow);
-}
-
-void Window::swapBuffer() {
-    SDL_GL_SwapWindow(m_SDLwindow);
+    return true;
 }
 
 }

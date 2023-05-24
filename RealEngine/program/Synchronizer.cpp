@@ -24,7 +24,7 @@ void Synchronizer::setStepsPerSecond(unsigned int stepsPerSecond) {
 }
 
 void Synchronizer::setFramesPerSecondLimit(unsigned int framesPerSecondLimit) {
-    m_timePerFrame = framesPerSecondLimit == DO_NOT_LIMIT_FRAMES_PER_SECOND ? Duration::zero() : 1'000'000'000ns / framesPerSecondLimit;
+    m_timePerFrame = framesPerSecondLimit == k_doNotLimitFramesPerSecond ? Duration::zero() : 1'000'000'000ns / framesPerSecondLimit;
     resumeSteps();
 }
 
@@ -40,15 +40,15 @@ void Synchronizer::resumeSteps() {
     m_stepsPaused = false;
 }
 
-double Synchronizer::getDrawInterpolationFactor() const {
+double Synchronizer::drawInterpolationFactor() const {
     return static_cast<double>(m_stepTimeAccumulator.count()) / static_cast<double>(m_timePerStep.count());
 }
 
-unsigned int Synchronizer::getFramesPerSecond() const {
+unsigned int Synchronizer::framesPerSecond() const {
     return m_framesPerSecond;
 }
 
-Synchronizer::Duration Synchronizer::getMaxFrameTime() const {
+Synchronizer::Duration Synchronizer::maxFrameTime() const {
     return m_maxFrameTime;
 }
 

@@ -26,24 +26,24 @@ void RoomToEngineAccess::setRelativeCursorMode(bool relative) {
 
 #pragma region InputManager
 
-int RoomToEngineAccess::isKeyDown(RE::Key keyID) const {
+int RoomToEngineAccess::isKeyDown(Key keyID) const {
     return m_inputManager.isDown(keyID);
 }
 
-int RoomToEngineAccess::wasKeyPressed(RE::Key keyID) const {
+int RoomToEngineAccess::wasKeyPressed(Key keyID) const {
     return m_inputManager.wasPressed(keyID);
 }
 
-int RoomToEngineAccess::wasKeyReleased(RE::Key keyID) const {
+int RoomToEngineAccess::wasKeyReleased(Key keyID) const {
     return m_inputManager.wasReleased(keyID);
 }
 
-glm::ivec2 RoomToEngineAccess::getCursorAbs() const {
-    return m_inputManager.getCursorAbs();
+glm::ivec2 RoomToEngineAccess::cursorAbs() const {
+    return m_inputManager.cursorAbs();
 }
 
-glm::ivec2 RoomToEngineAccess::getCursorRel() const {
-    return m_inputManager.getCursorRel();
+glm::ivec2 RoomToEngineAccess::cursorRel() const {
+    return m_inputManager.cursorRel();
 }
 
 #pragma endregion
@@ -58,26 +58,26 @@ void RoomToEngineAccess::resumeSteps() {
     m_synchronizer.resumeSteps();
 }
 
-unsigned int RoomToEngineAccess::getFramesPerSecond() const {
-    return m_synchronizer.getFramesPerSecond();
+unsigned int RoomToEngineAccess::framesPerSecond() const {
+    return m_synchronizer.framesPerSecond();
 }
 
-Synchronizer::Duration RoomToEngineAccess::getMaxFrameTime() const {
-    return m_synchronizer.getMaxFrameTime();
+Synchronizer::Duration RoomToEngineAccess::maxFrameTime() const {
+    return m_synchronizer.maxFrameTime();
 }
 
 #pragma endregion
 
 #pragma region Window
 
-WindowFlags RoomToEngineAccess::getWindowFlags() const {
-    return m_window.getFlags();
+WindowFlags RoomToEngineAccess::windowFlags() const {
+    return m_window.flags();
 }
 
 void RoomToEngineAccess::setWindowFullscreen(bool fullscreen, bool save) {
-    auto prev = m_window.getFlags();
+    auto prev = m_window.flags();
     m_window.setFullscreen(fullscreen, save);
-    auto curr = m_window.getFlags();
+    auto curr = m_window.flags();
     m_roomManager.notifyRooms<&Room::windowFlagsChangedCallback>(prev, curr);
 }
 
@@ -86,9 +86,9 @@ bool RoomToEngineAccess::isWindowFullscreen() const {
 }
 
 void RoomToEngineAccess::setWindowBorderless(bool borderless, bool save) {
-    auto prev = m_window.getFlags();
+    auto prev = m_window.flags();
     m_window.setBorderless(borderless, save);
-    auto curr = m_window.getFlags();
+    auto curr = m_window.flags();
     m_roomManager.notifyRooms<&Room::windowFlagsChangedCallback>(prev, curr);
 }
 
@@ -97,9 +97,9 @@ bool RoomToEngineAccess::isWindowBorderless() const {
 }
 
 void RoomToEngineAccess::setWindowVSync(bool vSync, bool save) {
-    auto prev = m_window.getFlags();
+    auto prev = m_window.flags();
     m_window.setVSync(vSync, save);
-    auto curr = m_window.getFlags();
+    auto curr = m_window.flags();
     m_roomManager.notifyRooms<&Room::windowFlagsChangedCallback>(prev, curr);
 }
 
@@ -108,23 +108,35 @@ bool RoomToEngineAccess::isWindowVSynced() const {
 }
 
 void RoomToEngineAccess::setWindowTitle(const std::string& title) {
-    std::string prev = m_window.getTitle();
+    std::string prev = m_window.title();
     m_window.setTitle(title);
     m_roomManager.notifyRooms<&Room::windowTitleChangedCallback>(prev, title);
 }
 
-const std::string& RoomToEngineAccess::getWindowTitle() const {
-    return m_window.getTitle();
+const std::string& RoomToEngineAccess::windowTitle() const {
+    return m_window.title();
 }
 
 void RoomToEngineAccess::setWindowDims(const glm::ivec2& newDims, bool save) {
-    auto oldDims = m_window.getDims();
+    auto oldDims = m_window.dims();
     m_window.setDims(newDims, save);
     m_roomManager.notifyRooms<&Room::windowResizedCallback>(oldDims, newDims);
 }
 
-glm::ivec2 RoomToEngineAccess::getWindowDims() const {
-    return m_window.getDims();
+glm::ivec2 RoomToEngineAccess::windowDims() const {
+    return m_window.dims();
+}
+
+void RoomToEngineAccess::setPreferredRenderer(RendererID renderer, bool save) {
+    m_window.setPreferredRenderer(renderer, save);
+}
+
+RendererID RoomToEngineAccess::preferredRenderer() const {
+    return m_window.preferredRenderer();
+}
+
+RendererID RoomToEngineAccess::usedRenderer() const {
+    return m_window.usedRenderer();
 }
 
 void RoomToEngineAccess::saveWindowSettings() {

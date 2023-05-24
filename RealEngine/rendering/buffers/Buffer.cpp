@@ -5,122 +5,89 @@
 
 #include <cassert>
 
-#include <RealEngine/rendering/internal_renderers/GL46Buffer.hpp>
+#include <RealEngine/rendering/CommandBuffer.hpp>
+#include <RealEngine/utility/Error.hpp>
 
 
 namespace RE {
 
-using enum BufferType;
-using enum BufferStorage;
-using enum BufferAccessFrequency;
-using enum BufferAccessNature;
-using enum BufferUsageFlags;
+using enum vk::MemoryPropertyFlagBits;
+using enum vk::BufferUsageFlagBits;
 
-template<Renderer R>
-Buffer<R>::Buffer(size_t sizeInBytes, BufferUsageFlags flags, const void* data/* = nullptr*/) :
-    m_id(s_impl->constructImmutable(sizeInBytes, flags, data)),
-    m_sizeInBytes(sizeInBytes)
-#ifndef NDEBUG
-    , m_storage(IMMUTABLE) {
-#else
-    {
-#endif // DEBUG
+constexpr auto k_hostMem = eHostVisible | eHostCoherent;
+
+Buffer::Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data/* = nullptr*/) {
+    BufferAndMemory main{};
+    if (data && (memProperty & k_hostMem) != k_hostMem) {//If initial data are provided or stage is requested
+        auto stage = createBufferAndMemory(sizeInBytes, eTransferSrc, k_hostMem);
+        main = createBufferAndMemory(sizeInBytes, usage | eTransferDst, memProperty);
+        //Copy from data to staging buffer
+        std::memcpy(device().mapMemory(stage.memory, 0, sizeInBytes), data, sizeInBytes);
+        device().unmapMemory(stage.memory);
+        //Copy from staging to final buffer
+        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
+            commandBuffer.copyBuffer(stage.buffer, main.buffer, vk::BufferCopy{0u, 0u, sizeInBytes});
+        });
+        //Destruct the temporary stage
+        device().destroyBuffer(stage.buffer);
+        device().free(stage.memory);
+    } else {//If no initial data are provided
+        main = createBufferAndMemory(sizeInBytes, usage, memProperty);
+    }
+    m_memory = main.memory;
+    m_buffer = main.buffer;
 }
 
-template<Renderer R>
-Buffer<R>::Buffer(size_t sizeInBytes, BufferAccessFrequency accessFreq, BufferAccessNature accessNature, const void* data/* = nullptr*/) :
-    m_id(s_impl->constructMutable(sizeInBytes, accessFreq, accessNature, data)),
-    m_sizeInBytes(sizeInBytes)
-#ifndef NDEBUG
-    , m_storage(MUTABLE) {
-#else
-    {
-#endif // DEBUG
+Buffer::Buffer(Buffer&& other) noexcept:
+    m_memory(other.m_memory),
+    m_buffer(other.m_buffer) {
+    other.m_memory = nullptr;
+    other.m_buffer = nullptr;
 }
 
-template<Renderer R>
-Buffer<R>::Buffer(Buffer<R>&& other) noexcept :
-    m_id(std::move(other.m_id)),
-    m_sizeInBytes(other.m_sizeInBytes)
-#ifndef NDEBUG
-    , m_storage(other.m_storage) {
-#else
-    {
-#endif // DEBUG
-}
-
-template<Renderer R>
-Buffer<R>& Buffer<R>::operator=(Buffer<R>&& other) noexcept {
-    m_id = std::move(other.m_id);
-    m_sizeInBytes = other.m_sizeInBytes;
-#ifndef NDEBUG
-    m_storage = other.m_storage;
-#endif // DEBUG
+Buffer& Buffer::operator=(Buffer&& other) noexcept {
+    std::swap(m_memory, other.m_memory);
+    std::swap(m_buffer, other.m_buffer);
     return *this;
 }
 
-template<Renderer R>
-Buffer<R>::~Buffer() {
-    s_impl->destruct(m_id);
+Buffer::~Buffer() {
+    deletionQueue().enqueueDeletion(m_buffer);
+    deletionQueue().enqueueDeletion(m_memory);
 }
 
-template<Renderer R>
-void Buffer<R>::bind(BufferType bindType) const {
-    s_impl->bind(m_id, bindType);
+void Buffer::unmap() const {
+    device().unmapMemory(m_memory);
 }
 
-template<Renderer R>
-void Buffer<R>::bindIndexed(const BufferTypedIndex& index) const {
-    s_impl->bindIndexed(m_id, index);
-}
-
-template<Renderer R>
-void Buffer<R>::overwrite(size_t offsetInBytes, size_t countBytes, const void* data) const {
-    s_impl->overwrite(m_id, offsetInBytes, countBytes, data);
-}
-
-template<Renderer R>
-void Buffer<R>::redefine(size_t sizeInBytes, const void* data) {
-    assert(m_storage == MUTABLE);
-    if (sizeInBytes > m_sizeInBytes) {
-        m_sizeInBytes = sizeInBytes;
-        s_impl->redefine(m_id, sizeInBytes, data);
-    } else {
-        s_impl->overwrite(m_id, 0, sizeInBytes, data);
+uint32_t Buffer::selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const {
+    auto memProperties = physicalDevice().getMemoryProperties2().memoryProperties;
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+            return i;
+        }
     }
+    throw Exception{"Could not find memory that suits the buffer!"};
 }
 
-template<Renderer R>
-void Buffer<R>::invalidate() const {
-    s_impl->invalidate(m_id);
+Buffer::BufferAndMemory Buffer::createBufferAndMemory(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const {
+    vk::BufferCreateInfo createInfo{{},
+        sizeInBytes,
+        usage,
+        vk::SharingMode::eExclusive
+    };
+    auto buffer = device().createBuffer(createInfo);
+    auto memReq = device().getBufferMemoryRequirements2({buffer}).memoryRequirements;
+    auto memory = device().allocateMemory({
+        memReq.size,
+        selectMemoryType(memReq.memoryTypeBits, properties)
+    });
+    device().bindBufferMemory2(vk::BindBufferMemoryInfo{buffer, memory, 0u});
+    return BufferAndMemory{.buffer = buffer, .memory = memory};
 }
 
-template<Renderer R>
-void Buffer<R>::invalidate(size_t lengthInBytes) const {
-    s_impl->invalidate(m_id, lengthInBytes);
+void* Buffer::map(size_t offsetInBytes, size_t lengthInBytes) const {
+    return device().mapMemory(m_memory, offsetInBytes, lengthInBytes);
 }
-
-template<Renderer R>
-void Buffer<R>::flushMapped(size_t offsetInBytes, size_t lengthInBytes) const {
-    s_impl->flushMapped(m_id, offsetInBytes, lengthInBytes);
-}
-
-template<Renderer R>
-bool Buffer<R>::unmap() const {
-    return s_impl->unmap(m_id);
-}
-
-template<Renderer R>
-size_t Buffer<R>::size() const {
-    return m_sizeInBytes;
-}
-
-template<Renderer R>
-void* Buffer<R>::map(size_t offsetInBytes, size_t lengthInBytes, BufferMapUsageFlags mappingUsage) const {
-    return s_impl->map(m_id, offsetInBytes, lengthInBytes, mappingUsage);
-}
-
-template Buffer<RendererLateBind>;
-template Buffer<RendererGL46>;
 
 }

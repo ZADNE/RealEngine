@@ -38,18 +38,18 @@ public:
     /**
      * @brief Constructs settings from given parameters
     */
-    WindowSettings(const glm::ivec2& dims, WindowFlags flags, RendererID renderer);
+    WindowSettings(const glm::ivec2& dims, WindowFlags flags, RendererID preferredRenderer);
 
     /**
      * @brief Gets a copy of the window flags
     */
-    WindowFlags getFlags() const { return m_flags; }
+    WindowFlags flags() const { return m_flags; }
 
     bool isFullscreen() const { return m_flags.fullscreen; }
     bool isBorderless() const { return m_flags.borderless; }
     bool isVSynced() const { return m_flags.vSync; }
 
-    RendererID getRenderer() const { return m_renderer; }
+    RendererID preferredRenderer() const { return m_preferredRenderer; }
 
     /**
      * @brief Save current settings to a file.
@@ -65,9 +65,9 @@ protected:
     */
     void reset();
 
-    glm::ivec2 m_dims;      /**< dimensions of the window */
-    WindowFlags m_flags;    /**< flags of the window */
-    RendererID m_renderer;  /**< the backing renderer of the window */
+    glm::ivec2 m_dims;              /**< dimensions of the window */
+    WindowFlags m_flags;            /**< flags of the window */
+    RendererID m_preferredRenderer; /**< The preffed renderer may be different from the actual renderer */
 };
 
 }

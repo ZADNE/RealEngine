@@ -1,97 +1,73 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/rendering/batches/Sprite.hpp>
 
-#include <RealEngine/rendering/textures/Texture.hpp>
-
 namespace RE {
 
-template<Renderer R>
-SpriteStatic<R>::SpriteStatic(const Texture<R>& tex, float sprite, float subimage/* = 0.0f*/) :
+SpriteStatic::SpriteStatic(const TextureShaped& tex, float sprite, float subimage/* = 0.0f*/) :
     m_tex(&tex), m_subimageSprite(subimage, sprite) {
 }
 
-template<Renderer R>
-float SpriteStatic<R>::getSpeed() const {
+float SpriteStatic::speed() const {
     return 1.0f;
 }
 
-template<Renderer R>
-Color SpriteStatic<R>::getColor() const {
-    return Color{ 255u, 255u, 255u, 255u };
+Color SpriteStatic::color() const {
+    return Color{255u, 255u, 255u, 255u};
 }
 
-template<Renderer R>
-glm::vec2 SpriteStatic<R>::getScale() const {
+glm::vec2 SpriteStatic::scale() const {
     return glm::vec2(1.0f, 1.0f);
 }
 
-template<Renderer R>
-glm::vec2 SpriteStatic<R>::getSubimageSprite() const {
+glm::vec2 SpriteStatic::subimageSprite() const {
     return m_subimageSprite;
 }
 
-template<Renderer R>
-void SpriteStatic<R>::step() {
+void SpriteStatic::step() {
 
 }
 
-template<Renderer R>
-SpriteAnimated<R>::SpriteAnimated(const Texture<R>& tex, float sprite, float subimage/* = 0.0f*/, float imageSpeed/* = 1.0f*/) :
-    SpriteStatic<R>(tex, sprite, subimage), m_imageSpeed(imageSpeed) {
+SpriteAnimated::SpriteAnimated(const TextureShaped& tex, float sprite, float subimage/* = 0.0f*/, float imageSpeed/* = 1.0f*/) :
+    SpriteStatic(tex, sprite, subimage), m_imageSpeed(imageSpeed) {
 }
 
-template<Renderer R>
-void SpriteAnimated<R>::step() {
-    this->m_subimageSprite.x += getSpeed();
-    if ((this->m_subimageSprite.x) >= this->m_tex->getSubimagesSpritesCount().x) {//Positive image speed
+void SpriteAnimated::step() {
+    this->m_subimageSprite.x += speed();
+    if ((this->m_subimageSprite.x) >= this->m_tex->subimagesSpritesCount().x) {//Positive image speed
         this->m_subimageSprite.x = 0.0f;
     } else if (this->m_subimageSprite.x < 0.0f) {//Negative image speed
-        this->m_subimageSprite.x = this->m_tex->getSubimagesSpritesCount().x + getSpeed();
+        this->m_subimageSprite.x = this->m_tex->subimagesSpritesCount().x + speed();
     }
 }
 
-template<Renderer R>
-void SpriteAnimated<R>::setSpeed(float newSpeed) {
+void SpriteAnimated::setSpeed(float newSpeed) {
     m_imageSpeed = newSpeed;
 }
 
-template<Renderer R>
-float SpriteAnimated<R>::getSpeed() const {
+float SpriteAnimated::speed() const {
     return m_imageSpeed;
 }
 
-template<Renderer R>
-SpriteComplex<R>::SpriteComplex(const Texture<R>& tex, float sprite, float subimage, float imageSpeed, Color color, const glm::vec2& scale) :
-    SpriteAnimated<R>(tex, sprite, subimage, imageSpeed), m_color(color), m_scale(scale) {
+SpriteComplex::SpriteComplex(const TextureShaped& tex, float sprite, float subimage, float imageSpeed, Color color, const glm::vec2& scale) :
+    SpriteAnimated(tex, sprite, subimage, imageSpeed), m_color(color), m_scale(scale) {
 }
 
-template<Renderer R>
-void SpriteComplex<R>::setColor(Color color) {
+void SpriteComplex::setColor(Color color) {
     m_color = color;
 }
 
-template<Renderer R>
-void SpriteComplex<R>::setScale(const glm::vec2& scale) {
+void SpriteComplex::setScale(const glm::vec2& scale) {
     m_scale = scale;
 }
 
-template<Renderer R>
-Color SpriteComplex<R>::getColor() const {
+Color SpriteComplex::color() const {
     return m_color;
 }
 
-template<Renderer R>
-glm::vec2 SpriteComplex<R>::getScale() const {
+glm::vec2 SpriteComplex::scale() const {
     return m_scale;
 }
-
-template SpriteStatic<RendererLateBind>;
-template SpriteStatic<RendererGL46>;
-template SpriteAnimated<RendererLateBind>;
-template SpriteAnimated<RendererGL46>;
-template SpriteComplex<RendererLateBind>;
-template SpriteComplex<RendererGL46>;
 
 }

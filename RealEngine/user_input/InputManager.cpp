@@ -20,7 +20,7 @@ void InputManager::update() {
     release(Key::RMW);
     int longest = 0;
     for (auto& i : m_stateMap) {
-        if (i.first == Key::ANY_KEY) { continue; }
+        if (i.first == Key::AnyKey) { continue; }
         if (i.second > 0) {
             m_stateMapPrevious[i.first] = ++i.second;
             if (i.second > longest) {
@@ -41,11 +41,11 @@ void InputManager::update() {
     m_keysHeldPrevious = m_keysHeld;
 }
 
-int InputManager::isDown(RE::Key keyID) const {
+int InputManager::isDown(Key keyID) const {
     //First checking for special keys
-    if (keyID == RE::Key::ANY_KEY) {
+    if (keyID == Key::AnyKey) {
         return m_stateMap[m_longestHeld];
-    } else if (keyID == RE::Key::NO_KEY) {
+    } else if (keyID == Key::NoKey) {
         return m_noKeyHeld;
     }
 
@@ -56,11 +56,11 @@ int InputManager::isDown(RE::Key keyID) const {
     return 0;
 }
 
-int InputManager::wasDown(RE::Key keyID) const {
+int InputManager::wasDown(Key keyID) const {
     //First checking for special keys
-    if (keyID == RE::Key::ANY_KEY) {
+    if (keyID == Key::AnyKey) {
         return m_stateMapPrevious[m_longestHeld];
-    } else if (keyID == RE::Key::NO_KEY) {
+    } else if (keyID == Key::NoKey) {
         return m_noKeyHeld;
     }
 
@@ -71,15 +71,15 @@ int InputManager::wasDown(RE::Key keyID) const {
     return 0;
 }
 
-int InputManager::wasPressed(RE::Key keyID) const {
+int InputManager::wasPressed(Key keyID) const {
     //First checking for special keys
-    if (keyID == RE::Key::ANY_KEY) {
+    if (keyID == Key::AnyKey) {
         if (m_keysHeld > m_keysHeldPrevious) {
             return m_stateMap[m_longestHeld];
         } else {
             return 0;
         }
-    } else if (keyID == RE::Key::NO_KEY) {
+    } else if (keyID == Key::NoKey) {
         if (m_keysHeld < m_keysHeldPrevious && m_keysHeld == 0) {
             return 1;
         } else {
@@ -93,15 +93,15 @@ int InputManager::wasPressed(RE::Key keyID) const {
     return 0;
 }
 
-int InputManager::wasReleased(RE::Key keyID) const {
+int InputManager::wasReleased(Key keyID) const {
     //First checking for special keys
-    if (keyID == RE::Key::ANY_KEY) {
+    if (keyID == Key::AnyKey) {
         if (m_keysHeld < m_keysHeldPrevious) {
             return m_stateMap[m_longestHeld];
         } else {
             return 0;
         }
-    } else if (keyID == RE::Key::NO_KEY) {
+    } else if (keyID == Key::NoKey) {
         if (m_keysHeld > m_keysHeldPrevious && m_keysHeldPrevious == 0) {
             return m_noKeyHeld + 1;
         } else {
@@ -115,11 +115,11 @@ int InputManager::wasReleased(RE::Key keyID) const {
     return 0;
 }
 
-glm::ivec2 InputManager::getCursorAbs() const {
+glm::ivec2 InputManager::cursorAbs() const {
     return m_cursorAbs;
 }
 
-glm::ivec2 InputManager::getCursorRel() const {
+glm::ivec2 InputManager::cursorRel() const {
     return m_cursorRel;
 }
 
@@ -128,9 +128,9 @@ void InputManager::setCursor(const glm::ivec2& abs, const glm::ivec2& rel) {
     m_cursorRel = rel;
 }
 
-void InputManager::press(RE::Key keyID, int times/* = 1*/) {
+void InputManager::press(Key keyID, int times/* = 1*/) {
     auto& it = m_stateMap[keyID];
-    if (keyID == Key::ANY_KEY) {
+    if (keyID == Key::AnyKey) {
         m_keysHeld += times;
     } else {
         if (m_keysHeld == 1) {
@@ -140,7 +140,7 @@ void InputManager::press(RE::Key keyID, int times/* = 1*/) {
     }
 }
 
-void InputManager::release(RE::Key keyID) {
+void InputManager::release(Key keyID) {
     auto& it = m_stateMap[keyID];
     it = 0;
 }

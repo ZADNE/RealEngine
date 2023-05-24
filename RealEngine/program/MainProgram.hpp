@@ -23,7 +23,6 @@ union SDL_Event;
 namespace RE {
 
 class Room;
-class RendererGL46;
 
 struct DisplayInfo {
     std::string name; /**< @brief UTF-8 encoded 'name' */
@@ -51,8 +50,11 @@ struct DisplayInfo {
 class MainProgram final {
 public:
 
-    MainProgram(const MainProgram&) = delete;
-    void operator=(const MainProgram&) = delete;
+    MainProgram(const MainProgram&) = delete;                   /**< Noncopyable */
+    MainProgram& operator=(const MainProgram&) = delete;        /**< Noncopyable */
+
+    MainProgram(MainProgram&&) = delete;                        /**< Nonmovable */
+    MainProgram& operator=(MainProgram&&) = delete;             /**< Nonmovable */
 
     /**
      * @brief Must be called before any Room is added
@@ -61,12 +63,9 @@ public:
     static void initialize();
 
     /**
-     * @brief Adds a late-bind Room to the management
+     * @brief Adds a Room to the management
      * @tparam RoomType A class derived from Room that will be instantiated.
      * @return Raw pointer to the created room
-     *
-     * Your room will use the default late-bind renderer which polymorphically
-     * calls the real renderer.
      *
      * Single type of room can be added multiple times, the only requirement is that
      * each room must have unique name.
@@ -74,28 +73,6 @@ public:
     template<DerivedFromRoom RoomType, typename... ConstructorArgs>
     static RoomType* addRoom(ConstructorArgs&&... args) {
         return instance().m_roomManager.addRoom<RoomType>(std::forward<ConstructorArgs>(args)...);
-    }
-
-    /**
-     * @brief Adds an early-bind Room to the management
-     * @tparam RoomType A class template derived from Room that will be instantiated.
-     * @return Raw pointer to the created room
-     *
-     * Your room template will be instantiated with the highest probability
-     * available renderer.
-     *
-     * Single type of room can be added multiple times, the only requirement is that
-     * each room must have unique name.
-    */
-    template<template<Renderer> class RoomTemplate, typename... ConstructorArgs> requires DerivedFromRoom<RoomTemplate<RendererGL46>>
-    static Room* addRoom(ConstructorArgs&&... args) {
-        auto& inst = instance();
-        switch (inst.m_window.getRenderer()) {
-        case RendererID::OPENGL_46:
-            return inst.m_roomManager.addRoom<RoomTemplate<RendererGL46>>(std::forward<ConstructorArgs>(args)...);
-        default:
-            return nullptr;
-        }
     }
 
     /**
@@ -138,9 +115,9 @@ public:
     static void pollEventsInMainThread(bool poll);
 
     /**
-     * @brief Gets displays that can be drawn to
+     * @brief Searches displays that can be drawn to
     */
-    std::vector<DisplayInfo> getDisplays() const;
+    std::vector<DisplayInfo> searchDisplays() const;
 
     void setRelativeCursorMode(bool relative);
 
@@ -161,16 +138,15 @@ private:
     /**
      * @brief Does the actual game loop on the singleton instance
     */
-    template<Renderer R>
     int doRun(size_t roomName, const RoomTransitionArguments& args);
 
     void step();
-    void render(double interpolationFactor);
+    void render(const vk::CommandBuffer& commandBuffer, double interpolationFactor);
 
     void pollEvents();
     void processEvent(SDL_Event* evnt);
 
-    Window m_window{WindowSettings{}, WindowSubsystems::getVersion()};/**< Window also creates and initializes renderer backends */
+    Window m_window{WindowSettings{}, WindowSubsystems::RealEngineVersionString()};/**< Window also creates and initializes renderer backends */
     RoomManager m_roomManager;                  /**< Manages rooms - you have to add at least 1 room to run the program */
     InputManager m_inputManager;                /**< Records key presses/releases, mouse movement etc. */
     Synchronizer m_synchronizer{50u, 50u};      /**< Maintains constant speed of simulation, can also limit FPS */
@@ -180,13 +156,11 @@ private:
     int m_programExitCode = EXIT_SUCCESS;
 
     bool m_pollEventsInMainThread = true;
-    bool m_usingImGui = false;
-    glm::vec4 m_clearColor{};
 
     void doRoomTransitionIfScheduled();
 
-    static constexpr size_t NO_NEXT_ROOM = std::numeric_limits<size_t>::max();
-    size_t m_nextRoomName = NO_NEXT_ROOM;
+    static constexpr size_t k_noNextRoom = std::numeric_limits<size_t>::max();
+    size_t m_nextRoomName = k_noNextRoom;
     RoomTransitionArguments m_roomTransitionArgs;
 };
 

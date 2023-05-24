@@ -9,8 +9,6 @@
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/rooms/RoomTransitionArguments.hpp>
 
-#include <RealEngine/rendering/Renderer.hpp>
-
 namespace RE {
 
 /**
@@ -22,16 +20,6 @@ namespace RE {
  * Transitions between rooms are mamaged by RoomManager.
  *
  * You use RealEngine by inheriting Room and adding your behavior to step(), render() etc.
- *
- * You can 'inherit' this in two ways: the easier way is simply creating a class that inherits from this.
- * This creates a late-bind room which means RE rendering-related objects in it
- * will polymorphically call the backing renderer.
- * The other way to 'inherit' this is to create template class (with one template parameter) that inherits from this.
- * This creates an early-bind room which means that it will be instantiated with highest priority available renderer.
- * The type of the renderer will be the template parameter but to actually use the early-bind,
- * the type has to passed (using templates) to the very RE rendering-objects (such as Buffer or ShaderProgram).
- *
- * Both early- and late-bind room are added to RealEngine (instantiated) by MainProgram::addRoom().
 */
 class Room {
 public:
@@ -43,15 +31,13 @@ public:
     */
     Room(size_t name, RoomDisplaySettings initialSettings = RoomDisplaySettings{});
 
-    /**
-     * @brief Destructs a room.
-     *
-     * This happens when the program ends.
-    */
-    virtual ~Room() = default;
+    Room(const Room&) = delete;                                 /**< Noncopyable */
+    Room& operator=(const Room&) = delete;                      /**< Noncopyable */
 
-    Room(const Room&) = delete;
-    Room& operator=(const Room&) = delete;
+    Room(Room&&) = default;                                     /**< Movable */
+    Room& operator=(Room&&) = default;                          /**< Movable */
+
+    virtual ~Room() = default;
 
     /**
      * @brief Informs the room that a new session happens inside it.
@@ -82,12 +68,13 @@ public:
      * This function is called at a variable rate, depending on
      * the speed of hardware. Upper limit can be set via Synchronizer.
      *
+     * @param commandBuffer         The command buffer that should be used for rendering
      * @param interpolationFactor   Represents relative time between last
      *                              performed step and the upcoming step.
      *                              Use it to interpolate between discrete
      *                              simulation steps.
     */
-    virtual void render(double interpolationFactor) = 0;
+    virtual void render(const vk::CommandBuffer& commandBuffer, double interpolationFactor) = 0;
 
     /**
      * @brief Callback used to notify that the window's size has changed
@@ -113,12 +100,12 @@ public:
     /**
      * @brief Gets the settings that should be used for this room
     */
-    RoomDisplaySettings getDisplaySettings() const;
+    const RoomDisplaySettings& displaySettings() const { return m_displaySettings; }
 
     /**
      * @brief Gets unique identifier of the room
     */
-    size_t getName() const;
+    size_t name() const { return m_name; }
 
     /**
      * @brief This is set by the MainProgram at startup
@@ -135,7 +122,7 @@ protected:
     /**
      * @brief Dynamically changes the room's display settings
     */
-    void setDisplaySettings(RoomDisplaySettings displaySettings);
+    void setDisplaySettings(const RoomDisplaySettings& displaySettings);
 
 private:
 

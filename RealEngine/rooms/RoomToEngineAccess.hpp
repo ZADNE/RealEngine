@@ -50,27 +50,27 @@ public:
     /**
      * @copydoc InputManager::isDown
     */
-    int isKeyDown(RE::Key keyID) const;
+    int isKeyDown(Key keyID) const;
 
     /**
      * @copydoc InputManager::wasPressed
     */
-    int wasKeyPressed(RE::Key keyID) const;
+    int wasKeyPressed(Key keyID) const;
 
     /**
      * @copydoc InputManager::wasReleased
     */
-    int wasKeyReleased(RE::Key keyID) const;
+    int wasKeyReleased(Key keyID) const;
 
     /**
-     * @copydoc InputManager::getCursorAbs
+     * @copydoc InputManager::cursorAbs
     */
-    glm::ivec2 getCursorAbs() const;
+    glm::ivec2 cursorAbs() const;
 
     /**
-     * @copydoc InputManager::getCursorRel
+     * @copydoc InputManager::cursorRel
     */
-    glm::ivec2 getCursorRel() const;
+    glm::ivec2 cursorRel() const;
 
 #pragma endregion
 
@@ -87,23 +87,23 @@ public:
     void resumeSteps();
 
     /**
-     * @copydoc Synchronizer::getFramesPerSecond
+     * @copydoc Synchronizer::framesPerSecond
     */
-    unsigned int getFramesPerSecond() const;
+    unsigned int framesPerSecond() const;
 
     /**
-     * @copydoc Synchronizer::getMaxFrameTime
+     * @copydoc Synchronizer::maxFrameTime
     */
-    Synchronizer::Duration getMaxFrameTime() const;
+    Synchronizer::Duration maxFrameTime() const;
 
 #pragma endregion
 
 #pragma region Window
 
     /**
-     * @copydoc Window::getFlags 
+     * @copydoc Window::flags
     */
-    WindowFlags getWindowFlags() const;
+    WindowFlags windowFlags() const;
 
     /**
      * @copydoc Window::setFullscreen
@@ -113,7 +113,7 @@ public:
     /**
      * @copydoc Window::isFullscreen
     */
-    bool isWindowFullscreen() const; 
+    bool isWindowFullscreen() const;
 
     /**
      * @copydoc Window::setBorderless
@@ -141,19 +141,34 @@ public:
     void setWindowTitle(const std::string& title);
 
     /**
-     * @copydoc Window::getTitle
+     * @copydoc Window::title
     */
-    const std::string& getWindowTitle() const;
+    const std::string& windowTitle() const;
 
     /**
-     * @brief Window::setDims
+     * @copydoc Window::setDims
     */
     void setWindowDims(const glm::ivec2& newDims, bool save);
 
     /**
-     * @copydoc Window::getDims
+     * @copydoc Window::dims
     */
-    glm::ivec2 getWindowDims() const;
+    glm::ivec2 windowDims() const;
+
+    /**
+     * @copydoc Window::setPreferredRenderer
+    */
+    void setPreferredRenderer(RendererID renderer, bool save);
+
+    /**
+     * @copydoc Window::preferredRenderer
+    */
+    RendererID preferredRenderer() const;
+
+    /**
+     * @copydoc Window::usedRenderer
+    */
+    RendererID usedRenderer() const;
 
     /**
      * @copydoc WindowSettings::save

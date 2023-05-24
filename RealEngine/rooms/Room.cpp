@@ -11,19 +11,11 @@ Room::Room(size_t name, RoomDisplaySettings initialSettings/* = RoomDisplaySetti
     m_displaySettings(initialSettings), m_name(name) {
 }
 
-RoomDisplaySettings Room::getDisplaySettings() const {
-    return m_displaySettings;
-}
-
-void Room::setDisplaySettings(RoomDisplaySettings displaySettings) {
+void Room::setDisplaySettings(const RoomDisplaySettings& displaySettings) {
     m_displaySettings = displaySettings;
-    if (s_roomManager->getCurrentRoom() == this) {//If this room is active
+    if (s_roomManager->currentRoom() == this) {//If this room is active
         s_mainProgram->adoptRoomDisplaySettings(displaySettings);//Notify MainProgram
     }
-}
-
-size_t Room::getName() const {
-    return m_name;
 }
 
 void Room::setStaticReferences(MainProgram* mainProgram, RoomManager* roomManager) {

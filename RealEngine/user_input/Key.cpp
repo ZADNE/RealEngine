@@ -119,15 +119,15 @@ Key SDLKToREKey(SDL_Keycode key) {
     case SDL_BUTTON_RIGHT:  return Key::RMB;
     case SDL_BUTTON_X1:     return Key::X1MB;
     case SDL_BUTTON_X2:     return Key::X2MB;
-    default:                return Key::UNKNOWN;
+    default:                return Key::UnknownKey;
     }
 }
 
 std::string_view keyToString(Key key) {
     switch (key) {
-    case Key::NO_KEY:      return "NO_KEY";
-    case Key::ANY_KEY:     return "ANY_KEY";
-    case Key::KEY_UNBOUND: return "KEY_UNBOUND";
+    case Key::NoKey:       return "NoKey";
+    case Key::AnyKey:      return "AnyKey";
+    case Key::KeyUnbound:  return "KeyUnbound";
     case Key::Backspace:   return "Backspace";
     case Key::Tab:         return "Tab";
     case Key::Return:      return "Return";
@@ -242,7 +242,7 @@ std::string_view keyToString(Key key) {
     case Key::DMW:         return "DMW";
     case Key::LMW:         return "LMW";
     case Key::RMW:         return "RMW";
-    default:               return "UNKNOWN";
+    default:               return "UnknownKey";
     }
 }
 
@@ -256,9 +256,9 @@ uint64_t constexpr hash(const char* m) {
 
 Key stringToKey(const std::string& string) {
     switch (hash(string.c_str())) {
-    case hash("NO_KEY"):      return Key::NO_KEY;
-    case hash("ANY_KEY"):     return Key::ANY_KEY;
-    case hash("KEY_UNBOUND"): return Key::KEY_UNBOUND;
+    case hash("NoKey"):      return Key::NoKey;
+    case hash("AnyKey"):     return Key::AnyKey;
+    case hash("KeyUnbound"): return Key::KeyUnbound;
     case hash("Backspace"):   return Key::Backspace;
     case hash("Tab"):         return Key::Tab;
     case hash("Return"):      return Key::Return;
@@ -373,7 +373,7 @@ Key stringToKey(const std::string& string) {
     case hash("DMW"):         return Key::DMW;
     case hash("LMW"):         return Key::LMW;
     case hash("RMW"):         return Key::RMW;
-    default:                  return Key::UNKNOWN;
+    default:                  return Key::UnknownKey;
     }
 }
 
