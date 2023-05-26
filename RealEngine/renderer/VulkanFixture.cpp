@@ -181,16 +181,16 @@ void VulkanFixture::finishFrame(bool useImGui) {
     commandBuffer.end();
     vk::PipelineStageFlags waitDstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
     vk::SubmitInfo submitInfo{
-        *current(m_imageAvailableSems),
-        waitDstStageMask,
+        *current(m_imageAvailableSems),                     //Wait for image to be available
+        waitDstStageMask,                                   //Wait just before writing output
         *commandBuffer,
-        *current(m_renderingFinishedSems)
+        *current(m_renderingFinishedSems)                   //Signal that the rendering has finished once done
     };
     m_graphicsQueue.submit(submitInfo, *current(m_inFlightFences));
 
     //Present new image
     vk::PresentInfoKHR presentInfo{
-        *current(m_renderingFinishedSems),
+        *current(m_renderingFinishedSems),                  //Wait for rendering to finish
         *m_swapchain,
         m_imageIndex
     };

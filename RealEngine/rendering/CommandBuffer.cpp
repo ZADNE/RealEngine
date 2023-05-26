@@ -24,18 +24,12 @@ CommandBuffer::~CommandBuffer() {
     device().freeCommandBuffers(commandPool(), m_commandBuffer);
 }
 
-void CommandBuffer::submitToGraphicsQueue(bool waitIdle) const {
-    graphicsQueue().submit(vk::SubmitInfo{{}, {}, m_commandBuffer});
-    if (waitIdle) {
-        graphicsQueue().waitIdle();
-    }
+void CommandBuffer::submitToGraphicsQueue(const vk::Fence& signalFence/* = nullptr*/) const {
+    graphicsQueue().submit(vk::SubmitInfo{{}, {}, m_commandBuffer}, signalFence);
 }
 
-void CommandBuffer::submitToComputeQueue(bool waitIdle) const {
-    computeQueue().submit(vk::SubmitInfo{{}, {}, m_commandBuffer});
-    if (waitIdle) {
-        computeQueue().waitIdle();
-    }
+void CommandBuffer::submitToComputeQueue(const vk::Fence& signalFence/* = nullptr*/) const {
+    computeQueue().submit(vk::SubmitInfo{{}, {}, m_commandBuffer}, signalFence);
 }
 
 }

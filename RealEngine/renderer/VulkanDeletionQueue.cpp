@@ -43,6 +43,8 @@ bool VulkanDeletionQueue::deleteNextGroup() {
             m_device.destroyPipeline(reinterpret_cast<VkPipeline>(front.handle)); break;
         case vk::ObjectType::ePipelineLayout:
             m_device.destroyPipelineLayout(reinterpret_cast<VkPipelineLayout>(front.handle)); break;
+        case vk::ObjectType::eFence:
+            m_device.destroyFence(reinterpret_cast<VkFence>(front.handle)); break;
         default: error("Unsupported object queued for deletion");
         }
         m_queue.pop();
