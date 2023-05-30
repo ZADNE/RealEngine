@@ -12,12 +12,12 @@ Semaphore::Semaphore():
 
 Semaphore::Semaphore(uint64_t initialValue):
     m_semaphore(device().createSemaphore(vk::StructureChain{
-        vk::SemaphoreCreateInfo{},
+    vk::SemaphoreCreateInfo{},
         vk::SemaphoreTypeCreateInfo{
-            vk::SemaphoreType::eTimeline,
+        vk::SemaphoreType::eTimeline,
             initialValue
-        }
-    }.get<vk::SemaphoreCreateInfo>())){
+    }
+}.get<vk::SemaphoreCreateInfo>())) {
 }
 
 Semaphore::Semaphore(Semaphore&& other) noexcept:
@@ -32,6 +32,10 @@ Semaphore& Semaphore::operator=(Semaphore&& other) noexcept {
 
 Semaphore::~Semaphore() {
     deletionQueue().enqueueDeletion(m_semaphore);
+}
+
+vk::Result Semaphore::wait(uint64_t waitForValue, uint64_t timeout/* = k_maxTimeout*/) {
+    return device().waitSemaphores(vk::SemaphoreWaitInfo{{}, m_semaphore, waitForValue}, timeout);
 }
 
 }

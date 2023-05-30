@@ -34,6 +34,11 @@ public:
 
     static constexpr auto k_maxTimeout = std::numeric_limits<uint64_t>::max();
 
+    /**
+     * @brief Blocks the calling thread until the semaphore reaches the value
+    */
+    vk::Result wait(uint64_t waitForValue, uint64_t timeout = k_maxTimeout);
+
     const vk::Semaphore& operator*() const { return m_semaphore; }
     const vk::Semaphore* operator->() const { return &m_semaphore; }
 

@@ -27,7 +27,7 @@ public:
     static constexpr auto k_maxTimeout = std::numeric_limits<uint64_t>::max();
 
     /**
-     * @brief Waits for the fence to become signaled
+     * @brief Blocks the calling thread until the fence becomes signaled
     */
     vk::Result wait(uint64_t timeout = k_maxTimeout);
 
