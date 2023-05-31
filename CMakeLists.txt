@@ -12,11 +12,16 @@ include("cmake/RealShaders/RealShaders.cmake")
     find_package(SDL2 REQUIRED)
     #SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/sdk-1.3.236.0.tar.gz)
-    #GLM
+    #OpenGL Mathematics
     FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/refs/tags/0.9.9.8.tar.gz)
     #nlohmann json
     FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+
+    #Download remote libs
     FetchContent_MakeAvailable(SPIRV-Cross glm json)
+
+    #Add embedded libs
+    add_subdirectory(external)
 
 #Declare projects
     #RealEngine library
@@ -28,11 +33,14 @@ include("cmake/RealShaders/RealShaders.cmake")
     target_link_libraries(RealEngine PUBLIC
         ${CMAKE_DL_LIBS}
         Vulkan::Vulkan
+        vma
         spirv-cross-core
         spirv-cross-reflect
         SDL2::Main
         glm
         nlohmann_json::nlohmann_json
+        ImGui
+        lodepng
     )
     target_include_directories(RealEngine PUBLIC . external)
     #RTICreator (Windows only)
@@ -46,4 +54,3 @@ include("cmake/RealShaders/RealShaders.cmake")
 
 #Add subdirectories
     add_subdirectory(RealEngine)
-    add_subdirectory(external)

@@ -1,3 +1,5 @@
-﻿target_sources(${PROJECT_NAME} PRIVATE
+﻿add_library(lodepng STATIC)
+
+target_sources(lodepng PRIVATE
     lodepng.hpp                 lodepng.cpp
 )
