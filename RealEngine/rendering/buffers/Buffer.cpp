@@ -1,93 +1,99 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/buffers/Buffer.hpp>
-
 #include <cassert>
 
 #include <RealEngine/rendering/CommandBuffer.hpp>
+#include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/utility/Error.hpp>
-
 
 namespace RE {
 
-using enum vk::MemoryPropertyFlagBits;
 using enum vk::BufferUsageFlagBits;
+using enum vma::AllocationCreateFlagBits;
+using enum vma::MemoryUsage;
 
-constexpr auto k_hostMem = eHostVisible | eHostCoherent;
+constexpr auto k_hostAccess = eHostAccessRandom | eHostAccessSequentialWrite;
 
-Buffer::Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data/* = nullptr*/) {
-    BufferAndMemory main{};
-    if (data && (memProperty & k_hostMem) != k_hostMem) {//If initial data are provided or stage is requested
-        auto stage = createBufferAndMemory(sizeInBytes, eTransferSrc, k_hostMem);
-        main = createBufferAndMemory(sizeInBytes, usage | eTransferDst, memProperty);
-        //Copy from data to staging buffer
-        std::memcpy(device().mapMemory(stage.memory, 0, sizeInBytes), data, sizeInBytes);
-        device().unmapMemory(stage.memory);
-        //Copy from staging to final buffer
-        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
-            commandBuffer.copyBuffer(stage.buffer, main.buffer, vk::BufferCopy{0u, 0u, sizeInBytes});
-        });
-        //Destruct the temporary stage
-        device().destroyBuffer(stage.buffer);
-        device().free(stage.memory);
-    } else {//If no initial data are provided
-        main = createBufferAndMemory(sizeInBytes, usage, memProperty);
+Buffer::Buffer(
+    const BufferCreateInfo& createInfo, void** pointerToMapped /* = nullptr*/
+) {
+    // If initial data are provided but data cannot be copied directly to the
+    // main buffer
+    if (createInfo.initData && !(createInfo.allocFlags & k_hostAccess)) {
+        void* stageMapped = nullptr;
+        // Create temporary stage buffer
+        auto stage = createBufferAndAllocation(
+            BufferCreateInfo{
+                .allocFlags  = eHostAccessSequentialWrite | eMapped,
+                .memoryUsage = eAutoPreferHost,
+                .sizeInBytes = createInfo.sizeInBytes,
+                .usage       = eTransferSrc},
+            &stageMapped
+        );
+        // Create the main buffer
+        auto mainCreateInfo = createInfo;
+        mainCreateInfo.usage |= eTransferDst;
+        std::tie(m_buffer, m_allocation) = createBufferAndAllocation(
+            mainCreateInfo, pointerToMapped
+        );
+        // Copy data to staging buffer
+        std::memcpy(stageMapped, createInfo.initData, createInfo.sizeInBytes);
+        // Copy from staging to main buffer
+        CommandBuffer::doOneTimeSubmit(
+            [&](const vk::CommandBuffer& commandBuffer) {
+                commandBuffer.copyBuffer(
+                    stage.first,
+                    m_buffer,
+                    vk::BufferCopy{0u, 0u, createInfo.sizeInBytes}
+                );
+            }
+        );
+        // Destroy the temporary stage
+        allocator().destroyBuffer(stage.first, stage.second);
+    } else { // Stage is not required
+        std::tie(m_buffer, m_allocation) = createBufferAndAllocation(
+            createInfo, pointerToMapped
+        );
     }
-    m_memory = main.memory;
-    m_buffer = main.buffer;
 }
 
-Buffer::Buffer(Buffer&& other) noexcept:
-    m_memory(other.m_memory),
-    m_buffer(other.m_buffer) {
-    other.m_memory = nullptr;
-    other.m_buffer = nullptr;
+Buffer::Buffer(Buffer&& other) noexcept
+    : m_allocation(other.m_allocation)
+    , m_buffer(other.m_buffer) {
+    other.m_allocation = nullptr;
+    other.m_buffer     = nullptr;
 }
 
 Buffer& Buffer::operator=(Buffer&& other) noexcept {
-    std::swap(m_memory, other.m_memory);
+    std::swap(m_allocation, other.m_allocation);
     std::swap(m_buffer, other.m_buffer);
     return *this;
 }
 
 Buffer::~Buffer() {
     deletionQueue().enqueueDeletion(m_buffer);
-    deletionQueue().enqueueDeletion(m_memory);
+    deletionQueue().enqueueDeletion(m_allocation);
 }
 
-void Buffer::unmap() const {
-    device().unmapMemory(m_memory);
-}
-
-uint32_t Buffer::selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const {
-    auto memProperties = physicalDevice().getMemoryProperties2().memoryProperties;
-    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-            return i;
-        }
+std::pair<vk::Buffer, vma::Allocation> Buffer::createBufferAndAllocation(
+    const BufferCreateInfo& createInfo, void** pointerToMapped
+) const {
+    vma::AllocationInfo  allocInfo;
+    vk::BufferCreateInfo bufCreateInfo{
+        {},
+        createInfo.sizeInBytes,
+        createInfo.usage,
+        vk::SharingMode::eExclusive};
+    vma::AllocationCreateInfo allocCreateInfo{
+        createInfo.allocFlags, createInfo.memoryUsage};
+    auto pair = allocator().createBuffer(
+        bufCreateInfo, allocCreateInfo, allocInfo
+    );
+    if (pointerToMapped) {
+        *pointerToMapped = allocInfo.pMappedData;
     }
-    throw Exception{"Could not find memory that suits the buffer!"};
+    return pair;
 }
 
-Buffer::BufferAndMemory Buffer::createBufferAndMemory(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const {
-    vk::BufferCreateInfo createInfo{{},
-        sizeInBytes,
-        usage,
-        vk::SharingMode::eExclusive
-    };
-    auto buffer = device().createBuffer(createInfo);
-    auto memReq = device().getBufferMemoryRequirements2({buffer}).memoryRequirements;
-    auto memory = device().allocateMemory({
-        memReq.size,
-        selectMemoryType(memReq.memoryTypeBits, properties)
-    });
-    device().bindBufferMemory2(vk::BindBufferMemoryInfo{buffer, memory, 0u});
-    return BufferAndMemory{.buffer = buffer, .memory = memory};
-}
-
-void* Buffer::map(size_t offsetInBytes, size_t lengthInBytes) const {
-    return device().mapMemory(m_memory, offsetInBytes, lengthInBytes);
-}
-
-}
+} // namespace RE

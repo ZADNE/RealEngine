@@ -8,7 +8,6 @@
 #include <ImGui/imgui_impl_vulkan.h>
 #include <SDL2/SDL_vulkan.h>
 #include <glm/common.hpp>
-#include <vma/vk_mem_alloc.h>
 #define VMA_IMPLEMENTATION
 #include <vma/vk_mem_alloc.hpp>
 
@@ -57,6 +56,7 @@ VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync)
     , m_surface(createSurface())
     , m_physicalDevice(createPhysicalDevice())
     , m_device(createDevice())
+    , m_allocator(createAllocator())
     , m_graphicsQueue(createQueue(m_graphicsQueueFamilyIndex))
     , m_computeQueue(createQueue(m_computeQueueFamilyIndex))
     , m_presentationQueue(createQueue(m_presentationQueueFamilyIndex))
@@ -109,8 +109,9 @@ VulkanFixture::~VulkanFixture() {
     clearImplementationReferences();
 }
 
-const vk::CommandBuffer&
-VulkanFixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
+const vk::CommandBuffer& VulkanFixture::prepareFrame(
+    const glm::vec4& clearColor, bool useImGui
+) {
     // Wait for the previous frame to finish
     checkSuccess(
         m_device.waitForFences(*current(m_inFlightFences), true, k_maxTimeout)
@@ -134,8 +135,8 @@ VulkanFixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
         *current(m_imageAvailableSems),
         nullptr,
         1u};
-    auto [res, imageIndex] =
-        m_device.acquireNextImage2KHR(acquireNextImageInfo);
+    auto [res, imageIndex] = m_device.acquireNextImage2KHR(acquireNextImageInfo
+    );
     checkSuccess(res);
     m_imageIndex = imageIndex;
 
@@ -153,8 +154,9 @@ VulkanFixture::prepareFrame(const glm::vec4& clearColor, bool useImGui) {
     VulkanObject::s_commandBuffer = &(*commandBuffer);
 
     // Begin renderpass
-    const auto* clearColorPtr =
-        reinterpret_cast<const std::array<float, 4u>*>(&clearColor);
+    const auto* clearColorPtr = reinterpret_cast<const std::array<float, 4u>*>(
+        &clearColor
+    );
     vk::ClearValue          clearValue{vk::ClearColorValue{*clearColorPtr}};
     vk::RenderPassBeginInfo renderPassBeginInfo{
         *m_renderPass,
@@ -374,6 +376,22 @@ vk::raii::Device VulkanFixture::createDevice() {
     return vk::raii::Device{m_physicalDevice, createInfo.get<>()};
 }
 
+vma::Allocator VulkanFixture::createAllocator() {
+    return vma::createAllocator(vma::AllocatorCreateInfo{
+        vma::AllocatorCreateFlagBits::eExternallySynchronized,
+        *m_physicalDevice,
+        *m_device,
+        0,       // Use default large heap block size (256 MB as of writing)
+        nullptr, // Use default CPU memory allocation callbacks
+        nullptr, // Do not receive informative callbacks from VMA
+        nullptr, // No heap size limits
+        nullptr, // Let VMA load Vulkan functions on its own
+        *m_instance,
+        VK_API_VERSION_1_3,
+        nullptr, // No external memory handles
+    });
+}
+
 vk::raii::Queue VulkanFixture::createQueue(uint32_t familyIndex) {
     return vk::raii::Queue{m_device, familyIndex, 0u};
 }
@@ -485,8 +503,8 @@ vk::raii::RenderPass VulkanFixture::createRenderPass() {
     return vk::raii::RenderPass{m_device, createInfo};
 }
 
-std::vector<vk::raii::Framebuffer>
-VulkanFixture::createSwapchainFramebuffers() {
+std::vector<vk::raii::Framebuffer> VulkanFixture::createSwapchainFramebuffers(
+) {
     vk::FramebufferCreateInfo createInfo{
         {},
         *m_renderPass,
@@ -510,8 +528,8 @@ vk::raii::CommandPool VulkanFixture::createCommandPool() {
     return vk::raii::CommandPool{m_device, createInfo};
 }
 
-PerFrameInFlight<vk::raii::CommandBuffer>
-VulkanFixture::createCommandBuffers() {
+PerFrameInFlight<vk::raii::CommandBuffer> VulkanFixture::createCommandBuffers(
+) {
     vk::CommandBufferAllocateInfo commandBufferAllocateInfo{
         *m_commandPool, ePrimary, k_maxFramesInFlight};
     vk::raii::CommandBuffers buffers{m_device, commandBufferAllocateInfo};
@@ -555,12 +573,8 @@ vk::raii::DescriptorPool VulkanFixture::createDescriptorPool() {
     });
     vk::DescriptorPoolCreateInfo createInfo{
         {},
-        static_cast<uint32_t>(m_swapchainImageViews.size()) * 8u, //'8 is
-                                                                  // just
-                                                                  // enough'
-                                                                  // - needs
-                                                                  // more
-                                                                  // work
+        // 8 is 'just enough' - deserves a better solution
+        static_cast<uint32_t>(m_swapchainImageViews.size()) * 8u,
         poolSizes};
     return vk::raii::DescriptorPool{m_device, createInfo};
 }
@@ -673,22 +687,24 @@ void VulkanFixture::recreateImGuiFontTexture() {
 }
 
 void VulkanFixture::assignImplementationReferences() {
-    VulkanObject::s_physicalDevice = &(*m_physicalDevice);
-    VulkanObject::s_device         = &(*m_device);
-    VulkanObject::s_graphicsQueue  = &(*m_graphicsQueue);
-    VulkanObject::s_computeQueue   = &(*m_computeQueue);
-    VulkanObject::s_commandPool    = &(*m_commandPool);
-    VulkanObject::s_descriptorPool = &(*m_descriptorPool);
-    VulkanObject::s_pipelineCache  = &(*m_pipelineCache);
-    VulkanObject::s_renderPass     = &(*m_renderPass);
-    VulkanObject::s_oneTimeSubmitCommandBuffer =
-        &(*m_oneTimeSubmitCommandBuffer);
-    VulkanObject::s_deletionQueue = &m_deletionQueue;
+    VulkanObject::s_physicalDevice             = &(*m_physicalDevice);
+    VulkanObject::s_device                     = &(*m_device);
+    VulkanObject::s_allocator                  = &m_allocator;
+    VulkanObject::s_graphicsQueue              = &(*m_graphicsQueue);
+    VulkanObject::s_computeQueue               = &(*m_computeQueue);
+    VulkanObject::s_commandPool                = &(*m_commandPool);
+    VulkanObject::s_descriptorPool             = &(*m_descriptorPool);
+    VulkanObject::s_pipelineCache              = &(*m_pipelineCache);
+    VulkanObject::s_renderPass                 = &(*m_renderPass);
+    VulkanObject::s_oneTimeSubmitCommandBuffer = &(*m_oneTimeSubmitCommandBuffer
+    );
+    VulkanObject::s_deletionQueue              = &m_deletionQueue;
 }
 
 void VulkanFixture::clearImplementationReferences() {
     VulkanObject::s_physicalDevice             = nullptr;
     VulkanObject::s_device                     = nullptr;
+    VulkanObject::s_allocator                  = nullptr;
     VulkanObject::s_graphicsQueue              = nullptr;
     VulkanObject::s_computeQueue               = nullptr;
     VulkanObject::s_commandPool                = nullptr;

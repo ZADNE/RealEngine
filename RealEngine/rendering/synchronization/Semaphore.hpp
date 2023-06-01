@@ -3,7 +3,7 @@
  */
 #pragma once
 #include <RealEngine/renderer/VulkanObject.hpp>
-#include <RealEngine/renderer/VulkanDeletionQueue.hpp>
+#include <RealEngine/renderer/DeletionQueue.hpp>
 
 
 namespace RE {

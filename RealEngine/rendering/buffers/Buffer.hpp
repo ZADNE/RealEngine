@@ -2,60 +2,47 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <vector>
 #include <type_traits>
+#include <vector>
 
+#include <RealEngine/renderer/DeletionQueue.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
-#include <RealEngine/renderer/VulkanDeletionQueue.hpp>
-
 
 namespace RE {
 
 /**
- * @brief Is a continuous block of memory stored in the GPU's memory
-*/
+ * @brief Specifies parameters for buffer creation
+ */
+struct BufferCreateInfo {
+    // Memory-related
+    vma::AllocationCreateFlags allocFlags  = {};
+    vma::MemoryUsage           memoryUsage = vma::MemoryUsage::eAuto;
+    // Buffer-related
+    vk::DeviceSize       sizeInBytes = 0;
+    vk::BufferUsageFlags usage       = {};
+    void*                initData    = nullptr;
+};
+
+/**
+ * @brief Is a continuous block of memory
+ * @note Use BufferMapped if you intend to map the buffer to CPU memory
+ */
 class Buffer: public VulkanObject {
 public:
+    Buffer(const BufferCreateInfo& createInfo)
+        : Buffer(createInfo, nullptr) {}
+
+    Buffer(const Buffer&)            = delete; /**< Noncopyable */
+    Buffer& operator=(const Buffer&) = delete; /**< Noncopyable */
+
+    Buffer(Buffer&& other) noexcept;            /**< Movable */
+    Buffer& operator=(Buffer&& other) noexcept; /**< Movable */
 
     /**
-     * @brief Constructs buffer of given size, usage and data
-     * @param sizeInBytes Size in bytes of the buffer
-     * @param usage Restrict usage of the buffer
-     * @param data  If a valid pointer is provided, it is used to initialize the contents of the buffer.
-     *              If the nullptr is provided, the contents of the buffer are undefined.
-    */
-    Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const void* data = nullptr);
-
-    template<typename T, typename = std::enable_if_t<!std::is_pointer_v<T>>>
-    Buffer(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags memProperty, const T& data):
-        Buffer(sizeInBytes, usage, memProperty, &data) {
-    }
-
-    Buffer(const Buffer&) = delete;                             /**< Noncopyable */
-    Buffer& operator=(const Buffer&) = delete;                  /**< Noncopyable */
-
-    Buffer(Buffer&& other) noexcept;                            /**< Movable */
-    Buffer& operator=(Buffer&& other) noexcept;                 /**< Movable */
-
-    /**
-     * @brief Frees the backing memory block on the GPU and destructs the buffer.
-    */
+     * @brief Frees the backing memory block on the GPU and destructs the
+     * buffer.
+     */
     ~Buffer();
-
-    /**
-     * @brief Maps a range of the buffer to the client's memory
-     * @tparam T Reinterpreted type of the returned pointer
-    */
-    template<typename T>
-    T* map(size_t offsetInBytes, size_t lengthInBytes) const {
-        return reinterpret_cast<T*>(map(offsetInBytes, lengthInBytes));
-    }
-
-    /**
-     * @brief Releases the mapping of the buffer
-     * @return True if success. Buffer's contents are undefined if false is returned.
-    */
-    void unmap() const;
 
     const vk::Buffer& operator*() const { return m_buffer; }
     const vk::Buffer* operator->() const { return &m_buffer; }
@@ -63,18 +50,22 @@ public:
     const vk::Buffer& buffer() const { return m_buffer; }
 
 protected:
+    /**
+     * @param pointerToMapped Output paramter - It is used to return pointer to
+     * the mapped buffer if persistent mapping is requested
+     */
+    Buffer(
+        const BufferCreateInfo& createInfo, void** pointerToMapped = nullptr
+    );
 
-    void* map(size_t offsetInBytes, size_t lengthInBytes) const;
+    using BufferAndAllocation = std::pair<vk::Buffer, vma::Allocation>;
 
-    uint32_t selectMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) const;
-    struct BufferAndMemory {
-        vk::Buffer buffer = nullptr;
-        vk::DeviceMemory memory = nullptr;
-    };
-    BufferAndMemory createBufferAndMemory(vk::DeviceSize sizeInBytes, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
+    BufferAndAllocation createBufferAndAllocation(
+        const BufferCreateInfo& createInfo, void** pointerToMapped
+    ) const;
 
-    vk::DeviceMemory m_memory{};
-    vk::Buffer m_buffer{};
+    vma::Allocation m_allocation{};
+    vk::Buffer      m_buffer{};
 };
 
-}
+} // namespace RE
