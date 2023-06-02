@@ -5,7 +5,7 @@
 #include <RealEngine/rendering/batches/GeometryBatch.hpp>
 #include <RealEngine/rendering/batches/shaders/AllShaders.hpp>
 
-namespace RE {
+namespace re {
 
 using enum vk::BufferUsageFlagBits;
 using enum vk::MemoryPropertyFlagBits;
@@ -91,4 +91,4 @@ GeometryBatch::createVertexInputStateInfo() const {
     return vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes};
 }
 
-} // namespace RE
+} // namespace re

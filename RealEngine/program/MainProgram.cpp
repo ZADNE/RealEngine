@@ -13,7 +13,7 @@
 
 #include <RealEngine/rooms/Room.hpp>
 
-namespace RE {
+namespace re {
 
 void MainProgram::initialize() {
     //Force initialization of the singleton instance

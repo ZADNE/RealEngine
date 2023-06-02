@@ -3,7 +3,7 @@
  */
 #include <RealEngine/resources/TextureCache.hpp>
 
-namespace RE {
+namespace re {
 
 SharedTexture TextureCache::texture(const std::string& filePathPNG) {
     auto mapIterator = m_textureMap.find(filePathPNG);

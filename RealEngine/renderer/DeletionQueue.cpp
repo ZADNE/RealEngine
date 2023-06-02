@@ -6,7 +6,7 @@
 #include <RealEngine/renderer/DeletionQueue.hpp>
 #include <RealEngine/utility/Error.hpp>
 
-namespace RE {
+namespace re {
 
 DeletionQueue::DeletionQueue(
     const vk::Device& device, const vma::Allocator& allocator
@@ -87,4 +87,4 @@ void DeletionQueue::deleteVulkanHandle(vk::ObjectType type, void* handle) {
     }
 }
 
-} // namespace RE
+} // namespace re

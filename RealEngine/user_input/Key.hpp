@@ -6,7 +6,7 @@
 
 #include <SDL2/SDL_keycode.h>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Every input (mouse/keyboard) key that can used.

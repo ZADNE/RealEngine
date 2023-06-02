@@ -5,7 +5,7 @@
 
 #include <spirv_glsl.hpp>
 
-namespace RE {
+namespace re {
 
 PipelineLayout::PipelineLayout(const PipelineLayoutCreateInfo& createInfo, const PipelineGraphicsSources& srcs)
     : PipelineLayout(createInfo, reflectSources(srcs, createInfo.specializationInfo)) {

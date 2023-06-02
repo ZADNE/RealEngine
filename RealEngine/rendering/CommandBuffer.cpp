@@ -3,7 +3,7 @@
  */
 #include <RealEngine/rendering/CommandBuffer.hpp>
 
-namespace RE {
+namespace re {
 
 CommandBuffer::CommandBuffer(vk::CommandBufferLevel level)
     : m_commandBuffer(device()
@@ -53,4 +53,4 @@ void CommandBuffer::submitToComputeQueue(const vk::Fence&
     computeQueue().submit(vk::SubmitInfo{{}, {}, m_commandBuffer}, signalFence);
 }
 
-} // namespace RE
+} // namespace re

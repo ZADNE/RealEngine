@@ -7,7 +7,7 @@
 
 #include <RealEngine/rendering/textures/TextureShaped.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Is a texture that can be shared across Rooms

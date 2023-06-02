@@ -10,7 +10,7 @@
 
 #include <RealEngine/utility/Error.hpp>
 
-namespace RE {
+namespace re {
 
 std::string to_string(RendererID r) {
     switch (r) {

@@ -5,7 +5,7 @@
 #include <RealEngine/renderer/VulkanObject.hpp>
 #include <RealEngine/rendering/pipelines/PipelineSources.hpp>
 
-namespace RE {
+namespace re {
 
 struct PipelineGraphicsCreateInfo {
     vk::PipelineLayout pipelineLayout = nullptr;

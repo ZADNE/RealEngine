@@ -8,7 +8,7 @@
 
 using namespace std::chrono_literals;
 
-namespace RE {
+namespace re {
 
 Synchronizer::Synchronizer(unsigned int stepsPerSecond, unsigned int framesPerSecondLimit, bool beginResumed/* = false*/) {
     setStepsPerSecond(stepsPerSecond);

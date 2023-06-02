@@ -12,7 +12,7 @@ using json = nlohmann::json;
 
 const std::string SETTINGS_FILENAME = "settings.json";
 
-namespace RE {
+namespace re {
 
 WindowSettings::WindowSettings() {
     std::ifstream i(SETTINGS_FILENAME);

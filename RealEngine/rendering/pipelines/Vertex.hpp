@@ -7,7 +7,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Is RGBA 8-bits-per-channel color

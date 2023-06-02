@@ -5,7 +5,7 @@
 
 #include <RealEngine/program/MainProgram.hpp>
 
-namespace RE {
+namespace re {
 
 Room::Room(size_t name, RoomDisplaySettings initialSettings/* = RoomDisplaySettings{}*/) :
     m_displaySettings(initialSettings), m_name(name) {

@@ -5,7 +5,7 @@
 #include <RealEngine/resources/TextureCache.hpp>
 
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Ensures there is at most one copy of shared resources.

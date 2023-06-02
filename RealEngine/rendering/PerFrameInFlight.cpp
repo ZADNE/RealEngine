@@ -3,7 +3,7 @@
  */
 #include <RealEngine/rendering/PerFrameInFlight.hpp>
 
-namespace RE {
+namespace re {
 
 int g_framesInFlight;
 int g_currentFrame;

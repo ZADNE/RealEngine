@@ -12,7 +12,7 @@
 #endif // CHAR_BIT != 8
 
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Checks at runtime whether the system uses big endian

@@ -5,7 +5,7 @@
 
 #include <glm/vec4.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Specifies some parameters related to how the room is drawn

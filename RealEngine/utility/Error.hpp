@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <string_view>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Logs a fatal error and ends program immediately.

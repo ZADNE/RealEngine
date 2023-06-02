@@ -7,7 +7,7 @@
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief   Provides access to global Vulkan objects (such as device)
@@ -54,4 +54,4 @@ private:
     static inline DeletionQueue*      s_deletionQueue  = nullptr;
 };
 
-} // namespace RE
+} // namespace re

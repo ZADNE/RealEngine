@@ -5,7 +5,7 @@
 #include <vector>
 #include <any>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Used for passing parameters to the next room when transitioning between them.

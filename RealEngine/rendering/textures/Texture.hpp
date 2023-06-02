@@ -6,7 +6,7 @@
 
 #include <RealEngine/renderer/VulkanObject.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Specifies parameters for texture creation
@@ -73,4 +73,4 @@ protected:
     );
 };
 
-} // namespace RE
+} // namespace re

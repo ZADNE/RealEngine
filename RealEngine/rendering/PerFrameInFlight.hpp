@@ -7,7 +7,7 @@
 #include <utility>
 #include <initializer_list>
 
-namespace RE {
+namespace re {
 
 extern const int& framesInFlight;
 extern const int& currentFrame;

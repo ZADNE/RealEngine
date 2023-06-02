@@ -4,7 +4,7 @@
 #include <RealEngine/rendering/synchronization/Semaphore.hpp>
 
 
-namespace RE {
+namespace re {
 
 Semaphore::Semaphore():
     m_semaphore(device().createSemaphore(vk::SemaphoreCreateInfo{})) {

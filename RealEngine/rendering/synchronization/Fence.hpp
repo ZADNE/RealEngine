@@ -6,7 +6,7 @@
 #include <RealEngine/renderer/DeletionQueue.hpp>
 
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Allows synchronization between GPU and CPU

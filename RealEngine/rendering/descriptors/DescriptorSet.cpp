@@ -3,7 +3,7 @@
  */
 #include <RealEngine/rendering/descriptors/DescriptorSet.hpp>
 
-namespace RE {
+namespace re {
 
 DescriptorSet::DescriptorSet(const PipelineLayout& pipelineLayout, uint32_t setIndex):
     m_descriptorSet(device().allocateDescriptorSets(vk::DescriptorSetAllocateInfo{

@@ -39,7 +39,7 @@ void checkSuccessImGui(VkResult res) {
 
 } // namespace
 
-namespace RE {
+namespace re {
 
 constexpr std::array k_deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
@@ -715,4 +715,4 @@ void VulkanFixture::clearImplementationReferences() {
     VulkanObject::s_deletionQueue              = nullptr;
 }
 
-} // namespace RE
+} // namespace re

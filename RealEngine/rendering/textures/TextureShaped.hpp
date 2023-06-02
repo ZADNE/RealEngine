@@ -11,7 +11,7 @@
 #include <RealEngine/rendering/textures/TextureShape.hpp>
 
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Converts simple filename to full path to a texture

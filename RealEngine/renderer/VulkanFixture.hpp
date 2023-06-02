@@ -15,7 +15,7 @@
 
 struct SDL_Window;
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Enforces use of Vulkan graphics backend.
@@ -123,4 +123,4 @@ private:
     void recreateImGuiFontTexture();
 };
 
-} // namespace RE
+} // namespace re

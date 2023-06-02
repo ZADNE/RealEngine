@@ -8,7 +8,7 @@
 
 #include <RealEngine/user_input/Key.hpp>
 
-namespace RE {
+namespace re {
     
 /**
 * @brief Keeps track of mouse and keyboard input.

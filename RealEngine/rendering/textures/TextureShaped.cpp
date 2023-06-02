@@ -3,7 +3,7 @@
  */
 #include <RealEngine/rendering/textures/TextureShaped.hpp>
 
-namespace RE {
+namespace re {
 
 TextureShaped::TextureShaped(PNGLoader::PNGData&& pngData):
     Texture(TextureCreateInfo{

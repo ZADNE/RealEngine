@@ -9,7 +9,7 @@
 
 #include <RealEngine/user_input/InputManager.hpp>
 
-namespace RE {
+namespace re {
 
 View2D::View2D(const glm::vec2& viewDimensions):
     m_viewDimensions(viewDimensions) {

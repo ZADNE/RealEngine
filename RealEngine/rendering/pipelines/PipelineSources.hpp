@@ -9,7 +9,7 @@
 
 #include <RealEngine/utility/Error.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Represents SPIR-V source code of a shader stage

@@ -8,7 +8,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-namespace RE {
+namespace re {
 
 FlyingCamera3D::FlyingCamera3D(const glm::vec3& pos, const glm::vec3& yawPitchRoll):
     m_pos(pos), m_dirQuat(yawPitchRoll) {

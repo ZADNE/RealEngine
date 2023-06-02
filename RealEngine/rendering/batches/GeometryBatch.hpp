@@ -9,7 +9,7 @@
 #include <RealEngine/rendering/pipelines/PipelineLayout.hpp>
 #include <RealEngine/rendering/pipelines/Vertex.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Draws geometric primitives
@@ -69,4 +69,4 @@ private:
     vk::PipelineVertexInputStateCreateInfo createVertexInputStateInfo() const;
 };
 
-} // namespace RE
+} // namespace re

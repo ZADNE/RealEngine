@@ -14,94 +14,88 @@
 #include <RealEngine/rendering/pipelines/Pipeline.hpp>
 #include <RealEngine/rendering/pipelines/PipelineLayout.hpp>
 
-namespace RE {
-
-/**
- * @brief   Draws 2D sprites efficiently
- * @detail  Can draw multiple batches per frame.
- *          Each batch has its own transformation matrix
- */
-class SpriteBatch {
-public:
-    /**
-     * @brief Construct Spritebatch
-     * @param maxSprites Maximum number of sprites that can be in the batch
-     * @param maxTextures Maximum number of unique textures that the sprites can
-     * refer to
-     */
-    SpriteBatch(unsigned int maxSprites, unsigned int maxTextures);
+namespace re {
 
     /**
-     * @brief Resets the sprite batch, also begins first batch
-     * @detail Call this at the beginning of each frame.
+     * @brief   Draws 2D sprites efficiently
+     * @detail  Can draw multiple batches per frame.
+     *          Each batch has its own transformation matrix
      */
-    void clearAndBeginFirstBatch();
+    class SpriteBatch {
+    public:
+        /**
+         * @brief Construct Spritebatch
+         * @param maxSprites Maximum number of sprites that can be in the batch
+         * @param maxTextures Maximum number of unique textures that the sprites
+         * can refer to
+         */
+        SpriteBatch(unsigned int maxSprites, unsigned int maxTextures);
 
-    /**
-     * @brief Begins new batch
-     * @detail There can be multiple batches in a frame, this function separates
-     * them
-     */
-    void nextBatch();
+        /**
+         * @brief Resets the sprite batch, also begins first batch
+         * @detail Call this at the beginning of each frame.
+         */
+        void clearAndBeginFirstBatch();
 
-    /**
-     * @brief Draws the last batch
-     * @detail Sprite in the batch are drawn in the order they were added in
-     * @param commandBuffer Command buffer used for rendering
-     * @param mvpMat Transformation matrix applied to the batch
-     */
-    void drawBatch(
-        const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat
-    );
+        /**
+         * @brief Begins new batch
+         * @detail There can be multiple batches in a frame, this function
+         * separates them
+         */
+        void nextBatch();
 
-    void add(
-        const Texture&   tex,
-        const glm::vec4& posSizeRect,
-        const glm::vec4& uvsSizeRect
-    );
+        /**
+         * @brief Draws the last batch
+         * @detail Sprite in the batch are drawn in the order they were added in
+         * @param commandBuffer Command buffer used for rendering
+         * @param mvpMat Transformation matrix applied to the batch
+         */
+        void drawBatch(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat);
 
-    void addSprite(const SpriteStatic& sprite, const glm::vec2& pos);
+        void add(
+            const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect
+        );
 
-    void addSprite(const SpriteComplex& sprite, const glm::vec2& pos);
+        void addSprite(const SpriteStatic& sprite, const glm::vec2& pos);
 
-    void addSubimage(
-        const TextureShaped& tex,
-        const glm::vec2&     pos,
-        const glm::vec2&     subImg_Spr
-    );
+        void addSprite(const SpriteComplex& sprite, const glm::vec2& pos);
 
-    const Pipeline& pipeline() const { return m_pipeline; }
+        void addSubimage(
+            const TextureShaped& tex, const glm::vec2& pos, const glm::vec2& subImg_Spr
+        );
 
-private:
-    using enum vk::BufferUsageFlagBits;
-    using enum vk::MemoryPropertyFlagBits;
+        const Pipeline& pipeline() const { return m_pipeline; }
 
-    struct alignas(16) Sprite {
-        glm::vec4 pos;
-        glm::vec4 uvs;
-        glm::uint tex;
-        RE::Color col;
+    private:
+        using enum vk::BufferUsageFlagBits;
+        using enum vk::MemoryPropertyFlagBits;
+
+        struct alignas(16) Sprite {
+            glm::vec4 pos;
+            glm::vec4 uvs;
+            glm::uint tex;
+            Color     col;
+        };
+        BufferMapped<Sprite>                             m_spritesBuf;
+        std::unordered_map<const Texture*, unsigned int> m_texToIndex;
+        unsigned int                                     m_maxSprites;
+        unsigned int                                     m_maxTextures;
+        unsigned int                                     m_nextSpriteIndex = 0;
+        unsigned int m_batchFirstSpriteIndex                               = 0;
+        unsigned int m_nextTextureIndex                                    = 0;
+
+        unsigned int texToIndex(const Texture& tex);
+
+        PipelineLayout        m_pipelineLayout;
+        static PipelineLayout createPipelineLayout(unsigned int maxTextures);
+        Pipeline              m_pipeline;
+        static Pipeline       createPipeline(
+                  const PipelineLayout& pipelineLayout, unsigned int maxTextures
+              );
+
+        DescriptorSet m_descSet{m_pipelineLayout, 0u};
+
+        static inline constexpr Color k_white{255, 255, 255, 255};
     };
-    BufferMapped<Sprite>                             m_spritesBuf;
-    std::unordered_map<const Texture*, unsigned int> m_texToIndex;
-    unsigned int                                     m_maxSprites;
-    unsigned int                                     m_maxTextures;
-    unsigned int                                     m_nextSpriteIndex = 0;
-    unsigned int m_batchFirstSpriteIndex                               = 0;
-    unsigned int m_nextTextureIndex                                    = 0;
 
-    unsigned int texToIndex(const Texture& tex);
-
-    PipelineLayout        m_pipelineLayout;
-    static PipelineLayout createPipelineLayout(unsigned int maxTextures);
-    Pipeline              m_pipeline;
-    static Pipeline       createPipeline(
-              const PipelineLayout& pipelineLayout, unsigned int maxTextures
-          );
-
-    DescriptorSet m_descSet{m_pipelineLayout, 0u};
-
-    static inline constexpr Color k_white{255, 255, 255, 255};
-};
-
-} // namespace RE
+} // namespace re

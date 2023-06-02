@@ -7,7 +7,7 @@
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/utility/Error.hpp>
 
-namespace RE {
+namespace re {
 
 using enum vk::BufferUsageFlagBits;
 using enum vma::AllocationCreateFlagBits;
@@ -94,4 +94,4 @@ std::pair<vk::Buffer, vma::Allocation> Buffer::createBufferAndAllocation(
     return pair;
 }
 
-} // namespace RE
+} // namespace re

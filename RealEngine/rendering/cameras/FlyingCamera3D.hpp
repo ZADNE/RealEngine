@@ -7,7 +7,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Is a moving 3D camera with pitch/yaw/roll rotations

@@ -7,7 +7,7 @@
 #include <RealEngine/window/Window.hpp>
 #include <RealEngine/rooms/RoomManager.hpp>
 
-namespace RE {
+namespace re {
 
 class MainProgram;
 

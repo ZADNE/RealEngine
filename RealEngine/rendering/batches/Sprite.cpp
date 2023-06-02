@@ -3,7 +3,7 @@
  */
 #include <RealEngine/rendering/batches/Sprite.hpp>
 
-namespace RE {
+namespace re {
 
 SpriteStatic::SpriteStatic(const TextureShaped& tex, float sprite, float subimage/* = 0.0f*/) :
     m_tex(&tex), m_subimageSprite(subimage, sprite) {

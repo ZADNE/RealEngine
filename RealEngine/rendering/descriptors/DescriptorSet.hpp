@@ -7,7 +7,7 @@
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 #include <RealEngine/rendering/textures/Texture.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Describes (= refers to) concrete resources (= buffers, images, etc)

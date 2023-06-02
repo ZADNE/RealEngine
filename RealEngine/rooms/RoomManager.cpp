@@ -6,7 +6,7 @@
 #include <RealEngine/rooms/Room.hpp>
 
 
-namespace RE {
+namespace re {
 
 RoomManager::RoomManager() {
 

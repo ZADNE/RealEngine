@@ -8,7 +8,7 @@
 #include <vma/vk_mem_alloc.hpp>
 #include <vulkan/vulkan.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief   Allows delayed deletion of Vulkan and Vma objects
@@ -93,4 +93,4 @@ private:
     const vma::Allocator&   m_allocator;
 };
 
-} // namespace RE
+} // namespace re

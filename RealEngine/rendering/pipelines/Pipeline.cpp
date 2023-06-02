@@ -3,7 +3,7 @@
  */
 #include <RealEngine/rendering/pipelines/Pipeline.hpp>
 
-namespace RE {
+namespace re {
 
 static vk::ShaderStageFlagBits convert(size_t st) {
     switch (st) {

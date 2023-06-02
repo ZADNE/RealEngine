@@ -4,7 +4,7 @@
 #pragma once
 #include <RealEngine/rendering/buffers/Buffer.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Is buffer that is persistently mapped throughout its lifetime
@@ -35,4 +35,4 @@ protected:
     T* m_mapped;
 };
 
-} // namespace RE
+} // namespace re

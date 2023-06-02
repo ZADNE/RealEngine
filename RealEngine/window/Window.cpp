@@ -12,7 +12,7 @@
 #include <RealEngine/utility/Error.hpp>
 
 
-namespace RE {
+namespace re {
 
 Window::Window(const WindowSettings& settings, const std::string& title):
     WindowSettings(settings), m_subsystems(), m_windowTitle(title), m_usedRenderer(RendererID::Any) {

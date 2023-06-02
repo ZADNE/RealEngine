@@ -5,7 +5,7 @@
 #include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Represents an orthographic projection.

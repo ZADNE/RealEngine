@@ -13,7 +13,7 @@
 
 union SDL_Event;
 
-namespace RE {
+namespace re {
 
 class MainProgram;
 

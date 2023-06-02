@@ -4,7 +4,7 @@
 #pragma once
 #include <vma/vk_mem_alloc.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Is a simple RAII wrapper around vma::Allocator
@@ -25,4 +25,4 @@ public:
     ~Allocator() { destroy(); }
 };
 
-} // namespace RE
+} // namespace re

@@ -4,7 +4,7 @@
 #pragma once
 #include <chrono>
 
-namespace RE {
+namespace re {
 
 class MainProgram;
 

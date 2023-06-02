@@ -7,7 +7,7 @@
 #include <RealEngine/rendering/textures/TextureShaped.hpp>
 #include <RealEngine/rendering/pipelines/Vertex.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Represents a static subimage within a texture

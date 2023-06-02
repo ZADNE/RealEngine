@@ -6,7 +6,7 @@
 #include <RealEngine/program/MainProgram.hpp>
 #include <RealEngine/rooms/Room.hpp>
 
-namespace RE {
+namespace re {
 
 #pragma region MainProgram
 

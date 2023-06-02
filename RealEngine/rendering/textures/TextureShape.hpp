@@ -5,7 +5,7 @@
 #include <glm/vec2.hpp>
 
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Defines logical size and layout of a shaped texture.

@@ -8,7 +8,7 @@
 #include <RealEngine/renderer/DeletionQueue.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Specifies parameters for buffer creation
@@ -66,4 +66,4 @@ protected:
     vk::Buffer      m_buffer{};
 };
 
-} // namespace RE
+} // namespace re

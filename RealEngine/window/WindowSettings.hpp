@@ -9,7 +9,7 @@
 
 #include <RealEngine/window/WindowSubsystems.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Specify ancillary parameters of a window

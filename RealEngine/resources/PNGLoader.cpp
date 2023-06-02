@@ -8,7 +8,7 @@
 #include <RealEngine/utility/Endianness.hpp>
 #include <RealEngine/utility/Error.hpp>
 
-namespace RE {
+namespace re {
 
 using RTI = std::array<unsigned char, sizeof(uint32_t) + sizeof(glm::vec2) * 3>;
 

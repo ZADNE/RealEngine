@@ -5,7 +5,7 @@
 
 #include <SDL2/SDL_mouse.h>
 
-namespace RE {
+namespace re {
 
 Key SDLKToREKey(SDL_Keycode key) {
     switch (key) {

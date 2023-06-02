@@ -28,7 +28,7 @@ include("cmake/RealShaders/RealShaders.cmake")
     add_library_with_shaders(RealEngine STATIC)
     set_target_properties(RealEngine PROPERTIES
         CXX_STANDARD 20
-        SHADERS_CXX_NAMESPACE "RE"
+        SHADERS_CXX_NAMESPACE "re"
     )
     target_link_libraries(RealEngine PUBLIC
         ${CMAKE_DL_LIBS}

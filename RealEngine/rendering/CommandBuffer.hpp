@@ -5,7 +5,7 @@
 #include <RealEngine/renderer/VulkanObject.hpp>
 #include <concepts>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Records commands to be executed by device (= GPU)
@@ -58,4 +58,4 @@ private:
     vk::CommandBuffer m_commandBuffer = nullptr;
 };
 
-} // namespace RE
+} // namespace re

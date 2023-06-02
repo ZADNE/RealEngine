@@ -4,7 +4,7 @@
 #include <RealEngine/rendering/synchronization/Fence.hpp>
 
 
-namespace RE {
+namespace re {
 
 Fence::Fence(vk::FenceCreateFlags createFlags):
     m_fence(device().createFence(vk::FenceCreateInfo{createFlags})) {

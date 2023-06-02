@@ -9,7 +9,7 @@
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/rooms/RoomTransitionArguments.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Separates program into logical units, only one room is active at a time.

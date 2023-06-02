@@ -7,7 +7,7 @@
 
 #include <RealEngine/rendering/textures/TextureShape.hpp>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Loads/saves texels and parameters from/to PNG file

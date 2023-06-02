@@ -3,7 +3,7 @@
  */
 #include <RealEngine/resources/ResourceManager.hpp>
 
-namespace RE {
+namespace re {
 
 SharedTexture ResourceManager::texture(const TextureSeed& seed) {
     return s_textureCache.texture(seed.toFullPath());

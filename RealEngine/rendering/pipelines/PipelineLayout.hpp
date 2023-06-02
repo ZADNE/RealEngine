@@ -5,7 +5,7 @@
 #include <RealEngine/renderer/VulkanObject.hpp>
 #include <RealEngine/rendering/pipelines/PipelineSources.hpp>
 
-namespace RE {
+namespace re {
 
 struct PipelineLayoutCreateInfo {
     vk::ArrayProxy<vk::ArrayProxy<vk::DescriptorBindingFlags>> descriptorBindingFlags{};

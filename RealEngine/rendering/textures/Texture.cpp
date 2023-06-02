@@ -6,7 +6,7 @@
 #include <RealEngine/rendering/textures/Texture.hpp>
 #include <RealEngine/utility/Error.hpp>
 
-namespace RE {
+namespace re {
 
 using enum vk::ImageLayout;
 using enum vk::PipelineStageFlagBits;
@@ -211,4 +211,4 @@ void Texture::pipelineImageBarrier(
     );
 }
 
-} // namespace RE
+} // namespace re

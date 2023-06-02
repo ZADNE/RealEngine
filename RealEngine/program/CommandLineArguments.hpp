@@ -4,7 +4,7 @@
 #pragma once
 #include <span>
 
-namespace RE {
+namespace re {
 
 using CommandLineArguments = std::span<char*>;
 
