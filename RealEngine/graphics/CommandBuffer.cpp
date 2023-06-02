@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/CommandBuffer.hpp>
+#include <RealEngine/graphics/CommandBuffer.hpp>
 
 namespace re {
 
@@ -40,16 +40,11 @@ void CommandBuffer::submitToComputeQueue(
     computeQueue().submit2(submits, signalFence);
 }
 
-void CommandBuffer::submitToGraphicsQueue(const vk::Fence&
-                                              signalFence /* = nullptr*/)
-    const {
-    graphicsQueue().submit(
-        vk::SubmitInfo{{}, {}, m_commandBuffer}, signalFence
-    );
+void CommandBuffer::submitToGraphicsQueue(const vk::Fence& signalFence /* = nullptr*/) const {
+    graphicsQueue().submit(vk::SubmitInfo{{}, {}, m_commandBuffer}, signalFence);
 }
 
-void CommandBuffer::submitToComputeQueue(const vk::Fence&
-                                             signalFence /* = nullptr*/) const {
+void CommandBuffer::submitToComputeQueue(const vk::Fence& signalFence /* = nullptr*/) const {
     computeQueue().submit(vk::SubmitInfo{{}, {}, m_commandBuffer}, signalFence);
 }
 

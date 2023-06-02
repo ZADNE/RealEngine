@@ -4,8 +4,8 @@
 #pragma once
 #include <glm/vec2.hpp>
 
-#include <RealEngine/rendering/textures/TextureShaped.hpp>
-#include <RealEngine/rendering/pipelines/Vertex.hpp>
+#include <RealEngine/graphics/textures/TextureShaped.hpp>
+#include <RealEngine/graphics/pipelines/Vertex.hpp>
 
 namespace re {
 

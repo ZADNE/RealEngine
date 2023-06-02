@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/pipelines/PipelineLayout.hpp>
+#include <RealEngine/graphics/pipelines/PipelineLayout.hpp>
 
 #include <spirv_glsl.hpp>
 

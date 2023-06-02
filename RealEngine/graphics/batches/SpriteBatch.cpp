@@ -5,9 +5,9 @@
 
 #include <glm/common.hpp>
 
-#include <RealEngine/rendering/PerFrameInFlight.hpp>
-#include <RealEngine/rendering/batches/SpriteBatch.hpp>
-#include <RealEngine/rendering/batches/shaders/AllShaders.hpp>
+#include <RealEngine/graphics/PerFrameInFlight.hpp>
+#include <RealEngine/graphics/batches/SpriteBatch.hpp>
+#include <RealEngine/graphics/batches/shaders/AllShaders.hpp>
 
 using enum vk::DescriptorBindingFlagBits;
 

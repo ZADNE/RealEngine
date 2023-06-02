@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/PerFrameInFlight.hpp>
+#include <RealEngine/graphics/PerFrameInFlight.hpp>
 
 namespace re {
 

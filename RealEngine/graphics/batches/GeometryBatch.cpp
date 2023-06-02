@@ -1,9 +1,9 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/PerFrameInFlight.hpp>
-#include <RealEngine/rendering/batches/GeometryBatch.hpp>
-#include <RealEngine/rendering/batches/shaders/AllShaders.hpp>
+#include <RealEngine/graphics/PerFrameInFlight.hpp>
+#include <RealEngine/graphics/batches/GeometryBatch.hpp>
+#include <RealEngine/graphics/batches/shaders/AllShaders.hpp>
 
 namespace re {
 

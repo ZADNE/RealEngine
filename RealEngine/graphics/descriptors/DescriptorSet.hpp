@@ -3,9 +3,9 @@
  */
 #pragma once
 #include <RealEngine/renderer/VulkanObject.hpp>
-#include <RealEngine/rendering/pipelines/PipelineLayout.hpp>
-#include <RealEngine/rendering/buffers/Buffer.hpp>
-#include <RealEngine/rendering/textures/Texture.hpp>
+#include <RealEngine/graphics/pipelines/PipelineLayout.hpp>
+#include <RealEngine/graphics/buffers/Buffer.hpp>
+#include <RealEngine/graphics/textures/Texture.hpp>
 
 namespace re {
 

@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <memory>
 
-#include <RealEngine/rendering/textures/TextureShaped.hpp>
+#include <RealEngine/graphics/textures/TextureShaped.hpp>
 
 namespace re {
 

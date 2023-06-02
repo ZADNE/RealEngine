@@ -11,7 +11,7 @@
 
 #include <RealEngine/renderer/Allocator.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
-#include <RealEngine/rendering/PerFrameInFlight.hpp>
+#include <RealEngine/graphics/PerFrameInFlight.hpp>
 
 struct SDL_Window;
 

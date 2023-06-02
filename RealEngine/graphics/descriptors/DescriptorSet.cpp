@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/descriptors/DescriptorSet.hpp>
+#include <RealEngine/graphics/descriptors/DescriptorSet.hpp>
 
 namespace re {
 

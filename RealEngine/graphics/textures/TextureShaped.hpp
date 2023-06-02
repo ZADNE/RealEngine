@@ -7,8 +7,8 @@
 #include <glm/vec2.hpp>
 
 #include <RealEngine/resources/PNGLoader.hpp>
-#include <RealEngine/rendering/textures/Texture.hpp>
-#include <RealEngine/rendering/textures/TextureShape.hpp>
+#include <RealEngine/graphics/textures/Texture.hpp>
+#include <RealEngine/graphics/textures/TextureShape.hpp>
 
 
 namespace re {

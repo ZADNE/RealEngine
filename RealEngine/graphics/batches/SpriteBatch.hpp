@@ -8,11 +8,11 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
-#include <RealEngine/rendering/batches/Sprite.hpp>
-#include <RealEngine/rendering/buffers/BufferMapped.hpp>
-#include <RealEngine/rendering/descriptors/DescriptorSet.hpp>
-#include <RealEngine/rendering/pipelines/Pipeline.hpp>
-#include <RealEngine/rendering/pipelines/PipelineLayout.hpp>
+#include <RealEngine/graphics/batches/Sprite.hpp>
+#include <RealEngine/graphics/buffers/BufferMapped.hpp>
+#include <RealEngine/graphics/descriptors/DescriptorSet.hpp>
+#include <RealEngine/graphics/pipelines/Pipeline.hpp>
+#include <RealEngine/graphics/pipelines/PipelineLayout.hpp>
 
 namespace re {
 

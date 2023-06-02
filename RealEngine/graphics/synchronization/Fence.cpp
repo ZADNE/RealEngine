@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/synchronization/Fence.hpp>
+#include <RealEngine/graphics/synchronization/Fence.hpp>
 
 
 namespace re {

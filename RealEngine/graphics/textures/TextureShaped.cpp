@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/textures/TextureShaped.hpp>
+#include <RealEngine/graphics/textures/TextureShaped.hpp>
 
 namespace re {
 

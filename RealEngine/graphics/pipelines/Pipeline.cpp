@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/pipelines/Pipeline.hpp>
+#include <RealEngine/graphics/pipelines/Pipeline.hpp>
 
 namespace re {
 

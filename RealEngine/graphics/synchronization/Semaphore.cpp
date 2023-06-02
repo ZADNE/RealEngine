@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/synchronization/Semaphore.hpp>
+#include <RealEngine/graphics/synchronization/Semaphore.hpp>
 
 
 namespace re {

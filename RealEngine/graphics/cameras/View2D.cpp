@@ -1,7 +1,7 @@
 ﻿/*! 
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/cameras/View2D.hpp>
+#include <RealEngine/graphics/cameras/View2D.hpp>
 
 #include <algorithm>
 

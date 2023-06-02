@@ -1,9 +1,9 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/CommandBuffer.hpp>
-#include <RealEngine/rendering/buffers/BufferMapped.hpp>
-#include <RealEngine/rendering/textures/Texture.hpp>
+#include <RealEngine/graphics/CommandBuffer.hpp>
+#include <RealEngine/graphics/buffers/BufferMapped.hpp>
+#include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 namespace re {

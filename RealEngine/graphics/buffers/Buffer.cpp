@@ -3,8 +3,8 @@
  */
 #include <cassert>
 
-#include <RealEngine/rendering/CommandBuffer.hpp>
-#include <RealEngine/rendering/buffers/Buffer.hpp>
+#include <RealEngine/graphics/CommandBuffer.hpp>
+#include <RealEngine/graphics/buffers/Buffer.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 namespace re {

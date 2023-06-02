@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <RealEngine/rendering/textures/TextureShape.hpp>
+#include <RealEngine/graphics/textures/TextureShape.hpp>
 
 namespace re {
 

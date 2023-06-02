@@ -5,9 +5,9 @@
 #include <optional>
 
 #include <RealEngine/program/CommandLineArguments.hpp>
-#include <RealEngine/rendering/batches/GeometryBatch.hpp>
-#include <RealEngine/rendering/batches/SpriteBatch.hpp>
-#include <RealEngine/rendering/cameras/View2D.hpp>
+#include <RealEngine/graphics/batches/GeometryBatch.hpp>
+#include <RealEngine/graphics/batches/SpriteBatch.hpp>
+#include <RealEngine/graphics/cameras/View2D.hpp>
 #include <RealEngine/rooms/Room.hpp>
 
 /**

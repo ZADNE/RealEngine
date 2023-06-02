@@ -3,7 +3,7 @@
  */
 #pragma once
 #include <RealEngine/renderer/VulkanObject.hpp>
-#include <RealEngine/rendering/pipelines/PipelineSources.hpp>
+#include <RealEngine/graphics/pipelines/PipelineSources.hpp>
 
 namespace re {
 

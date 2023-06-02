@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/batches/Sprite.hpp>
+#include <RealEngine/graphics/batches/Sprite.hpp>
 
 namespace re {
 

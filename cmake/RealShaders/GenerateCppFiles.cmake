@@ -16,7 +16,7 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
     string(CONCAT hpp_preamble
         "//Automatically generated file by RealShaders\n"
         "#pragma once\n"
-        "#include <RealEngine/rendering/pipelines/PipelineSources.hpp>\n\n"
+        "#include <RealEngine/graphics/pipelines/PipelineSources.hpp>\n\n"
         ${cpp_namespace_start})
 
     string(CONCAT folder_hpp

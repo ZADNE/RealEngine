@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rendering/cameras/FlyingCamera3D.hpp>
+#include <RealEngine/graphics/cameras/FlyingCamera3D.hpp>
 
 #include <glm/geometric.hpp>
 #include <glm/gtc/matrix_transform.hpp>

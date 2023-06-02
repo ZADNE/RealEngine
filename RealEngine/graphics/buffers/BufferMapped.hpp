@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/rendering/buffers/Buffer.hpp>
+#include <RealEngine/graphics/buffers/Buffer.hpp>
 
 namespace re {
 

@@ -4,10 +4,10 @@
 #pragma once
 #include <glm/mat4x4.hpp>
 
-#include <RealEngine/rendering/buffers/BufferMapped.hpp>
-#include <RealEngine/rendering/pipelines/Pipeline.hpp>
-#include <RealEngine/rendering/pipelines/PipelineLayout.hpp>
-#include <RealEngine/rendering/pipelines/Vertex.hpp>
+#include <RealEngine/graphics/buffers/BufferMapped.hpp>
+#include <RealEngine/graphics/pipelines/Pipeline.hpp>
+#include <RealEngine/graphics/pipelines/PipelineLayout.hpp>
+#include <RealEngine/graphics/pipelines/Vertex.hpp>
 
 namespace re {
 
