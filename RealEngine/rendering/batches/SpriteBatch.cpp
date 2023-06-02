@@ -46,29 +46,18 @@ void SpriteBatch::drawBatch(
     );
     commandBuffer.bindVertexBuffers(0u, m_spritesBuf.buffer(), 0ull);
     commandBuffer.pushConstants<glm::mat4>(
-        *m_pipelineLayout,
-        vk::ShaderStageFlagBits::eTessellationEvaluation,
-        0u,
-        mvpMat
+        *m_pipelineLayout, vk::ShaderStageFlagBits::eTessellationEvaluation, 0u, mvpMat
     );
     commandBuffer.draw(
-        m_nextSpriteIndex - m_batchFirstSpriteIndex,
-        1u,
-        m_batchFirstSpriteIndex,
-        0u
+        m_nextSpriteIndex - m_batchFirstSpriteIndex, 1u, m_batchFirstSpriteIndex, 0u
     );
 }
 
 void SpriteBatch::add(
-    const Texture&   tex,
-    const glm::vec4& posSizeRect,
-    const glm::vec4& uvsSizeRect
+    const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect
 ) {
     m_spritesBuf[m_nextSpriteIndex++] = Sprite{
-        .pos = posSizeRect,
-        .uvs = uvsSizeRect,
-        .tex = texToIndex(tex),
-        .col = k_white};
+        .pos = posSizeRect, .uvs = uvsSizeRect, .tex = texToIndex(tex), .col = k_white};
 }
 
 void SpriteBatch::addSprite(const SpriteStatic& sprite, const glm::vec2& pos) {
@@ -87,8 +76,7 @@ void SpriteBatch::addSprite(const SpriteComplex& sprite, const glm::vec2& pos) {
     const auto& tex                   = sprite.texture();
     m_spritesBuf[m_nextSpriteIndex++] = Sprite{
         .pos = glm::vec4(
-            pos - tex.pivot() * sprite.scale(),
-            tex.subimageDims() * sprite.scale()
+            pos - tex.pivot() * sprite.scale(), tex.subimageDims() * sprite.scale()
         ),
         .uvs = glm::vec4(
             glm::floor(sprite.subimageSprite()) / tex.subimagesSpritesCount(),
@@ -134,8 +122,7 @@ PipelineLayout SpriteBatch::createPipelineLayout(unsigned int maxTextures) {
     unsigned int totalTextures = maxTextures * k_maxFramesInFlight;
     static constexpr vk::DescriptorBindingFlags bindingFlags = {
         eUpdateUnusedWhilePending | ePartiallyBound};
-    auto bindingFlagsArray = vk::ArrayProxy<vk::DescriptorBindingFlags>(
-        bindingFlags
+    auto bindingFlagsArray = vk::ArrayProxy<vk::DescriptorBindingFlags>(bindingFlags
     );
     return PipelineLayout{
         PipelineLayoutCreateInfo{
@@ -194,16 +181,12 @@ Pipeline SpriteBatch::createPipeline(
         PipelineGraphicsCreateInfo{
             .pipelineLayout = *pipelineLayout,
             .vertexInput =
-                vk::PipelineVertexInputStateCreateInfo{
-                    {}, bindings, attributes},
+                vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes},
             .topology           = vk::PrimitiveTopology::ePatchList,
             .patchControlPoints = 1u,
             .specializationInfo =
                 vk::SpecializationInfo{
-                    1u,
-                    &SPEC_MAP_ENTRY,
-                    sizeof(totalTextures),
-                    &totalTextures}},
+                    1u, &SPEC_MAP_ENTRY, sizeof(totalTextures), &totalTextures}},
         PipelineGraphicsSources{
             .vert = sprite_vert,
             .tesc = sprite_tesc,

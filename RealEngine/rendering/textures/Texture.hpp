@@ -13,8 +13,8 @@ namespace RE {
  */
 struct TextureCreateInfo {
     // Memory-related
-    vma::AllocationCreateFlags allocFlags  = {};
-    vma::MemoryUsage           memoryUsage = vma::MemoryUsage::eAuto;
+    vma::AllocationCreateFlags allocFlags = {};
+    vma::MemoryUsage memoryUsage          = vma::MemoryUsage::eAutoPreferDevice;
     // Image-related
     vk::ImageType       type   = vk::ImageType::e2D;
     vk::Format          format = vk::Format::eR8G8B8A8Unorm;

@@ -20,7 +20,7 @@ struct BufferCreateInfo {
     // Buffer-related
     vk::DeviceSize       sizeInBytes = 0;
     vk::BufferUsageFlags usage       = {};
-    void*                initData    = nullptr;
+    const void*          initData    = nullptr;
 };
 
 /**
@@ -54,9 +54,7 @@ protected:
      * @param pointerToMapped Output paramter - It is used to return pointer to
      * the mapped buffer if persistent mapping is requested
      */
-    Buffer(
-        const BufferCreateInfo& createInfo, void** pointerToMapped = nullptr
-    );
+    Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped);
 
     using BufferAndAllocation = std::pair<vk::Buffer, vma::Allocation>;
 

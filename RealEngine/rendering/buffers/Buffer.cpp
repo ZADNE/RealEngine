@@ -15,9 +15,7 @@ using enum vma::MemoryUsage;
 
 constexpr auto k_hostAccess = eHostAccessRandom | eHostAccessSequentialWrite;
 
-Buffer::Buffer(
-    const BufferCreateInfo& createInfo, void** pointerToMapped /* = nullptr*/
-) {
+Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
     // If initial data are provided but data cannot be copied directly to the
     // main buffer
     if (createInfo.initData && !(createInfo.allocFlags & k_hostAccess)) {
