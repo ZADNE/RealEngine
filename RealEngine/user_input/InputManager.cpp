@@ -1,16 +1,12 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
+#include <algorithm>
+#include <iostream>
+
 #include <RealEngine/user_input/InputManager.hpp>
 
-#include <iostream>
-#include <algorithm>
-
 namespace re {
-
-InputManager::InputManager() {
-
-}
 
 void InputManager::update() {
     m_cursorRel = glm::ivec2(0, 0);
@@ -20,11 +16,13 @@ void InputManager::update() {
     release(Key::RMW);
     int longest = 0;
     for (auto& i : m_stateMap) {
-        if (i.first == Key::AnyKey) { continue; }
+        if (i.first == Key::AnyKey) {
+            continue;
+        }
         if (i.second > 0) {
             m_stateMapPrevious[i.first] = ++i.second;
             if (i.second > longest) {
-                longest = i.second;
+                longest       = i.second;
                 m_longestHeld = i.first;
             }
         } else {
@@ -38,11 +36,11 @@ void InputManager::update() {
     }
 
     m_noKeyHeldPrevious = m_noKeyHeld;
-    m_keysHeldPrevious = m_keysHeld;
+    m_keysHeldPrevious  = m_keysHeld;
 }
 
 int InputManager::isDown(Key keyID) const {
-    //First checking for special keys
+    // First check for special keys
     if (keyID == Key::AnyKey) {
         return m_stateMap[m_longestHeld];
     } else if (keyID == Key::NoKey) {
@@ -57,7 +55,7 @@ int InputManager::isDown(Key keyID) const {
 }
 
 int InputManager::wasDown(Key keyID) const {
-    //First checking for special keys
+    // First check for special keys
     if (keyID == Key::AnyKey) {
         return m_stateMapPrevious[m_longestHeld];
     } else if (keyID == Key::NoKey) {
@@ -72,7 +70,7 @@ int InputManager::wasDown(Key keyID) const {
 }
 
 int InputManager::wasPressed(Key keyID) const {
-    //First checking for special keys
+    // First check for special keys
     if (keyID == Key::AnyKey) {
         if (m_keysHeld > m_keysHeldPrevious) {
             return m_stateMap[m_longestHeld];
@@ -94,7 +92,7 @@ int InputManager::wasPressed(Key keyID) const {
 }
 
 int InputManager::wasReleased(Key keyID) const {
-    //First checking for special keys
+    // First check for special keys
     if (keyID == Key::AnyKey) {
         if (m_keysHeld < m_keysHeldPrevious) {
             return m_stateMap[m_longestHeld];
@@ -128,21 +126,19 @@ void InputManager::setCursor(const glm::ivec2& abs, const glm::ivec2& rel) {
     m_cursorRel = rel;
 }
 
-void InputManager::press(Key keyID, int times/* = 1*/) {
-    auto& it = m_stateMap[keyID];
+void InputManager::press(Key keyID, int times /* = 1*/) {
     if (keyID == Key::AnyKey) {
         m_keysHeld += times;
     } else {
         if (m_keysHeld == 1) {
             m_longestHeld = keyID;
         }
-        it += times;
+        m_stateMap[keyID] += times;
     }
 }
 
 void InputManager::release(Key keyID) {
-    auto& it = m_stateMap[keyID];
-    it = 0;
+    m_stateMap[keyID] = 0;
 }
 
-}
+} // namespace re

@@ -10,8 +10,8 @@ int g_currentFrame;
 int g_nextFrame;
 
 const int& framesInFlight = g_framesInFlight;
-const int& currentFrame = g_currentFrame;
-const int& nextFrame = g_nextFrame;
+const int& currentFrame   = g_currentFrame;
+const int& nextFrame      = g_nextFrame;
 
 void setFramesInFlight(int framesInFLight) {
     g_framesInFlight = framesInFLight;
@@ -19,7 +19,7 @@ void setFramesInFlight(int framesInFLight) {
 
 void setFrame(int totalFrame) {
     g_currentFrame = totalFrame % framesInFlight;
-    g_nextFrame = (totalFrame + 1) % framesInFlight;
+    g_nextFrame    = (totalFrame + 1) % framesInFlight;
 }
 
-}
+} // namespace re

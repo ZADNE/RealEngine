@@ -1,27 +1,26 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/window/WindowSubsystems.hpp>
-
 #include <stdexcept>
 
-#include <SDL2/SDL.h>
 #include <ImGui/imgui.h>
+#include <SDL2/SDL.h>
 
 #include <RealEngine/utility/Error.hpp>
+#include <RealEngine/window/WindowSubsystems.hpp>
 
 namespace re {
 
 std::string to_string(RendererID r) {
     switch (r) {
-    case RendererID::Vulkan13:      return "Vulkan13";
-    case RendererID::Any:           return "Any";
-    default:                        return "Unknown renderer";
+    case RendererID::Vulkan13: return "Vulkan13";
+    case RendererID::Any: return "Any";
+    default: return "Unknown renderer";
     }
 }
 
-WindowSubsystems::WindowSubsystems() :
-    m_sdl2() {
+WindowSubsystems::WindowSubsystems()
+    : m_sdl2() {
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
 }
@@ -51,11 +50,13 @@ void WindowSubsystems::SDL2_RAII::printVersion() const {
 #ifndef NDEBUG
     SDL_version compiled;
     SDL_VERSION(&compiled);
-    std::printf("SDL compiled: %u.%u.%u\n", compiled.major, compiled.minor, compiled.patch);
+    std::printf(
+        "SDL compiled: %u.%u.%u\n", compiled.major, compiled.minor, compiled.patch
+    );
 #endif // DEBUG
     SDL_version linked;
     SDL_GetVersion(&linked);
     std::printf("SDL linked:   %u.%u.%u\n", linked.major, linked.minor, linked.patch);
 }
 
-}
+} // namespace re

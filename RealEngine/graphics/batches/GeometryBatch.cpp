@@ -45,28 +45,21 @@ void GeometryBatch::addVertices(
     uint32_t first, uint32_t countVer, const VertexPOCO* data
 ) {
     std::memcpy(
-        &m_verticesBuf[m_nextVertexIndex],
-        &data[first],
-        sizeof(VertexPOCO) * countVer
+        &m_verticesBuf[m_nextVertexIndex], &data[first], sizeof(VertexPOCO) * countVer
     );
     m_nextVertexIndex += countVer;
 }
 
-void GeometryBatch::draw(
-    const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat
-) {
+void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat) {
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
     commandBuffer.bindVertexBuffers(0u, m_verticesBuf.buffer(), 0ull);
     commandBuffer.pushConstants<glm::mat4>(
         *m_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0u, mvpMat
     );
-    commandBuffer.draw(
-        m_nextVertexIndex - m_maxVertices * nextFrame, 1u, 0u, 0u
-    );
+    commandBuffer.draw(m_nextVertexIndex - m_maxVertices * nextFrame, 1u, 0u, 0u);
 }
 
-vk::PipelineVertexInputStateCreateInfo
-GeometryBatch::createVertexInputStateInfo() const {
+vk::PipelineVertexInputStateCreateInfo GeometryBatch::createVertexInputStateInfo() const {
     static constexpr std::array bindings =
         std::to_array<vk::VertexInputBindingDescription>({{
             0u,                          // Binding index

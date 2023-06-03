@@ -13,26 +13,28 @@ namespace re {
 
 /**
  * @brief Represents SPIR-V source code of a shader stage
-*/
+ */
 struct ShaderSource {
-    const std::basic_string<uint32_t> vk13;/**< SPIR-V compiled for Vulkan 1.3 environment */
+    /**
+     * @brief SPIR-V compiled for Vulkan 1.3 environment
+     */
+    const std::basic_string<uint32_t> vk13;
 };
 
 /**
  * @brief Represents a non-owning handle to source codes of a shader stage
-*/
+ */
 struct ShaderSourceRef {
     constexpr ShaderSourceRef() {}
-    constexpr ShaderSourceRef(const ShaderSource& source):
-        vk13(source.vk13) {
-    }
+    constexpr ShaderSourceRef(const ShaderSource& source)
+        : vk13(source.vk13) {}
 
     std::basic_string_view<uint32_t> vk13{};
 };
 
 /**
-* @brief POD representing source codes for all shaders within a graphics pipeline
-*/
+ * @brief POD representing source codes for all shaders within a graphics pipeline
+ */
 struct PipelineGraphicsSources {
 
     static constexpr size_t k_numStages = 5;
@@ -72,16 +74,16 @@ struct PipelineGraphicsSources {
         }
     }
 
-    ShaderSourceRef vert{};/**< Vertex shader stage of the program */
-    ShaderSourceRef tesc{};/**< Tesselation control shader stage of the program */
-    ShaderSourceRef tese{};/**< Tesselation evaluation stage of the program */
-    ShaderSourceRef geom{};/**< Geometry shader stage of the program */
-    ShaderSourceRef frag{};/**< Fragment shader stage of the program */
+    ShaderSourceRef vert{}; /**< Vertex shader stage of the program */
+    ShaderSourceRef tesc{}; /**< Tesselation control shader stage of the program */
+    ShaderSourceRef tese{}; /**< Tesselation evaluation stage of the program */
+    ShaderSourceRef geom{}; /**< Geometry shader stage of the program */
+    ShaderSourceRef frag{}; /**< Fragment shader stage of the program */
 };
 
 /**
-* @brief POD representing source codes for all shaders within a compute pipeline
-*/
+ * @brief POD representing source codes for all shaders within a compute pipeline
+ */
 struct PipelineComputeSources {
 
     static constexpr size_t k_numStages = 1;
@@ -109,7 +111,7 @@ struct PipelineComputeSources {
         }
     }
 
-    ShaderSourceRef comp{};/**< Copute shader stage of the program */
+    ShaderSourceRef comp{}; /**< Copute shader stage of the program */
 };
 
-}
+} // namespace re

@@ -13,4 +13,4 @@ SharedTexture ResourceManager::texture(const std::string& filePathPNG) {
     return s_textureCache.texture(filePathPNG);
 }
 
-}
+} // namespace re

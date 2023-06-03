@@ -53,28 +53,25 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
     vma::AllocationCreateInfo allocCreateInfo{
         createInfo.allocFlags, createInfo.memoryUsage};
     // Create the image
-    std::tie(m_image, m_allocation) = allocator().createImage(
-        imageCreateInfo, allocCreateInfo
-    );
+    std::tie(m_image, m_allocation) =
+        allocator().createImage(imageCreateInfo, allocCreateInfo);
     if (!createInfo.texels.empty()) {
         // Initialize texels of the image and transit to initial layout
         initializeTexels(createInfo);
     } else {
         // Only transit to initial layout
-        CommandBuffer::doOneTimeSubmit(
-            [&](const vk::CommandBuffer& commandBuffer) {
-                pipelineImageBarrier(
-                    commandBuffer,
-                    eUndefined,
-                    createInfo.initialLayout, // Image layouts
-                    eTopOfPipe,
-                    eTransfer, // Pipeline stage
-                    {},
-                    {},
-                    createInfo.layers
-                );
-            }
-        );
+        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
+            pipelineImageBarrier(
+                commandBuffer,
+                eUndefined,
+                createInfo.initialLayout, // Image layouts
+                eTopOfPipe,
+                eTransfer, // Pipeline stage
+                {},
+                {},
+                createInfo.layers
+            );
+        });
     }
     // Create image view
     m_imageView = device().createImageView(vk::ImageViewCreateInfo{
@@ -130,9 +127,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
         .usage       = vk::BufferUsageFlagBits::eTransferSrc}};
     // Copy texels to the staging buffer
     std::memcpy(
-        stagingBuffer.mapped(),
-        createInfo.texels.data(),
-        createInfo.texels.size()
+        stagingBuffer.mapped(), createInfo.texels.data(), createInfo.texels.size()
     );
     // Copy data from staging buffer to the image
     CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {

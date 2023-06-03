@@ -5,8 +5,11 @@
 
 namespace re {
 
-SpriteStatic::SpriteStatic(const TextureShaped& tex, float sprite, float subimage/* = 0.0f*/) :
-    m_tex(&tex), m_subimageSprite(subimage, sprite) {
+SpriteStatic::SpriteStatic(
+    const TextureShaped& tex, float sprite, float subimage /* = 0.0f*/
+)
+    : m_tex(&tex)
+    , m_subimageSprite(subimage, sprite) {
 }
 
 float SpriteStatic::speed() const {
@@ -26,19 +29,24 @@ glm::vec2 SpriteStatic::subimageSprite() const {
 }
 
 void SpriteStatic::step() {
-
 }
 
-SpriteAnimated::SpriteAnimated(const TextureShaped& tex, float sprite, float subimage/* = 0.0f*/, float imageSpeed/* = 1.0f*/) :
-    SpriteStatic(tex, sprite, subimage), m_imageSpeed(imageSpeed) {
+SpriteAnimated::SpriteAnimated(
+    const TextureShaped& tex,
+    float                sprite,
+    float                subimage /* = 0.0f*/,
+    float                imageSpeed /* = 1.0f*/
+)
+    : SpriteStatic(tex, sprite, subimage)
+    , m_imageSpeed(imageSpeed) {
 }
 
 void SpriteAnimated::step() {
-    this->m_subimageSprite.x += speed();
-    if ((this->m_subimageSprite.x) >= this->m_tex->subimagesSpritesCount().x) {//Positive image speed
-        this->m_subimageSprite.x = 0.0f;
-    } else if (this->m_subimageSprite.x < 0.0f) {//Negative image speed
-        this->m_subimageSprite.x = this->m_tex->subimagesSpritesCount().x + speed();
+    m_subimageSprite.x += speed();
+    if (m_subimageSprite.x >= m_tex->subimagesSpritesCount().x) {
+        m_subimageSprite.x = 0.0f;
+    } else if (m_subimageSprite.x < 0.0f) {
+        m_subimageSprite.x = m_tex->subimagesSpritesCount().x + speed();
     }
 }
 
@@ -50,8 +58,17 @@ float SpriteAnimated::speed() const {
     return m_imageSpeed;
 }
 
-SpriteComplex::SpriteComplex(const TextureShaped& tex, float sprite, float subimage, float imageSpeed, Color color, const glm::vec2& scale) :
-    SpriteAnimated(tex, sprite, subimage, imageSpeed), m_color(color), m_scale(scale) {
+SpriteComplex::SpriteComplex(
+    const TextureShaped& tex,
+    float                sprite,
+    float                subimage,
+    float                imageSpeed,
+    Color                color,
+    const glm::vec2&     scale
+)
+    : SpriteAnimated(tex, sprite, subimage, imageSpeed)
+    , m_color(color)
+    , m_scale(scale) {
 }
 
 void SpriteComplex::setColor(Color color) {
@@ -70,4 +87,4 @@ glm::vec2 SpriteComplex::scale() const {
     return m_scale;
 }
 
-}
+} // namespace re

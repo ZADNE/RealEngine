@@ -2,8 +2,9 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/renderer/VulkanObject.hpp>
 #include <concepts>
+
+#include <RealEngine/renderer/VulkanObject.hpp>
 
 namespace re {
 
@@ -22,6 +23,10 @@ public:
 
     ~CommandBuffer();
 
+    /**
+     * @warning Waits for device to become idle which is very expensive!
+     *          Use only when performance is not critical (e.g. outside of main loop)
+     */
     template<typename F>
         requires std::invocable<F, const vk::CommandBuffer&>
     static void doOneTimeSubmit(F op) {
@@ -30,10 +35,8 @@ public:
         );
         op(oneTimeSubmitCommandBuffer());
         oneTimeSubmitCommandBuffer().end();
-        graphicsQueue().submit(vk::SubmitInfo{
-            {}, {}, oneTimeSubmitCommandBuffer()});
-        device().waitIdle(); // TODO expensive operation, use fence instead or
-                             // use outside main loop
+        graphicsQueue().submit(vk::SubmitInfo{{}, {}, oneTimeSubmitCommandBuffer()});
+        device().waitIdle();
     }
 
     static void submitToGraphicsQueue(

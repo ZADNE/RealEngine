@@ -21,7 +21,7 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
     if (createInfo.initData && !(createInfo.allocFlags & k_hostAccess)) {
         void* stageMapped = nullptr;
         // Create temporary stage buffer
-        auto stage = createBufferAndAllocation(
+        auto stage = allocateBuffer(
             BufferCreateInfo{
                 .allocFlags  = eHostAccessSequentialWrite | eMapped,
                 .memoryUsage = eAutoPreferHost,
@@ -32,27 +32,20 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
         // Create the main buffer
         auto mainCreateInfo = createInfo;
         mainCreateInfo.usage |= eTransferDst;
-        std::tie(m_buffer, m_allocation) = createBufferAndAllocation(
-            mainCreateInfo, pointerToMapped
-        );
+        std::tie(m_buffer, m_allocation) =
+            allocateBuffer(mainCreateInfo, pointerToMapped);
         // Copy data to staging buffer
         std::memcpy(stageMapped, createInfo.initData, createInfo.sizeInBytes);
         // Copy from staging to main buffer
-        CommandBuffer::doOneTimeSubmit(
-            [&](const vk::CommandBuffer& commandBuffer) {
-                commandBuffer.copyBuffer(
-                    stage.first,
-                    m_buffer,
-                    vk::BufferCopy{0u, 0u, createInfo.sizeInBytes}
-                );
-            }
-        );
+        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
+            commandBuffer.copyBuffer(
+                stage.first, m_buffer, vk::BufferCopy{0u, 0u, createInfo.sizeInBytes}
+            );
+        });
         // Destroy the temporary stage
         allocator().destroyBuffer(stage.first, stage.second);
     } else { // Stage is not required
-        std::tie(m_buffer, m_allocation) = createBufferAndAllocation(
-            createInfo, pointerToMapped
-        );
+        std::tie(m_buffer, m_allocation) = allocateBuffer(createInfo, pointerToMapped);
     }
 }
 
@@ -74,20 +67,15 @@ Buffer::~Buffer() {
     deletionQueue().enqueueDeletion(m_allocation);
 }
 
-std::pair<vk::Buffer, vma::Allocation> Buffer::createBufferAndAllocation(
+std::pair<vk::Buffer, vma::Allocation> Buffer::allocateBuffer(
     const BufferCreateInfo& createInfo, void** pointerToMapped
 ) const {
     vma::AllocationInfo  allocInfo;
     vk::BufferCreateInfo bufCreateInfo{
-        {},
-        createInfo.sizeInBytes,
-        createInfo.usage,
-        vk::SharingMode::eExclusive};
+        {}, createInfo.sizeInBytes, createInfo.usage, vk::SharingMode::eExclusive};
     vma::AllocationCreateInfo allocCreateInfo{
         createInfo.allocFlags, createInfo.memoryUsage};
-    auto pair = allocator().createBuffer(
-        bufCreateInfo, allocCreateInfo, allocInfo
-    );
+    auto pair = allocator().createBuffer(bufCreateInfo, allocCreateInfo, allocInfo);
     if (pointerToMapped) {
         *pointerToMapped = allocInfo.pMappedData;
     }

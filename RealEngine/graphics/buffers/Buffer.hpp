@@ -56,9 +56,7 @@ protected:
      */
     Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped);
 
-    using BufferAndAllocation = std::pair<vk::Buffer, vma::Allocation>;
-
-    BufferAndAllocation createBufferAndAllocation(
+    std::pair<vk::Buffer, vma::Allocation> allocateBuffer(
         const BufferCreateInfo& createInfo, void** pointerToMapped
     ) const;
 

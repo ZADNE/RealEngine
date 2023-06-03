@@ -9,9 +9,9 @@
 #include <vma/vk_mem_alloc.hpp>
 #include <vulkan/vulkan_raii.hpp>
 
+#include <RealEngine/graphics/PerFrameInFlight.hpp>
 #include <RealEngine/renderer/Allocator.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
-#include <RealEngine/graphics/PerFrameInFlight.hpp>
 
 struct SDL_Window;
 
@@ -19,9 +19,7 @@ namespace re {
 
 /**
  * @brief Enforces use of Vulkan graphics backend.
- *
- * This is used internally when the RealEngine starts.
- *
+ * @details This is used internally when the RealEngine starts.
  * @warning Never use this class directly!
  */
 class VulkanFixture {
@@ -40,9 +38,7 @@ public:
 
     ~VulkanFixture();
 
-    const vk::CommandBuffer& prepareFrame(
-        const glm::vec4& clearColor, bool useImGui
-    );
+    const vk::CommandBuffer& prepareFrame(const glm::vec4& clearColor, bool useImGui);
     void finishFrame(bool useImGui);
 
     void changePresentation(bool vSync);

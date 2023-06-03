@@ -48,10 +48,9 @@ private:
     static inline const vk::RenderPass*     s_renderPass        = nullptr;
     static inline const vk::CommandPool*    s_commandPool       = nullptr;
     static inline const vk::CommandBuffer*  s_commandBuffer     = nullptr;
-    static inline const vk::CommandBuffer*  s_oneTimeSubmitCommandBuffer =
-        nullptr;
+    static inline const vk::CommandBuffer* s_oneTimeSubmitCommandBuffer = nullptr;
     static inline const vk::DescriptorPool* s_descriptorPool = nullptr;
-    static inline DeletionQueue*      s_deletionQueue  = nullptr;
+    static inline DeletionQueue*            s_deletionQueue  = nullptr;
 };
 
 } // namespace re

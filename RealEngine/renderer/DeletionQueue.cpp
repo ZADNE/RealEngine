@@ -8,9 +8,7 @@
 
 namespace re {
 
-DeletionQueue::DeletionQueue(
-    const vk::Device& device, const vma::Allocator& allocator
-)
+DeletionQueue::DeletionQueue(const vk::Device& device, const vma::Allocator& allocator)
     : m_device(device)
     , m_allocator(allocator) {
 }
@@ -22,9 +20,7 @@ DeletionQueue::~DeletionQueue() {
 }
 
 void DeletionQueue::beginNewGroup() {
-    m_queue.emplace(
-        QueueRecord::Category::Separator, vk::ObjectType::eUnknown, nullptr
-    );
+    m_queue.emplace(QueueRecord::Category::Separator, vk::ObjectType::eUnknown, nullptr);
 }
 
 bool DeletionQueue::deleteNextGroup() {
@@ -37,8 +33,7 @@ bool DeletionQueue::deleteNextGroup() {
             deleteVulkanHandle(front.type, front.handle);
             break;
         case QueueRecord::Category::VmaAllocation:
-            m_allocator.freeMemory(reinterpret_cast<VmaAllocation>(front.handle)
-            );
+            m_allocator.freeMemory(reinterpret_cast<VmaAllocation>(front.handle));
             break;
         default: break;
         }

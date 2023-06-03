@@ -66,9 +66,9 @@ VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync)
     , m_swapChainFramebuffers(createSwapchainFramebuffers())
     , m_commandPool(createCommandPool())
     , m_commandBuffers(createCommandBuffers())
-    , m_oneTimeSubmitCommandBuffer(std::move(vk::raii::CommandBuffers{
-          m_device,
-          {*m_commandPool, ePrimary, 1u}}.back()))
+    , m_oneTimeSubmitCommandBuffer(std::move(
+          vk::raii::CommandBuffers{m_device, {*m_commandPool, ePrimary, 1u}}.back()
+      ))
     , m_pipelineCache(createPipelineCache())
     , m_descriptorPool(createDescriptorPool())
     , m_imageAvailableSems(createSemaphores())
@@ -113,8 +113,7 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
     const glm::vec4& clearColor, bool useImGui
 ) {
     // Wait for the previous frame to finish
-    checkSuccess(
-        m_device.waitForFences(*current(m_inFlightFences), true, k_maxTimeout)
+    checkSuccess(m_device.waitForFences(*current(m_inFlightFences), true, k_maxTimeout)
     );
 
     m_deletionQueue.deleteNextGroup();
@@ -130,13 +129,8 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
 
     // Acquire next image
     vk::AcquireNextImageInfoKHR acquireNextImageInfo{
-        *m_swapchain,
-        k_maxTimeout,
-        *current(m_imageAvailableSems),
-        nullptr,
-        1u};
-    auto [res, imageIndex] = m_device.acquireNextImage2KHR(acquireNextImageInfo
-    );
+        *m_swapchain, k_maxTimeout, *current(m_imageAvailableSems), nullptr, 1u};
+    auto [res, imageIndex] = m_device.acquireNextImage2KHR(acquireNextImageInfo);
     checkSuccess(res);
     m_imageIndex = imageIndex;
 
@@ -154,18 +148,14 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
     VulkanObject::s_commandBuffer = &(*commandBuffer);
 
     // Begin renderpass
-    const auto* clearColorPtr = reinterpret_cast<const std::array<float, 4u>*>(
-        &clearColor
-    );
-    vk::ClearValue          clearValue{vk::ClearColorValue{*clearColorPtr}};
+    vk::ClearValue          clearValue{vk::ClearColorValue{
+        clearColor.r, clearColor.g, clearColor.b, clearColor.a}};
     vk::RenderPassBeginInfo renderPassBeginInfo{
         *m_renderPass,
         *m_swapChainFramebuffers[m_imageIndex],
         vk::Rect2D{{}, m_swapchainExtent},
         clearValue};
-    commandBuffer.beginRenderPass(
-        renderPassBeginInfo, vk::SubpassContents::eInline
-    );
+    commandBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
 
     // Begin ImGui frame
     if (useImGui) {
@@ -179,19 +169,19 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
     commandBuffer.setViewport(
         0u,
         vk::Viewport{
-            0.0f,
-            extent.y, // X, Y
-            extent.x,
-            -extent.y, // Width, height
-            0.0f,
-            1.0f // MinDepth, MaxDepth
+            0.0f,      // x
+            extent.y,  // y
+            extent.x,  // width
+            -extent.y, // height
+            0.0f,      // minDepth
+            1.0f       // maxDepth
         }
     );
     commandBuffer.setScissor(
         0u,
         vk::Rect2D{
-            {0, 0},                                             // X, Y
-            {m_swapchainExtent.width, m_swapchainExtent.height} // Width, height
+            {0, 0},                                             // x, y
+            {m_swapchainExtent.width, m_swapchainExtent.height} // width, height
         }
     );
 
@@ -256,9 +246,7 @@ vk::raii::Instance VulkanFixture::createInstance() {
 
     // Add extensions required by SDL2
     unsigned int sdl2ExtensionCount;
-    if (!SDL_Vulkan_GetInstanceExtensions(
-            m_sdlWindow, &sdl2ExtensionCount, nullptr
-        )) {
+    if (!SDL_Vulkan_GetInstanceExtensions(m_sdlWindow, &sdl2ExtensionCount, nullptr)) {
         throw std::runtime_error(
             "Could not get number of Vulkan extensions required for SDL2!"
         );
@@ -266,9 +254,7 @@ vk::raii::Instance VulkanFixture::createInstance() {
     size_t defaultExtensionsCount = extensions.size();
     extensions.resize(defaultExtensionsCount + sdl2ExtensionCount);
     if (!SDL_Vulkan_GetInstanceExtensions(
-            m_sdlWindow,
-            &sdl2ExtensionCount,
-            &extensions[defaultExtensionsCount]
+            m_sdlWindow, &sdl2ExtensionCount, &extensions[defaultExtensionsCount]
         )) {
         throw std::runtime_error(
             "Could not get Vulkan extensions required for SDL2!"
@@ -287,11 +273,7 @@ vk::raii::Instance VulkanFixture::createInstance() {
     return vk::raii::Instance{
         m_context,
         vk::InstanceCreateInfo{
-            {},
-            &applicationInfo,
-            validationLayers,
-            extensions,
-            &debugMessengerCreateInfo}};
+            {}, &applicationInfo, validationLayers, extensions, &debugMessengerCreateInfo}};
 }
 
 vk::raii::DebugUtilsMessengerEXT VulkanFixture::createDebugUtilsMessenger() {
@@ -300,8 +282,7 @@ vk::raii::DebugUtilsMessengerEXT VulkanFixture::createDebugUtilsMessenger() {
         /*eVerbose | eInfo |*/ eWarning | eError,
         eGeneral | eValidation | ePerformance,
         &VulkanFixture::debugMessengerCallback};
-    return vk::raii::DebugUtilsMessengerEXT{
-        m_instance, debugMessengerCreateInfo};
+    return vk::raii::DebugUtilsMessengerEXT{m_instance, debugMessengerCreateInfo};
 }
 
 vk::raii::SurfaceKHR VulkanFixture::createSurface() {
@@ -337,25 +318,16 @@ vk::raii::Device VulkanFixture::createDevice() {
     float                                  deviceQueuePriority = 1.0f;
     std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos;
     deviceQueueCreateInfos.emplace_back(
-        vk::DeviceQueueCreateFlags{},
-        m_graphicsQueueFamilyIndex,
-        1,
-        &deviceQueuePriority
+        vk::DeviceQueueCreateFlags{}, m_graphicsQueueFamilyIndex, 1, &deviceQueuePriority
     );
     if (m_graphicsQueueFamilyIndex != m_presentationQueueFamilyIndex) {
         deviceQueueCreateInfos.emplace_back(
-            vk::DeviceQueueCreateFlags{},
-            m_presentationQueueFamilyIndex,
-            1,
-            &deviceQueuePriority
+            vk::DeviceQueueCreateFlags{}, m_presentationQueueFamilyIndex, 1, &deviceQueuePriority
         );
     }
     if (m_graphicsQueueFamilyIndex != m_computeQueueFamilyIndex) {
         deviceQueueCreateInfos.emplace_back(
-            vk::DeviceQueueCreateFlags{},
-            m_computeQueueFamilyIndex,
-            1,
-            &deviceQueuePriority
+            vk::DeviceQueueCreateFlags{}, m_computeQueueFamilyIndex, 1, &deviceQueuePriority
         );
     }
     vk::PhysicalDeviceFeatures baseFeatures{};
@@ -480,8 +452,7 @@ vk::raii::RenderPass VulkanFixture::createRenderPass() {
         vk::ImageLayout::eUndefined,      // Initial
         vk::ImageLayout::ePresentSrcKHR   // Final
     };
-    vk::AttachmentReference attachmentRef{
-        0, vk::ImageLayout::eColorAttachmentOptimal};
+    vk::AttachmentReference attachmentRef{0, vk::ImageLayout::eColorAttachmentOptimal};
     vk::SubpassDescription subpassDescription{
         {},
         vk::PipelineBindPoint::eGraphics,
@@ -491,10 +462,8 @@ vk::raii::RenderPass VulkanFixture::createRenderPass() {
     vk::SubpassDependency subpassDependency{
         VK_SUBPASS_EXTERNAL,                                 // Src subpass
         0u,                                                  // Dst subpass
-        {vk::PipelineStageFlagBits::eColorAttachmentOutput}, // Src stage
-                                                             // mask
-        {vk::PipelineStageFlagBits::eColorAttachmentOutput}, // Dst stage
-                                                             // mask
+        {vk::PipelineStageFlagBits::eColorAttachmentOutput}, // Src stage mask
+        {vk::PipelineStageFlagBits::eColorAttachmentOutput}, // Dst stage mask
         vk::AccessFlags{},                                   // Src access mask
         {vk::AccessFlagBits::eColorAttachmentWrite}          // Dst access mask
     };
@@ -503,15 +472,9 @@ vk::raii::RenderPass VulkanFixture::createRenderPass() {
     return vk::raii::RenderPass{m_device, createInfo};
 }
 
-std::vector<vk::raii::Framebuffer> VulkanFixture::createSwapchainFramebuffers(
-) {
+std::vector<vk::raii::Framebuffer> VulkanFixture::createSwapchainFramebuffers() {
     vk::FramebufferCreateInfo createInfo{
-        {},
-        *m_renderPass,
-        {},
-        m_swapchainExtent.width,
-        m_swapchainExtent.height,
-        1};
+        {}, *m_renderPass, {}, m_swapchainExtent.width, m_swapchainExtent.height, 1};
     std::vector<vk::raii::Framebuffer> vec;
     vec.reserve(m_swapchainImageViews.size());
     for (size_t i = 0; i < m_swapchainImageViews.size(); i++) {
@@ -528,8 +491,7 @@ vk::raii::CommandPool VulkanFixture::createCommandPool() {
     return vk::raii::CommandPool{m_device, createInfo};
 }
 
-PerFrameInFlight<vk::raii::CommandBuffer> VulkanFixture::createCommandBuffers(
-) {
+PerFrameInFlight<vk::raii::CommandBuffer> VulkanFixture::createCommandBuffers() {
     vk::CommandBufferAllocateInfo commandBufferAllocateInfo{
         *m_commandPool, ePrimary, k_maxFramesInFlight};
     vk::raii::CommandBuffers buffers{m_device, commandBufferAllocateInfo};
@@ -592,16 +554,14 @@ VkBool32 VulkanFixture::debugMessengerCallback(
     return false;
 }
 
-bool VulkanFixture::areExtensionsSupported(
-    const vk::raii::PhysicalDevice& physicalDevice
+bool VulkanFixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice
 ) {
     std::bitset<k_deviceExtensions.size()> supported{};
     for (const auto& extensionProperties :
          physicalDevice.enumerateDeviceExtensionProperties()) {
         for (size_t i = 0; i < k_deviceExtensions.size(); ++i) {
             if (std::strcmp(
-                    extensionProperties.extensionName.data(),
-                    k_deviceExtensions[i]
+                    extensionProperties.extensionName.data(), k_deviceExtensions[i]
                 ) == 0) {
                 supported[i] = true;
             }
@@ -610,8 +570,7 @@ bool VulkanFixture::areExtensionsSupported(
     return supported.all();
 }
 
-bool VulkanFixture::isSwapchainSupported(
-    const vk::raii::PhysicalDevice& physicalDevice
+bool VulkanFixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice
 ) {
     bool formatSupported = false;
     for (const auto& format : physicalDevice.getSurfaceFormatsKHR(*m_surface)) {
@@ -631,19 +590,16 @@ bool VulkanFixture::isSwapchainSupported(
     return formatSupported && mailboxSupported;
 }
 
-bool VulkanFixture::findQueueFamilyIndices(
-    const vk::raii::PhysicalDevice& physicalDevice
+bool VulkanFixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice
 ) {
     bool                                   graphicsQueueFound = false;
     bool                                   computeQueueFound  = false;
     bool                                   presentQueueFound  = false;
     std::vector<vk::QueueFamilyProperties> queueFamilyProperties =
         physicalDevice.getQueueFamilyProperties();
-    for (uint32_t i = 0;
-         i < static_cast<uint32_t>(queueFamilyProperties.size());
+    for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size());
          i++) { // Iterate over all queue families
-        if (queueFamilyProperties[i].queueFlags &
-            vk::QueueFlagBits::eGraphics) {
+        if (queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eGraphics) {
             m_graphicsQueueFamilyIndex = i;
             graphicsQueueFound         = true;
         }
@@ -676,8 +632,7 @@ void VulkanFixture::recreateSwapchain() {
 
 void VulkanFixture::recreateImGuiFontTexture() {
     vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
-    current(m_commandBuffers)
-        .begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+    current(m_commandBuffers).begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
     ImGui_ImplVulkan_CreateFontsTexture(*current(m_commandBuffers));
     current(m_commandBuffers).end();
     m_graphicsQueue.submit(
@@ -687,18 +642,17 @@ void VulkanFixture::recreateImGuiFontTexture() {
 }
 
 void VulkanFixture::assignImplementationReferences() {
-    VulkanObject::s_physicalDevice             = &(*m_physicalDevice);
-    VulkanObject::s_device                     = &(*m_device);
-    VulkanObject::s_allocator                  = &m_allocator;
-    VulkanObject::s_graphicsQueue              = &(*m_graphicsQueue);
-    VulkanObject::s_computeQueue               = &(*m_computeQueue);
-    VulkanObject::s_commandPool                = &(*m_commandPool);
-    VulkanObject::s_descriptorPool             = &(*m_descriptorPool);
-    VulkanObject::s_pipelineCache              = &(*m_pipelineCache);
-    VulkanObject::s_renderPass                 = &(*m_renderPass);
-    VulkanObject::s_oneTimeSubmitCommandBuffer = &(*m_oneTimeSubmitCommandBuffer
-    );
-    VulkanObject::s_deletionQueue              = &m_deletionQueue;
+    VulkanObject::s_physicalDevice = &(*m_physicalDevice);
+    VulkanObject::s_device         = &(*m_device);
+    VulkanObject::s_allocator      = &m_allocator;
+    VulkanObject::s_graphicsQueue  = &(*m_graphicsQueue);
+    VulkanObject::s_computeQueue   = &(*m_computeQueue);
+    VulkanObject::s_commandPool    = &(*m_commandPool);
+    VulkanObject::s_descriptorPool = &(*m_descriptorPool);
+    VulkanObject::s_pipelineCache  = &(*m_pipelineCache);
+    VulkanObject::s_renderPass     = &(*m_renderPass);
+    VulkanObject::s_oneTimeSubmitCommandBuffer = &(*m_oneTimeSubmitCommandBuffer);
+    VulkanObject::s_deletionQueue = &m_deletionQueue;
 }
 
 void VulkanFixture::clearImplementationReferences() {

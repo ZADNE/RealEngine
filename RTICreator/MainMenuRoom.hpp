@@ -4,10 +4,10 @@
 #pragma once
 #include <optional>
 
-#include <RealEngine/program/CommandLineArguments.hpp>
 #include <RealEngine/graphics/batches/GeometryBatch.hpp>
 #include <RealEngine/graphics/batches/SpriteBatch.hpp>
 #include <RealEngine/graphics/cameras/View2D.hpp>
+#include <RealEngine/program/CommandLineArguments.hpp>
 #include <RealEngine/rooms/Room.hpp>
 
 /**

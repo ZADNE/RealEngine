@@ -4,8 +4,6 @@
 #include <algorithm>
 #include <iostream>
 
-#include <RTICreator/MainMenuRoom.hpp>
-
 #if not defined(WIN32) && not defined(_WIN32) && not defined(__WIN32__)
 #    error \
         "Since this tool requires file selection dialog window and I did not want another library dependency, it is a Windows-only tool. Sorry!"
@@ -14,6 +12,10 @@
 #include <Windows.h>
 
 #include <RealEngine/utility/Error.hpp>
+
+#include <RTICreator/MainMenuRoom.hpp>
+
+using namespace ImGui;
 
 constexpr re::RoomDisplaySettings k_initialSettings{
     .clearColor           = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
@@ -30,7 +32,7 @@ MainMenuRoom::MainMenuRoom(re::CommandLineArguments args)
     m_lastVisitedLoc = args[0];
 
     if (args.size() > 1) {
-        // We have a second argument which should be the texture that should be
+        // We have a second argument which should be a texture that should be
         // loaded on start-up
         load(args[1]);
     }
@@ -78,40 +80,36 @@ void MainMenuRoom::render(
     }
 
     // Menu
-    if (ImGui::Begin("RTICreator v4.0.0", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        if (ImGui::BeginTabBar("##TabBar")) {
-            if (ImGui::BeginTabItem("File")) {
-                if (ImGui::Button("Load a texture"))
+    if (Begin("RTICreator v4.0.0", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        if (BeginTabBar("##TabBar")) {
+            if (BeginTabItem("File")) {
+                if (Button("Load a texture"))
                     selectAndLoad();
-                if (!m_textureLoc.empty() && ImGui::Button("Save the texture"))
+                if (!m_textureLoc.empty() && Button("Save the texture"))
                     save(m_textureLoc);
-                ImGui::EndTabItem();
+                EndTabItem();
             }
             if (m_texture) {
-                if (ImGui::BeginTabItem("Parameters")) {
+                if (BeginTabItem("Parameters")) {
                     parametersGUI();
-                    ImGui::EndTabItem();
+                    EndTabItem();
                 }
-                if (ImGui::BeginTabItem("View")) {
-                    ImGui::SliderFloat2(
-                        "Overlap (to see wrapping)", &m_overlap.x, 0.0f, 1.0f
-                    );
-                    if (ImGui::Button("Reset view"))
+                if (BeginTabItem("View")) {
+                    SliderFloat2("Overlap (to see wrapping)", &m_overlap.x, 0.0f, 1.0f);
+                    if (Button("Reset view"))
                         resetView();
-                    if (ImGui::ColorPicker3(
-                            "Background color", &m_backgroundColor.x
-                        )) {
+                    if (ColorPicker3("Background color", &m_backgroundColor.x)) {
                         auto ds       = displaySettings();
                         ds.clearColor = glm::vec4(m_backgroundColor, 1.0f);
                         setDisplaySettings(ds);
                     }
-                    ImGui::EndTabItem();
+                    EndTabItem();
                 }
             }
-            ImGui::EndTabBar();
+            EndTabBar();
         }
     }
-    ImGui::End();
+    End();
 }
 
 void MainMenuRoom::windowResizedCallback(
@@ -121,26 +119,26 @@ void MainMenuRoom::windowResizedCallback(
 }
 
 void MainMenuRoom::parametersGUI() {
-    if (ImGui::InputInt("Number of subimages", &m_subimagesSprites.x)) {
+    if (InputInt("Number of subimages", &m_subimagesSprites.x)) {
         m_texture->setSubimagesSpritesCount(m_subimagesSprites);
     }
-    if (ImGui::InputInt("Number of sprites", &m_subimagesSprites.y)) {
+    if (InputInt("Number of sprites", &m_subimagesSprites.y)) {
         m_texture->setSubimagesSpritesCount(m_subimagesSprites);
     }
-    if (ImGui::InputFloat2("Subimage dims", &m_subimageDims.x)) {
+    if (InputFloat2("Subimage dims", &m_subimageDims.x)) {
         m_texture->setSubimageDims(m_subimageDims);
     }
-    ImGui::SameLine();
-    if (ImGui::Button("Match")) {
+    SameLine();
+    if (Button("Match")) {
         m_subimageDims = static_cast<glm::vec2>(m_texture->trueDims()) /
                          m_texture->subimagesSpritesCount();
         m_texture->setSubimageDims(m_subimageDims);
     }
-    if (ImGui::InputFloat2("Pivot offset", &m_pivot.x)) {
+    if (InputFloat2("Pivot offset", &m_pivot.x)) {
         m_texture->setPivot(m_pivot);
     }
-    ImGui::SameLine();
-    if (ImGui::Button("Center")) {
+    SameLine();
+    if (Button("Center")) {
         m_pivot = m_subimageDims * 0.5f;
         m_texture->setPivot(m_pivot);
     }
@@ -234,23 +232,17 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
     // Pivots
     color                 = {0u, 0u, 255u, 255u};
     glm::vec2 pivotOffset = m_texture->pivot();
-    float pivotMarkRadius = glm::min(subimageDims.x, subimageDims.y) * 0.45f;
+    float     pivotRadius = glm::min(subimageDims.x, subimageDims.y) * 0.45f;
     for (float x = 0.0f; x < m_texture->subimagesSpritesCount().x; ++x) {
         for (float y = 0.0f; y < m_texture->subimagesSpritesCount().y; ++y) {
             glm::vec2 pivotPos = botLeft + glm::vec2(x, y) * subimageDims +
                                  pivotOffset;
+            vertices.emplace_back(pivotPos + glm::vec2(pivotRadius, pivotRadius), color);
             vertices.emplace_back(
-                pivotPos + glm::vec2(pivotMarkRadius, pivotMarkRadius), color
+                pivotPos + glm::vec2(-pivotRadius, -pivotRadius), color
             );
-            vertices.emplace_back(
-                pivotPos + glm::vec2(-pivotMarkRadius, -pivotMarkRadius), color
-            );
-            vertices.emplace_back(
-                pivotPos + glm::vec2(pivotMarkRadius, -pivotMarkRadius), color
-            );
-            vertices.emplace_back(
-                pivotPos + glm::vec2(-pivotMarkRadius, pivotMarkRadius), color
-            );
+            vertices.emplace_back(pivotPos + glm::vec2(pivotRadius, -pivotRadius), color);
+            vertices.emplace_back(pivotPos + glm::vec2(-pivotRadius, pivotRadius), color);
         }
     }
 
