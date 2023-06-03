@@ -9,9 +9,9 @@
 
 namespace re {
 
-extern const int& framesInFlight;
-extern const int& currentFrame;
-extern const int& nextFrame;
+extern const int& g_framesInFlight;
+extern const int& g_currentFrame;
+extern const int& g_nextFrame;
 
 void setFramesInFlight(int framesInFLight);
 void setFrame(int totalFrame);
@@ -22,7 +22,7 @@ using PerFrameInFlight = std::array<T, k_maxFramesInFlight>;
 
 template<typename T>
 T& current(PerFrameInFlight<T>& perFrameInFlight) {
-    return perFrameInFlight[currentFrame];
+    return perFrameInFlight[g_currentFrame];
 }
 
 } // namespace re

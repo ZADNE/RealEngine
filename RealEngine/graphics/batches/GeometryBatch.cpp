@@ -34,7 +34,7 @@ GeometryBatch::GeometryBatch(
 }
 
 void GeometryBatch::begin() {
-    m_nextVertexIndex = m_maxVertices * nextFrame;
+    m_nextVertexIndex = m_maxVertices * g_nextFrame;
 }
 
 void GeometryBatch::end() {
@@ -56,7 +56,12 @@ void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4
     commandBuffer.pushConstants<glm::mat4>(
         *m_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0u, mvpMat
     );
-    commandBuffer.draw(m_nextVertexIndex - m_maxVertices * nextFrame, 1u, 0u, 0u);
+    commandBuffer.draw(
+        m_nextVertexIndex - m_maxVertices * g_nextFrame,
+        1u,
+        m_maxVertices * g_nextFrame,
+        0u
+    );
 }
 
 vk::PipelineVertexInputStateCreateInfo GeometryBatch::createVertexInputStateInfo() const {

@@ -27,8 +27,8 @@ SpriteBatch::SpriteBatch(unsigned int maxSprites, unsigned int maxTextures)
 }
 
 void SpriteBatch::clearAndBeginFirstBatch() {
-    m_nextSpriteIndex  = m_maxSprites * nextFrame;
-    m_nextTextureIndex = m_maxTextures * nextFrame;
+    m_nextSpriteIndex  = m_maxSprites * g_nextFrame;
+    m_nextTextureIndex = m_maxTextures * g_nextFrame;
     m_texToIndex.clear();
     nextBatch();
 }

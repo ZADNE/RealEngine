@@ -5,21 +5,21 @@
 
 namespace re {
 
-int g_framesInFlight;
-int g_currentFrame;
-int g_nextFrame;
+int g_framesInFlightVar;
+int g_currentFrameVar;
+int g_nextFrameVar;
 
-const int& framesInFlight = g_framesInFlight;
-const int& currentFrame   = g_currentFrame;
-const int& nextFrame      = g_nextFrame;
+const int& g_framesInFlight = g_framesInFlightVar;
+const int& g_currentFrame   = g_currentFrameVar;
+const int& g_nextFrame      = g_nextFrameVar;
 
 void setFramesInFlight(int framesInFLight) {
-    g_framesInFlight = framesInFLight;
+    g_framesInFlightVar = framesInFLight;
 }
 
 void setFrame(int totalFrame) {
-    g_currentFrame = totalFrame % framesInFlight;
-    g_nextFrame    = (totalFrame + 1) % framesInFlight;
+    g_currentFrameVar = totalFrame % g_framesInFlight;
+    g_nextFrameVar    = (totalFrame + 1) % g_framesInFlight;
 }
 
 } // namespace re
