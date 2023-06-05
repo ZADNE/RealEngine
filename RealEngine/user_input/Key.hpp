@@ -1,4 +1,4 @@
-﻿/*! 
+﻿/*!
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -6,17 +6,18 @@
 
 #include <SDL2/SDL_keycode.h>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Every input (mouse/keyboard) key that can used.
-*/
+ */
 enum class Key {
+    // Special constants
     NoKey,
     AnyKey,
     KeyUnbound,
     UnknownKey,
-
+    // Control keys
     Backspace,
     Tab,
     Return,
@@ -27,7 +28,7 @@ enum class Key {
     Minus,
     Period,
     Slash,
-    //Numbers above normal letters
+    // Numbers above normal letters
     K0,
     K1,
     K2,
@@ -44,7 +45,7 @@ enum class Key {
     LeftBracket,
     Backslash,
     RightBracket,
-    //Letters
+    // Letters
     A,
     B,
     C,
@@ -72,7 +73,7 @@ enum class Key {
     Y,
     Z,
     Delete,
-    //Numpad
+    // Numpad
     Numpad0,
     Numpad1,
     Numpad2,
@@ -99,7 +100,7 @@ enum class Key {
     End,
     PageUp,
     PageDown,
-    //Function keys
+    // Function keys
     F1,
     F2,
     F3,
@@ -126,7 +127,7 @@ enum class Key {
     SysRq,
     Menu,
     Power,
-    //Mouse buttons
+    // Mouse buttons
     LMB,
     MMB,
     RMB,
@@ -144,4 +145,4 @@ std::string_view keyToString(Key key);
 
 Key stringToKey(const std::string& string);
 
-}
+} // namespace re

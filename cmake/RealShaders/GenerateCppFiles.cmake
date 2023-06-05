@@ -2,13 +2,13 @@
 
 function(RealShaders_GenerateCppFiles target scope path_rel)
     #Resolve Cpp namespace
-    get_property(cpp_namespace_start TARGET ${target} PROPERTY SHADERS_CXX_NAMESPACE)
-    if ("${cpp_namespace_start}" STREQUAL "")
+    get_property(cpp_namespace TARGET ${target} PROPERTY SHADERS_CXX_NAMESPACE)
+    if ("${cpp_namespace}" STREQUAL "")
         set(cpp_namespace_start "\n")
         set(cpp_namespace_end "\n")
     else()
-        set(cpp_namespace_start "namespace ${cpp_namespace_start} {\n\n")
-        set(cpp_namespace_end "\n}\n")
+        set(cpp_namespace_start "namespace ${cpp_namespace} {\n\n")
+        set(cpp_namespace_end "\n} // namespace ${cpp_namespace}\n")
     endif()
 
     string(CONCAT cpp_preamble
@@ -16,7 +16,7 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
     string(CONCAT hpp_preamble
         "//Automatically generated file by RealShaders\n"
         "#pragma once\n"
-        "#include <RealEngine/rendering/pipelines/PipelineSources.hpp>\n\n"
+        "#include <RealEngine/graphics/pipelines/PipelineSources.hpp>\n\n"
         ${cpp_namespace_start})
 
     string(CONCAT folder_hpp
@@ -28,7 +28,7 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
         if (${shader_ext} IN_LIST stage_exts)
             #Compose declarations for the C++ constant
             string(REPLACE "." "_" shader_ ${shader})
-            set(shader_declaration_line "extern RE::ShaderSource ${shader_}\;\n")
+            set(shader_declaration_line "extern re::ShaderSource ${shader_}\;\n")
             string(APPEND folder_hpp "${shader_declaration_line}")
             string(CONCAT shader_hpp
                 ${hpp_preamble}
@@ -50,7 +50,7 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
                 "//Disassembly file:\n"
                 "   #include <${path_rel}/${shader}.spv_vk13.txt>\n"
                 "#endif // 0 (navigation section)\n\n"
-                "RE::ShaderSource ${shader_}{\n"
+                "re::ShaderSource ${shader_}{\n"
                 "    .vk13 =\n"
                 "    #include <${path_rel}/${shader}.spv_vk13>\n"
                 "}\;\n"

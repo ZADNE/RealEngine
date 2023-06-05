@@ -1,6 +1,6 @@
-﻿add_subdirectory(program)
+﻿add_subdirectory(graphics)
+add_subdirectory(program)
 add_subdirectory(renderer)
-add_subdirectory(rendering)
 add_subdirectory(resources)
 add_subdirectory(rooms)
 add_subdirectory(user_input)

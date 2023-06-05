@@ -1,27 +1,27 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/utility/Error.hpp>
-
 #include <iostream>
 #include <string>
 
-namespace RE {
+#include <RealEngine/utility/Error.hpp>
 
-[[noreturn]]
-void fatalError(std::string_view error, int exitCode/* = EXIT_FAILURE*/) {
+namespace re {
+
+[[noreturn]] void fatalError(std::string_view error, int exitCode /* = EXIT_FAILURE*/) {
     std::cerr << error << std::endl;
     exit(EXIT_FAILURE);
 }
 
-void error(std::string_view error, bool appendEOL/* = true*/) {
+void error(std::string_view error, bool appendEOL /* = true*/) {
     std::cerr << error;
-    if (appendEOL) std::cerr << std::endl;
+    if (appendEOL)
+        std::cerr << std::endl;
 }
 
-void log(std::string_view message, bool appendEOL/* = true*/) {
+void log(std::string_view message, bool appendEOL /* = true*/) {
     std::cout << message;
-    if (appendEOL) std::cout << '\n';
+    if (appendEOL)
+        std::cout << '\n';
 }
-
-}
+} // namespace re

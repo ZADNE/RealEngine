@@ -3,12 +3,11 @@
  *  @file
  */
 #pragma once
-#include <stdlib.h>
-
 #include <stdexcept>
+#include <stdlib.h>
 #include <string_view>
 
-namespace RE {
+namespace re {
 
 /**
  * @brief Logs a fatal error and ends program immediately.
@@ -16,8 +15,7 @@ namespace RE {
  * @param exitCode Program's exit code
  * @note This function never returns.
  */
-[[noreturn]]
-void fatalError(std::string_view error, int exitCode = EXIT_FAILURE);
+[[noreturn]] void fatalError(std::string_view error, int exitCode = EXIT_FAILURE);
 
 /**
  * @brief Logs an error
@@ -35,18 +33,14 @@ void log(std::string_view message, bool appendEOL = true);
 
 /**
  * @brief Is the base class for exceptions thrown by RealEngine
-*/
+ */
 class Exception: public std::runtime_error {
 public:
+    Exception(const char* str)
+        : std::runtime_error(str) {}
 
-    Exception(const char* str):
-        std::runtime_error(str) {
-    }
-
-    Exception(const std::string& str):
-        std::runtime_error(str) {
-    }
+    Exception(const std::string& str)
+        : std::runtime_error(str) {}
 };
 
-
-}
+} // namespace re
