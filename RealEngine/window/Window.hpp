@@ -125,7 +125,7 @@ public:
     /**
      * @brief Gets current dimensions of the window
      */
-    glm::ivec2 dims() const { return m_dims; }
+    const glm::ivec2& dims() const { return m_dims; }
 
     /**
      * @brief       Sets the preferred renderer.

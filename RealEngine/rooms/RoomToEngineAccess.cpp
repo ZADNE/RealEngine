@@ -39,11 +39,11 @@ int RoomToEngineAccess::wasKeyReleased(Key keyID) const {
     return m_inputManager.wasReleased(keyID);
 }
 
-glm::ivec2 RoomToEngineAccess::cursorAbs() const {
+const glm::ivec2& RoomToEngineAccess::cursorAbs() const {
     return m_inputManager.cursorAbs();
 }
 
-glm::ivec2 RoomToEngineAccess::cursorRel() const {
+const glm::ivec2& RoomToEngineAccess::cursorRel() const {
     return m_inputManager.cursorRel();
 }
 
@@ -124,7 +124,7 @@ void RoomToEngineAccess::setWindowDims(const glm::ivec2& newDims, bool save) {
     m_roomManager.notifyRooms<&Room::windowResizedCallback>(oldDims, newDims);
 }
 
-glm::ivec2 RoomToEngineAccess::windowDims() const {
+const glm::ivec2& RoomToEngineAccess::windowDims() const {
     return m_window.dims();
 }
 

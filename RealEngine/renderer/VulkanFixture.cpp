@@ -557,12 +557,9 @@ VkBool32 VulkanFixture::debugMessengerCallback(
 bool VulkanFixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice
 ) {
     std::bitset<k_deviceExtensions.size()> supported{};
-    for (const auto& extensionProperties :
-         physicalDevice.enumerateDeviceExtensionProperties()) {
+    for (const auto& ext : physicalDevice.enumerateDeviceExtensionProperties()) {
         for (size_t i = 0; i < k_deviceExtensions.size(); ++i) {
-            if (std::strcmp(
-                    extensionProperties.extensionName.data(), k_deviceExtensions[i]
-                ) == 0) {
+            if (std::strcmp(ext.extensionName.data(), k_deviceExtensions[i]) == 0) {
                 supported[i] = true;
             }
         }
