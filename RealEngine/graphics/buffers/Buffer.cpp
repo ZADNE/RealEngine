@@ -16,16 +16,15 @@ using enum vma::MemoryUsage;
 constexpr auto k_hostAccess = eHostAccessRandom | eHostAccessSequentialWrite;
 
 Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
-    // If initial data are provided but data cannot be copied directly to the
-    // main buffer
-    if (createInfo.initData && !(createInfo.allocFlags & k_hostAccess)) {
+    // If initial data are provided but it cannot be copied directly to the main buffer
+    if (!createInfo.initData.empty() && !(createInfo.allocFlags & k_hostAccess)) {
         void* stageMapped = nullptr;
         // Create temporary stage buffer
         auto stage = allocateBuffer(
             BufferCreateInfo{
                 .allocFlags  = eHostAccessSequentialWrite | eMapped,
                 .memoryUsage = eAutoPreferHost,
-                .sizeInBytes = createInfo.sizeInBytes,
+                .sizeInBytes = createInfo.initData.size_bytes(),
                 .usage       = eTransferSrc},
             &stageMapped
         );
@@ -35,11 +34,15 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
         std::tie(m_buffer, m_allocation) =
             allocateBuffer(mainCreateInfo, pointerToMapped);
         // Copy data to staging buffer
-        std::memcpy(stageMapped, createInfo.initData, createInfo.sizeInBytes);
+        std::memcpy(
+            stageMapped, createInfo.initData.data(), createInfo.initData.size_bytes()
+        );
         // Copy from staging to main buffer
         CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
             commandBuffer.copyBuffer(
-                stage.first, m_buffer, vk::BufferCopy{0u, 0u, createInfo.sizeInBytes}
+                stage.first,
+                m_buffer,
+                vk::BufferCopy{0u, 0u, createInfo.initData.size_bytes()}
             );
         });
         // Destroy the temporary stage

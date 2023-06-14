@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <memory>
 #include <type_traits>
 #include <vector>
 
@@ -11,6 +12,14 @@
 namespace re {
 
 /**
+ * @brief Converts an object to span of bytes
+ */
+template<class T>
+std::span<const std::byte> objectToByteSpan(const T& t) {
+    return {reinterpret_cast<const std::byte*>(std::addressof(t)), sizeof(T)};
+}
+
+/**
  * @brief Specifies parameters for buffer creation
  */
 struct BufferCreateInfo {
@@ -18,9 +27,9 @@ struct BufferCreateInfo {
     vma::AllocationCreateFlags allocFlags  = {};
     vma::MemoryUsage           memoryUsage = vma::MemoryUsage::eAuto;
     // Buffer-related
-    vk::DeviceSize       sizeInBytes = 0;
-    vk::BufferUsageFlags usage       = {};
-    const void*          initData    = nullptr;
+    vk::DeviceSize             sizeInBytes = 0;
+    vk::BufferUsageFlags       usage       = {};
+    std::span<const std::byte> initData    = {};
 };
 
 /**
