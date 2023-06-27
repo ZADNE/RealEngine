@@ -39,7 +39,7 @@ public:
      * @brief Constructs Texture
      * @param createInfo Specifies parameters of the texture
      */
-    Texture(const TextureCreateInfo& createInfo);
+    explicit Texture(const TextureCreateInfo& createInfo);
 
     Texture(const Texture&)            = delete; /**< Noncopyable */
     Texture& operator=(const Texture&) = delete; /**< Noncopyable */

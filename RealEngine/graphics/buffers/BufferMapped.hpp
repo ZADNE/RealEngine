@@ -18,7 +18,7 @@ public:
      * @warning It is your job to unsure that the createInfo::allocFlags
      * contains flag eMapped
      */
-    BufferMapped(const BufferCreateInfo& createInfo)
+    explicit BufferMapped(const BufferCreateInfo& createInfo)
         : Buffer(createInfo, reinterpret_cast<void**>(&m_mapped)) {}
 
     const T& operator[](auto i) const { return m_mapped[i]; }

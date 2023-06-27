@@ -13,7 +13,7 @@ namespace re {
  */
 class CommandBuffer: public VulkanObject {
 public:
-    CommandBuffer(vk::CommandBufferLevel level);
+    explicit CommandBuffer(vk::CommandBufferLevel level);
 
     CommandBuffer(const CommandBuffer&)            = delete; /**< Noncopyable */
     CommandBuffer& operator=(const CommandBuffer&) = delete; /**< Noncopyable */

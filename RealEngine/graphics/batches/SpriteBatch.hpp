@@ -90,8 +90,7 @@ private:
     static Pipeline       createPipeline(
               const PipelineLayout& pipelineLayout, unsigned int maxTextures
           );
-
-    DescriptorSet m_descSet{m_pipelineLayout, 0u};
+    DescriptorSet m_descSet{m_pipelineLayout.descriptorSetLayout(0)};
 
     static inline constexpr Color k_white{255, 255, 255, 255};
 };

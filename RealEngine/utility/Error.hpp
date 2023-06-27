@@ -36,10 +36,10 @@ void log(std::string_view message, bool appendEOL = true);
  */
 class Exception: public std::runtime_error {
 public:
-    Exception(const char* str)
+    explicit Exception(const char* str)
         : std::runtime_error(str) {}
 
-    Exception(const std::string& str)
+    explicit Exception(const std::string& str)
         : std::runtime_error(str) {}
 };
 

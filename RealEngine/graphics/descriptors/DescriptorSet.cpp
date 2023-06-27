@@ -5,11 +5,10 @@
 
 namespace re {
 
-DescriptorSet::DescriptorSet(const PipelineLayout& pipelineLayout, uint32_t setIndex)
+DescriptorSet::DescriptorSet(const vk::DescriptorSetLayout& descSetLayout)
     : m_descriptorSet(device()
                           .allocateDescriptorSets(vk::DescriptorSetAllocateInfo{
-                              descriptorPool(),
-                              pipelineLayout.descriptorSetLayout(setIndex)})
+                              descriptorPool(), descSetLayout})
                           .back()) {
 }
 

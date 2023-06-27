@@ -130,7 +130,7 @@ private:
     /**
      * @brief Constructs the main program.
      */
-    MainProgram();
+    explicit MainProgram();
 
     /**
      * @brief Gets the singleton instance

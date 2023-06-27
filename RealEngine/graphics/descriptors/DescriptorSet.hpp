@@ -3,7 +3,6 @@
  */
 #pragma once
 #include <RealEngine/graphics/buffers/Buffer.hpp>
-#include <RealEngine/graphics/pipelines/PipelineLayout.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
 
@@ -16,10 +15,8 @@ class DescriptorSet: public VulkanObject {
 public:
     /**
      * @brief Constructs set for given layout
-     * @param pipelineLayout Array of set layouts to select from
-     * @param setIndex Index of the set layout within the pipeline layout
      */
-    DescriptorSet(const PipelineLayout& pipelineLayout, uint32_t setIndex);
+    explicit DescriptorSet(const vk::DescriptorSetLayout& descSetLayout);
 
     DescriptorSet(const DescriptorSet&)            = delete; /**< Noncopyable */
     DescriptorSet& operator=(const DescriptorSet&) = delete; /**< Noncopyable */

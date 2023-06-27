@@ -12,7 +12,7 @@ namespace re {
  */
 class Fence: public VulkanObject {
 public:
-    Fence(vk::FenceCreateFlags createFlags);
+    explicit Fence(vk::FenceCreateFlags createFlags);
 
     Fence(const Fence&)            = delete; /**< Noncopyable */
     Fence& operator=(const Fence&) = delete; /**< Noncopyable */

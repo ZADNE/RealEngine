@@ -38,7 +38,7 @@ public:
      * @details Shape of the texture is also loaded from the chunk,
      *          or if that cannot be done, default shape is used instead.
      */
-    TextureShaped(const std::string& filePathPNG)
+    explicit TextureShaped(const std::string& filePathPNG)
         : TextureShaped(PNGLoader::load(filePathPNG)) {}
 
     /**
@@ -46,7 +46,7 @@ public:
      * @details TextureSeed is converted to full path which is used to load the
      * texture
      */
-    TextureShaped(const TextureSeed& seed)
+    explicit TextureShaped(const TextureSeed& seed)
         : TextureShaped(seed.toFullPath()) {}
 
     TextureShaped(const TextureShaped&)            = delete; /**< Noncopyable */

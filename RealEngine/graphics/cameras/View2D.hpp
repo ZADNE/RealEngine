@@ -12,7 +12,7 @@ namespace re {
  */
 class View2D {
 public:
-    View2D(const glm::vec2& viewDimensions);
+    explicit View2D(const glm::vec2& viewDimensions);
 
     void setCursorAbs(const glm::vec2& cursorAbs);
 

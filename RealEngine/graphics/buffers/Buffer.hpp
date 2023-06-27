@@ -38,7 +38,7 @@ struct BufferCreateInfo {
  */
 class Buffer: public VulkanObject {
 public:
-    Buffer(const BufferCreateInfo& createInfo)
+    explicit Buffer(const BufferCreateInfo& createInfo)
         : Buffer(createInfo, nullptr) {}
 
     Buffer(const Buffer&)            = delete; /**< Noncopyable */
