@@ -14,17 +14,10 @@
 namespace re {
 
 /**
- * @brief Checks at runtime whether the system uses big endian
- * or little endian byte order.
- * @return True if the system is big endian, false otherwise
+ * @brief Checks at compile-time whether the system uses big endian byte order
  */
-bool isSystemBigEndian() {
-    union {
-        uint32_t i;
-        uint8_t  c[4];
-    } u = {0x01020304};
-
-    return (u.c[0] == 1);
+constexpr bool isSystemBigEndian() {
+    return (std::endian::native == std::endian::big);
 }
 
 /**
@@ -57,7 +50,7 @@ constexpr T reverseByteOrder(const T& val) {
  */
 template<typename T>
 constexpr T ntoh(const T& net) {
-    if (isSystemBigEndian()) { // Big endian
+    if constexpr (isSystemBigEndian()) { // Big endian
         return net;
     } else { // Little endian
         return reverseByteOrder(net);
@@ -67,12 +60,12 @@ constexpr T ntoh(const T& net) {
 /**
  * @brief Converts given value in host byte order to network byte order
  * @tparam T Any type
- * @param net Value in host byte order
+ * @param host Value in host byte order
  * @return Value in network byte order
  */
 template<typename T>
 constexpr T hton(const T& host) {
-    if (isSystemBigEndian()) { // Big endian
+    if constexpr (isSystemBigEndian()) { // Big endian
         return host;
     } else { // Little endian
         return reverseByteOrder(host);
@@ -89,7 +82,7 @@ constexpr T hton(const T& host) {
  */
 template<typename... Args>
 constexpr void ntohBulk(Args&... net) {
-    if (!isSystemBigEndian()) { // Little endian
+    if constexpr (!isSystemBigEndian()) { // Little endian
         (reverseByteOrder(net), ...);
     }
 }
@@ -104,7 +97,7 @@ constexpr void ntohBulk(Args&... net) {
  */
 template<typename... Args>
 constexpr void htonBulk(Args&... host) {
-    if (!isSystemBigEndian()) { // Little endian
+    if constexpr (!isSystemBigEndian()) { // Little endian
         (reverseByteOrder(host), ...);
     }
 }

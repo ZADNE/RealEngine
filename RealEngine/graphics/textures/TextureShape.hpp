@@ -23,13 +23,13 @@ struct TextureShape {
 
     /**
      * @brief   Dimensions of subimages
-     * @detail  All subimages have the same dimensions
+     * @details All subimages have the same dimensions
      */
     glm::vec2 subimageDims = glm::vec2{0.0f, 0.0f};
 
     /**
      * @brief   Pivot of the texture
-     * @detail  All subimages have the same pivot
+     * @details All subimages have the same pivot
      *          Pivot is the center point of the subimage for transformations
      * (such as rotation or scale)
      */
@@ -37,7 +37,7 @@ struct TextureShape {
 
     /**
      * @brief   Count of subimages and sprites
-     * @detail  All sprites have same number of subimages
+     * @details All sprites have same number of subimages
      *          Subimages placed along X axis form together a sprite.
      *          There can also be multiple sprites in single geometry so these
      * are placed under each other. In other words: x = number of subimages in

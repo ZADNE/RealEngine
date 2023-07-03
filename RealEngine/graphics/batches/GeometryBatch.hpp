@@ -28,38 +28,38 @@ public:
     );
 
     /**
-     * @brief Begins new batch
-     * @detail All vertices have to be added between begin() and end()
+     * @brief   Begins new batch
+     * @details All vertices have to be added between begin() and end()
      */
     void begin();
 
     /**
-     * @brief Ends the batch
-     * @detail All vertices have to be added between begin() and end()
+     * @brief   Ends the batch
+     * @details All vertices have to be added between begin() and end()
      */
     void end();
 
     /**
-     * @brief Adds vertices that will be rendered
-     * @detail Must be called between begin() and end().
+     * @brief   Adds vertices that will be rendered
+     * @details Must be called between begin() and end().
      */
-    void addVertices(uint32_t first, uint32_t count, const VertexPOCO* data);
+    void addVertices(uint32_t first, uint32_t count, const VertexPoCo* data);
 
     template<size_t size>
-    void addVertices(const std::array<VertexPOCO, size>& vertices) {
+    void addVertices(const std::array<VertexPoCo, size>& vertices) {
         addVertices(0u, size, vertices.data());
     }
 
     /**
-     * @brief Draws the batch
-     * @detail The whole geometry is drawn in the order it was added in
+     * @brief   Draws the batch
+     * @details The whole geometry is drawn in the order it was added in
      * @param commandBuffer Command buffer used for rendering
      * @param mvpMat Transformation matrix applied to the sprites
      */
     void draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat);
 
 private:
-    BufferMapped<VertexPOCO>               m_verticesBuf;
+    BufferMapped<VertexPoCo>               m_verticesBuf;
     uint32_t                               m_nextVertexIndex;
     uint32_t                               m_maxVertices;
     PipelineLayout                         m_pipelineLayout;

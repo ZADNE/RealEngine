@@ -18,7 +18,7 @@ namespace re {
 
 /**
  * @brief   Draws 2D sprites efficiently
- * @detail  Can draw multiple batches per frame.
+ * @details Can draw multiple batches per frame.
  *          Each batch has its own transformation matrix
  */
 class SpriteBatch {
@@ -32,21 +32,21 @@ public:
     SpriteBatch(unsigned int maxSprites, unsigned int maxTextures);
 
     /**
-     * @brief Resets the sprite batch, also begins first batch
-     * @detail Call this at the beginning of each frame.
+     * @brief   Resets the sprite batch, also begins first batch
+     * @details Call this at the beginning of each frame.
      */
     void clearAndBeginFirstBatch();
 
     /**
-     * @brief Begins new batch
-     * @detail There can be multiple batches in a frame, this function
-     * separates them
+     * @brief   Begins new batch
+     * @details There can be multiple batches in a frame, this function
+     *          separates them
      */
     void nextBatch();
 
     /**
-     * @brief Draws the last batch
-     * @detail Sprite in the batch are drawn in the order they were added in
+     * @brief   Draws the last batch
+     * @details Sprite in the batch are drawn in the order they were added in
      * @param commandBuffer Command buffer used for rendering
      * @param mvpMat Transformation matrix applied to the batch
      */

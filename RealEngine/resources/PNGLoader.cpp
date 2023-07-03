@@ -9,7 +9,11 @@
 
 namespace re {
 
-using RTI = std::array<unsigned char, sizeof(uint32_t) + sizeof(glm::vec2) * 3>;
+/**
+ * @brief Represents erialized version of texture shape
+ */
+using RealTextureInformation =
+    std::array<unsigned char, sizeof(uint32_t) + sizeof(glm::vec2) * 3>;
 
 TextureShape decodeTextureShape(const unsigned char* data, unsigned length) {
     TextureShape shape{};
@@ -35,8 +39,8 @@ TextureShape decodeTextureShape(const unsigned char* data, unsigned length) {
     return shape;
 }
 
-RTI encodeTextureShape(const TextureShape& shape) {
-    RTI rti{};
+RealTextureInformation encodeTextureShape(const TextureShape& shape) {
+    RealTextureInformation rti{};
     *reinterpret_cast<uint32_t*>(rti.data()) = hton<uint32_t>(0);
     float* v = reinterpret_cast<float*>(&rti[4]);
     int    i = 0;

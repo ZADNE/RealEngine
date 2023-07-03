@@ -209,7 +209,7 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
     m_sb.drawBatch(commandBuffer, m_texView.viewMatrix());
 
     m_gb.begin();
-    std::vector<re::VertexPOCO> vertices;
+    std::vector<re::VertexPoCo> vertices;
     glm::vec2 subimageSprite = m_texture->subimagesSpritesCount();
     vertices.reserve((size_t)(subimageSprite.x * subimageSprite.y) * 4u);
     re::Color color{0, 255u, 0u, 255u};

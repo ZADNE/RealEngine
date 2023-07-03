@@ -20,9 +20,9 @@ using Color = glm::vec<4, uint8_t, glm::qualifier::defaultp>;
 /**
  * @brief Is POD vertex with position
  */
-struct VertexPO {
-    VertexPO() {}
-    VertexPO(const glm::vec2& pos)
+struct VertexPo {
+    VertexPo() {}
+    VertexPo(const glm::vec2& pos)
         : position(pos) {}
 
     glm::vec2 position;
@@ -31,9 +31,9 @@ struct VertexPO {
 /**
  * @brief Is POD vertex with position and color
  */
-struct VertexPOCO {
-    VertexPOCO() {}
-    VertexPOCO(const glm::vec2& pos, Color col)
+struct VertexPoCo {
+    VertexPoCo() {}
+    VertexPoCo(const glm::vec2& pos, Color col)
         : position(pos)
         , color(col) {}
 
@@ -44,9 +44,9 @@ struct VertexPOCO {
 /**
  * @brief Is POD vertex with position, color and UVs
  */
-struct VertexPOCOUV {
-    VertexPOCOUV() {}
-    VertexPOCOUV(const glm::vec2& pos, Color col, const glm::vec2& uv)
+struct VertexPoCoUv {
+    VertexPoCoUv() {}
+    VertexPoCoUv(const glm::vec2& pos, Color col, const glm::vec2& uv)
         : position(pos)
         , color(col)
         , uv(uv) {}

@@ -16,7 +16,7 @@ GeometryBatch::GeometryBatch(
 )
     : m_verticesBuf(BufferCreateInfo{
           .allocFlags  = eMapped | eHostAccessSequentialWrite,
-          .sizeInBytes = sizeof(VertexPOCO) * maxVertices * k_maxFramesInFlight,
+          .sizeInBytes = sizeof(VertexPoCo) * maxVertices * k_maxFramesInFlight,
           .usage       = eVertexBuffer})
     , m_maxVertices(maxVertices)
     , m_pipelineLayout(
@@ -42,10 +42,10 @@ void GeometryBatch::end() {
 }
 
 void GeometryBatch::addVertices(
-    uint32_t first, uint32_t countVer, const VertexPOCO* data
+    uint32_t first, uint32_t countVer, const VertexPoCo* data
 ) {
     std::memcpy(
-        &m_verticesBuf[m_nextVertexIndex], &data[first], sizeof(VertexPOCO) * countVer
+        &m_verticesBuf[m_nextVertexIndex], &data[first], sizeof(VertexPoCo) * countVer
     );
     m_nextVertexIndex += countVer;
 }
@@ -68,7 +68,7 @@ vk::PipelineVertexInputStateCreateInfo GeometryBatch::createVertexInputStateInfo
     static constexpr std::array bindings =
         std::to_array<vk::VertexInputBindingDescription>({{
             0u,                          // Binding index
-            sizeof(VertexPOCO),          // Stride
+            sizeof(VertexPoCo),          // Stride
             vk::VertexInputRate::eVertex // Input rate
         }});
     static constexpr std::array attributes =
@@ -77,13 +77,13 @@ vk::PipelineVertexInputStateCreateInfo GeometryBatch::createVertexInputStateInfo
                  0u,                              // Location
                  0u,                              // Binding index
                  vk::Format::eR32G32B32A32Sfloat, // Format
-                 offsetof(VertexPOCO, position)   // Relative offset
+                 offsetof(VertexPoCo, position)   // Relative offset
              },
              {
                  1u,                         // Location
                  0u,                         // Binding index
                  vk::Format::eR8G8B8A8Unorm, // Format
-                 offsetof(VertexPOCO, color) // Relative offset
+                 offsetof(VertexPoCo, color) // Relative offset
              }}
         );
     return vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes};

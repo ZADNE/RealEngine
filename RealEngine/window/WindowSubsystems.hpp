@@ -25,6 +25,12 @@ constexpr int k_versionMinor = 0;
 constexpr int k_versionPatch = 0;
 
 /**
+ * @brief Is integer representation of RealEngine's version
+ */
+constexpr int k_version = k_versionMajor * 1'000'000 + k_versionMinor * 1'000 +
+                          k_versionPatch;
+
+/**
  * @brief Lists all renderers known to RealEngine
  *
  * The order also represents precedence when no specific renderer is
@@ -35,9 +41,7 @@ enum class RendererID {
     Any
 };
 
-std::string   to_string(RendererID r);
-constexpr int k_version = k_versionMajor * 1'000'000 + k_versionMinor * 1'000 +
-                          k_versionPatch;
+std::string to_string(RendererID r);
 
 /**
  * @brief Represents RealEngine's subsystems

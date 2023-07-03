@@ -20,14 +20,14 @@ namespace re {
 /**
  * @brief Logs an error
  * @param error The error message
- * @param newLine If true, end of line will be appended at the end of message.
+ * @param appendEOL If true, end of line will be appended at the end of message.
  */
 void error(std::string_view error, bool appendEOL = true);
 
 /**
  * @brief Logs a message
  * @param message The log message
- * @param newLine If true, end of line will be appended at the end of message.
+ * @param appendEOL If true, end of line will be appended at the end of message.
  */
 void log(std::string_view message, bool appendEOL = true);
 
