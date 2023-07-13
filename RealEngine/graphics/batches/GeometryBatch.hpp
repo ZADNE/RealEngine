@@ -2,6 +2,8 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <span>
+
 #include <glm/mat4x4.hpp>
 
 #include <RealEngine/graphics/buffers/BufferMapped.hpp>
@@ -43,12 +45,7 @@ public:
      * @brief   Adds vertices that will be rendered
      * @details Must be called between begin() and end().
      */
-    void addVertices(uint32_t first, uint32_t count, const VertexPoCo* data);
-
-    template<size_t size>
-    void addVertices(const std::array<VertexPoCo, size>& vertices) {
-        addVertices(0u, size, vertices.data());
-    }
+    void addVertices(std::span<const VertexPoCo> vertices);
 
     /**
      * @brief   Draws the batch

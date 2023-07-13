@@ -41,13 +41,13 @@ void GeometryBatch::end() {
     // Nothing to do :-)
 }
 
-void GeometryBatch::addVertices(
-    uint32_t first, uint32_t countVer, const VertexPoCo* data
-) {
+void GeometryBatch::addVertices(std::span<const VertexPoCo> vertices) {
     std::memcpy(
-        &m_verticesBuf[m_nextVertexIndex], &data[first], sizeof(VertexPoCo) * countVer
+        &m_verticesBuf[m_nextVertexIndex],
+        vertices.data(),
+        sizeof(VertexPoCo) * vertices.size()
     );
-    m_nextVertexIndex += countVer;
+    m_nextVertexIndex += vertices.size();
 }
 
 void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat) {
