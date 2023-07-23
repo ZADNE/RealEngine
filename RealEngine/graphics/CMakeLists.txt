@@ -8,5 +8,4 @@ add_subdirectory(textures)
 
 target_sources(RealEngine PRIVATE
     CommandBuffer.hpp           CommandBuffer.cpp
-    PerFrameInFlight.hpp        PerFrameInFlight.cpp
 )

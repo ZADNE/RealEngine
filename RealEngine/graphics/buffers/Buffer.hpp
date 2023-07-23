@@ -48,8 +48,7 @@ public:
     Buffer& operator=(Buffer&& other) noexcept; /**< Movable */
 
     /**
-     * @brief Frees the backing memory block on the GPU and destructs the
-     * buffer.
+     * @brief Frees the backing memory block on the GPU and destructs the buffer.
      */
     ~Buffer();
 

@@ -8,6 +8,7 @@
 #include <SDL2/SDL_events.h>
 #include <glm/common.hpp>
 
+#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 #include <RealEngine/program/MainProgram.hpp>
 #include <RealEngine/rooms/Room.hpp>
 
@@ -27,9 +28,7 @@ int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
         fatalError(std::string("C-string exception: ") + str);
     } catch (int i) {
         fatalError(std::string("int exception: ") + std::to_string(i));
-    } catch (...) {
-        fatalError("Unknown exception!");
-    }
+    } catch (...) { fatalError("Unknown exception!"); }
 }
 
 void MainProgram::scheduleExit(int exitcode /* = EXIT_SUCCESS*/) {
@@ -147,6 +146,7 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
 }
 
 void MainProgram::step() {
+    details::g_stepDoubleBufferingState.setTotalIndex(++m_stepN);
     m_roomManager.currentRoom()->step();
 }
 

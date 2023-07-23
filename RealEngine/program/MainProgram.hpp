@@ -162,6 +162,7 @@ private:
 
     bool m_programShouldRun = false;
     int  m_programExitCode  = EXIT_SUCCESS;
+    int  m_stepN            = 0;
 
     bool m_pollEventsInMainThread = true;
 

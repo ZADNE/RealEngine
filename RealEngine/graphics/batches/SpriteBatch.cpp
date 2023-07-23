@@ -5,9 +5,9 @@
 
 #include <glm/common.hpp>
 
-#include <RealEngine/graphics/PerFrameInFlight.hpp>
 #include <RealEngine/graphics/batches/SpriteBatch.hpp>
 #include <RealEngine/graphics/batches/shaders/AllShaders.hpp>
+#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 
 using enum vk::DescriptorBindingFlagBits;
 
@@ -27,8 +27,8 @@ SpriteBatch::SpriteBatch(unsigned int maxSprites, unsigned int maxTextures)
 }
 
 void SpriteBatch::clearAndBeginFirstBatch() {
-    m_nextSpriteIndex  = m_maxSprites * g_nextFrame;
-    m_nextTextureIndex = m_maxTextures * g_nextFrame;
+    m_nextSpriteIndex = m_maxSprites * g_frameDoubleBufferingState.writeIndex();
+    m_nextTextureIndex = m_maxTextures * g_frameDoubleBufferingState.writeIndex();
     m_texToIndex.clear();
     nextBatch();
 }

@@ -76,8 +76,7 @@ VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync)
     , m_inFlightFences(createFences()) {
     // Implementations
     assignImplementationReferences();
-    setFramesInFlight(2);
-    setFrame(m_frame++);
+    details::g_frameDoubleBufferingState.setTotalIndex(m_frame++);
     // Initialize ImGui
     if (!ImGui_ImplSDL2_InitForVulkan(m_sdlWindow)) {
         throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
@@ -113,7 +112,7 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
     const glm::vec4& clearColor, bool useImGui
 ) {
     // Wait for the previous frame to finish
-    checkSuccess(m_device.waitForFences(*current(m_inFlightFences), true, k_maxTimeout)
+    checkSuccess(m_device.waitForFences(*m_inFlightFences.write(), true, k_maxTimeout)
     );
 
     m_deletionQueue.deleteNextGroup();
@@ -125,11 +124,11 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
         m_recreteSwapchain = false;
     }
 
-    m_device.resetFences(*current(m_inFlightFences));
+    m_device.resetFences(*m_inFlightFences.write());
 
     // Acquire next image
     vk::AcquireNextImageInfoKHR acquireNextImageInfo{
-        *m_swapchain, k_maxTimeout, *current(m_imageAvailableSems), nullptr, 1u};
+        *m_swapchain, k_maxTimeout, *m_imageAvailableSems.write(), nullptr, 1u};
     auto [res, imageIndex] = m_device.acquireNextImage2KHR(acquireNextImageInfo);
     checkSuccess(res);
     m_imageIndex = imageIndex;
@@ -140,7 +139,7 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
     }
 
     // Restart command buffer
-    auto& commandBuffer = current(m_commandBuffers);
+    auto& commandBuffer = m_commandBuffers.write();
     commandBuffer.reset();
     commandBuffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 
@@ -189,7 +188,7 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
 }
 
 void VulkanFixture::finishFrame(bool useImGui) {
-    auto& commandBuffer = current(m_commandBuffers);
+    auto& commandBuffer = m_commandBuffers.write();
     if (useImGui) {
         ImGui::Render();
         ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *commandBuffer);
@@ -201,17 +200,17 @@ void VulkanFixture::finishFrame(bool useImGui) {
     vk::PipelineStageFlags waitDstStageMask =
         vk::PipelineStageFlagBits::eColorAttachmentOutput;
     vk::SubmitInfo submitInfo{
-        *current(m_imageAvailableSems), // Wait for image to be available
-        waitDstStageMask,               // Wait just before writing output
+        *m_imageAvailableSems.write(), // Wait for image to be available
+        waitDstStageMask,              // Wait just before writing output
         *commandBuffer,
-        *current(m_renderingFinishedSems) // Signal that the rendering has
-                                          // finished once done
+        *m_renderingFinishedSems.write() // Signal that the rendering has
+                                         // finished once done
     };
-    m_graphicsQueue.submit(submitInfo, *current(m_inFlightFences));
+    m_graphicsQueue.submit(submitInfo, *m_inFlightFences.write());
 
     // Present new image
     vk::PresentInfoKHR presentInfo{
-        *current(m_renderingFinishedSems), // Wait for rendering to finish
+        *m_renderingFinishedSems.write(), // Wait for rendering to finish
         *m_swapchain,
         m_imageIndex};
 
@@ -219,7 +218,7 @@ void VulkanFixture::finishFrame(bool useImGui) {
         checkSuccess(m_presentationQueue.presentKHR(presentInfo));
     } catch (vk::OutOfDateKHRError&) { recreateSwapchain(); }
 
-    setFrame(m_frame++);
+    details::g_frameDoubleBufferingState.setTotalIndex(m_frame++);
 }
 
 void VulkanFixture::changePresentation(bool vSync) {
@@ -491,23 +490,23 @@ vk::raii::CommandPool VulkanFixture::createCommandPool() {
     return vk::raii::CommandPool{m_device, createInfo};
 }
 
-PerFrameInFlight<vk::raii::CommandBuffer> VulkanFixture::createCommandBuffers() {
+FrameDoubleBuffered<vk::raii::CommandBuffer> VulkanFixture::createCommandBuffers() {
     vk::CommandBufferAllocateInfo commandBufferAllocateInfo{
         *m_commandPool, ePrimary, k_maxFramesInFlight};
     vk::raii::CommandBuffers buffers{m_device, commandBufferAllocateInfo};
     assert(buffers.size() == k_maxFramesInFlight);
-    return PerFrameInFlight<vk::raii::CommandBuffer>{
+    return FrameDoubleBuffered<vk::raii::CommandBuffer>{
         std::move(buffers[0]), std::move(buffers[1])};
 }
 
-PerFrameInFlight<vk::raii::Semaphore> VulkanFixture::createSemaphores() {
+FrameDoubleBuffered<vk::raii::Semaphore> VulkanFixture::createSemaphores() {
     vk::SemaphoreCreateInfo createInfo{};
     return {
         vk::raii::Semaphore{m_device, createInfo},
         vk::raii::Semaphore{m_device, createInfo}};
 }
 
-PerFrameInFlight<vk::raii::Fence> VulkanFixture::createFences() {
+FrameDoubleBuffered<vk::raii::Fence> VulkanFixture::createFences() {
     vk::FenceCreateInfo createInfo{vk::FenceCreateFlagBits::eSignaled};
     return {
         vk::raii::Fence{m_device, createInfo},
@@ -629,11 +628,11 @@ void VulkanFixture::recreateSwapchain() {
 
 void VulkanFixture::recreateImGuiFontTexture() {
     vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
-    current(m_commandBuffers).begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-    ImGui_ImplVulkan_CreateFontsTexture(*current(m_commandBuffers));
-    current(m_commandBuffers).end();
+    m_commandBuffers.write().begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+    ImGui_ImplVulkan_CreateFontsTexture(*m_commandBuffers.write());
+    m_commandBuffers.write().end();
     m_graphicsQueue.submit(
-        vk::SubmitInfo{{}, {}, *current(m_commandBuffers)}, *uploadFence
+        vk::SubmitInfo{{}, {}, *m_commandBuffers.write()}, *uploadFence
     );
     checkSuccess(m_device.waitForFences(*uploadFence, true, k_maxTimeout));
 }

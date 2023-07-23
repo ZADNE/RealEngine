@@ -1,9 +1,9 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/PerFrameInFlight.hpp>
 #include <RealEngine/graphics/batches/GeometryBatch.hpp>
 #include <RealEngine/graphics/batches/shaders/AllShaders.hpp>
+#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 
 namespace re {
 
@@ -34,7 +34,7 @@ GeometryBatch::GeometryBatch(
 }
 
 void GeometryBatch::begin() {
-    m_nextVertexIndex = m_maxVertices * g_nextFrame;
+    m_nextVertexIndex = m_maxVertices * g_frameDoubleBufferingState.writeIndex();
 }
 
 void GeometryBatch::end() {
@@ -57,9 +57,10 @@ void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4
         *m_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0u, mvpMat
     );
     commandBuffer.draw(
-        m_nextVertexIndex - m_maxVertices * g_nextFrame,
+        m_nextVertexIndex -
+            m_maxVertices * g_frameDoubleBufferingState.writeIndex(),
         1u,
-        m_maxVertices * g_nextFrame,
+        m_maxVertices * g_frameDoubleBufferingState.writeIndex(),
         0u
     );
 }
