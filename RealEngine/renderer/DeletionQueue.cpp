@@ -78,6 +78,9 @@ void DeletionQueue::deleteVulkanHandle(vk::ObjectType type, void* handle) {
     case vk::ObjectType::eSemaphore:
         m_device.destroy(reinterpret_cast<VkSemaphore>(handle));
         break;
+    case vk::ObjectType::eFramebuffer:
+        m_device.destroy(reinterpret_cast<VkSemaphore>(handle));
+        break;
     default: error("Unsupported object queued for deletion");
     }
 }

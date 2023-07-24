@@ -17,6 +17,12 @@ class VulkanObject {
     friend class VulkanFixture;
 
 protected:
+    /**
+     * @brief Concrete Vulkan objects (e.g. buffers, textures, pipelines) are
+     * supposed to derive from this
+     */
+    VulkanObject() { /* Protected constructor */ }
+
     static const vk::PhysicalDevice& physicalDevice() {
         return *s_physicalDevice;
     }
