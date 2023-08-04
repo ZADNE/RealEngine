@@ -1,11 +1,12 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/output/Framebuffer.hpp>
+#include <RealEngine/graphics/output_control/Framebuffer.hpp>
 
 namespace re {
 
-Framebuffer::Framebuffer() {
+Framebuffer::Framebuffer(const vk::FramebufferCreateInfo& createInfo)
+    : m_framebuffer(device().createFramebuffer(createInfo)) {
 }
 
 Framebuffer::Framebuffer(Framebuffer&& other) noexcept

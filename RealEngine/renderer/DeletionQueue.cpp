@@ -45,38 +45,41 @@ bool DeletionQueue::deleteNextGroup() {
 
 void DeletionQueue::deleteVulkanHandle(vk::ObjectType type, void* handle) {
     switch (type) {
-    case vk::ObjectType::eBuffer:
-        m_device.destroy(reinterpret_cast<VkBuffer>(handle));
-        break;
-    case vk::ObjectType::eBufferView:
-        m_device.destroy(reinterpret_cast<VkBufferView>(handle));
-        break;
-    case vk::ObjectType::eImage:
-        m_device.destroy(reinterpret_cast<VkImage>(handle));
-        break;
-    case vk::ObjectType::eImageView:
-        m_device.destroy(reinterpret_cast<VkImageView>(handle));
-        break;
-    case vk::ObjectType::eSampler:
-        m_device.destroy(reinterpret_cast<VkSampler>(handle));
-        break;
-    case vk::ObjectType::eDeviceMemory:
-        m_device.free(reinterpret_cast<VkDeviceMemory>(handle));
-        break;
-    case vk::ObjectType::eDescriptorSetLayout:
-        m_device.destroy(reinterpret_cast<VkDescriptorSetLayout>(handle));
-        break;
-    case vk::ObjectType::ePipeline:
-        m_device.destroy(reinterpret_cast<VkPipeline>(handle));
-        break;
-    case vk::ObjectType::ePipelineLayout:
-        m_device.destroy(reinterpret_cast<VkPipelineLayout>(handle));
+    case vk::ObjectType::eSemaphore:
+        m_device.destroy(reinterpret_cast<VkSemaphore>(handle));
         break;
     case vk::ObjectType::eFence:
         m_device.destroy(reinterpret_cast<VkFence>(handle));
         break;
-    case vk::ObjectType::eSemaphore:
-        m_device.destroy(reinterpret_cast<VkSemaphore>(handle));
+    case vk::ObjectType::eDeviceMemory:
+        m_device.free(reinterpret_cast<VkDeviceMemory>(handle));
+        break;
+    case vk::ObjectType::eBuffer:
+        m_device.destroy(reinterpret_cast<VkBuffer>(handle));
+        break;
+    case vk::ObjectType::eImage:
+        m_device.destroy(reinterpret_cast<VkImage>(handle));
+        break;
+    case vk::ObjectType::eBufferView:
+        m_device.destroy(reinterpret_cast<VkBufferView>(handle));
+        break;
+    case vk::ObjectType::eImageView:
+        m_device.destroy(reinterpret_cast<VkImageView>(handle));
+        break;
+    case vk::ObjectType::ePipelineLayout:
+        m_device.destroy(reinterpret_cast<VkPipelineLayout>(handle));
+        break;
+    case vk::ObjectType::eRenderPass:
+        m_device.destroy(reinterpret_cast<VkRenderPass>(handle));
+        break;
+    case vk::ObjectType::ePipeline:
+        m_device.destroy(reinterpret_cast<VkPipeline>(handle));
+        break;
+    case vk::ObjectType::eDescriptorSetLayout:
+        m_device.destroy(reinterpret_cast<VkDescriptorSetLayout>(handle));
+        break;
+    case vk::ObjectType::eSampler:
+        m_device.destroy(reinterpret_cast<VkSampler>(handle));
         break;
     case vk::ObjectType::eFramebuffer:
         m_device.destroy(reinterpret_cast<VkSemaphore>(handle));

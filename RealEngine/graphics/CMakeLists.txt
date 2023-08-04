@@ -2,7 +2,7 @@
 add_subdirectory(buffers)
 add_subdirectory(cameras)
 add_subdirectory(descriptors)
-add_subdirectory(output)
+add_subdirectory(output_control)
 add_subdirectory(pipelines)
 add_subdirectory(synchronization)
 add_subdirectory(textures)

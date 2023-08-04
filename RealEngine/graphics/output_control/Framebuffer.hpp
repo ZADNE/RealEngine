@@ -7,11 +7,12 @@
 namespace re {
 
 /**
- * @brief Allows drawing to a texture
+ * @brief Represents a collection of specific memory attachments,
+ * to be used by a RenderPass.
  */
 class Framebuffer: public VulkanObject {
 public:
-    explicit Framebuffer();
+    explicit Framebuffer(const vk::FramebufferCreateInfo& createInfo);
 
     Framebuffer(const Framebuffer&)            = delete; /**< Noncopyable */
     Framebuffer& operator=(const Framebuffer&) = delete; /**< Noncopyable */
