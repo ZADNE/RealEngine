@@ -226,7 +226,7 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
         vertices.emplace_back(coord + glm::vec2(texDims.x, 0.0f), color);
     }
     if (vertices.size() > 0u) {
-        m_gb.addVertices(0u, static_cast<uint32_t>(vertices.size()), vertices.data());
+        m_gb.addVertices(vertices);
         vertices.clear();
     }
     // Pivots
@@ -246,7 +246,7 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
         }
     }
 
-    m_gb.addVertices(0u, static_cast<uint32_t>(vertices.size()), vertices.data());
+    m_gb.addVertices(vertices);
     vertices.clear();
     // Whole image
     color = {255u, 0u, 0u, 255u};
@@ -258,7 +258,7 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
     vertices.emplace_back(botLeft + glm::vec2(0.0f, texDims.y), color);
     vertices.emplace_back(botLeft + glm::vec2(0.0f, texDims.y), color);
     vertices.emplace_back(botLeft, color);
-    m_gb.addVertices(0u, static_cast<uint32_t>(vertices.size()), vertices.data());
+    m_gb.addVertices(vertices);
 
     m_gb.end();
     m_gb.draw(commandBuffer, m_texView.viewMatrix());
