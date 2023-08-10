@@ -14,12 +14,12 @@ layout(location = 2) in         uint i_tex[];
 layout(location = 3) in         uint i_col[];
 
 void main() {
-    gl_TessLevelOuter[0] = 1.0f;
-    gl_TessLevelOuter[1] = 1.0f;
-    gl_TessLevelOuter[2] = 1.0f;
-    gl_TessLevelOuter[3] = 1.0f;
-    gl_TessLevelInner[0] = 0.0f;
-    gl_TessLevelInner[1] = 0.0f;
+    gl_TessLevelOuter[0] = 1.0;
+    gl_TessLevelOuter[1] = 1.0;
+    gl_TessLevelOuter[2] = 1.0;
+    gl_TessLevelOuter[3] = 1.0;
+    gl_TessLevelInner[0] = 0.0;
+    gl_TessLevelInner[1] = 0.0;
 
     o_pos = i_pos[gl_InvocationID];
     o_uvs = i_uvs[gl_InvocationID];

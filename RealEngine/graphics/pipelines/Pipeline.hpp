@@ -14,7 +14,10 @@ struct PipelineGraphicsCreateInfo {
     bool                   enablePrimitiveRestart = false;
     uint32_t               patchControlPoints     = 0;
     vk::SpecializationInfo specializationInfo{};
-    float                  lineWidth = 1.0f;
+    float                  lineWidth   = 1.0f;
+    bool                   enableBlend = true;
+    vk::RenderPass renderPass = nullptr; // The default renderpass is used if unspecified
+    uint32_t subpassIndex = 0;
 };
 
 struct PipelineComputeCreateInfo {

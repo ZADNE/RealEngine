@@ -4,8 +4,7 @@
 #pragma once
 #include <algorithm>
 #include <array>
-#include <climits>
-#include <cstdint>
+#include <bit>
 
 #if CHAR_BIT != 8
 #    error 8 bits per byte required

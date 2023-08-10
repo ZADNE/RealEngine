@@ -68,7 +68,7 @@ Pipeline::Pipeline(
     using enum vk::BlendOp;
     using enum vk::ColorComponentFlagBits;
     vk::PipelineColorBlendAttachmentState colorBlendAttachment{
-        true,              // Enable blending
+        createInfo.enableBlend,
         eSrcAlpha,         // Src color
         eOneMinusSrcAlpha, // Dst color
         eAdd,              // Color operation
@@ -105,8 +105,8 @@ Pipeline::Pipeline(
                     &colorBlend,
                     &dynamic,
                     createInfo.pipelineLayout,
-                    renderPass(),
-                    0u, // Subpass index
+                    createInfo.renderPass ? createInfo.renderPass : renderPass(),
+                    createInfo.subpassIndex,
                     nullptr,
                     -1 // No base pipeline
                 }

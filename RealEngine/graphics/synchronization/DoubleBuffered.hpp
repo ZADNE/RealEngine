@@ -76,6 +76,8 @@ public:
         }
     }
 
+    T& operator[](int i) { return m_ts[i]; }
+
 private:
     std::array<T, 2> m_ts;
 };

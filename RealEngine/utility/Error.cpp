@@ -24,4 +24,5 @@ void log(std::string_view message, bool appendEOL /* = true*/) {
     if (appendEOL)
         std::cout << '\n';
 }
+
 } // namespace re

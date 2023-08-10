@@ -38,8 +38,6 @@ Window::Window(const WindowSettings& settings, const std::string& title)
             fatalError("No renderer could be initialized!");
         }
     }
-
-    assert(m_usedRenderer != RendererID::Any);
 }
 
 Window::~Window() {
@@ -133,9 +131,9 @@ void Window::initForVulkan13() {
 
     // Set up Vulkan 1.3 fixture
     try {
-        new (&m_vk13) VulkanFixture(m_SDLwindow, (bool)m_flags.vSync);
+        new (&m_vk13) VulkanFixture{m_SDLwindow, (bool)m_flags.vSync};
     } catch (std::exception& e) {
-        std::cerr << e.what();
+        std::cerr << e.what() << '\n';
         goto fail_SDLWindow;
     }
 

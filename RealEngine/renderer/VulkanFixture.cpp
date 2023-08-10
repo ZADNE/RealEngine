@@ -147,14 +147,16 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
     VulkanObject::s_commandBuffer = &(*commandBuffer);
 
     // Begin renderpass
-    vk::ClearValue          clearValue{vk::ClearColorValue{
+    vk::ClearValue clearValue{vk::ClearColorValue{
         clearColor.r, clearColor.g, clearColor.b, clearColor.a}};
-    vk::RenderPassBeginInfo renderPassBeginInfo{
-        *m_renderPass,
-        *m_swapChainFramebuffers[m_imageIndex],
-        vk::Rect2D{{}, m_swapchainExtent},
-        clearValue};
-    commandBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+    commandBuffer.beginRenderPass2(
+        vk::RenderPassBeginInfo{
+            *m_renderPass,
+            *m_swapChainFramebuffers[m_imageIndex],
+            vk::Rect2D{{}, m_swapchainExtent},
+            clearValue},
+        vk::SubpassBeginInfo{vk::SubpassContents::eInline}
+    );
 
     // Begin ImGui frame
     if (useImGui) {
@@ -195,7 +197,7 @@ void VulkanFixture::finishFrame(bool useImGui) {
     }
 
     // Submit the command buffer
-    commandBuffer.endRenderPass();
+    commandBuffer.endRenderPass2(vk::SubpassEndInfo{});
     commandBuffer.end();
     vk::PipelineStageFlags waitDstStageMask =
         vk::PipelineStageFlagBits::eColorAttachmentOutput;
