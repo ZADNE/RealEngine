@@ -42,7 +42,8 @@ include("cmake/RealShaders/RealShaders.cmake")
         ImGui
         lodepng
     )
-    target_include_directories(RealEngine PUBLIC . external)
+    target_include_directories(RealEngine PUBLIC src external)
+    add_subdirectory(src)
 
     #Doxygen documentation
     find_package(Doxygen)
@@ -61,11 +62,8 @@ include("cmake/RealShaders/RealShaders.cmake")
     #RTICreator (Windows only)
     if(WIN32)
         add_executable(RTICreator)
-        target_include_directories(RTICreator PRIVATE .)
+        target_include_directories(RTICreator PRIVATE tools)
         set_target_properties(RTICreator PROPERTIES CXX_STANDARD 20)
         target_link_libraries(RTICreator PUBLIC RealEngine)
-        add_subdirectory(RTICreator)
+        add_subdirectory(tools)
     endif()
-
-#Add subdirectories
-    add_subdirectory(RealEngine)
