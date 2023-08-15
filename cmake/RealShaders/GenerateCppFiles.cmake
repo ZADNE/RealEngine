@@ -1,8 +1,8 @@
-#author     Dubsky Tomas
+# author    Dubsky Tomas
 
 function(RealShaders_GenerateCppFiles target scope path_rel)
     #Resolve Cpp namespace
-    get_property(cpp_namespace TARGET ${target} PROPERTY SHADERS_CXX_NAMESPACE)
+    get_property(cpp_namespace TARGET ${target} PROPERTY REALSHADERS_CXX_NAMESPACE)
     if ("${cpp_namespace}" STREQUAL "")
         set(cpp_namespace_start "\n")
         set(cpp_namespace_end "\n")
@@ -27,6 +27,7 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
         get_filename_component(shader_ext ${shader} LAST_EXT)
         if (${shader_ext} IN_LIST stage_exts)
             #Compose declarations for the C++ constant
+
             string(REPLACE "." "_" shader_ ${shader})
             set(shader_declaration_line "extern re::ShaderSource ${shader_}\;\n")
             string(APPEND folder_hpp "${shader_declaration_line}")
@@ -36,6 +37,7 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
                 ${cpp_namespace_end})
             file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.hpp" ${shader_hpp})
             #Compose definition for the constant
+
             set(shader_rel "${path_rel}/${shader}")
             string(CONCAT shader_cpp
                 ${cpp_preamble}
