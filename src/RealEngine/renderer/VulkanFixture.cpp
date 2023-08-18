@@ -331,9 +331,10 @@ vk::raii::Device VulkanFixture::createDevice() {
             vk::DeviceQueueCreateFlags{}, m_computeQueueFamilyIndex, 1, &deviceQueuePriority
         );
     }
-    vk::PhysicalDeviceFeatures baseFeatures{};
-    baseFeatures.setTessellationShader(true);
-    baseFeatures.setWideLines(true);
+    auto baseFeatures = vk::PhysicalDeviceFeatures{}
+                            .setTessellationShader(true)
+                            .setWideLines(true)
+                            .setVertexPipelineStoresAndAtomics(true);
     auto createInfo = vk::StructureChain{
         vk::DeviceCreateInfo{
             {}, deviceQueueCreateInfos, {}, k_deviceExtensions, &baseFeatures},
