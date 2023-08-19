@@ -13,43 +13,19 @@ namespace re {
  */
 constexpr int k_maxFramesInFlight = 2;
 
-class DoubleBufferingState {
-public:
-    DoubleBufferingState() {}
-
-    void setTotalIndex(int totalIndex) {
-        m_writeIndex = totalIndex % 2;
-        m_readIndex  = (totalIndex + 1) % 2;
-    }
-
-    int writeIndex() const { return m_writeIndex; }
-    int readIndex() const { return m_readIndex; }
-
-private:
-    int m_writeIndex = 0;
-    int m_readIndex  = 1;
+template<typename T>
+concept DoubleBufferingState = requires(T)
+{
+    { T::writeIndex() } -> std::convertible_to<int>;
+    { T::readIndex() } -> std::convertible_to<int>;
 };
-
-/**
- * @brief Represents current state for frame-wise double buffering
- * @note The state is updated automatically by RealEngine, do not update
- * it manually.
- */
-extern const DoubleBufferingState& g_frameDoubleBufferingState;
-
-/**
- * @brief Represents current state for step-wise double buffering
- * @note The state is updated automatically by RealEngine, do not update
- * it manually.
- */
-extern const DoubleBufferingState& g_stepDoubleBufferingState;
 
 /**
  * @brief Helps with managing double buffered objects
  */
-template<typename T, const DoubleBufferingState* state>
+template<typename T, DoubleBufferingState State>
 class DoubleBuffered {
-    template<class Tother, const DoubleBufferingState*>
+    template<class Tother, DoubleBufferingState>
     friend class DoubleBuffered;
 
 public:
@@ -57,8 +33,8 @@ public:
     DoubleBuffered(T&& first, T&& second)
         : m_ts{std::move(first), std::move(second)} {}
 
-    T&       write() { return m_ts[state->writeIndex()]; }
-    const T& read() const { return m_ts[state->readIndex()]; }
+    T&       write() { return m_ts[State::writeIndex()]; }
+    const T& read() const { return m_ts[State::readIndex()]; }
 
     void forEach(std::invocable<T&> auto func) {
         for (auto& t : m_ts) { func(t); }
@@ -67,7 +43,7 @@ public:
     template<typename Arg>
     void forEach(
         std::invocable<T&, const Arg&> auto func,
-        const DoubleBuffered<Arg, state>&   arg
+        const DoubleBuffered<Arg, State>&   arg
     ) {
         for (auto it = std::make_pair(m_ts.begin(), arg.m_ts.cbegin());
              it.first != m_ts.end();
@@ -82,21 +58,49 @@ private:
     std::array<T, 2> m_ts;
 };
 
+class FrameDoubleBufferingState {
+public:
+    // Updated internally by RealEngine
+    static void setTotalIndex(int totalIndex) {
+        s_writeIndex = totalIndex % 2;
+        s_readIndex  = (totalIndex + 1) % 2;
+    }
+
+    static int writeIndex() { return s_writeIndex; }
+    static int readIndex() { return s_readIndex; }
+
+private:
+    static inline int s_writeIndex = 0;
+    static inline int s_readIndex  = 1;
+};
+static_assert(DoubleBufferingState<FrameDoubleBufferingState>);
+class StepDoubleBufferingState {
+public:
+    // Updated internally by RealEngine
+    static void setTotalIndex(int totalIndex) {
+        s_writeIndex = totalIndex % 2;
+        s_readIndex  = (totalIndex + 1) % 2;
+    }
+
+    static int writeIndex() { return s_writeIndex; }
+    static int readIndex() { return s_readIndex; }
+
+private:
+    static inline int s_writeIndex = 0;
+    static inline int s_readIndex  = 1;
+};
+static_assert(DoubleBufferingState<StepDoubleBufferingState>);
+
 /**
  * @brief Represents frame-wise double buffered object
  */
 template<typename T>
-using FrameDoubleBuffered = DoubleBuffered<T, &g_frameDoubleBufferingState>;
+using FrameDoubleBuffered = DoubleBuffered<T, FrameDoubleBufferingState>;
 
 /**
  * @brief Represents step-wise double buffered object
  */
 template<typename T>
-using StepDoubleBuffered = DoubleBuffered<T, &g_stepDoubleBufferingState>;
-
-namespace details {
-extern DoubleBufferingState& g_frameDoubleBufferingState;
-extern DoubleBufferingState& g_stepDoubleBufferingState;
-} // namespace details
+using StepDoubleBuffered = DoubleBuffered<T, StepDoubleBufferingState>;
 
 } // namespace re

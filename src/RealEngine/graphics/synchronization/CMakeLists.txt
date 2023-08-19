@@ -1,5 +1,5 @@
 ﻿target_sources(RealEngine PRIVATE
-    DoubleBuffered.hpp          DoubleBuffered.cpp
+    DoubleBuffered.hpp          
     Fence.hpp                   Fence.cpp
     Semaphore.hpp               Semaphore.cpp
 )

@@ -76,7 +76,7 @@ VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync)
     , m_inFlightFences(createFences()) {
     // Implementations
     assignImplementationReferences();
-    details::g_frameDoubleBufferingState.setTotalIndex(m_frame++);
+    FrameDoubleBufferingState::setTotalIndex(m_frame++);
     // Initialize ImGui
     if (!ImGui_ImplSDL2_InitForVulkan(m_sdlWindow)) {
         throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
@@ -220,7 +220,7 @@ void VulkanFixture::finishFrame(bool useImGui) {
         checkSuccess(m_presentationQueue.presentKHR(presentInfo));
     } catch (vk::OutOfDateKHRError&) { recreateSwapchain(); }
 
-    details::g_frameDoubleBufferingState.setTotalIndex(m_frame++);
+    FrameDoubleBufferingState::setTotalIndex(m_frame++);
 }
 
 void VulkanFixture::changePresentation(bool vSync) {

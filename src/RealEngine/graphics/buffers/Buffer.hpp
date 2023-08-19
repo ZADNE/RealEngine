@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <span>
 #include <memory>
 #include <type_traits>
 #include <vector>

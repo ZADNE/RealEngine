@@ -6,10 +6,6 @@
 #include <array>
 #include <bit>
 
-#if CHAR_BIT != 8
-#    error 8 bits per byte required
-#endif // CHAR_BIT != 8
-
 namespace re {
 
 /**

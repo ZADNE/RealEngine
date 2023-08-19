@@ -34,7 +34,7 @@ GeometryBatch::GeometryBatch(
 }
 
 void GeometryBatch::begin() {
-    m_nextVertexIndex = m_maxVertices * g_frameDoubleBufferingState.writeIndex();
+    m_nextVertexIndex = m_maxVertices * FrameDoubleBufferingState::writeIndex();
 }
 
 void GeometryBatch::end() {
@@ -52,15 +52,15 @@ void GeometryBatch::addVertices(std::span<const VertexPoCo> vertices) {
 
 void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat) {
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
-    commandBuffer.bindVertexBuffers(0u, m_verticesBuf.buffer(), 0ull);
+    commandBuffer.bindVertexBuffers(0u, m_verticesBuf.buffer(), vk::DeviceSize{0});
     commandBuffer.pushConstants<glm::mat4>(
         *m_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0u, mvpMat
     );
     commandBuffer.draw(
         m_nextVertexIndex -
-            m_maxVertices * g_frameDoubleBufferingState.writeIndex(),
+            m_maxVertices * FrameDoubleBufferingState::writeIndex(),
         1u,
-        m_maxVertices * g_frameDoubleBufferingState.writeIndex(),
+        m_maxVertices * FrameDoubleBufferingState::writeIndex(),
         0u
     );
 }

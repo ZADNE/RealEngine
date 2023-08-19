@@ -27,8 +27,8 @@ SpriteBatch::SpriteBatch(unsigned int maxSprites, unsigned int maxTextures)
 }
 
 void SpriteBatch::clearAndBeginFirstBatch() {
-    m_nextSpriteIndex = m_maxSprites * g_frameDoubleBufferingState.writeIndex();
-    m_nextTextureIndex = m_maxTextures * g_frameDoubleBufferingState.writeIndex();
+    m_nextSpriteIndex = m_maxSprites * FrameDoubleBufferingState::writeIndex();
+    m_nextTextureIndex = m_maxTextures * FrameDoubleBufferingState::writeIndex();
     m_texToIndex.clear();
     nextBatch();
 }
@@ -44,7 +44,7 @@ void SpriteBatch::drawBatch(
     commandBuffer.bindDescriptorSets(
         vk::PipelineBindPoint::eGraphics, *m_pipelineLayout, 0u, *m_descSet, {}
     );
-    commandBuffer.bindVertexBuffers(0u, m_spritesBuf.buffer(), 0ull);
+    commandBuffer.bindVertexBuffers(0u, m_spritesBuf.buffer(), vk::DeviceSize{0});
     commandBuffer.pushConstants<glm::mat4>(
         *m_pipelineLayout, vk::ShaderStageFlagBits::eTessellationEvaluation, 0u, mvpMat
     );

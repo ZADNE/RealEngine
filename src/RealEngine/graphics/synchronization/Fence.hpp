@@ -2,6 +2,8 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <limits>
+
 #include <RealEngine/renderer/DeletionQueue.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
 
