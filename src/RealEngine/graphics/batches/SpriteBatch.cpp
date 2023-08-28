@@ -175,7 +175,7 @@ Pipeline SpriteBatch::createPipeline(
              }}
         );
     // Specialization constants
-    static constexpr vk::SpecializationMapEntry SPEC_MAP_ENTRY{0u, 0u, 4ull};
+    static constexpr vk::SpecializationMapEntry k_specMapEntry{0u, 0u, 4ull};
     unsigned int totalTextures = maxTextures * k_maxFramesInFlight;
     return Pipeline{
         PipelineGraphicsCreateInfo{
@@ -186,7 +186,7 @@ Pipeline SpriteBatch::createPipeline(
             .patchControlPoints = 1u,
             .specializationInfo =
                 vk::SpecializationInfo{
-                    1u, &SPEC_MAP_ENTRY, sizeof(totalTextures), &totalTextures}},
+                    1u, &k_specMapEntry, sizeof(totalTextures), &totalTextures}},
         PipelineGraphicsSources{
             .vert = sprite_vert,
             .tesc = sprite_tesc,
