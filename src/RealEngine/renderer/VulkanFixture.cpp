@@ -334,7 +334,8 @@ vk::raii::Device VulkanFixture::createDevice() {
     auto baseFeatures = vk::PhysicalDeviceFeatures{}
                             .setTessellationShader(true)
                             .setWideLines(true)
-                            .setVertexPipelineStoresAndAtomics(true);
+                            .setVertexPipelineStoresAndAtomics(true)
+                            .setFragmentStoresAndAtomics(true);
     auto createInfo = vk::StructureChain{
         vk::DeviceCreateInfo{
             {}, deviceQueueCreateInfos, {}, k_deviceExtensions, &baseFeatures},
