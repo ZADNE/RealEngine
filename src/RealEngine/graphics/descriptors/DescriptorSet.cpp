@@ -58,4 +58,17 @@ void DescriptorSet::write(
     );
 }
 
+void DescriptorSet::write(
+    vk::DescriptorType             type,
+    uint32_t                       binding,
+    uint32_t                       arrayIndex,
+    const vk::DescriptorImageInfo& imageInfo
+) {
+    device().updateDescriptorSets(
+        vk::WriteDescriptorSet{
+            m_descriptorSet, binding, arrayIndex, type, imageInfo, {}, {}},
+        {}
+    );
+}
+
 } // namespace re

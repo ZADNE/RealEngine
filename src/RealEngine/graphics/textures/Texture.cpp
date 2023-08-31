@@ -37,7 +37,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
     bool requiresStagingBuffer = !createInfo.texels.empty() &&
                                  !(createInfo.allocFlags & k_hostAccess);
     auto imageCreateInfo = vk::ImageCreateInfo{
-        {},
+        createInfo.flags,
         createInfo.type,
         createInfo.format,
         {createInfo.extent.x, createInfo.extent.y, createInfo.extent.z},
@@ -49,7 +49,8 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
             (requiresStagingBuffer ? eTransferDst : vk::ImageUsageFlagBits{}),
         vk::SharingMode::eExclusive,
         {},
-        eUndefined};
+        eUndefined,
+        createInfo.pNext};
     vma::AllocationCreateInfo allocCreateInfo{
         createInfo.allocFlags, createInfo.memoryUsage};
     // Create the image

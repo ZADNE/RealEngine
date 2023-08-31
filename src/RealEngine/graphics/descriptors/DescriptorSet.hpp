@@ -41,6 +41,12 @@ public:
         const Texture&     tex,
         vk::ImageLayout    layout
     );
+    void write(
+        vk::DescriptorType             type,
+        uint32_t                       binding,
+        uint32_t                       arrayIndex,
+        const vk::DescriptorImageInfo& imageInfo
+    );
 
     const vk::DescriptorSet& operator*() const { return m_descriptorSet; }
     const vk::DescriptorSet* operator->() const { return &m_descriptorSet; }

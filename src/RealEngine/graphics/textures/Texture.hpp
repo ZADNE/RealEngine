@@ -16,12 +16,14 @@ struct TextureCreateInfo {
     vma::AllocationCreateFlags allocFlags = {};
     vma::MemoryUsage memoryUsage          = vma::MemoryUsage::eAutoPreferDevice;
     // Image-related
-    vk::ImageType       type   = vk::ImageType::e2D;
-    vk::Format          format = vk::Format::eR8G8B8A8Unorm;
-    glm::uvec3          extent{};
-    uint32_t            layers        = 1u;
-    vk::ImageUsageFlags usage         = vk::ImageUsageFlagBits::eSampled;
-    vk::ImageLayout     initialLayout = vk::ImageLayout::eReadOnlyOptimal;
+    vk::ImageCreateFlags flags  = {};
+    vk::ImageType        type   = vk::ImageType::e2D;
+    vk::Format           format = vk::Format::eR8G8B8A8Unorm;
+    glm::uvec3           extent{};
+    uint32_t             layers        = 1u;
+    vk::ImageUsageFlags  usage         = vk::ImageUsageFlagBits::eSampled;
+    vk::ImageLayout      initialLayout = vk::ImageLayout::eReadOnlyOptimal;
+    const void*          pNext         = nullptr;
     // Sampler-related
     vk::Filter            magFilter  = vk::Filter::eNearest;
     vk::Filter            minFilter  = vk::Filter::eNearest;
