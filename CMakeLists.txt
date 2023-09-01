@@ -11,7 +11,7 @@ include("cmake/RealShaders/RealShaders.cmake")
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
     find_package(SDL2 REQUIRED)
     #SPIRV-Cross
-    FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/sdk-1.3.250.0.tar.gz)
+    FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/sdk-1.3.261.1.tar.gz)
     #OpenGL Mathematics
     FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/refs/tags/0.9.9.8.tar.gz)
     #nlohmann json
