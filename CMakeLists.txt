@@ -11,7 +11,7 @@ include("cmake/RealShaders/RealShaders.cmake")
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
     find_package(SDL2 REQUIRED)
     #SPIRV-Cross
-    FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/sdk-1.3.250.0.tar.gz)
+    FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/sdk-1.3.261.1.tar.gz)
     #OpenGL Mathematics
     FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/refs/tags/0.9.9.8.tar.gz)
     #nlohmann json
@@ -28,7 +28,7 @@ include("cmake/RealShaders/RealShaders.cmake")
     add_library_with_shaders(RealEngine STATIC)
     set_target_properties(RealEngine PROPERTIES
         CXX_STANDARD 20
-        SHADERS_CXX_NAMESPACE "re"
+        REALSHADERS_CXX_NAMESPACE "re"
     )
     target_link_libraries(RealEngine PUBLIC
         ${CMAKE_DL_LIBS}
@@ -42,7 +42,8 @@ include("cmake/RealShaders/RealShaders.cmake")
         ImGui
         lodepng
     )
-    target_include_directories(RealEngine PUBLIC . external)
+    target_include_directories(RealEngine PUBLIC src external)
+    add_subdirectory(src)
 
     #Doxygen documentation
     find_package(Doxygen)
@@ -61,11 +62,8 @@ include("cmake/RealShaders/RealShaders.cmake")
     #RTICreator (Windows only)
     if(WIN32)
         add_executable(RTICreator)
-        target_include_directories(RTICreator PRIVATE .)
+        target_include_directories(RTICreator PRIVATE tools)
         set_target_properties(RTICreator PROPERTIES CXX_STANDARD 20)
         target_link_libraries(RTICreator PUBLIC RealEngine)
-        add_subdirectory(RTICreator)
+        add_subdirectory(tools)
     endif()
-
-#Add subdirectories
-    add_subdirectory(RealEngine)

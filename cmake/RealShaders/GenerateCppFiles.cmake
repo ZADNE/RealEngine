@@ -1,8 +1,8 @@
-#author     Dubsky Tomas
+# author    Dubsky Tomas
 
 function(RealShaders_GenerateCppFiles target scope path_rel)
     #Resolve Cpp namespace
-    get_property(cpp_namespace TARGET ${target} PROPERTY SHADERS_CXX_NAMESPACE)
+    get_property(cpp_namespace TARGET ${target} PROPERTY REALSHADERS_CXX_NAMESPACE)
     if ("${cpp_namespace}" STREQUAL "")
         set(cpp_namespace_start "\n")
         set(cpp_namespace_end "\n")
@@ -26,17 +26,20 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
     foreach(shader IN LISTS ARGN)
         get_filename_component(shader_ext ${shader} LAST_EXT)
         if (${shader_ext} IN_LIST stage_exts)
-            #Compose declarations for the C++ constant
             string(REPLACE "." "_" shader_ ${shader})
             set(shader_declaration_line "extern re::ShaderSource ${shader_}\;\n")
             string(APPEND folder_hpp "${shader_declaration_line}")
+
+            # Create C++ header for the shader
             string(CONCAT shader_hpp
                 ${hpp_preamble}
                 "${shader_declaration_line}"
                 ${cpp_namespace_end})
-            file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.hpp" ${shader_hpp})
-            #Compose definition for the constant
-            set(shader_rel "${path_rel}/${shader}")
+            file(GENERATE
+                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.hpp"
+                CONTENT ${shader_hpp})
+            
+            # Create C++ source for the shader
             string(CONCAT shader_cpp
                 ${cpp_preamble}
                 "#include <${path_rel}/${shader_}.hpp>\n\n"
@@ -55,11 +58,16 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
                 "    #include <${path_rel}/${shader}.spv_vk13>\n"
                 "}\;\n"
                 ${cpp_namespace_end})
-            file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.cpp" ${shader_cpp})
-            target_sources(${target} ${scope} "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.cpp")
+            set(cpp_abs "${CMAKE_CURRENT_BINARY_DIR}/${shader_}.cpp")
+            file(GENERATE
+                OUTPUT ${cpp_abs}
+                CONTENT ${shader_cpp})
+            target_sources(${target} ${scope} ${cpp_abs})
         endif()
     endforeach()
-    
+
     string(APPEND folder_hpp ${cpp_namespace_end})
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/AllShaders.hpp" ${folder_hpp})
+    file(GENERATE
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/AllShaders.hpp"
+        CONTENT ${folder_hpp})
 endfunction()

@@ -2,6 +2,6 @@
 
 An engine-like library.
 
-Libraries that have to be installed:
- * [SDL2](https://www.libsdl.org/)
- * [GLEW](http://glew.sourceforge.net/)
+Requires the following libraries to be installed:
+- [SDL2](https://www.libsdl.org/)
+- [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/)

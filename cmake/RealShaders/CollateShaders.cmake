@@ -1,11 +1,12 @@
-#author     Dubsky Tomas
+# author    Dubsky Tomas
 
 function(RealShaders_CollateShaders target)
-    #Load target properties and prepare variables
-    get_property(shader_sources_rel TARGET ${target} PROPERTY SHADER_SOURCES_REL)
-    get_property(shader_sources_abs TARGET ${target} PROPERTY SHADER_SOURCES_ABS)
+    # Load target properties and prepare variables
+    get_property(shader_sources_rel TARGET ${target} PROPERTY REALSHADERS_SOURCES_REL)
+    get_property(shader_sources_abs TARGET ${target} PROPERTY REALSHADERS_SOURCES_ABS)
     set(shader_includes "$<TARGET_PROPERTY:${target},INCLUDE_DIRECTORIES>")
-    #Determine shader compilation flags
+
+    # Determine shader compilation flags
     if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
         set(glslc_flags "-O")
     elseif(${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
@@ -15,12 +16,15 @@ function(RealShaders_CollateShaders target)
     else()
         set(glslc_flags "-O0" "-g")
         if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-            message(WARNING "Configuting unknown configuration (not Release, Debug, RelWithDebInfo or MinSizeRel). GLSL will be compiled as Debug.")
+            message(WARNING "Configuting unknown configuration
+            (not Release, Debug, RelWithDebInfo or MinSizeRel). 
+            GLSL will be compiled as Debug.")
         endif()
     endif()
-    get_property(glsl_standard TARGET ${target} PROPERTY GLSL_STANDARD)
+    get_property(glsl_standard TARGET ${target} PROPERTY REALSHADERS_GLSL_STANDARD)
     list(APPEND glslc_flags "-std=${glsl_standard}")
-    #Collate the shaders
+
+    # Collate the shaders
     set(stage_exts ".vert;.tesc;.tese;.geom;.frag;.comp")
     foreach(shader_source IN ZIP_LISTS shader_sources_rel shader_sources_abs)
         set(shader_source_rel ${shader_source_0})
@@ -35,9 +39,11 @@ function(RealShaders_CollateShaders target)
             add_custom_command(
                 OUTPUT "${shader_bin_abs}_vk13" "${shader_bin_abs}_vk13.txt"
                 COMMAND ${Vulkan_GLSLC_EXECUTABLE} -MD -mfmt=c -MF ${shader_dep_abs} ${shader_source_abs}
-                        -o "${shader_bin_abs}_vk13" --target-env=vulkan1.2 ${glslc_flags} "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
+                        -o "${shader_bin_abs}_vk13" --target-env=vulkan1.2 ${glslc_flags}
+                        "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
                 COMMAND ${Vulkan_GLSLC_EXECUTABLE} -S ${shader_source_abs}
-                        -o "${shader_bin_abs}_vk13.txt" --target-env=vulkan1.2 ${glslc_flags} "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
+                        -o "${shader_bin_abs}_vk13.txt" --target-env=vulkan1.2 ${glslc_flags}
+                        "$<$<BOOL:${shader_includes}>:-I$<JOIN:${shader_includes},;-I>>"
                 DEPENDS ${shader_source_abs}
                 BYPRODUCTS ${shader_dep_abs}
                 COMMENT "Compiling shader: ${shader_source_rel}"
@@ -47,11 +53,20 @@ function(RealShaders_CollateShaders target)
             )
         endif()
     endforeach()
-    #Add custom target which compiles the shaders
+
+    # Add custom target which compiles the shaders
     set(shader_target "${target}_Shaders")
     add_custom_target(${shader_target} DEPENDS ${shader_bins_abs})
     add_dependencies(${target} ${shader_target})
-    #Additional include for compiled shaders
+
+    # Additional include directories for the compiled shaders
+    get_property(include_dirs TARGET ${target} PROPERTY INCLUDE_DIRECTORIES)
+    foreach(include_dir ${include_dirs})
+        file(RELATIVE_PATH path_rel ${CMAKE_CURRENT_SOURCE_DIR} ${include_dir})
+        target_include_directories(${target}
+            PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/${path_rel}
+        )
+    endforeach()
     target_include_directories(${target}
         PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
     )
