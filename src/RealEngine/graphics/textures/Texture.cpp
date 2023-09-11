@@ -194,8 +194,8 @@ void Texture::pipelineImageBarrier(
             dstAccess,
             oldLayout,
             newLayout,
-            VK_QUEUE_FAMILY_IGNORED, // Source queue family index
-            VK_QUEUE_FAMILY_IGNORED, // Dest queue family index
+            vk::QueueFamilyIgnored, // Source queue family index
+            vk::QueueFamilyIgnored, // Dest queue family index
             m_image,
             vk::ImageSubresourceRange{
                 vk::ImageAspectFlagBits::eColor,

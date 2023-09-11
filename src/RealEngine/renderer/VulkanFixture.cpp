@@ -99,6 +99,7 @@ VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync)
         ImGui_ImplSDL2_Shutdown();
         throw std::runtime_error{"Could not initialize ImGui for Vulkan!"};
     }
+
 }
 
 VulkanFixture::~VulkanFixture() {
@@ -264,7 +265,7 @@ vk::raii::Instance VulkanFixture::createInstance() {
 
     // Create Vulkan instance
     vk::ApplicationInfo applicationInfo(
-        "RealEngine", 1, "RealEngine", k_version, VK_API_VERSION_1_3
+        "RealEngine", 1, "RealEngine", k_version, vk::ApiVersion13
     );
     vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo{
         {},
@@ -302,9 +303,9 @@ vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice() {
             isSwapchainSupported(physicalDevice) &&
             findQueueFamilyIndices(physicalDevice)) {
             auto props = physicalDevice.getProperties2();
-            auto major = VK_API_VERSION_MAJOR(props.properties.apiVersion);
-            auto minor = VK_API_VERSION_MINOR(props.properties.apiVersion);
-            auto patch = VK_API_VERSION_PATCH(props.properties.apiVersion);
+            auto major = vk::versionMajor(props.properties.apiVersion);
+            auto minor = vk::versionMinor(props.properties.apiVersion);
+            auto patch = vk::versionPatch(props.properties.apiVersion);
             if (major == 1 && minor >= 3) {
                 std::cout << "Vulkan:       " << major << '.' << minor << '.'
                           << patch << std::endl;
@@ -362,7 +363,7 @@ vma::Allocator VulkanFixture::createAllocator() {
         nullptr, // No heap size limits
         nullptr, // Let VMA load Vulkan functions on its own
         *m_instance,
-        VK_API_VERSION_1_3,
+        vk::ApiVersion13,
         nullptr, // No external memory handles
     });
 }
@@ -463,7 +464,7 @@ vk::raii::RenderPass VulkanFixture::createRenderPass() {
         attachmentRef // Color attachments
     };
     vk::SubpassDependency subpassDependency{
-        VK_SUBPASS_EXTERNAL,                                 // Src subpass
+        vk::SubpassExternal,                                 // Src subpass
         0u,                                                  // Dst subpass
         {vk::PipelineStageFlagBits::eColorAttachmentOutput}, // Src stage mask
         {vk::PipelineStageFlagBits::eColorAttachmentOutput}, // Dst stage mask

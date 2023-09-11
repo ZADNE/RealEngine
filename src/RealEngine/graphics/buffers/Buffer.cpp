@@ -18,6 +18,7 @@ constexpr auto k_hostAccess = eHostAccessRandom | eHostAccessSequentialWrite;
 Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
     // If initial data are provided but it cannot be copied directly to the main buffer
     if (!createInfo.initData.empty() && !(createInfo.allocFlags & k_hostAccess)) {
+        assert(createInfo.sizeInBytes >= createInfo.initData.size_bytes());
         void* stageMapped = nullptr;
         // Create temporary stage buffer
         auto stage = allocateBuffer(
