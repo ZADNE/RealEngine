@@ -60,17 +60,17 @@ public:
     /**
      * @copydoc InputManager::isDown
      */
-    int isKeyDown(Key keyID) const;
+    int isKeyDown(Key key) const;
 
     /**
      * @copydoc InputManager::wasPressed
      */
-    int wasKeyPressed(Key keyID) const;
+    int wasKeyPressed(Key key) const;
 
     /**
      * @copydoc InputManager::wasReleased
      */
-    int wasKeyReleased(Key keyID) const;
+    int wasKeyReleased(Key key) const;
 
     /**
      * @copydoc InputManager::cursorAbs

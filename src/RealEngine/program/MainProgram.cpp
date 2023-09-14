@@ -39,7 +39,7 @@ void MainProgram::scheduleExit(int exitcode /* = EXIT_SUCCESS*/) {
 void MainProgram::pollEventsInMainThread(bool poll) {
     auto& mainProgram                    = instance();
     mainProgram.m_pollEventsInMainThread = poll;
-    mainProgram.m_inputManager.update();
+    mainProgram.m_inputManager.step();
 }
 
 std::vector<DisplayInfo> MainProgram::searchDisplays() const {
@@ -114,7 +114,7 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
         while (m_synchronizer.shouldStepHappen()) {
             // Check for user input
             if (m_pollEventsInMainThread) {
-                m_inputManager.update();
+                m_inputManager.step();
                 pollEvents();
             } else {
                 SDL_PumpEvents();
@@ -160,29 +160,25 @@ void MainProgram::processEvent(SDL_Event* evnt) {
     Key key = Key::UnknownKey;
     switch (evnt->type) {
     case SDL_KEYDOWN:
-        key = SDLKToREKey(evnt->key.keysym.sym);
+        key = toKey(evnt->key.keysym.sym);
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(Key::AnyKey);
             m_inputManager.press(key);
         }
         break;
     case SDL_KEYUP:
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(Key::AnyKey, -1);
-            m_inputManager.release(SDLKToREKey(evnt->key.keysym.sym));
+            m_inputManager.release(toKey(evnt->key.keysym.sym));
         }
         break;
     case SDL_MOUSEBUTTONDOWN:
         if (evnt->key.repeat == 0) {
-            auto key = SDLKToREKey(evnt->button.button);
-            m_inputManager.press(Key::AnyKey);
+            auto key = toKey(evnt->button.button);
             m_inputManager.press(key, evnt->button.clicks);
         }
         break;
     case SDL_MOUSEBUTTONUP:
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(Key::AnyKey, -1);
-            m_inputManager.release(SDLKToREKey(evnt->button.button));
+            m_inputManager.release(toKey(evnt->button.button));
         }
         break;
     case SDL_MOUSEMOTION:
@@ -220,7 +216,7 @@ void MainProgram::doRoomTransitionIfScheduled() {
         // Adopt the display settings of the entered room
         adoptRoomDisplaySettings(current->displaySettings());
         // Pressed/released events belong to the previous room
-        m_inputManager.update();
+        m_inputManager.step();
         // Ensure at least one step before the first frame is rendered
         step();
     }

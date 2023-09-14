@@ -109,7 +109,7 @@ public:
             auto binding = searchBindingEnum(item.key());
             if (binding.has_value()) {
                 m_bindings[static_cast<size_t>(*binding)] =
-                    stringToKey(item.value().get<std::string>());
+                    toKey(item.value().get<std::string>());
             }
         }
 
@@ -143,7 +143,7 @@ public:
         nlohmann::ordered_json j;
 
         for (size_t i = 0; i < static_cast<size_t>(KeyBindings::Count); i++) {
-            j[infoList[i].name] = keyToString(m_bindings[i]);
+            j[infoList[i].name] = toString(m_bindings[i]);
         }
 
         std::ofstream o(m_bindingFileName, std::ofstream::trunc);
@@ -202,11 +202,9 @@ private:
         while (newKey == Key::UnknownKey) {           // Until a key is pressed
             while (SDL_WaitEventTimeout(&evnt, 10)) { // Wait for events
                 switch (evnt.type) { // Extract the pressed key (if it is one)
-                case SDL_KEYDOWN:
-                    newKey = SDLKToREKey(evnt.key.keysym.sym);
-                    break;
+                case SDL_KEYDOWN: newKey = toKey(evnt.key.keysym.sym); break;
                 case SDL_MOUSEBUTTONDOWN:
-                    newKey = SDLKToREKey(evnt.button.button);
+                    newKey = toKey(evnt.button.button);
                     break;
                 case SDL_MOUSEWHEEL:
                     if (evnt.wheel.y != 0) {

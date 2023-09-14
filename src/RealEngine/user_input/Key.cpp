@@ -5,9 +5,23 @@
 
 #include <RealEngine/user_input/Key.hpp>
 
+namespace {
+
+constexpr uint64_t mix(char m, uint64_t s) {
+    return ((s << 7) + ~(s >> 3)) + ~m;
+}
+
+constexpr uint64_t hash(std::string_view string) {
+    uint64_t res = 0;
+    for (const auto& c : string) { res = mix(c, res); }
+    return res;
+}
+
+} // namespace
+
 namespace re {
 
-Key SDLKToREKey(SDL_Keycode key) {
+Key toKey(SDL_Keycode key) {
     switch (key) {
     case SDLK_BACKSPACE: return Key::Backspace;
     case SDLK_TAB: return Key::Tab;
@@ -123,10 +137,8 @@ Key SDLKToREKey(SDL_Keycode key) {
     }
 }
 
-std::string_view keyToString(Key key) {
+std::string_view toString(Key key) {
     switch (key) {
-    case Key::NoKey: return "NoKey";
-    case Key::AnyKey: return "AnyKey";
     case Key::KeyUnbound: return "KeyUnbound";
     case Key::Backspace: return "Backspace";
     case Key::Tab: return "Tab";
@@ -242,22 +254,14 @@ std::string_view keyToString(Key key) {
     case Key::DMW: return "DMW";
     case Key::LMW: return "LMW";
     case Key::RMW: return "RMW";
+    case Key::NoKey: return "NoKey";
+    case Key::AnyKey: return "AnyKey";
     default: return "UnknownKey";
     }
 }
 
-uint64_t constexpr mix(char m, uint64_t s) {
-    return ((s << 7) + ~(s >> 3)) + ~m;
-}
-
-uint64_t constexpr hash(const char* m) {
-    return (*m) ? mix(*m, hash(m + 1)) : 0;
-}
-
-Key stringToKey(const std::string& string) {
-    switch (hash(string.c_str())) {
-    case hash("NoKey"): return Key::NoKey;
-    case hash("AnyKey"): return Key::AnyKey;
+Key toKey(std::string_view string) {
+    switch (hash(string)) {
     case hash("KeyUnbound"): return Key::KeyUnbound;
     case hash("Backspace"): return Key::Backspace;
     case hash("Tab"): return Key::Tab;
@@ -373,6 +377,8 @@ Key stringToKey(const std::string& string) {
     case hash("DMW"): return Key::DMW;
     case hash("LMW"): return Key::LMW;
     case hash("RMW"): return Key::RMW;
+    case hash("NoKey"): return Key::NoKey;
+    case hash("AnyKey"): return Key::AnyKey;
     default: return Key::UnknownKey;
     }
 }

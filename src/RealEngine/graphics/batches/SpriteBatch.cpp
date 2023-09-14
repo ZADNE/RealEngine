@@ -28,7 +28,7 @@ SpriteBatch::SpriteBatch(unsigned int maxSprites, unsigned int maxTextures)
 
 void SpriteBatch::clearAndBeginFirstBatch() {
     m_nextSpriteIndex = m_maxSprites * FrameDoubleBufferingState::writeIndex();
-    m_nextTextureIndex = m_maxTextures * FrameDoubleBufferingState::writeIndex();
+    m_textureIndexOffset = m_maxTextures * FrameDoubleBufferingState::writeIndex();
     m_texToIndex.clear();
     nextBatch();
 }
@@ -100,19 +100,20 @@ void SpriteBatch::addSubimage(
 }
 
 unsigned int SpriteBatch::texToIndex(const Texture& tex) {
-    auto it = m_texToIndex.find(&tex);
-    if (it != m_texToIndex.end()) {
-        return it->second;
+    if (auto it = std::find(m_texToIndex.begin(), m_texToIndex.end(), &tex);
+        it != m_texToIndex.end()) {
+        return m_textureIndexOffset + (it - m_texToIndex.begin());
     } else {
-        m_texToIndex.emplace(&tex, m_nextTextureIndex);
+        unsigned int newIndex = m_texToIndex.size() + m_textureIndexOffset;
         m_descSet.write(
             vk::DescriptorType::eCombinedImageSampler,
             0u,
-            m_nextTextureIndex,
+            newIndex,
             tex,
             vk::ImageLayout::eReadOnlyOptimal
         );
-        return m_nextTextureIndex++;
+        m_texToIndex.emplace_back(&tex);
+        return newIndex;
     }
 }
 

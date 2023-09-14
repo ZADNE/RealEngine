@@ -12,11 +12,6 @@ namespace re {
  * @brief Every input (mouse/keyboard) key that can used.
  */
 enum class Key {
-    // Special constants
-    NoKey,
-    AnyKey,
-    KeyUnbound,
-    UnknownKey,
     // Control keys
     Backspace,
     Tab,
@@ -136,13 +131,25 @@ enum class Key {
     UMW,
     DMW,
     LMW,
-    RMW
+    RMW,
+    // Special
+    NoKey,
+    AnyKey,
+    KeyUnbound,
+    UnknownKey,
+    NumberOfKeys,
+    // Aliases
+    FirstSpecialKey = NoKey
 };
 
-Key SDLKToREKey(SDL_Keycode key);
+inline bool isSpecialKey(Key key) {
+    return static_cast<int>(key) >= static_cast<int>(Key::FirstSpecialKey);
+}
 
-std::string_view keyToString(Key key);
+Key toKey(SDL_Keycode key);
 
-Key stringToKey(const std::string& string);
+std::string_view toString(Key key);
+
+Key toKey(std::string_view string);
 
 } // namespace re

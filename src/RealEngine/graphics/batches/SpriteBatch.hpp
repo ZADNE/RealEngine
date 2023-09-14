@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <unordered_map>
+#include <vector>
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
@@ -74,13 +74,13 @@ private:
         glm::uint tex;
         Color     col;
     };
-    BufferMapped<Sprite>                             m_spritesBuf;
-    std::unordered_map<const Texture*, unsigned int> m_texToIndex;
-    unsigned int                                     m_maxSprites;
-    unsigned int                                     m_maxTextures;
-    unsigned int                                     m_nextSpriteIndex = 0;
-    unsigned int m_batchFirstSpriteIndex                               = 0;
-    unsigned int m_nextTextureIndex                                    = 0;
+    BufferMapped<Sprite>        m_spritesBuf;
+    std::vector<const Texture*> m_texToIndex;
+    unsigned int                m_maxSprites;
+    unsigned int                m_maxTextures;
+    unsigned int                m_nextSpriteIndex       = 0;
+    unsigned int                m_batchFirstSpriteIndex = 0;
+    unsigned int                m_textureIndexOffset    = 0;
 
     unsigned int texToIndex(const Texture& tex);
 
