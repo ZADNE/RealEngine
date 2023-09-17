@@ -14,8 +14,7 @@ namespace re {
 constexpr int k_maxFramesInFlight = 2;
 
 template<typename T>
-concept DoubleBufferingState = requires(T)
-{
+concept DoubleBufferingState = requires(T) {
     { T::writeIndex() } -> std::convertible_to<int>;
     { T::readIndex() } -> std::convertible_to<int>;
 };
@@ -74,6 +73,7 @@ private:
     static inline int s_readIndex  = 1;
 };
 static_assert(DoubleBufferingState<FrameDoubleBufferingState>);
+
 class StepDoubleBufferingState {
 public:
     // Updated internally by RealEngine

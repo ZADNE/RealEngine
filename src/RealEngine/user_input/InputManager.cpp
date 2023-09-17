@@ -66,12 +66,12 @@ void InputManager::setCursor(const glm::ivec2& abs, const glm::ivec2& rel) {
 }
 
 void InputManager::press(Key key, int times /* = 1*/) {
-    assert(!isSpecialKey(key));
+    assert(!isSpecialKey(key) || key == Key::UnknownKey);
     m_stateMap[cast(key)] += times;
 }
 
 void InputManager::release(Key key) {
-    assert(!isSpecialKey(key));
+    assert(!isSpecialKey(key) || key == Key::UnknownKey);
     m_stateMap[cast(key)] = 0;
 }
 
