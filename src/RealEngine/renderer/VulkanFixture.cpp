@@ -99,7 +99,6 @@ VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync)
         ImGui_ImplSDL2_Shutdown();
         throw std::runtime_error{"Could not initialize ImGui for Vulkan!"};
     }
-
 }
 
 VulkanFixture::~VulkanFixture() {
@@ -296,9 +295,7 @@ vk::raii::SurfaceKHR VulkanFixture::createSurface() {
 }
 
 vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice() {
-    for (const auto& physicalDevice :
-         vk::raii::PhysicalDevices{m_instance}) { // Iterate over all physical
-                                                  // device
+    for (const auto& physicalDevice : vk::raii::PhysicalDevices{m_instance}) {
         if (areExtensionsSupported(physicalDevice) &&
             isSwapchainSupported(physicalDevice) &&
             findQueueFamilyIndices(physicalDevice)) {
@@ -337,19 +334,18 @@ vk::raii::Device VulkanFixture::createDevice() {
                             .setWideLines(true)
                             .setVertexPipelineStoresAndAtomics(true)
                             .setFragmentStoresAndAtomics(true);
-    auto createInfo = vk::StructureChain{
+    auto createInfoChain = vk::StructureChain{
         vk::DeviceCreateInfo{
             {}, deviceQueueCreateInfos, {}, k_deviceExtensions, &baseFeatures},
-        vk::PhysicalDeviceUniformBufferStandardLayoutFeatures{true},
-        vk::PhysicalDeviceDescriptorIndexingFeatures{},
-        vk::PhysicalDeviceSynchronization2Features{true},
-        vk::PhysicalDeviceTimelineSemaphoreFeatures{true}};
-    auto& descIndexing =
-        createInfo.get<vk::PhysicalDeviceDescriptorIndexingFeatures>();
-    descIndexing.setShaderSampledImageArrayNonUniformIndexing(true);
-    descIndexing.setDescriptorBindingUpdateUnusedWhilePending(true);
-    descIndexing.setDescriptorBindingPartiallyBound(true);
-    return vk::raii::Device{m_physicalDevice, createInfo.get<>()};
+        vk::PhysicalDeviceVulkan12Features{}
+            .setStorageBuffer8BitAccess(true)
+            .setUniformBufferStandardLayout(true)
+            .setShaderSampledImageArrayNonUniformIndexing(true)
+            .setDescriptorBindingUpdateUnusedWhilePending(true)
+            .setDescriptorBindingPartiallyBound(true)
+            .setTimelineSemaphore(true),
+        vk::PhysicalDeviceVulkan13Features{}.setSynchronization2(true)};
+    return vk::raii::Device{m_physicalDevice, createInfoChain.get<>()};
 }
 
 vma::Allocator VulkanFixture::createAllocator() {
