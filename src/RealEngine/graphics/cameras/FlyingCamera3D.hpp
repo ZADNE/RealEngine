@@ -2,7 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-
 #include <glm/gtc/quaternion.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
@@ -30,6 +29,11 @@ public:
      * @brief Gets the projection matrix of the view
      */
     const glm::mat4& viewMat() const;
+
+    /**
+     * @brief Gets position of the camera
+     */
+    const glm::vec3& pos() const { return m_pos; }
 
 private:
     void      recalculateViewMat();

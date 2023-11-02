@@ -60,7 +60,7 @@ public:
      * @brief Must be called before any Room is added
      * @warning Never call this more than once!
      */
-    static void initialize();
+    static void initialize(const VulkanInitInfo& initInfo);
 
     /**
      * @brief Adds a Room to the management
@@ -72,7 +72,7 @@ public:
      */
     template<DerivedFromRoom RoomType, typename... ConstructorArgs>
     static RoomType* addRoom(ConstructorArgs&&... args) {
-        return instance().m_roomManager.addRoom<RoomType>(
+        return instance({}).m_roomManager.addRoom<RoomType>(
             std::forward<ConstructorArgs>(args)...
         );
     }
@@ -130,12 +130,12 @@ private:
     /**
      * @brief Constructs the main program.
      */
-    explicit MainProgram();
+    explicit MainProgram(const VulkanInitInfo& initInfo);
 
     /**
      * @brief Gets the singleton instance
      */
-    static MainProgram& instance();
+    static MainProgram& instance(const VulkanInitInfo& initInfo);
 
     /**
      * @brief Does the actual game loop on the singleton instance
@@ -148,10 +148,7 @@ private:
     void pollEvents();
     void processEvent(SDL_Event* evnt);
 
-    Window m_window{
-        WindowSettings{},
-        WindowSubsystems::RealEngineVersionString(
-        )}; /**< Window also creates and initializes renderer backends */
+    Window m_window; /**< Window also creates and initializes renderer backends */
     RoomManager m_roomManager; /**< Manages rooms - you have to add at least 1
                                   room to run the program */
     InputManager m_inputManager; /**< Records key presses/releases, mouse movement etc. */

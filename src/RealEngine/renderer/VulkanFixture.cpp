@@ -43,10 +43,9 @@ namespace re {
 
 constexpr std::array k_deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-constexpr vk::SurfaceFormatKHR k_surfaceFormat{
-    vk::Format::eB8G8R8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear};
-
-VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync)
+VulkanFixture::VulkanFixture(
+    SDL_Window* sdlWindow, bool vSync, const VulkanInitInfo& initInfo
+)
     : m_sdlWindow(sdlWindow)
     , m_vSync(vSync)
     , m_instance(createInstance())
@@ -55,14 +54,22 @@ VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync)
 #endif // !NDEBUG
     , m_surface(createSurface())
     , m_physicalDevice(createPhysicalDevice())
-    , m_device(createDevice())
+    , m_device(createDevice(initInfo.deviceCreateInfoChain))
     , m_allocator(createAllocator())
     , m_graphicsQueue(createQueue(m_graphicsQueueFamilyIndex))
     , m_computeQueue(createQueue(m_computeQueueFamilyIndex))
     , m_presentationQueue(createQueue(m_presentationQueueFamilyIndex))
     , m_swapchain(createSwapchain())
     , m_swapchainImageViews(createSwapchainImageViews())
-    , m_renderPass(createRenderPass())
+    , m_additionalBufferDescrs(
+          {initInfo.additionalBuffers.begin(), initInfo.additionalBuffers.end()}
+      )
+    , m_additionalBuffers(createAdditionalBuffers())
+    , m_renderPass(
+          initInfo.defaultRenderPass
+              ? vk::raii::RenderPass{m_device, *initInfo.defaultRenderPass}
+              : createRenderPass()
+      )
     , m_swapChainFramebuffers(createSwapchainFramebuffers())
     , m_commandPool(createCommandPool())
     , m_commandBuffers(createCommandBuffers())
@@ -81,7 +88,7 @@ VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync)
     if (!ImGui_ImplSDL2_InitForVulkan(m_sdlWindow)) {
         throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
     }
-    ImGui_ImplVulkan_InitInfo initInfo{
+    ImGui_ImplVulkan_InitInfo imGuiInitInfo{
         .Instance        = *m_instance,
         .PhysicalDevice  = *m_physicalDevice,
         .Device          = *m_device,
@@ -89,13 +96,13 @@ VulkanFixture::VulkanFixture(SDL_Window* sdlWindow, bool vSync)
         .Queue           = *m_graphicsQueue,
         .PipelineCache   = *m_pipelineCache,
         .DescriptorPool  = *m_descriptorPool,
-        .Subpass         = 0u,
+        .Subpass         = initInfo.imguiSubpassIndex,
         .MinImageCount   = m_minImageCount,
         .ImageCount      = static_cast<uint32_t>(m_swapchainImageViews.size()),
         .MSAASamples     = VK_SAMPLE_COUNT_1_BIT,
         .Allocator       = nullptr,
         .CheckVkResultFn = &checkSuccessImGui};
-    if (!ImGui_ImplVulkan_Init(&initInfo, *m_renderPass)) {
+    if (!ImGui_ImplVulkan_Init(&imGuiInitInfo, *m_renderPass)) {
         ImGui_ImplSDL2_Shutdown();
         throw std::runtime_error{"Could not initialize ImGui for Vulkan!"};
     }
@@ -105,11 +112,12 @@ VulkanFixture::~VulkanFixture() {
     m_device.waitIdle();
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplSDL2_Shutdown();
+    m_additionalBuffers.clear(); // Must be destroyed before impl references are cleared
     clearImplementationReferences();
 }
 
 const vk::CommandBuffer& VulkanFixture::prepareFrame(
-    const glm::vec4& clearColor, bool useImGui
+    std::span<const vk::ClearValue> clearValues, bool useImGui
 ) {
     // Wait for the previous frame to finish
     checkSuccess(m_device.waitForFences(*m_inFlightFences.write(), true, k_maxTimeout)
@@ -147,14 +155,12 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
     VulkanObject::s_commandBuffer = &(*commandBuffer);
 
     // Begin renderpass
-    vk::ClearValue clearValue{vk::ClearColorValue{
-        clearColor.r, clearColor.g, clearColor.b, clearColor.a}};
     commandBuffer.beginRenderPass2(
         vk::RenderPassBeginInfo{
             *m_renderPass,
             *m_swapChainFramebuffers[m_imageIndex],
             vk::Rect2D{{}, m_swapchainExtent},
-            clearValue},
+            clearValues},
         vk::SubpassBeginInfo{vk::SubpassContents::eInline}
     );
 
@@ -313,7 +319,7 @@ vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice() {
     throw std::runtime_error("No physical device is suitable!");
 }
 
-vk::raii::Device VulkanFixture::createDevice() {
+vk::raii::Device VulkanFixture::createDevice(const void* deviceCreateInfoChain) {
     float                                  deviceQueuePriority = 1.0f;
     std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos;
     deviceQueueCreateInfos.emplace_back(
@@ -329,24 +335,23 @@ vk::raii::Device VulkanFixture::createDevice() {
             vk::DeviceQueueCreateFlags{}, m_computeQueueFamilyIndex, 1, &deviceQueuePriority
         );
     }
-    auto baseFeatures = vk::PhysicalDeviceFeatures{}
-                            .setTessellationShader(true)
-                            .setWideLines(true)
-                            .setVertexPipelineStoresAndAtomics(true)
-                            .setFragmentStoresAndAtomics(true)
-                            .setGeometryShader(true);
-    auto createInfoChain = vk::StructureChain{
-        vk::DeviceCreateInfo{
-            {}, deviceQueueCreateInfos, {}, k_deviceExtensions, &baseFeatures},
+    auto createInfo =
+        vk::DeviceCreateInfo{{}, deviceQueueCreateInfos, {}, k_deviceExtensions};
+
+    auto defaultChain = vk::StructureChain{
+        vk::PhysicalDeviceFeatures2{
+            vk::PhysicalDeviceFeatures{}.setTessellationShader(true)},
         vk::PhysicalDeviceVulkan12Features{}
-            .setStorageBuffer8BitAccess(true)
-            .setUniformBufferStandardLayout(true)
             .setShaderSampledImageArrayNonUniformIndexing(true)
             .setDescriptorBindingUpdateUnusedWhilePending(true)
             .setDescriptorBindingPartiallyBound(true)
             .setTimelineSemaphore(true),
         vk::PhysicalDeviceVulkan13Features{}.setSynchronization2(true)};
-    return vk::raii::Device{m_physicalDevice, createInfoChain.get<>()};
+
+    createInfo.pNext = deviceCreateInfoChain
+                           ? deviceCreateInfoChain
+                           : reinterpret_cast<const void*>(&defaultChain.get<>());
+    return vk::raii::Device{m_physicalDevice, createInfo};
 }
 
 vma::Allocator VulkanFixture::createAllocator() {
@@ -441,8 +446,27 @@ std::vector<vk::raii::ImageView> VulkanFixture::createSwapchainImageViews() {
     return imageViews;
 }
 
+std::vector<Texture> VulkanFixture::createAdditionalBuffers() {
+    // Ugly hack to be able to use re::Texture already
+    VulkanObject::s_allocator = &m_allocator;
+    VulkanObject::s_device    = &(*m_device);
+    std::vector<Texture> buffers;
+    buffers.reserve(m_additionalBufferDescrs.size());
+    for (const auto& descr : m_additionalBufferDescrs) {
+        buffers.emplace_back(TextureCreateInfo{
+            .allocFlags = vma::AllocationCreateFlagBits::eDedicatedMemory,
+            .format     = descr.format,
+            .extent = glm::uvec3{m_swapchainExtent.width, m_swapchainExtent.height, 1},
+            .usage         = descr.usage,
+            .initialLayout = vk::ImageLayout::eUndefined,
+            .aspects       = descr.aspects,
+            .hasSampler    = false});
+    }
+    return buffers;
+}
+
 vk::raii::RenderPass VulkanFixture::createRenderPass() {
-    vk::AttachmentDescription attachmentDescription{
+    vk::AttachmentDescription2 attachmentDescription{
         {},
         k_surfaceFormat.format,
         vk::SampleCountFlagBits::e1,
@@ -453,14 +477,15 @@ vk::raii::RenderPass VulkanFixture::createRenderPass() {
         vk::ImageLayout::eUndefined,      // Initial
         vk::ImageLayout::ePresentSrcKHR   // Final
     };
-    vk::AttachmentReference attachmentRef{0, vk::ImageLayout::eColorAttachmentOptimal};
-    vk::SubpassDescription subpassDescription{
+    vk::AttachmentReference2 attachmentRef{0, vk::ImageLayout::eColorAttachmentOptimal};
+    vk::SubpassDescription2 subpassDescription{
         {},
         vk::PipelineBindPoint::eGraphics,
+        0u,
         {},           // Input attachments
         attachmentRef // Color attachments
     };
-    vk::SubpassDependency subpassDependency{
+    vk::SubpassDependency2 subpassDependency{
         vk::SubpassExternal,                                 // Src subpass
         0u,                                                  // Dst subpass
         {vk::PipelineStageFlagBits::eColorAttachmentOutput}, // Src stage mask
@@ -468,21 +493,30 @@ vk::raii::RenderPass VulkanFixture::createRenderPass() {
         vk::AccessFlags{},                                   // Src access mask
         {vk::AccessFlagBits::eColorAttachmentWrite}          // Dst access mask
     };
-    vk::RenderPassCreateInfo createInfo{
+    vk::RenderPassCreateInfo2 createInfo{
         {}, attachmentDescription, subpassDescription, subpassDependency};
     return vk::raii::RenderPass{m_device, createInfo};
 }
 
 std::vector<vk::raii::Framebuffer> VulkanFixture::createSwapchainFramebuffers() {
+    std::vector<vk::ImageView> views;
+    views.resize(1 + m_additionalBuffers.size());
     vk::FramebufferCreateInfo createInfo{
-        {}, *m_renderPass, {}, m_swapchainExtent.width, m_swapchainExtent.height, 1};
-    std::vector<vk::raii::Framebuffer> vec;
-    vec.reserve(m_swapchainImageViews.size());
-    for (size_t i = 0; i < m_swapchainImageViews.size(); i++) {
-        createInfo.setAttachments(*m_swapchainImageViews[i]);
-        vec.emplace_back(m_device, createInfo);
+        {}, *m_renderPass, views, m_swapchainExtent.width, m_swapchainExtent.height, 1};
+
+    // Additional buffer are shared among the framebuffers
+    for (size_t addtBuf = 0; addtBuf < m_additionalBuffers.size(); ++addtBuf) {
+        views[addtBuf + 1] = m_additionalBuffers[addtBuf].imageView();
     }
-    return vec;
+
+    // Swapchain images are different
+    std::vector<vk::raii::Framebuffer> framebuffers;
+    framebuffers.reserve(m_swapchainImageViews.size());
+    for (size_t i = 0; i < m_swapchainImageViews.size(); i++) {
+        views[0] = *m_swapchainImageViews[i];
+        framebuffers.emplace_back(m_device, createInfo);
+    }
+    return framebuffers;
 }
 
 vk::raii::CommandPool VulkanFixture::createCommandPool() {
@@ -618,12 +652,18 @@ bool VulkanFixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physi
 
 void VulkanFixture::recreateSwapchain() {
     m_device.waitIdle();
+    // Destroy all swapchain dependent objects
     m_swapChainFramebuffers.~vector();
+    m_additionalBuffers.~vector();
     m_swapchainImageViews.~vector();
     m_swapchain.~SwapchainKHR();
+
+    // Recreate them with the new size
     new (&m_swapchain) decltype(m_swapchain){createSwapchain()};
     new (&m_swapchainImageViews) decltype(m_swapchainImageViews
     ){createSwapchainImageViews()};
+    new (&m_additionalBuffers) decltype(m_additionalBuffers
+    ){createAdditionalBuffers()};
     new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers
     ){createSwapchainFramebuffers()};
 }

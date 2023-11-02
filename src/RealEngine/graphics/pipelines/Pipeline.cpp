@@ -3,6 +3,10 @@
  */
 #include <RealEngine/graphics/pipelines/Pipeline.hpp>
 
+using enum vk::BlendFactor;
+using enum vk::BlendOp;
+using enum vk::ColorComponentFlagBits;
+
 namespace re {
 
 static vk::ShaderStageFlagBits convert(size_t st) {
@@ -51,7 +55,7 @@ Pipeline::Pipeline(
         nullptr // Scissor
     };
     vk::PipelineRasterizationStateCreateInfo rasterization{
-        vk::PipelineRasterizationStateCreateFlags{},
+        {},
         false, // Enable depth clamping
         false, // Enable rasterizer discard
         vk::PolygonMode::eFill,
@@ -63,10 +67,9 @@ Pipeline::Pipeline(
         0.0f,                // Depth bias slope factor
         createInfo.lineWidth // Line width
     };
-    vk::PipelineMultisampleStateCreateInfo multisample{};
-    using enum vk::BlendFactor;
-    using enum vk::BlendOp;
-    using enum vk::ColorComponentFlagBits;
+    vk::PipelineMultisampleStateCreateInfo  multisample{};
+    vk::PipelineDepthStencilStateCreateInfo depthStencil{
+        {}, createInfo.enableDepth, createInfo.enableDepth, vk::CompareOp::eLess};
     vk::PipelineColorBlendAttachmentState colorBlendAttachment{
         createInfo.enableBlend,
         eSrcAlpha,         // Src color
@@ -101,7 +104,7 @@ Pipeline::Pipeline(
                     &viewport,
                     &rasterization,
                     &multisample,
-                    nullptr, // Depth & stencil
+                    &depthStencil,
                     &colorBlend,
                     &dynamic,
                     createInfo.pipelineLayout,

@@ -15,6 +15,7 @@ struct TextureCreateInfo {
     // Memory-related
     vma::AllocationCreateFlags allocFlags = {};
     vma::MemoryUsage memoryUsage          = vma::MemoryUsage::eAutoPreferDevice;
+
     // Image-related
     vk::ImageCreateFlags flags  = {};
     vk::ImageType        type   = vk::ImageType::e2D;
@@ -24,12 +25,18 @@ struct TextureCreateInfo {
     vk::ImageUsageFlags  usage         = vk::ImageUsageFlagBits::eSampled;
     vk::ImageLayout      initialLayout = vk::ImageLayout::eReadOnlyOptimal;
     const void*          pNext         = nullptr;
+
+    // ImageView-related
+    vk::ImageAspectFlags aspects = vk::ImageAspectFlagBits::eColor;
+
     // Sampler-related
-    vk::Filter            magFilter  = vk::Filter::eNearest;
-    vk::Filter            minFilter  = vk::Filter::eNearest;
+    bool       hasSampler = true; // No sampler is created if this is false
+    vk::Filter magFilter  = vk::Filter::eNearest;
+    vk::Filter minFilter  = vk::Filter::eNearest;
     vk::SamplerMipmapMode mipmapMode = vk::SamplerMipmapMode::eNearest;
+
     // Raster-related
-    std::vector<unsigned char> texels;
+    std::span<unsigned char> texels; // Only for 1 layer color images
 };
 
 /**

@@ -34,7 +34,11 @@ public:
      * @param settings Settings to initialize the window with.
      * @param title Title for the window
      */
-    Window(const WindowSettings& settings, const std::string& title);
+    Window(
+        const WindowSettings& settings,
+        const std::string&    title,
+        const VulkanInitInfo& initInfo
+    );
 
     Window(const Window&)         = delete; /**< Noncopyable */
     void operator=(const Window&) = delete; /**< Noncopyable */
@@ -64,11 +68,10 @@ public:
     bool passSDLEvent(const SDL_Event& evnt);
 
     /**
-     * @brief Set the color that the default framebuffer is cleared with at the
-     * start of each frame
+     * @brief Sets clear values that will be used to clear render outputs
      */
-    void setClearColor(const glm::vec4& clearColor) {
-        m_clearColor = clearColor;
+    void setClearValues(std::span<const vk::ClearValue> clearValues) {
+        m_clearValues.assign(clearValues.begin(), clearValues.end());
     }
 
     /**
@@ -143,8 +146,8 @@ public:
     RendererID usedRenderer() const { return m_usedRenderer; }
 
 private:
-    void initForRenderer(RendererID renderer);
-    void initForVulkan13();
+    void initForRenderer(RendererID renderer, const VulkanInitInfo& initInfo);
+    void initForVulkan13(const VulkanInitInfo& initInfo);
 
     bool createSDLWindow(RendererID renderer);
 
@@ -159,8 +162,8 @@ private:
     std::string m_windowTitle; /**< Title of the window */
 
     // Room-dependent state variables
-    glm::vec4 m_clearColor{};
-    bool      m_usingImGui = false;
+    std::vector<vk::ClearValue> m_clearValues;
+    bool                        m_usingImGui = false;
 };
 
 } // namespace re

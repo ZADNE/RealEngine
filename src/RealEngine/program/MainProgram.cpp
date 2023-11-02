@@ -14,14 +14,14 @@
 
 namespace re {
 
-void MainProgram::initialize() {
+void MainProgram::initialize(const VulkanInitInfo& initInfo) {
     // Force initialization of the singleton instance
-    instance();
+    instance(initInfo);
 }
 
 int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
     try {
-        return instance().doRun(roomName, args);
+        return instance({}).doRun(roomName, args);
     } catch (const std::exception& e) {
         fatalError(std::string("Exception: ") + e.what());
     } catch (const char* str) {
@@ -37,7 +37,7 @@ void MainProgram::scheduleExit(int exitcode /* = EXIT_SUCCESS*/) {
 }
 
 void MainProgram::pollEventsInMainThread(bool poll) {
-    auto& mainProgram                    = instance();
+    auto& mainProgram                    = instance(VulkanInitInfo{});
     mainProgram.m_pollEventsInMainThread = poll;
     mainProgram.m_inputManager.step();
 }
@@ -86,7 +86,7 @@ void MainProgram::setRelativeCursorMode(bool relative) {
 }
 
 void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
-    m_window.setClearColor(s.clearColor);
+    m_window.setClearValues(s.clearValues);
     m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
     m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
     m_window.useImGui(s.usingImGui);
@@ -246,15 +246,16 @@ void MainProgram::pollEvents() {
     }
 }
 
-MainProgram::MainProgram()
-    : s_roomToEngineAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
+MainProgram::MainProgram(const VulkanInitInfo& initInfo)
+    : m_window{WindowSettings{}, WindowSubsystems::RealEngineVersionString(), initInfo}
+    , s_roomToEngineAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
 
     Room::setRoomSystemAccess(&s_roomToEngineAccess);
     Room::setStaticReferences(this, &m_roomManager);
 }
 
-MainProgram& MainProgram::instance() {
-    static MainProgram mainProgram;
+MainProgram& MainProgram::instance(const VulkanInitInfo& initInfo) {
+    static MainProgram mainProgram{initInfo};
     return mainProgram;
 }
 

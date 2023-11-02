@@ -12,7 +12,9 @@
 
 namespace re {
 
-Window::Window(const WindowSettings& settings, const std::string& title)
+Window::Window(
+    const WindowSettings& settings, const std::string& title, const VulkanInitInfo& initInfo
+)
     : WindowSettings(settings)
     , m_subsystems()
     , m_windowTitle(title)
@@ -21,13 +23,13 @@ Window::Window(const WindowSettings& settings, const std::string& title)
     m_subsystems.printRealEngineVersion();
     m_subsystems.printSubsystemsVersions();
 
-    initForRenderer(settings.preferredRenderer());
+    initForRenderer(settings.preferredRenderer(), initInfo);
 
     // If the preferred renderer could not be initialized
     if (m_usedRenderer == RendererID::Any) {
         for (size_t i = 0; i < static_cast<size_t>(RendererID::Any);
              i++) { // Try to init any other
-            initForRenderer(static_cast<RendererID>(i));
+            initForRenderer(static_cast<RendererID>(i), initInfo);
             if (m_usedRenderer != RendererID::Any)
                 break;
         }
@@ -48,7 +50,7 @@ Window::~Window() {
 }
 
 const vk::CommandBuffer& Window::prepareNewFrame() {
-    return m_vk13.prepareFrame(m_clearColor, m_usingImGui);
+    return m_vk13.prepareFrame(m_clearValues, m_usingImGui);
 }
 
 void Window::finishNewFrame() {
@@ -116,14 +118,14 @@ void Window::setDims(const glm::ivec2& newDims, bool save) {
         this->save();
 }
 
-void Window::initForRenderer(RendererID renderer) {
+void Window::initForRenderer(RendererID renderer, const VulkanInitInfo& initInfo) {
     switch (renderer) {
-    case RendererID::Vulkan13: initForVulkan13(); break;
+    case RendererID::Vulkan13: initForVulkan13(initInfo); break;
     default: break;
     }
 }
 
-void Window::initForVulkan13() {
+void Window::initForVulkan13(const VulkanInitInfo& initInfo) {
     // Create SDL window
     if (!createSDLWindow(RendererID::Vulkan13)) {
         goto fail;
@@ -131,7 +133,7 @@ void Window::initForVulkan13() {
 
     // Set up Vulkan 1.3 fixture
     try {
-        new (&m_vk13) VulkanFixture{m_SDLwindow, (bool)m_flags.vSync};
+        new (&m_vk13) VulkanFixture{m_SDLwindow, (bool)m_flags.vSync, initInfo};
     } catch (std::exception& e) {
         std::cerr << e.what() << '\n';
         goto fail_SDLWindow;

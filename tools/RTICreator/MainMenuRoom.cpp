@@ -17,13 +17,17 @@
 
 using namespace ImGui;
 
-constexpr re::RoomDisplaySettings k_initialSettings{
-    .clearColor           = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
-    .framesPerSecondLimit = 144,
-    .usingImGui           = true};
+constexpr vk::ClearValue k_defaultClearColor =
+    vk::ClearColorValue{0.1f, 0.1f, 0.1f, 1.0f};
 
 MainMenuRoom::MainMenuRoom(re::CommandLineArguments args)
-    : Room(0, k_initialSettings)
+    : Room(
+          0,
+          re::RoomDisplaySettings{
+              .clearValues          = {&k_defaultClearColor, 1},
+              .framesPerSecondLimit = 144,
+              .usingImGui           = true}
+      )
     , m_texView(engine().windowDims()) {
 
     engine().setWindowTitle("RTICreator v4.0.0");
@@ -99,8 +103,13 @@ void MainMenuRoom::render(
                     if (Button("Reset view"))
                         resetView();
                     if (ColorPicker3("Background color", &m_backgroundColor.x)) {
-                        auto ds       = displaySettings();
-                        ds.clearColor = glm::vec4(m_backgroundColor, 1.0f);
+                        auto           ds  = displaySettings();
+                        vk::ClearValue val = vk::ClearColorValue{
+                            m_backgroundColor.r,
+                            m_backgroundColor.g,
+                            m_backgroundColor.b,
+                            1.0f};
+                        ds.clearValues = {&val, 1};
                         setDisplaySettings(ds);
                     }
                     EndTabItem();
@@ -192,7 +201,6 @@ void MainMenuRoom::load(const std::string& loc) {
     m_subimagesSprites = m_texture->subimagesSpritesCount();
     m_subimageDims     = m_texture->subimageDims();
     m_pivot            = m_texture->pivot();
-    ;
 }
 
 void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {

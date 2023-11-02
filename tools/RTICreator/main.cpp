@@ -6,7 +6,7 @@
 #include <RTICreator/MainMenuRoom.hpp>
 
 int main(int argc, char* argv[]) {
-    re::MainProgram::initialize();
+    re::MainProgram::initialize({});
     auto* mainMenuRoom = re::MainProgram::addRoom<MainMenuRoom>(
         re::CommandLineArguments(argv, argc)
     );

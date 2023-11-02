@@ -59,8 +59,8 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
     if (!createInfo.texels.empty()) {
         // Initialize texels of the image and transit to initial layout
         initializeTexels(createInfo);
-    } else {
-        // Only transit to initial layout
+    } else if (createInfo.initialLayout != eUndefined) {
+        // Transit to initial layout
         CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
             pipelineImageBarrier(
                 commandBuffer,
@@ -82,15 +82,17 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         createInfo.format,
         vk::ComponentMapping{}, // Component mapping (= identity)
         vk::ImageSubresourceRange{
-            vk::ImageAspectFlagBits::eColor,
+            createInfo.aspects,
             0u,               // Mip level
             1u,               // Mip level count
             0u,               // Base array layer
             createInfo.layers // Array layer count
         }});
     // Create sampler
-    m_sampler = device().createSampler(vk::SamplerCreateInfo{
-        {}, createInfo.magFilter, createInfo.minFilter, createInfo.mipmapMode});
+    if (createInfo.hasSampler) {
+        m_sampler = device().createSampler(vk::SamplerCreateInfo{
+            {}, createInfo.magFilter, createInfo.minFilter, createInfo.mipmapMode});
+    }
 }
 
 Texture::Texture(Texture&& other) noexcept

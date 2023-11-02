@@ -10,11 +10,17 @@ namespace re {
 struct PipelineGraphicsCreateInfo {
     vk::PipelineLayout                     pipelineLayout = nullptr;
     vk::PipelineVertexInputStateCreateInfo vertexInput{};
-    vk::PrimitiveTopology  topology = vk::PrimitiveTopology::eTriangleList;
-    bool                   enablePrimitiveRestart = false;
-    uint32_t               patchControlPoints     = 0;
+
+    // Input assembly
+    vk::PrimitiveTopology topology = vk::PrimitiveTopology::eTriangleList;
+    bool                  enablePrimitiveRestart = false;
+
+    // Tesselation
+    uint32_t patchControlPoints = 0; // Zero means that tesselation is not used
+
     vk::SpecializationInfo specializationInfo{};
     float                  lineWidth   = 1.0f;
+    bool                   enableDepth = false;
     bool                   enableBlend = true;
     vk::RenderPass renderPass = nullptr; // The default renderpass is used if unspecified
     uint32_t subpassIndex = 0;

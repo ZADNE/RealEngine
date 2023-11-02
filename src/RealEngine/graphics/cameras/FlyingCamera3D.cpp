@@ -17,7 +17,7 @@ FlyingCamera3D::FlyingCamera3D(const glm::vec3& pos, const glm::vec3& yawPitchRo
 }
 
 void FlyingCamera3D::rotate(const glm::vec3& yawPitchRoll) {
-    m_dirQuat = glm::normalize(glm::quat(yawPitchRoll) * m_dirQuat);
+    m_dirQuat = glm::normalize(glm::quat{yawPitchRoll} * m_dirQuat);
     recalculateViewMat();
 }
 

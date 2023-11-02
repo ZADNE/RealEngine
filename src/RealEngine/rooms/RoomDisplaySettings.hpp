@@ -2,8 +2,9 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <span>
 
-#include <glm/vec4.hpp>
+#include <vulkan/vulkan.hpp>
 
 namespace re {
 
@@ -11,10 +12,14 @@ namespace re {
  * @brief Specifies parameters that determine how the room is drawn
  */
 struct RoomDisplaySettings {
+
+    constexpr static vk::ClearValue k_defaultClearColor =
+        vk::ClearColorValue{1.0f, 1.0f, 1.0f, 1.0f};
+
     /**
-     * @brief Is used to clear the window framebuffer
+     * @brief Values that are used to clear render outputs
      */
-    glm::vec4 clearColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    std::span<const vk::ClearValue> clearValues{&k_defaultClearColor, 1};
     /**
      * @brief The number of steps per second that this romm runs at
      */
@@ -27,7 +32,7 @@ struct RoomDisplaySettings {
      * @brief Tells whether this room uses ImGui.
      * @warning ImGui may not be used if it is false
      */
-    bool usingImGui = false; /**<  */
+    bool usingImGui = false;
 };
 
 } // namespace re
