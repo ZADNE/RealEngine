@@ -378,9 +378,7 @@ vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
     auto caps = m_physicalDevice.getSurfaceCapabilitiesKHR(*m_surface);
     // Minimum image count
     m_minImageCount = glm::clamp(
-        caps.minImageCount + 1,
-        caps.minImageCount,
-        caps.maxImageCount ? caps.maxImageCount : 8
+        2u, caps.minImageCount, caps.maxImageCount ? caps.maxImageCount : 2u
     );
 
     // Extent

@@ -59,7 +59,7 @@ Pipeline::Pipeline(
         false, // Enable depth clamping
         false, // Enable rasterizer discard
         vk::PolygonMode::eFill,
-        vk::CullModeFlagBits::eNone,
+        createInfo.cullMode,
         vk::FrontFace::eClockwise,
         false,               // Enable depth bias
         0.0f,                // Depth bias constant factor

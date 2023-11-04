@@ -19,9 +19,13 @@ struct PipelineGraphicsCreateInfo {
     uint32_t patchControlPoints = 0; // Zero means that tesselation is not used
 
     vk::SpecializationInfo specializationInfo{};
-    float                  lineWidth   = 1.0f;
-    bool                   enableDepth = false;
-    bool                   enableBlend = true;
+
+    // Rasterization
+    vk::CullModeFlags cullMode  = vk::CullModeFlagBits::eNone;
+    float             lineWidth = 1.0f;
+
+    bool enableDepth = false;
+    bool enableBlend = true;
     vk::RenderPass renderPass = nullptr; // The default renderpass is used if unspecified
     uint32_t subpassIndex = 0;
 };

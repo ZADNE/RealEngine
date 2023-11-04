@@ -21,8 +21,8 @@ void FlyingCamera3D::rotate(const glm::vec3& yawPitchRoll) {
     recalculateViewMat();
 }
 
-void FlyingCamera3D::move(const glm::vec3& leftUpForward) {
-    m_pos += leftUpForward * m_dirQuat;
+void FlyingCamera3D::move(const glm::vec3& rightUpBack) {
+    m_pos += rightUpBack * m_dirQuat;
     recalculateViewMat();
 }
 
@@ -31,7 +31,7 @@ const glm::mat4& FlyingCamera3D::viewMat() const {
 }
 
 void FlyingCamera3D::recalculateViewMat() {
-    m_viewMat = glm::translate(glm::toMat4(m_dirQuat), m_pos);
+    m_viewMat = glm::translate(glm::toMat4(m_dirQuat), -m_pos);
 }
 
 } // namespace re

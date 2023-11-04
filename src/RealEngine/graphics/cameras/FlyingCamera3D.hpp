@@ -23,7 +23,7 @@ public:
     /**
      * @brief Moves based on current rotation
      */
-    void move(const glm::vec3& leftUpForward);
+    void move(const glm::vec3& rightUpBack);
 
     /**
      * @brief Gets the projection matrix of the view
