@@ -41,15 +41,15 @@ struct VulkanInitInfo {
      */
     const void* deviceCreateInfoChain = nullptr;
     /**
-     * @brief Is used to create custom default RenderPass. A default
+     * @brief Is used to create custom main RenderPass. A default
      * single-subpass Renderpass is created instead if this is nullptr.
      */
-    vk::RenderPassCreateInfo2* defaultRenderPass = nullptr;
+    vk::RenderPassCreateInfo2* mainRenderPass = nullptr;
     /**
-     * @brief Index of subpass with default RenderPass in which imgui will be
-     * rendered.
+     * @brief Index of subpass within main RenderPass in which ImGui will be
+     * rendered
      */
-    uint32_t imguiSubpassIndex = 0;
+    uint32_t imGuiSubpassIndex = 0;
     /**
      * @brief Additional buffers that should be created.
      * Extent of all of these is the extent of the swapchain.
@@ -78,10 +78,14 @@ public:
 
     ~VulkanFixture();
 
-    const vk::CommandBuffer& prepareFrame(
-        std::span<const vk::ClearValue> clearValues, bool useImGui
-    );
-    void finishFrame(bool useImGui);
+    const vk::CommandBuffer& prepareFrame(bool useImGui);
+
+    void mainRenderPassBegin(std::span<const vk::ClearValue> clearValues);
+    void mainRenderPassNextSubpass();
+    void mainRenderPassDrawImGui();
+    void mainRenderPassEnd();
+
+    void finishFrame();
 
     void changePresentation(bool vSync);
 

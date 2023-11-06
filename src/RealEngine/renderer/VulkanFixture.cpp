@@ -66,8 +66,8 @@ VulkanFixture::VulkanFixture(
       )
     , m_additionalBuffers(createAdditionalBuffers())
     , m_renderPass(
-          initInfo.defaultRenderPass
-              ? vk::raii::RenderPass{m_device, *initInfo.defaultRenderPass}
+          initInfo.mainRenderPass
+              ? vk::raii::RenderPass{m_device, *initInfo.mainRenderPass}
               : createRenderPass()
       )
     , m_swapChainFramebuffers(createSwapchainFramebuffers())
@@ -96,7 +96,7 @@ VulkanFixture::VulkanFixture(
         .Queue           = *m_graphicsQueue,
         .PipelineCache   = *m_pipelineCache,
         .DescriptorPool  = *m_descriptorPool,
-        .Subpass         = initInfo.imguiSubpassIndex,
+        .Subpass         = initInfo.imGuiSubpassIndex,
         .MinImageCount   = m_minImageCount,
         .ImageCount      = static_cast<uint32_t>(m_swapchainImageViews.size()),
         .MSAASamples     = VK_SAMPLE_COUNT_1_BIT,
@@ -116,9 +116,7 @@ VulkanFixture::~VulkanFixture() {
     clearImplementationReferences();
 }
 
-const vk::CommandBuffer& VulkanFixture::prepareFrame(
-    std::span<const vk::ClearValue> clearValues, bool useImGui
-) {
+const vk::CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
     // Wait for the previous frame to finish
     checkSuccess(m_device.waitForFences(*m_inFlightFences.write(), true, k_maxTimeout)
     );
@@ -154,7 +152,19 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
     // Set current commandbuffer
     VulkanObject::s_commandBuffer = &(*commandBuffer);
 
-    // Begin renderpass
+    // Begin ImGui frame
+    if (useImGui) {
+        ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+    }
+
+    return (*commandBuffer);
+}
+
+void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues
+) {
+    auto& commandBuffer = m_commandBuffers.write();
     commandBuffer.beginRenderPass2(
         vk::RenderPassBeginInfo{
             *m_renderPass,
@@ -163,13 +173,6 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
             clearValues},
         vk::SubpassBeginInfo{vk::SubpassContents::eInline}
     );
-
-    // Begin ImGui frame
-    if (useImGui) {
-        ImGui_ImplVulkan_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-    }
 
     // Set default viewport & scissor
     glm::vec2 extent{m_swapchainExtent.width, m_swapchainExtent.height};
@@ -191,20 +194,29 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(
             {m_swapchainExtent.width, m_swapchainExtent.height} // width, height
         }
     );
-
-    return (*commandBuffer);
 }
 
-void VulkanFixture::finishFrame(bool useImGui) {
-    auto& commandBuffer = m_commandBuffers.write();
-    if (useImGui) {
-        ImGui::Render();
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *commandBuffer);
-    }
+void VulkanFixture::mainRenderPassNextSubpass() {
+    m_commandBuffers.write().nextSubpass2(
+        vk::SubpassBeginInfo{vk::SubpassContents::eInline}, vk::SubpassEndInfo{}
+    );
+}
 
-    // Submit the command buffer
+void VulkanFixture::mainRenderPassDrawImGui() {
+    ImGui::Render();
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *m_commandBuffers.write());
+}
+
+void VulkanFixture::mainRenderPassEnd() {
+    auto& commandBuffer = m_commandBuffers.write();
     commandBuffer.endRenderPass2(vk::SubpassEndInfo{});
     commandBuffer.end();
+}
+
+void VulkanFixture::finishFrame() {
+    auto& commandBuffer = m_commandBuffers.write();
+
+    // Submit the command buffer
     vk::PipelineStageFlags waitDstStageMask =
         vk::PipelineStageFlagBits::eColorAttachmentOutput;
     vk::SubmitInfo submitInfo{

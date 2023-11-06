@@ -78,6 +78,8 @@ void MainMenuRoom::step() {
 void MainMenuRoom::render(
     const vk::CommandBuffer& commandBuffer, double interpolationFactor
 ) {
+    engine().mainRenderPassBegin();
+
     // Texture
     if (m_texture) {
         drawTexture(commandBuffer);
@@ -119,6 +121,9 @@ void MainMenuRoom::render(
         }
     }
     End();
+
+    engine().mainRenderPassDrawImGui();
+    engine().mainRenderPassEnd();
 }
 
 void MainMenuRoom::windowResizedCallback(

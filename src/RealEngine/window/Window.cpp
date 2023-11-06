@@ -50,11 +50,27 @@ Window::~Window() {
 }
 
 const vk::CommandBuffer& Window::prepareNewFrame() {
-    return m_vk13.prepareFrame(m_clearValues, m_usingImGui);
+    return m_vk13.prepareFrame(m_usingImGui);
+}
+
+void Window::mainRenderPassBegin() {
+    m_vk13.mainRenderPassBegin(m_clearValues);
+}
+
+void Window::mainRenderPassNextSubpass() {
+    m_vk13.mainRenderPassNextSubpass();
+}
+
+void Window::mainRenderPassDrawImGui() {
+    m_vk13.mainRenderPassDrawImGui();
+}
+
+void Window::mainRenderPassEnd() {
+    m_vk13.mainRenderPassEnd();
 }
 
 void Window::finishNewFrame() {
-    m_vk13.finishFrame(m_usingImGui);
+    m_vk13.finishFrame();
 }
 
 void Window::prepareForDestructionOfRendererObjects() {

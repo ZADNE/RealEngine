@@ -187,6 +187,30 @@ public:
 
 #pragma endregion
 
+#pragma region Main RenderPass
+
+    /**
+     * @copydoc Window::mainRenderPassBegin()
+     */
+    void mainRenderPassBegin();
+
+    /**
+     * @copydoc Window::mainRenderPassNextSubpass()
+     */
+    void mainRenderPassNextSubpass();
+
+    /**
+     * @copydoc Window::mainRenderPassDrawImGui()
+     */
+    void mainRenderPassDrawImGui();
+
+    /**
+     * @copydoc Window::mainRenderPassEnd()
+     */
+    void mainRenderPassEnd();
+
+#pragma endregion
+
 private:
     MainProgram&  m_mainProgram;
     InputManager& m_inputManager;

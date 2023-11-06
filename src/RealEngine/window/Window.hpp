@@ -54,6 +54,11 @@ public:
      */
     const vk::CommandBuffer& prepareNewFrame();
 
+    void mainRenderPassBegin();
+    void mainRenderPassNextSubpass();
+    void mainRenderPassDrawImGui();
+    void mainRenderPassEnd();
+
     /**
      * @brief Renders new frame
      */

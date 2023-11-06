@@ -146,4 +146,24 @@ void RoomToEngineAccess::saveWindowSettings() {
 
 #pragma endregion
 
+#pragma region Main RenderPass
+
+void RoomToEngineAccess::mainRenderPassBegin() {
+    m_window.mainRenderPassBegin();
+}
+
+void RoomToEngineAccess::mainRenderPassNextSubpass() {
+    m_window.mainRenderPassNextSubpass();
+}
+
+void RoomToEngineAccess::mainRenderPassDrawImGui() {
+    m_window.mainRenderPassDrawImGui();
+}
+
+void RoomToEngineAccess::mainRenderPassEnd() {
+    m_window.mainRenderPassEnd();
+}
+
+#pragma endregion
+
 } // namespace re
