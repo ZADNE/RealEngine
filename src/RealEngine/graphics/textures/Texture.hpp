@@ -45,8 +45,12 @@ struct TextureCreateInfo {
 class Texture: public VulkanObject {
 public:
     /**
-     * @brief Constructs Texture
-     * @param createInfo Specifies parameters of the texture
+     * @brief Constructs a null Texture with no memory or images
+     */
+    explicit Texture() {}
+
+    /**
+     * @brief Constructs a Texture according to the given parameters
      */
     explicit Texture(const TextureCreateInfo& createInfo);
 

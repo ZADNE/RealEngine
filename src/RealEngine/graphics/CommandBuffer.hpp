@@ -13,6 +13,11 @@ namespace re {
  */
 class CommandBuffer: public VulkanObject {
 public:
+    /**
+     * @brief Constructs a null CommandBuffer that cannot be used for recording
+     */
+    explicit CommandBuffer() {}
+
     explicit CommandBuffer(vk::CommandBufferLevel level);
 
     CommandBuffer(const CommandBuffer&)            = delete; /**< Noncopyable */
@@ -58,7 +63,7 @@ public:
     const vk::CommandBuffer& commandBuffer() const { return m_commandBuffer; }
 
 private:
-    vk::CommandBuffer m_commandBuffer = nullptr;
+    vk::CommandBuffer m_commandBuffer{};
 };
 
 } // namespace re

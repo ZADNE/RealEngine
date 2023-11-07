@@ -15,7 +15,7 @@ struct PipelineGraphicsCreateInfo {
     vk::PrimitiveTopology topology = vk::PrimitiveTopology::eTriangleList;
     bool                  enablePrimitiveRestart = false;
 
-    // Tesselation
+    // Tessellation
     uint32_t patchControlPoints = 0; // Zero means that tesselation is not used
 
     vk::SpecializationInfo specializationInfo{};
@@ -39,6 +39,11 @@ struct PipelineComputeCreateInfo {
  */
 class Pipeline: public VulkanObject {
 public:
+    /**
+     * @brief Constructs a null pipeline that cannot be used for rendering
+     */
+    explicit Pipeline() {}
+
     /**
      * @brief Constructs graphics pipeline
      */

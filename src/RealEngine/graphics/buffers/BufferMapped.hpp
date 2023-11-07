@@ -14,12 +14,17 @@ template<typename T = std::byte>
 class BufferMapped: public Buffer {
 public:
     /**
-     * @brief Creates and mappes the buffer to CPU
+     * @brief Constructs a null buffer without any backing memory
+     */
+    explicit BufferMapped() {}
+
+    /**
+     * @brief Creates and mapps the buffer to CPU-accessible memory
      * @warning It is your job to unsure that the createInfo::allocFlags
      * contains flag eMapped
      */
     explicit BufferMapped(const BufferCreateInfo& createInfo)
-        : Buffer(createInfo, reinterpret_cast<void**>(&m_mapped)) {}
+        : BufferMapped(createInfo, nullptr) {}
 
     const T& operator[](auto i) const { return m_mapped[i]; }
     T&       operator[](auto i) { return m_mapped[i]; }
@@ -32,7 +37,10 @@ public:
     T*       mapped() { return m_mapped; }
 
 protected:
-    T* m_mapped;
+    BufferMapped(const BufferCreateInfo& createInfo, void* holder)
+        : Buffer(createInfo, &holder)
+        , m_mapped(reinterpret_cast<T*>(holder)) {}
+    T* m_mapped{};
 };
 
 } // namespace re

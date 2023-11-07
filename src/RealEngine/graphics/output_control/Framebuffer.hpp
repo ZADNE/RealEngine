@@ -12,6 +12,14 @@ namespace re {
  */
 class Framebuffer: public VulkanObject {
 public:
+    /**
+     * @brief Constructs a null framebuffer that cannot be rendered into
+     */
+    explicit Framebuffer() {}
+
+    /**
+     * @brief Constructs a framebuffer that can be used as rendering target
+     */
     explicit Framebuffer(const vk::FramebufferCreateInfo& createInfo);
 
     Framebuffer(const Framebuffer&)            = delete; /**< Noncopyable */

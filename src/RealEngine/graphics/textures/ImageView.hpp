@@ -13,6 +13,11 @@ namespace re {
  */
 class ImageView: public VulkanObject {
 public:
+    /**
+     * @brief Constructs a null ImageView that does not view any image
+     */
+    explicit ImageView() {}
+
     explicit ImageView(const vk::ImageViewCreateInfo& createInfo);
 
     ImageView(const ImageView&)            = delete; /**< Noncopyable */

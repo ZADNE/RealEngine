@@ -14,6 +14,11 @@ namespace re {
  */
 class Fence: public VulkanObject {
 public:
+    /**
+     * @brief Constructs a null fence that cannot be used for synchronization
+     */
+    explicit Fence() {}
+
     explicit Fence(vk::FenceCreateFlags createFlags);
 
     Fence(const Fence&)            = delete; /**< Noncopyable */

@@ -14,6 +14,11 @@ namespace re {
 class DescriptorSet: public VulkanObject {
 public:
     /**
+     * @brief Constructs a null descriptor set that does not describe anything
+     */
+    explicit DescriptorSet() {}
+
+    /**
      * @brief Constructs set for given layout
      */
     explicit DescriptorSet(const vk::DescriptorSetLayout& descSetLayout);

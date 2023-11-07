@@ -13,6 +13,14 @@ namespace re {
  */
 class RenderPass: public VulkanObject {
 public:
+    /**
+     * @brief Constructs a null renderpass that cannot be used for rendering
+     */
+    explicit RenderPass() {}
+
+    /**
+     * @brief Constructs a renderpass that can be used for rendering
+     */
     explicit RenderPass(const vk::RenderPassCreateInfo2& createInfo);
 
     RenderPass(const RenderPass&)            = delete; /**< Noncopyable */

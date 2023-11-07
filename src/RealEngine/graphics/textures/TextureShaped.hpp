@@ -32,6 +32,10 @@ private:
 class TextureShaped: public Texture {
 public:
     /**
+     * @brief Constructs a null Texture with no memory or images
+     */
+    explicit TextureShaped() {}
+    /**
      * @brief   Constructs texture from PNG
      * @param   filePathPNG Path to the PNG
      * @throws  Throws when the PNG cannot be loaded

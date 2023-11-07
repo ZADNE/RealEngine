@@ -24,6 +24,11 @@ struct PipelineLayoutDescription {
 class PipelineLayout: public VulkanObject {
 public:
     /**
+     * @brief Constructs a null PipelineLayout that cannot be used
+     */
+    explicit PipelineLayout() {}
+
+    /**
      * @brief Constructs pipeline layout by reflecting graphics pipeline sources
      */
     PipelineLayout(

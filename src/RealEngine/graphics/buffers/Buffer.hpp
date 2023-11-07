@@ -2,8 +2,8 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <span>
 #include <memory>
+#include <span>
 #include <type_traits>
 #include <vector>
 
@@ -39,6 +39,11 @@ struct BufferCreateInfo {
  */
 class Buffer: public VulkanObject {
 public:
+    /**
+     * @brief Constructs a null buffer without any backing memory
+     */
+    explicit Buffer() {}
+
     explicit Buffer(const BufferCreateInfo& createInfo)
         : Buffer(createInfo, nullptr) {}
 
