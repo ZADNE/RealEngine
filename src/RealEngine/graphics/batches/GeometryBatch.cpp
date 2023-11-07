@@ -25,10 +25,10 @@ GeometryBatch::GeometryBatch(
       )
     , m_pipeline(
           PipelineGraphicsCreateInfo{
-              .pipelineLayout = *m_pipelineLayout,
               .vertexInput    = createVertexInputStateInfo(),
               .topology       = topology,
-              .lineWidth      = lineWidth},
+              .lineWidth      = lineWidth,
+              .pipelineLayout = *m_pipelineLayout},
           PipelineGraphicsSources{.vert = geometry_vert, .frag = geometry_frag}
       ) {
 }
@@ -57,8 +57,7 @@ void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4
         *m_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0u, mvpMat
     );
     commandBuffer.draw(
-        m_nextVertexIndex -
-            m_maxVertices * FrameDoubleBufferingState::writeIndex(),
+        m_nextVertexIndex - m_maxVertices * FrameDoubleBufferingState::writeIndex(),
         1u,
         m_maxVertices * FrameDoubleBufferingState::writeIndex(),
         0u

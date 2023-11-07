@@ -8,7 +8,8 @@
 namespace re {
 
 struct PipelineGraphicsCreateInfo {
-    vk::PipelineLayout                     pipelineLayout = nullptr;
+    // Specialization
+    const vk::SpecializationInfo*          specializationInfo = nullptr;
     vk::PipelineVertexInputStateCreateInfo vertexInput{};
 
     // Input assembly
@@ -18,20 +19,22 @@ struct PipelineGraphicsCreateInfo {
     // Tessellation
     uint32_t patchControlPoints = 0; // Zero means that tesselation is not used
 
-    vk::SpecializationInfo specializationInfo{};
-
     // Rasterization
     vk::CullModeFlags cullMode  = vk::CullModeFlagBits::eNone;
     float             lineWidth = 1.0f;
 
     bool enableDepth = false;
     bool enableBlend = true;
-    vk::RenderPass renderPass = nullptr; // The default renderpass is used if unspecified
+
+    vk::PipelineLayout pipelineLayout = nullptr;
+    vk::RenderPass renderPass = nullptr; // The main renderpass is used if unspecified
     uint32_t subpassIndex = 0;
 };
 
 struct PipelineComputeCreateInfo {
-    vk::PipelineLayout pipelineLayout = nullptr;
+    // Specialization
+    const vk::SpecializationInfo* specializationInfo = nullptr;
+    vk::PipelineLayout            pipelineLayout     = nullptr;
 };
 
 /**
@@ -40,7 +43,7 @@ struct PipelineComputeCreateInfo {
 class Pipeline: public VulkanObject {
 public:
     /**
-     * @brief Constructs a null pipeline that cannot be used for rendering
+     * @brief Constructs a null pipeline that cannot be used for rendering or compute
      */
     explicit Pipeline() {}
 

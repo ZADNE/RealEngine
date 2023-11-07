@@ -39,7 +39,7 @@ Pipeline::Pipeline(
                 convert(st),
                 modules[shaderCount],
                 "main",
-                &createInfo.specializationInfo};
+                createInfo.specializationInfo};
             shaderCount++;
         }
     }
@@ -89,6 +89,7 @@ Pipeline::Pipeline(
         {vk::DynamicState::eViewport, vk::DynamicState::eScissor}
     );
     vk::PipelineDynamicStateCreateInfo dynamic{{}, dynamicStates};
+
     // Create pipeline
     m_pipeline =
         device()
@@ -115,6 +116,7 @@ Pipeline::Pipeline(
                 }
             )
             .value;
+
     // Destroy shader modules
     for (uint32_t i = 0; i < shaderCount; i++) {
         device().destroyShaderModule(modules[i]);
@@ -127,6 +129,7 @@ Pipeline::Pipeline(
     // Create compute shader module
     vk::ShaderModule compShader = device().createShaderModule(vk::ShaderModuleCreateInfo{
         {}, srcs.comp.vk13.size() * 4, srcs.comp.vk13.data()});
+
     // Create pipeline
     m_pipeline =
         device()
@@ -138,13 +141,15 @@ Pipeline::Pipeline(
                         {},
                         vk::ShaderStageFlagBits::eCompute,
                         compShader,
-                        "main"},
+                        "main",
+                        createInfo.specializationInfo},
                     createInfo.pipelineLayout,
                     nullptr,
                     -1 // No base pipeline
                 }
             )
             .value;
+
     // Destroy compute shader module
     device().destroyShaderModule(compShader);
 }

@@ -177,17 +177,17 @@ Pipeline SpriteBatch::createPipeline(
         );
     // Specialization constants
     static constexpr vk::SpecializationMapEntry k_specMapEntry{0u, 0u, 4ull};
-    unsigned int totalTextures = maxTextures * k_maxFramesInFlight;
+    unsigned int           totalTextures = maxTextures * k_maxFramesInFlight;
+    vk::SpecializationInfo specInfo{
+        1u, &k_specMapEntry, sizeof(totalTextures), &totalTextures};
     return Pipeline{
         PipelineGraphicsCreateInfo{
-            .pipelineLayout = *pipelineLayout,
+            .specializationInfo = &specInfo,
             .vertexInput =
                 vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes},
             .topology           = vk::PrimitiveTopology::ePatchList,
             .patchControlPoints = 1u,
-            .specializationInfo =
-                vk::SpecializationInfo{
-                    1u, &k_specMapEntry, sizeof(totalTextures), &totalTextures}},
+            .pipelineLayout     = *pipelineLayout},
         PipelineGraphicsSources{
             .vert = sprite_vert,
             .tesc = sprite_tesc,
