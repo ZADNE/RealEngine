@@ -43,7 +43,8 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
             commandBuffer.copyBuffer(
                 stage.first,
                 m_buffer,
-                vk::BufferCopy{0u, 0u, createInfo.initData.size_bytes()}
+                vk::BufferCopy{
+                    0u, createInfo.initDataDstOffset, createInfo.initData.size_bytes()}
             );
         });
         // Destroy the temporary stage

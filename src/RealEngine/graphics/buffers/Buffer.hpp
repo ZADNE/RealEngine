@@ -27,10 +27,14 @@ struct BufferCreateInfo {
     // Memory-related
     vma::AllocationCreateFlags allocFlags  = {};
     vma::MemoryUsage           memoryUsage = vma::MemoryUsage::eAuto;
+
     // Buffer-related
-    vk::DeviceSize             sizeInBytes = 0;
-    vk::BufferUsageFlags       usage       = {};
-    std::span<const std::byte> initData    = {};
+    vk::DeviceSize       sizeInBytes = 0;
+    vk::BufferUsageFlags usage       = {};
+
+    // Initial data
+    std::span<const std::byte> initData = {};
+    vk::DeviceSize initDataDstOffset = {}; // Offset in bytes where initData will be placed
 };
 
 /**
