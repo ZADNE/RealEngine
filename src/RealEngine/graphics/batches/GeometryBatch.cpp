@@ -5,11 +5,11 @@
 #include <RealEngine/graphics/batches/shaders/AllShaders.hpp>
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 
-namespace re {
-
 using enum vk::BufferUsageFlagBits;
 using enum vk::MemoryPropertyFlagBits;
 using enum vma::AllocationCreateFlagBits;
+
+namespace re {
 
 GeometryBatch::GeometryBatch(
     vk::PrimitiveTopology topology, unsigned int maxVertices, float lineWidth
@@ -50,13 +50,13 @@ void GeometryBatch::addVertices(std::span<const VertexPoCo> vertices) {
     m_nextVertexIndex += vertices.size();
 }
 
-void GeometryBatch::draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat) {
-    commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
-    commandBuffer.bindVertexBuffers(0u, m_verticesBuf.buffer(), vk::DeviceSize{0});
-    commandBuffer.pushConstants<glm::mat4>(
+void GeometryBatch::draw(const vk::CommandBuffer& cmdBuf, const glm::mat4& mvpMat) {
+    cmdBuf.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
+    cmdBuf.bindVertexBuffers(0u, m_verticesBuf.buffer(), vk::DeviceSize{0});
+    cmdBuf.pushConstants<glm::mat4>(
         *m_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0u, mvpMat
     );
-    commandBuffer.draw(
+    cmdBuf.draw(
         m_nextVertexIndex - m_maxVertices * FrameDoubleBufferingState::writeIndex(),
         1u,
         m_maxVertices * FrameDoubleBufferingState::writeIndex(),

@@ -72,7 +72,7 @@ VulkanFixture::VulkanFixture(
       )
     , m_swapChainFramebuffers(createSwapchainFramebuffers())
     , m_commandPool(createCommandPool())
-    , m_commandBuffers(createCommandBuffers())
+    , m_cmdBufs(createCommandBuffers())
     , m_oneTimeSubmitCommandBuffer(std::move(
           vk::raii::CommandBuffers{m_device, {*m_commandPool, ePrimary, 1u}}.back()
       ))
@@ -145,12 +145,12 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
     }
 
     // Restart command buffer
-    auto& commandBuffer = m_commandBuffers.write();
-    commandBuffer.reset();
-    commandBuffer.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+    auto& cmdBuf = m_cmdBufs.write();
+    cmdBuf.reset();
+    cmdBuf.begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 
     // Set current commandbuffer
-    VulkanObject::s_commandBuffer = &(*commandBuffer);
+    VulkanObject::s_cmdBuf = &(*cmdBuf);
 
     // Begin ImGui frame
     if (useImGui) {
@@ -159,13 +159,13 @@ const vk::CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
         ImGui::NewFrame();
     }
 
-    return (*commandBuffer);
+    return (*cmdBuf);
 }
 
 void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues
 ) {
-    auto& commandBuffer = m_commandBuffers.write();
-    commandBuffer.beginRenderPass2(
+    auto& cmdBuf = m_cmdBufs.write();
+    cmdBuf.beginRenderPass2(
         vk::RenderPassBeginInfo{
             *m_renderPass,
             *m_swapChainFramebuffers[m_imageIndex],
@@ -176,7 +176,7 @@ void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearVal
 
     // Set default viewport & scissor
     glm::vec2 extent{m_swapchainExtent.width, m_swapchainExtent.height};
-    commandBuffer.setViewport(
+    cmdBuf.setViewport(
         0u,
         vk::Viewport{
             0.0f,      // x
@@ -187,7 +187,7 @@ void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearVal
             1.0f       // maxDepth
         }
     );
-    commandBuffer.setScissor(
+    cmdBuf.setScissor(
         0u,
         vk::Rect2D{
             {0, 0},                                             // x, y
@@ -197,24 +197,24 @@ void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearVal
 }
 
 void VulkanFixture::mainRenderPassNextSubpass() {
-    m_commandBuffers.write().nextSubpass2(
+    m_cmdBufs.write().nextSubpass2(
         vk::SubpassBeginInfo{vk::SubpassContents::eInline}, vk::SubpassEndInfo{}
     );
 }
 
 void VulkanFixture::mainRenderPassDrawImGui() {
     ImGui::Render();
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *m_commandBuffers.write());
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *m_cmdBufs.write());
 }
 
 void VulkanFixture::mainRenderPassEnd() {
-    auto& commandBuffer = m_commandBuffers.write();
-    commandBuffer.endRenderPass2(vk::SubpassEndInfo{});
-    commandBuffer.end();
+    auto& cmdBuf = m_cmdBufs.write();
+    cmdBuf.endRenderPass2(vk::SubpassEndInfo{});
+    cmdBuf.end();
 }
 
 void VulkanFixture::finishFrame() {
-    auto& commandBuffer = m_commandBuffers.write();
+    auto& cmdBuf = m_cmdBufs.write();
 
     // Submit the command buffer
     vk::PipelineStageFlags waitDstStageMask =
@@ -222,7 +222,7 @@ void VulkanFixture::finishFrame() {
     vk::SubmitInfo submitInfo{
         *m_imageAvailableSems.write(), // Wait for image to be available
         waitDstStageMask,              // Wait just before writing output
-        *commandBuffer,
+        *cmdBuf,
         *m_renderingFinishedSems.write() // Signal that the rendering has
                                          // finished once done
     };
@@ -539,9 +539,9 @@ vk::raii::CommandPool VulkanFixture::createCommandPool() {
 }
 
 FrameDoubleBuffered<vk::raii::CommandBuffer> VulkanFixture::createCommandBuffers() {
-    vk::CommandBufferAllocateInfo commandBufferAllocateInfo{
+    vk::CommandBufferAllocateInfo cmdBufAllocateInfo{
         *m_commandPool, ePrimary, k_maxFramesInFlight};
-    vk::raii::CommandBuffers buffers{m_device, commandBufferAllocateInfo};
+    vk::raii::CommandBuffers buffers{m_device, cmdBufAllocateInfo};
     assert(buffers.size() == k_maxFramesInFlight);
     return FrameDoubleBuffered<vk::raii::CommandBuffer>{
         std::move(buffers[0]), std::move(buffers[1])};
@@ -682,12 +682,10 @@ void VulkanFixture::recreateSwapchain() {
 
 void VulkanFixture::recreateImGuiFontTexture() {
     vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
-    m_commandBuffers.write().begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-    ImGui_ImplVulkan_CreateFontsTexture(*m_commandBuffers.write());
-    m_commandBuffers.write().end();
-    m_graphicsQueue.submit(
-        vk::SubmitInfo{{}, {}, *m_commandBuffers.write()}, *uploadFence
-    );
+    m_cmdBufs.write().begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+    ImGui_ImplVulkan_CreateFontsTexture(*m_cmdBufs.write());
+    m_cmdBufs.write().end();
+    m_graphicsQueue.submit(vk::SubmitInfo{{}, {}, *m_cmdBufs.write()}, *uploadFence);
     checkSuccess(m_device.waitForFences(*uploadFence, true, k_maxTimeout));
 }
 

@@ -19,9 +19,11 @@ class VulkanObject {
 protected:
     /**
      * @brief Concrete Vulkan objects (e.g. buffers, textures, pipelines) are
-     * supposed to derive from this
+     * supposed to derive from this.
+     * @details This constructor is deliberately protected as the VulkanObject
+     * does not do anything on its own
      */
-    VulkanObject() { /* Protected constructor */ }
+    VulkanObject() {}
 
     static const vk::PhysicalDevice& physicalDevice() {
         return *s_physicalDevice;
@@ -34,7 +36,7 @@ protected:
     static const vk::PipelineCache& pipelineCache() { return *s_pipelineCache; }
     static const vk::RenderPass&    renderPass() { return *s_renderPass; }
     static const vk::CommandPool&   commandPool() { return *s_commandPool; }
-    static const vk::CommandBuffer& commandBuffer() { return *s_commandBuffer; }
+    static const vk::CommandBuffer& cmdBuf() { return *s_cmdBuf; }
     static const vk::CommandBuffer& oneTimeSubmitCommandBuffer() {
         return *s_oneTimeSubmitCommandBuffer;
     }
@@ -53,7 +55,7 @@ private:
     static inline const vk::PipelineCache*  s_pipelineCache     = nullptr;
     static inline const vk::RenderPass*     s_renderPass        = nullptr;
     static inline const vk::CommandPool*    s_commandPool       = nullptr;
-    static inline const vk::CommandBuffer*  s_commandBuffer     = nullptr;
+    static inline const vk::CommandBuffer*  s_cmdBuf            = nullptr;
     static inline const vk::CommandBuffer* s_oneTimeSubmitCommandBuffer = nullptr;
     static inline const vk::DescriptorPool* s_descriptorPool = nullptr;
     static inline DeletionQueue*            s_deletionQueue  = nullptr;

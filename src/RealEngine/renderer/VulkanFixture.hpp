@@ -121,7 +121,7 @@ private:
     vk::raii::RenderPass                         m_renderPass;
     std::vector<vk::raii::Framebuffer>           m_swapChainFramebuffers;
     vk::raii::CommandPool                        m_commandPool;
-    FrameDoubleBuffered<vk::raii::CommandBuffer> m_commandBuffers;
+    FrameDoubleBuffered<vk::raii::CommandBuffer> m_cmdBufs;
     vk::raii::CommandBuffer                      m_oneTimeSubmitCommandBuffer;
     vk::raii::PipelineCache                      m_pipelineCache;
     vk::raii::DescriptorPool                     m_descriptorPool;

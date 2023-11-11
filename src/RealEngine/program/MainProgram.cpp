@@ -124,10 +124,10 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
         }
 
         // Prepare for drawing
-        const auto& commandBuffer = m_window.prepareNewFrame();
+        const auto& cmdBuf = m_window.prepareNewFrame();
 
         // Draw the frame
-        render(commandBuffer, m_synchronizer.drawInterpolationFactor());
+        render(cmdBuf, m_synchronizer.drawInterpolationFactor());
 
         // Finish the drawing
         m_window.finishNewFrame();
@@ -150,10 +150,8 @@ void MainProgram::step() {
     m_roomManager.currentRoom()->step();
 }
 
-void MainProgram::render(
-    const vk::CommandBuffer& commandBuffer, double interpolationFactor
-) {
-    m_roomManager.currentRoom()->render(commandBuffer, interpolationFactor);
+void MainProgram::render(const vk::CommandBuffer& cmdBuf, double interpolationFactor) {
+    m_roomManager.currentRoom()->render(cmdBuf, interpolationFactor);
 }
 
 void MainProgram::processEvent(SDL_Event* evnt) {

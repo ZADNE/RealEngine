@@ -69,16 +69,13 @@ public:
      * This function is called at a variable rate, depending on
      * the speed of hardware. Upper limit can be set via Synchronizer.
      *
-     * @param commandBuffer         The command buffer that should be used for
-     * rendering
+     * @param cmdBuf The command buffer that should be used for rendering
      * @param interpolationFactor   Represents relative time between last
      *                              performed step and the upcoming step.
      *                              Use it to interpolate between discrete
      *                              simulation steps.
      */
-    virtual void render(
-        const vk::CommandBuffer& commandBuffer, double interpolationFactor
-    ) = 0;
+    virtual void render(const vk::CommandBuffer& cmdBuf, double interpolationFactor) = 0;
 
     /**
      * @brief Callback used to notify that the window's size has changed

@@ -6,12 +6,12 @@
 #include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/utility/Error.hpp>
 
-namespace re {
-
 using enum vk::ImageLayout;
 using enum vk::PipelineStageFlagBits;
 using enum vma::AllocationCreateFlagBits;
 using enum vma::MemoryUsage;
+
+namespace re {
 
 constexpr auto k_hostAccess = eHostAccessRandom | eHostAccessSequentialWrite;
 
@@ -61,9 +61,9 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         initializeTexels(createInfo);
     } else if (createInfo.initialLayout != eUndefined) {
         // Transit to initial layout
-        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
+        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& cmdBuf) {
             pipelineImageBarrier(
-                commandBuffer,
+                cmdBuf,
                 eUndefined,
                 createInfo.initialLayout, // Image layouts
                 eTopOfPipe,
@@ -133,9 +133,9 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
         stagingBuffer.mapped(), createInfo.texels.data(), createInfo.texels.size()
     );
     // Copy data from staging buffer to the image
-    CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
+    CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& cmdBuf) {
         pipelineImageBarrier(
-            commandBuffer,
+            cmdBuf,
             eUndefined,
             eTransferDstOptimal, // Image layouts
             eAllCommands,
@@ -144,7 +144,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
             vk::AccessFlagBits::eTransferWrite, // Access flags
             createInfo.layers                   // Array layer count
         );
-        commandBuffer.copyBufferToImage(
+        cmdBuf.copyBufferToImage(
             stagingBuffer.buffer(),
             m_image,
             eTransferDstOptimal,
@@ -163,7 +163,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
         );
         using enum vk::AccessFlagBits;
         pipelineImageBarrier(
-            commandBuffer,
+            cmdBuf,
             eTransferDstOptimal,
             createInfo.initialLayout, // Image layouts
             eTransfer,
@@ -176,7 +176,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
 }
 
 void Texture::pipelineImageBarrier(
-    const vk::CommandBuffer& commandBuffer,
+    const vk::CommandBuffer& cmdBuf,
     vk::ImageLayout          oldLayout,
     vk::ImageLayout          newLayout,
     vk::PipelineStageFlags   srcStage,
@@ -185,7 +185,7 @@ void Texture::pipelineImageBarrier(
     vk::AccessFlags          dstAccess,
     uint32_t                 layerCount
 ) {
-    commandBuffer.pipelineBarrier(
+    cmdBuf.pipelineBarrier(
         srcStage,
         dstStage,
         vk::DependencyFlags{},

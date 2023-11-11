@@ -75,7 +75,7 @@ protected:
     void initializeTexels(const TextureCreateInfo& createInfo);
 
     void pipelineImageBarrier(
-        const vk::CommandBuffer& commandBuffer,
+        const vk::CommandBuffer& cmdBuf,
         vk::ImageLayout          oldLayout,
         vk::ImageLayout          newLayout,
         vk::PipelineStageFlags   srcStage,

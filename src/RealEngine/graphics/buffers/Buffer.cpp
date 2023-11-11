@@ -7,11 +7,11 @@
 #include <RealEngine/graphics/buffers/Buffer.hpp>
 #include <RealEngine/utility/Error.hpp>
 
-namespace re {
-
 using enum vk::BufferUsageFlagBits;
 using enum vma::AllocationCreateFlagBits;
 using enum vma::MemoryUsage;
+
+namespace re {
 
 constexpr auto k_hostAccess = eHostAccessRandom | eHostAccessSequentialWrite;
 
@@ -39,8 +39,8 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
             stageMapped, createInfo.initData.data(), createInfo.initData.size_bytes()
         );
         // Copy from staging to main buffer
-        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& commandBuffer) {
-            commandBuffer.copyBuffer(
+        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& cmdBuf) {
+            cmdBuf.copyBuffer(
                 stage.first,
                 m_buffer,
                 vk::BufferCopy{

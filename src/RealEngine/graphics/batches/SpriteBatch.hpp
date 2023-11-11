@@ -47,10 +47,10 @@ public:
     /**
      * @brief   Draws the last batch
      * @details Sprite in the batch are drawn in the order they were added in
-     * @param commandBuffer Command buffer used for rendering
+     * @param cmdBuf Command buffer used for rendering
      * @param mvpMat Transformation matrix applied to the batch
      */
-    void drawBatch(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat);
+    void drawBatch(const vk::CommandBuffer& cmdBuf, const glm::mat4& mvpMat);
 
     void add(const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect);
 

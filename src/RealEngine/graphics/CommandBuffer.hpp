@@ -57,13 +57,13 @@ public:
     void submitToGraphicsQueue(const vk::Fence& signalFence = nullptr) const;
     void submitToComputeQueue(const vk::Fence& signalFence = nullptr) const;
 
-    const vk::CommandBuffer& operator*() const { return m_commandBuffer; }
-    const vk::CommandBuffer* operator->() const { return &m_commandBuffer; }
+    const vk::CommandBuffer& operator*() const { return m_cmdBuf; }
+    const vk::CommandBuffer* operator->() const { return &m_cmdBuf; }
 
-    const vk::CommandBuffer& commandBuffer() const { return m_commandBuffer; }
+    const vk::CommandBuffer& commandBuffer() const { return m_cmdBuf; }
 
 private:
-    vk::CommandBuffer m_commandBuffer{};
+    vk::CommandBuffer m_cmdBuf{};
 };
 
 } // namespace re

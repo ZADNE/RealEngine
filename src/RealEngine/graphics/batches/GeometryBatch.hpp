@@ -50,10 +50,10 @@ public:
     /**
      * @brief   Draws the batch
      * @details The whole geometry is drawn in the order it was added in
-     * @param commandBuffer Command buffer used for rendering
+     * @param cmdBuf Command buffer used for rendering
      * @param mvpMat Transformation matrix applied to the sprites
      */
-    void draw(const vk::CommandBuffer& commandBuffer, const glm::mat4& mvpMat);
+    void draw(const vk::CommandBuffer& cmdBuf, const glm::mat4& mvpMat);
 
 private:
     BufferMapped<VertexPoCo>               m_verticesBuf;
