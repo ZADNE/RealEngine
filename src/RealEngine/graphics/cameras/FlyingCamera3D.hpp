@@ -28,7 +28,7 @@ public:
     /**
      * @brief Gets the projection matrix of the view
      */
-    const glm::mat4& viewMat() const;
+    const glm::mat4& viewMat() const { return m_viewMat; }
 
     /**
      * @brief Gets position of the camera

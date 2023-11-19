@@ -26,10 +26,6 @@ void FlyingCamera3D::move(const glm::vec3& rightUpBack) {
     recalculateViewMat();
 }
 
-const glm::mat4& FlyingCamera3D::viewMat() const {
-    return m_viewMat;
-}
-
 void FlyingCamera3D::recalculateViewMat() {
     m_viewMat = glm::translate(glm::toMat4(m_dirQuat), -m_pos);
 }

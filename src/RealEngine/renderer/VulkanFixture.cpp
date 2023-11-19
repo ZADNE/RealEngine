@@ -210,11 +210,11 @@ void VulkanFixture::mainRenderPassDrawImGui() {
 void VulkanFixture::mainRenderPassEnd() {
     auto& cmdBuf = m_cmdBufs.write();
     cmdBuf.endRenderPass2(vk::SubpassEndInfo{});
-    cmdBuf.end();
 }
 
 void VulkanFixture::finishFrame() {
     auto& cmdBuf = m_cmdBufs.write();
+    cmdBuf.end();
 
     // Submit the command buffer
     vk::PipelineStageFlags waitDstStageMask =

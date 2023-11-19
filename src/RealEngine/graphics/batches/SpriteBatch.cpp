@@ -140,13 +140,13 @@ Pipeline SpriteBatch::createPipeline(
     const PipelineLayout& pipelineLayout, unsigned int maxTextures
 ) {
     // Vertex input
-    static constexpr std::array bindings =
+    static constexpr std::array k_bindings =
         std::to_array<vk::VertexInputBindingDescription>({{
             0u,                          // Binding index
             sizeof(Sprite),              // Stride
             vk::VertexInputRate::eVertex // Input rate
         }});
-    static constexpr std::array attributes =
+    static constexpr std::array k_attributes =
         std::to_array<vk::VertexInputAttributeDescription>(
             {{
                  0u,                              // Location
@@ -173,6 +173,7 @@ Pipeline SpriteBatch::createPipeline(
                  offsetof(Sprite, col) // Relative offset
              }}
         );
+    vk::PipelineVertexInputStateCreateInfo vertexInput{{}, k_bindings, k_attributes};
     // Specialization constants
     static constexpr vk::SpecializationMapEntry k_specMapEntry{0u, 0u, 4ull};
     unsigned int           totalTextures = maxTextures * k_maxFramesInFlight;
@@ -181,8 +182,7 @@ Pipeline SpriteBatch::createPipeline(
     return Pipeline{
         PipelineGraphicsCreateInfo{
             .specializationInfo = &specInfo,
-            .vertexInput =
-                vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes},
+            .vertexInput        = &vertexInput,
             .topology           = vk::PrimitiveTopology::ePatchList,
             .patchControlPoints = 1u,
             .pipelineLayout     = *pipelineLayout},

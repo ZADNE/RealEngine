@@ -11,6 +11,29 @@ using enum vma::AllocationCreateFlagBits;
 
 namespace re {
 
+namespace {
+constexpr std::array k_bindings = std::to_array<vk::VertexInputBindingDescription>({{
+    0u,                          // Binding index
+    sizeof(VertexPoCo),          // Stride
+    vk::VertexInputRate::eVertex // Input rate
+}});
+constexpr std::array k_attributes = std::to_array<vk::VertexInputAttributeDescription>(
+    {{
+         0u,                              // Location
+         0u,                              // Binding index
+         vk::Format::eR32G32B32A32Sfloat, // Format
+         offsetof(VertexPoCo, position)   // Relative offset
+     },
+     {
+         1u,                         // Location
+         0u,                         // Binding index
+         vk::Format::eR8G8B8A8Unorm, // Format
+         offsetof(VertexPoCo, color) // Relative offset
+     }}
+);
+vk::PipelineVertexInputStateCreateInfo k_vertexInput{{}, k_bindings, k_attributes};
+} // namespace
+
 GeometryBatch::GeometryBatch(
     vk::PrimitiveTopology topology, unsigned int maxVertices, float lineWidth
 )
@@ -25,7 +48,7 @@ GeometryBatch::GeometryBatch(
       )
     , m_pipeline(
           PipelineGraphicsCreateInfo{
-              .vertexInput    = createVertexInputStateInfo(),
+              .vertexInput    = &k_vertexInput,
               .topology       = topology,
               .lineWidth      = lineWidth,
               .pipelineLayout = *m_pipelineLayout},
@@ -62,31 +85,6 @@ void GeometryBatch::draw(const vk::CommandBuffer& cmdBuf, const glm::mat4& mvpMa
         m_maxVertices * FrameDoubleBufferingState::writeIndex(),
         0u
     );
-}
-
-vk::PipelineVertexInputStateCreateInfo GeometryBatch::createVertexInputStateInfo() const {
-    static constexpr std::array bindings =
-        std::to_array<vk::VertexInputBindingDescription>({{
-            0u,                          // Binding index
-            sizeof(VertexPoCo),          // Stride
-            vk::VertexInputRate::eVertex // Input rate
-        }});
-    static constexpr std::array attributes =
-        std::to_array<vk::VertexInputAttributeDescription>(
-            {{
-                 0u,                              // Location
-                 0u,                              // Binding index
-                 vk::Format::eR32G32B32A32Sfloat, // Format
-                 offsetof(VertexPoCo, position)   // Relative offset
-             },
-             {
-                 1u,                         // Location
-                 0u,                         // Binding index
-                 vk::Format::eR8G8B8A8Unorm, // Format
-                 offsetof(VertexPoCo, color) // Relative offset
-             }}
-        );
-    return vk::PipelineVertexInputStateCreateInfo{{}, bindings, attributes};
 }
 
 } // namespace re

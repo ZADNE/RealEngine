@@ -9,10 +9,10 @@ namespace re {
 
 struct PipelineGraphicsCreateInfo {
     // Specialization
-    const vk::SpecializationInfo*          specializationInfo = nullptr;
-    vk::PipelineVertexInputStateCreateInfo vertexInput{};
+    const vk::SpecializationInfo* specializationInfo = nullptr;
 
     // Input assembly
+    const vk::PipelineVertexInputStateCreateInfo* vertexInput = nullptr;
     vk::PrimitiveTopology topology = vk::PrimitiveTopology::eTriangleList;
     bool                  enablePrimitiveRestart = false;
 

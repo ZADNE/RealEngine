@@ -9,7 +9,8 @@ using enum vk::ColorComponentFlagBits;
 
 namespace re {
 
-static vk::ShaderStageFlagBits convert(size_t st) {
+namespace {
+vk::ShaderStageFlagBits convert(size_t st) {
     switch (st) {
     case 0: return vk::ShaderStageFlagBits::eVertex;
     case 1: return vk::ShaderStageFlagBits::eTessellationControl;
@@ -20,6 +21,8 @@ static vk::ShaderStageFlagBits convert(size_t st) {
     default: throw Exception{"Unknown shader type"};
     }
 }
+constexpr vk::PipelineVertexInputStateCreateInfo k_emptyVertexInput{};
+} // namespace
 
 Pipeline::Pipeline(
     const PipelineGraphicsCreateInfo& createInfo, const PipelineGraphicsSources& srcs
@@ -99,7 +102,7 @@ Pipeline::Pipeline(
                     {},
                     shaderCount,
                     stages.data(), // Shader modules
-                    &createInfo.vertexInput,
+                    createInfo.vertexInput ? createInfo.vertexInput : &k_emptyVertexInput,
                     &inputAssembly,
                     &tessellation,
                     &viewport,
