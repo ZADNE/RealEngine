@@ -13,32 +13,46 @@ namespace re {
  */
 class FlyingCamera3D {
 public:
-    FlyingCamera3D(const glm::vec3& pos, const glm::vec3& yawPitchRoll);
+    FlyingCamera3D(glm::vec3 pos, glm::vec3 yawPitchRoll);
 
     /**
      * @brief Adds given angles (in radians) to the current ones
      */
-    void rotate(const glm::vec3& yawPitchRoll);
+    void rotate(glm::vec3 yawPitchRoll);
 
     /**
      * @brief Moves based on current rotation
      */
-    void move(const glm::vec3& rightUpBack);
+    void move(glm::vec3 rightUpBack);
 
     /**
-     * @brief Gets the projection matrix of the view
+     * @brief Gets view matrix of the camera
      */
     const glm::mat4& viewMat() const { return m_viewMat; }
 
     /**
+     * @brief Calculates view matrix that the camera would have if it has
+     * rotated and moved
+     * @details This does not change the state camera.
+     */
+    glm::mat4 calculateRelativeViewMat(
+        glm::vec3 yawPitchRoll, glm::vec3 rightUpBack
+    ) const;
+
+    /**
      * @brief Gets position of the camera
      */
-    const glm::vec3& pos() const { return m_pos; }
+    glm::vec3 pos() const { return m_pos; }
+
+    /**
+     * @brief Gets quaternion representation of the camera's direction
+     */
+    glm::quat dir() const { return m_dirQuat; }
 
 private:
-    void      recalculateViewMat();
-    glm::mat4 m_viewMat;
+    glm::mat4 calculateViewMat(glm::quat dirQuat, glm::vec3 pos) const;
 
+    glm::mat4 m_viewMat;
     glm::vec3 m_pos;
     glm::quat m_dirQuat{};
 };
