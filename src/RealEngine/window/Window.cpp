@@ -126,7 +126,7 @@ void Window::setPreferredRenderer(RendererID renderer, bool save) {
         this->save();
 }
 
-void Window::setDims(const glm::ivec2& newDims, bool save) {
+void Window::setDims(glm::ivec2 newDims, bool save) {
     SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
     SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);

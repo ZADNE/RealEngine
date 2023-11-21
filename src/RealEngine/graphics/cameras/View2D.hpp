@@ -12,26 +12,26 @@ namespace re {
  */
 class View2D {
 public:
-    explicit View2D(const glm::vec2& viewDimensions);
+    explicit View2D(glm::vec2 viewDimensions);
 
-    void setCursorAbs(const glm::vec2& cursorAbs);
+    void setCursorAbs(glm::vec2 cursorAbs);
 
-    glm::vec2 convertAbsToRel(const glm::uvec2& abs);
+    glm::vec2 convertAbsToRel(glm::uvec2 abs);
 
-    void resizeView(const glm::vec2& newDims);
-    void setPosition(const glm::vec2& newPosition) {
+    void resizeView(glm::vec2 newDims);
+    void setPosition(glm::vec2 newPosition) {
         m_position = newPosition;
         update();
     }
-    void setScale(const glm::vec2& newScale) {
+    void setScale(glm::vec2 newScale) {
         m_scale = newScale;
         update();
     }
-    void shiftPosition(const glm::vec2& shiftPosition) {
+    void shiftPosition(glm::vec2 shiftPosition) {
         m_position += shiftPosition;
         update();
     }
-    void zoom(const glm::vec2& zoomVec) {
+    void zoom(glm::vec2 zoomVec) {
         m_scale *= zoomVec;
         update();
     }
@@ -52,7 +52,7 @@ public:
      */
     glm::mat4 viewMatrix() const { return m_viewMatrix; };
 
-    void enableClipping(const glm::vec2& minXY, const glm::vec2& maxXY);
+    void enableClipping(glm::vec2 minXY, glm::vec2 maxXY);
     void disableClipping();
 
 private:

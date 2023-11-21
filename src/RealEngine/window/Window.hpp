@@ -128,12 +128,12 @@ public:
      * @param newDims New dimensions of the window
      * @param save Changed settings are saved to file if true.
      */
-    void setDims(const glm::ivec2& newDims, bool save);
+    void setDims(glm::ivec2 newDims, bool save);
 
     /**
      * @brief Gets current dimensions of the window
      */
-    const glm::ivec2& dims() const { return m_dims; }
+    glm::ivec2 dims() const { return m_dims; }
 
     /**
      * @brief       Sets the preferred renderer.

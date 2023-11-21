@@ -64,7 +64,7 @@ SpriteComplex::SpriteComplex(
     float                subimage,
     float                imageSpeed,
     Color                color,
-    const glm::vec2&     scale
+    glm::vec2            scale
 )
     : SpriteAnimated(tex, sprite, subimage, imageSpeed)
     , m_color(color)
@@ -75,7 +75,7 @@ void SpriteComplex::setColor(Color color) {
     m_color = color;
 }
 
-void SpriteComplex::setScale(const glm::vec2& scale) {
+void SpriteComplex::setScale(glm::vec2 scale) {
     m_scale = scale;
 }
 

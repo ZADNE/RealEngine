@@ -75,12 +75,12 @@ public:
     /**
      * @copydoc InputManager::cursorAbs
      */
-    const glm::ivec2& cursorAbs() const;
+    glm::ivec2 cursorAbs() const;
 
     /**
      * @copydoc InputManager::cursorRel
      */
-    const glm::ivec2& cursorRel() const;
+    glm::ivec2 cursorRel() const;
 
 #pragma endregion
 
@@ -158,12 +158,12 @@ public:
     /**
      * @copydoc Window::setDims
      */
-    void setWindowDims(const glm::ivec2& newDims, bool save);
+    void setWindowDims(glm::ivec2 newDims, bool save);
 
     /**
      * @copydoc Window::dims
      */
-    const glm::ivec2& windowDims() const;
+    glm::ivec2 windowDims() const;
 
     /**
      * @copydoc Window::setPreferredRenderer

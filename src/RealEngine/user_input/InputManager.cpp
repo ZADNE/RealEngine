@@ -32,11 +32,11 @@ int InputManager::wasReleased(Key key) const {
     return (wasDown(key) > isDown(key)) ? m_stateMapPrev[cast(key)] : 0;
 }
 
-const glm::ivec2& InputManager::cursorAbs() const {
+glm::ivec2 InputManager::cursorAbs() const {
     return m_cursorAbs;
 }
 
-const glm::ivec2& InputManager::cursorRel() const {
+glm::ivec2 InputManager::cursorRel() const {
     return m_cursorRel;
 }
 
@@ -60,7 +60,7 @@ void InputManager::step() {
     m_stateMap[cast(Key::NoKey)]      = longestHeld == 0;
 }
 
-void InputManager::setCursor(const glm::ivec2& abs, const glm::ivec2& rel) {
+void InputManager::setCursor(glm::ivec2 abs, glm::ivec2 rel) {
     m_cursorAbs = abs;
     m_cursorRel = rel;
 }

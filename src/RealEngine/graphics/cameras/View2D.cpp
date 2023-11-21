@@ -10,18 +10,18 @@
 
 namespace re {
 
-View2D::View2D(const glm::vec2& viewDimensions)
+View2D::View2D(glm::vec2 viewDimensions)
     : m_viewDimensions(viewDimensions) {
     m_orthoMatrix = glm::ortho(0.0f, m_viewDimensions.x, 0.0f, m_viewDimensions.y);
     update();
 }
 
-void View2D::setCursorAbs(const glm::vec2& cursorAbs) {
+void View2D::setCursorAbs(glm::vec2 cursorAbs) {
     m_cursorAbs = cursorAbs;
     m_cursorRel = convertAbsToRel(cursorAbs);
 }
 
-glm::vec2 View2D::convertAbsToRel(const glm::uvec2& abs) {
+glm::vec2 View2D::convertAbsToRel(glm::uvec2 abs) {
     // Center [0;0]
     glm::vec2 floatAbs = glm::vec2(abs);
     floatAbs -= m_viewDimensions * 0.5f;
@@ -32,7 +32,7 @@ glm::vec2 View2D::convertAbsToRel(const glm::uvec2& abs) {
     return (glm::vec2)floatAbs;
 }
 
-void View2D::resizeView(const glm::vec2& newDims) {
+void View2D::resizeView(glm::vec2 newDims) {
     m_viewDimensions = newDims;
     m_orthoMatrix    = glm::ortho(0.0f, newDims.x, 0.0f, newDims.y);
     update();
@@ -55,7 +55,7 @@ void View2D::update() {
     m_cursorRel = convertAbsToRel(m_cursorAbs);
 }
 
-void View2D::enableClipping(const glm::vec2& minXY, const glm::vec2& maxXY) {
+void View2D::enableClipping(glm::vec2 minXY, glm::vec2 maxXY) {
     m_minXY           = minXY;
     m_maxXY           = maxXY;
     m_clippingEnabled = true;

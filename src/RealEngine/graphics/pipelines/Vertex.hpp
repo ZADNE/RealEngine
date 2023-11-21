@@ -22,7 +22,7 @@ using Color = glm::vec<4, uint8_t, glm::qualifier::defaultp>;
  */
 struct VertexPo {
     VertexPo() {}
-    VertexPo(const glm::vec2& pos)
+    VertexPo(glm::vec2 pos)
         : position(pos) {}
 
     glm::vec2 position;
@@ -33,7 +33,7 @@ struct VertexPo {
  */
 struct VertexPoCo {
     VertexPoCo() {}
-    VertexPoCo(const glm::vec2& pos, Color col)
+    VertexPoCo(glm::vec2 pos, Color col)
         : position(pos)
         , color(col) {}
 
@@ -46,7 +46,7 @@ struct VertexPoCo {
  */
 struct VertexPoCoUv {
     VertexPoCoUv() {}
-    VertexPoCoUv(const glm::vec2& pos, Color col, const glm::vec2& uv)
+    VertexPoCoUv(glm::vec2 pos, Color col, glm::vec2 uv)
         : position(pos)
         , color(col)
         , uv(uv) {}

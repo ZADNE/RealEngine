@@ -58,7 +58,7 @@ void SpriteBatch::add(
         .pos = posSizeRect, .uvs = uvsSizeRect, .tex = texToIndex(tex), .col = k_white};
 }
 
-void SpriteBatch::addSprite(const SpriteStatic& sprite, const glm::vec2& pos) {
+void SpriteBatch::addSprite(const SpriteStatic& sprite, glm::vec2 pos) {
     const auto& tex                   = sprite.texture();
     m_spritesBuf[m_nextSpriteIndex++] = Sprite{
         .pos = glm::vec4(pos - tex.pivot(), tex.subimageDims()),
@@ -70,7 +70,7 @@ void SpriteBatch::addSprite(const SpriteStatic& sprite, const glm::vec2& pos) {
         .col = k_white};
 }
 
-void SpriteBatch::addSprite(const SpriteComplex& sprite, const glm::vec2& pos) {
+void SpriteBatch::addSprite(const SpriteComplex& sprite, glm::vec2 pos) {
     const auto& tex                   = sprite.texture();
     m_spritesBuf[m_nextSpriteIndex++] = Sprite{
         .pos = glm::vec4(
@@ -85,7 +85,7 @@ void SpriteBatch::addSprite(const SpriteComplex& sprite, const glm::vec2& pos) {
 }
 
 void SpriteBatch::addSubimage(
-    const TextureShaped& tex, const glm::vec2& pos, const glm::vec2& subimgSpr
+    const TextureShaped& tex, glm::vec2 pos, glm::vec2 subimgSpr
 ) {
     m_spritesBuf[m_nextSpriteIndex++] = Sprite{
         .pos = glm::vec4(pos - tex.pivot(), tex.subimageDims()),

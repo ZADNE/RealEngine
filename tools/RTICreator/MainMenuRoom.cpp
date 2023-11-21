@@ -126,9 +126,7 @@ void MainMenuRoom::render(
     engine().mainRenderPassEnd();
 }
 
-void MainMenuRoom::windowResizedCallback(
-    const glm::ivec2& oldSize, const glm::ivec2& newSize
-) {
+void MainMenuRoom::windowResizedCallback(glm::ivec2 oldSize, glm::ivec2 newSize) {
     m_texView.resizeView(newSize);
 }
 

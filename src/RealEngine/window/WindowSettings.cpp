@@ -54,7 +54,7 @@ WindowSettings::WindowSettings() {
 }
 
 WindowSettings::WindowSettings(
-    const glm::ivec2& dims, WindowFlags flags, RendererID preferredRenderer
+    glm::ivec2 dims, WindowFlags flags, RendererID preferredRenderer
 )
     : m_dims(dims)
     , m_flags(flags)

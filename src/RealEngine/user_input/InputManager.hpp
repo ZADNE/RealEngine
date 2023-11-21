@@ -42,16 +42,16 @@ public:
     /**
      * @brief Gets absolute position of the cursor.
      */
-    const glm::ivec2& cursorAbs() const;
+    glm::ivec2 cursorAbs() const;
 
     /**
      * @brief Gets position of the cursor relative to previous step.
      */
-    const glm::ivec2& cursorRel() const;
+    glm::ivec2 cursorRel() const;
 
 private:
     void step();
-    void setCursor(const glm::ivec2& abs, const glm::ivec2& rel);
+    void setCursor(glm::ivec2 abs, glm::ivec2 rel);
     void press(Key key, int times = 1);
     void release(Key key);
 

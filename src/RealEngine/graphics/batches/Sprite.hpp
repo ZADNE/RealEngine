@@ -67,11 +67,11 @@ public:
         float                subimage,
         float                imageSpeed,
         Color                color,
-        const glm::vec2&     scale
+        glm::vec2            scale
     );
 
     void setColor(Color color);
-    void setScale(const glm::vec2& scale);
+    void setScale(glm::vec2 scale);
 
     Color     color() const override;
     glm::vec2 scale() const override;

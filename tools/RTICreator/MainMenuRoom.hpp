@@ -21,9 +21,7 @@ public:
     void sessionEnd() override;
     void step() override;
     void render(const vk::CommandBuffer& commandBuffer, double interpolationFactor) override;
-    void windowResizedCallback(
-        const glm::ivec2& oldSize, const glm::ivec2& newSize
-    ) override;
+    void windowResizedCallback(glm::ivec2 oldSize, glm::ivec2 newSize) override;
 
 private:
     void parametersGUI();

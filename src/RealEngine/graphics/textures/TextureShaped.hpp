@@ -68,11 +68,11 @@ public:
     }
     glm::uvec2 trueDims() const { return m_trueDims; }
 
-    void setSubimageDims(const glm::vec2& subimageDims) {
+    void setSubimageDims(glm::vec2 subimageDims) {
         m_shape.subimageDims = subimageDims;
     }
-    void setPivot(const glm::vec2& pivot) { m_shape.pivot = pivot; }
-    void setSubimagesSpritesCount(const glm::vec2& subimagesSpritesCount) {
+    void setPivot(glm::vec2 pivot) { m_shape.pivot = pivot; }
+    void setSubimagesSpritesCount(glm::vec2 subimagesSpritesCount) {
         m_shape.subimagesSpritesCount = subimagesSpritesCount;
     }
 

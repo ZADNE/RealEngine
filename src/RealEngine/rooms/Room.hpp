@@ -80,9 +80,7 @@ public:
     /**
      * @brief Callback used to notify that the window's size has changed
      */
-    virtual void windowResizedCallback(
-        const glm::ivec2& oldSize, const glm::ivec2& newSize
-    ) {}
+    virtual void windowResizedCallback(glm::ivec2 oldSize, glm::ivec2 newSize) {}
 
     /**
      * @brief Callback used to notify that the window's title has changed

@@ -54,13 +54,11 @@ public:
 
     void add(const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect);
 
-    void addSprite(const SpriteStatic& sprite, const glm::vec2& pos);
+    void addSprite(const SpriteStatic& sprite, glm::vec2 pos);
 
-    void addSprite(const SpriteComplex& sprite, const glm::vec2& pos);
+    void addSprite(const SpriteComplex& sprite, glm::vec2 pos);
 
-    void addSubimage(
-        const TextureShaped& tex, const glm::vec2& pos, const glm::vec2& subimgSpr
-    );
+    void addSubimage(const TextureShaped& tex, glm::vec2 pos, glm::vec2 subimgSpr);
 
     const Pipeline& pipeline() const { return m_pipeline; }
 

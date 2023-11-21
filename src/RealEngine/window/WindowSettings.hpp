@@ -41,9 +41,7 @@ public:
     /**
      * @brief Constructs settings from given parameters
      */
-    WindowSettings(
-        const glm::ivec2& dims, WindowFlags flags, RendererID preferredRenderer
-    );
+    WindowSettings(glm::ivec2 dims, WindowFlags flags, RendererID preferredRenderer);
 
     /**
      * @brief Gets a copy of the window flags
