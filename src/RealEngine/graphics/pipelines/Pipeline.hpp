@@ -20,8 +20,9 @@ struct PipelineGraphicsCreateInfo {
     uint32_t patchControlPoints = 0; // Zero means that tesselation is not used
 
     // Rasterization
-    vk::CullModeFlags cullMode  = vk::CullModeFlagBits::eNone;
-    float             lineWidth = 1.0f;
+    vk::PolygonMode   polygonMode = vk::PolygonMode::eFill;
+    vk::CullModeFlags cullMode    = vk::CullModeFlagBits::eNone;
+    float             lineWidth   = 1.0f;
 
     bool enableDepth = false;
     bool enableBlend = true;
