@@ -21,29 +21,29 @@ class DebugName;
 template<>
 class DebugName<BuildType::Debug> {
 public:
-    DebugName() {}
-    DebugName(const char* name)
+    constexpr DebugName() {}
+    constexpr DebugName(const char* name)
         : m_name(name) {}
-    DebugName(std::string_view name)
+    constexpr DebugName(std::string_view name)
         : m_name(name) {}
 
-    operator const char*() const { return m_name.data(); }
+    constexpr operator const char*() const { return m_name.data(); }
 
 private:
     std::string_view m_name;
 };
 
 /**
- * @brief Is an empty type, keeps the same constructors as the debug version
+ * @brief Is an empty type but keeps the same API as the debug version
  */
 template<>
 class DebugName<BuildType::Release> {
 public:
-    DebugName() {}
-    DebugName(const char* name_) {}
-    DebugName(std::string_view name_) {}
+    constexpr DebugName() {}
+    constexpr DebugName([[maybe_unused]] const char* name_) {}
+    constexpr DebugName([[maybe_unused]] std::string_view name_) {}
 
-    operator const char*() const { return ""; }
+    constexpr operator const char*() const { return ""; }
 };
 
 } // namespace re

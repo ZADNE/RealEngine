@@ -33,14 +33,13 @@ public:
      *          Use only when performance is not critical (e.g. outside of main loop)
      */
     template<typename F>
-        requires std::invocable<F, const vk::CommandBuffer&>
+        requires std::invocable<F, const CommandBuffer&>
     static void doOneTimeSubmit(F op) {
-        oneTimeSubmitCommandBuffer().begin(
-            {vk::CommandBufferUsageFlagBits::eOneTimeSubmit}
+        oneTimeSubmitCmdBuf()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit}
         );
-        op(oneTimeSubmitCommandBuffer());
-        oneTimeSubmitCommandBuffer().end();
-        graphicsQueue().submit(vk::SubmitInfo{{}, {}, oneTimeSubmitCommandBuffer()});
+        op(oneTimeSubmitCmdBuf());
+        oneTimeSubmitCmdBuf()->end();
+        graphicsQueue().submit(vk::SubmitInfo{{}, {}, *oneTimeSubmitCmdBuf()});
         device().waitIdle();
     }
 

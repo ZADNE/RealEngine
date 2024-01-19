@@ -4,6 +4,7 @@
 #pragma once
 #include <glm/vec3.hpp>
 
+#include <RealEngine/graphics/CommandBuffer.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
 
 namespace re {
@@ -78,14 +79,14 @@ protected:
     void initializeTexels(const TextureCreateInfo& createInfo);
 
     void pipelineImageBarrier(
-        const vk::CommandBuffer& cmdBuf,
-        vk::ImageLayout          oldLayout,
-        vk::ImageLayout          newLayout,
-        vk::PipelineStageFlags   srcStage,
-        vk::PipelineStageFlags   dstStage,
-        vk::AccessFlags          srcAccess,
-        vk::AccessFlags          dstAccess,
-        uint32_t                 layerCount
+        const CommandBuffer&   cmdBuf,
+        vk::ImageLayout        oldLayout,
+        vk::ImageLayout        newLayout,
+        vk::PipelineStageFlags srcStage,
+        vk::PipelineStageFlags dstStage,
+        vk::AccessFlags        srcAccess,
+        vk::AccessFlags        dstAccess,
+        uint32_t               layerCount
     );
 };
 

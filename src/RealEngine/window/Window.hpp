@@ -52,7 +52,7 @@ public:
      * @brief Prepares for rendering of new frame
      * @return The command buffer that should be used for rendering of this frame
      */
-    const vk::CommandBuffer& prepareNewFrame();
+    const re::CommandBuffer& prepareNewFrame();
 
     void mainRenderPassBegin();
     void mainRenderPassNextSubpass();

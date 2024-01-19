@@ -1,6 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/graphics/CommandBuffer.hpp>
 #include <RealEngine/graphics/batches/GeometryBatch.hpp>
 #include <RealEngine/graphics/batches/shaders/AllShaders.hpp>
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
@@ -73,13 +74,13 @@ void GeometryBatch::addVertices(std::span<const VertexPoCo> vertices) {
     m_nextVertexIndex += vertices.size();
 }
 
-void GeometryBatch::draw(const vk::CommandBuffer& cmdBuf, const glm::mat4& mvpMat) {
-    cmdBuf.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
-    cmdBuf.bindVertexBuffers(0u, m_verticesBuf.buffer(), vk::DeviceSize{0});
-    cmdBuf.pushConstants<glm::mat4>(
+void GeometryBatch::draw(const CommandBuffer& cmdBuf, const glm::mat4& mvpMat) {
+    cmdBuf->bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
+    cmdBuf->bindVertexBuffers(0u, m_verticesBuf.buffer(), vk::DeviceSize{0});
+    cmdBuf->pushConstants<glm::mat4>(
         *m_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0u, mvpMat
     );
-    cmdBuf.draw(
+    cmdBuf->draw(
         m_nextVertexIndex - m_maxVertices * FrameDoubleBufferingState::writeIndex(),
         1u,
         m_maxVertices * FrameDoubleBufferingState::writeIndex(),

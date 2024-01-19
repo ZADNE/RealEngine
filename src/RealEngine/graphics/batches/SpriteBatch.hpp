@@ -50,7 +50,7 @@ public:
      * @param cmdBuf Command buffer used for rendering
      * @param mvpMat Transformation matrix applied to the batch
      */
-    void drawBatch(const vk::CommandBuffer& cmdBuf, const glm::mat4& mvpMat);
+    void drawBatch(const CommandBuffer& cmdBuf, const glm::mat4& mvpMat);
 
     void add(const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect);
 

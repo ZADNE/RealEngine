@@ -39,8 +39,8 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
             stageMapped, createInfo.initData.data(), createInfo.initData.size_bytes()
         );
         // Copy from staging to main buffer
-        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& cmdBuf) {
-            cmdBuf.copyBuffer(
+        CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cmdBuf) {
+            cmdBuf->copyBuffer(
                 stage.first,
                 m_buffer,
                 vk::BufferCopy{

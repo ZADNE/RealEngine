@@ -78,7 +78,7 @@ public:
 
     ~VulkanFixture();
 
-    const vk::CommandBuffer& prepareFrame(bool useImGui);
+    const re::CommandBuffer& prepareFrame(bool useImGui);
 
     void mainRenderPassBegin(std::span<const vk::ClearValue> clearValues);
     void mainRenderPassNextSubpass();
@@ -102,39 +102,40 @@ private:
 #ifndef NDEBUG
     vk::raii::DebugUtilsMessengerEXT m_debugUtilsMessenger;
 #endif // !NDEBUG
-    vk::raii::SurfaceKHR                         m_surface;
-    uint32_t                                     m_graphicsQueueFamilyIndex;
-    uint32_t                                     m_computeQueueFamilyIndex;
-    uint32_t                                     m_presentationQueueFamilyIndex;
-    vk::raii::PhysicalDevice                     m_physicalDevice;
-    vk::raii::Device                             m_device;
-    Allocator                                    m_allocator;
-    vk::raii::Queue                              m_graphicsQueue;
-    vk::raii::Queue                              m_computeQueue;
-    vk::raii::Queue                              m_presentationQueue;
-    uint32_t                                     m_minImageCount;
-    vk::Extent2D                                 m_swapchainExtent;
-    vk::raii::SwapchainKHR                       m_swapchain;
-    std::vector<vk::raii::ImageView>             m_swapchainImageViews;
-    std::vector<VulkanInitInfo::BufferDescr>     m_additionalBufferDescrs;
-    std::vector<Texture>                         m_additionalBuffers;
-    vk::raii::RenderPass                         m_renderPass;
-    std::vector<vk::raii::Framebuffer>           m_swapChainFramebuffers;
-    vk::raii::CommandPool                        m_commandPool;
-    FrameDoubleBuffered<vk::raii::CommandBuffer> m_cmdBufs;
-    vk::raii::CommandBuffer                      m_oneTimeSubmitCommandBuffer;
-    vk::raii::PipelineCache                      m_pipelineCache;
-    vk::raii::DescriptorPool                     m_descriptorPool;
-    FrameDoubleBuffered<vk::raii::Semaphore>     m_imageAvailableSems;
-    FrameDoubleBuffered<vk::raii::Semaphore>     m_renderingFinishedSems;
-    FrameDoubleBuffered<vk::raii::Fence>         m_inFlightFences;
-    bool                                         m_recreteSwapchain = false;
-    vk::DispatchLoaderDynamic                    m_dispatchLoaderDynamic{
+    vk::raii::SurfaceKHR                     m_surface;
+    uint32_t                                 m_graphicsQueueFamilyIndex;
+    uint32_t                                 m_computeQueueFamilyIndex;
+    uint32_t                                 m_presentationQueueFamilyIndex;
+    vk::raii::PhysicalDevice                 m_physicalDevice;
+    vk::raii::Device                         m_device;
+    Allocator                                m_allocator;
+    vk::raii::Queue                          m_graphicsQueue;
+    vk::raii::Queue                          m_computeQueue;
+    vk::raii::Queue                          m_presentationQueue;
+    uint32_t                                 m_minImageCount;
+    vk::Extent2D                             m_swapchainExtent;
+    vk::raii::SwapchainKHR                   m_swapchain;
+    std::vector<vk::raii::ImageView>         m_swapchainImageViews;
+    std::vector<VulkanInitInfo::BufferDescr> m_additionalBufferDescrs;
+    std::vector<Texture>                     m_additionalBuffers;
+    vk::raii::RenderPass                     m_renderPass;
+    std::vector<vk::raii::Framebuffer>       m_swapChainFramebuffers;
+    vk::raii::CommandPool                    m_commandPool;
+    FrameDoubleBuffered<CommandBuffer>       m_cmdBufs;
+    CommandBuffer                            m_oneTimeSubmitCmdBuf;
+    vk::raii::PipelineCache                  m_pipelineCache;
+    vk::raii::DescriptorPool                 m_descriptorPool;
+    FrameDoubleBuffered<vk::raii::Semaphore> m_imageAvailableSems;
+    FrameDoubleBuffered<vk::raii::Semaphore> m_renderingFinishedSems;
+    FrameDoubleBuffered<vk::raii::Fence>     m_inFlightFences;
+    bool                                     m_recreteSwapchain = false;
+    vk::DispatchLoaderDynamic                m_dispatchLoaderDynamic{
         *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr};
     DeletionQueue m_deletionQueue{*m_device, m_allocator};
+
     // Implementations
     void assignImplementationReferences();
-    void clearImplementationReferences();
+
     // Create object helpers
     vk::raii::Instance               createInstance();
     vk::raii::DebugUtilsMessengerEXT createDebugUtilsMessenger();
@@ -144,16 +145,15 @@ private:
     vma::Allocator         createAllocator();
     vk::raii::Queue        createQueue(uint32_t familyIndex);
     vk::raii::SwapchainKHR createSwapchain();
-    std::vector<vk::raii::ImageView>             createSwapchainImageViews();
-    std::vector<Texture>                         createAdditionalBuffers();
-    vk::raii::RenderPass                         createRenderPass();
-    std::vector<vk::raii::Framebuffer>           createSwapchainFramebuffers();
-    vk::raii::CommandPool                        createCommandPool();
-    FrameDoubleBuffered<vk::raii::CommandBuffer> createCommandBuffers();
-    FrameDoubleBuffered<vk::raii::Semaphore>     createSemaphores();
-    FrameDoubleBuffered<vk::raii::Fence>         createFences();
-    vk::raii::PipelineCache                      createPipelineCache();
-    vk::raii::DescriptorPool                     createDescriptorPool();
+    std::vector<vk::raii::ImageView>         createSwapchainImageViews();
+    std::vector<Texture>                     createAdditionalBuffers();
+    vk::raii::RenderPass                     createRenderPass();
+    std::vector<vk::raii::Framebuffer>       createSwapchainFramebuffers();
+    vk::raii::CommandPool                    createCommandPool();
+    FrameDoubleBuffered<vk::raii::Semaphore> createSemaphores();
+    FrameDoubleBuffered<vk::raii::Fence>     createFences();
+    vk::raii::PipelineCache                  createPipelineCache();
+    vk::raii::DescriptorPool                 createDescriptorPool();
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT      sev,

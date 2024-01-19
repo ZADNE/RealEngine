@@ -10,6 +10,8 @@
 
 namespace re {
 
+class CommandBuffer;
+
 /**
  * @brief   Provides access to global Vulkan objects (such as device)
  *          to lower-level vulkan objects (such as pipeline)
@@ -37,9 +39,9 @@ protected:
     static const vk::PipelineCache& pipelineCache() { return *s_pipelineCache; }
     static const vk::RenderPass&    renderPass() { return *s_renderPass; }
     static const vk::CommandPool&   commandPool() { return *s_commandPool; }
-    static const vk::CommandBuffer& cmdBuf() { return *s_cmdBuf; }
-    static const vk::CommandBuffer& oneTimeSubmitCommandBuffer() {
-        return *s_oneTimeSubmitCommandBuffer;
+    static const CommandBuffer&     cmdBuf() { return *s_cmdBuf; }
+    static const CommandBuffer&     oneTimeSubmitCmdBuf() {
+        return *s_oneTimeSubmitCmdBuf;
     }
     static const vk::DescriptorPool& descriptorPool() {
         return *s_descriptorPool;
@@ -67,18 +69,18 @@ protected:
     }
 
 private:
-    static inline const vk::PhysicalDevice* s_physicalDevice    = nullptr;
-    static inline const vk::Device*         s_device            = nullptr;
-    static inline const vma::Allocator*     s_allocator         = nullptr;
-    static inline const vk::Queue*          s_graphicsQueue     = nullptr;
-    static inline const vk::Queue*          s_computeQueue      = nullptr;
-    static inline const vk::Queue*          s_presentationQueue = nullptr;
-    static inline const vk::PipelineCache*  s_pipelineCache     = nullptr;
-    static inline const vk::RenderPass*     s_renderPass        = nullptr;
-    static inline const vk::CommandPool*    s_commandPool       = nullptr;
-    static inline const vk::CommandBuffer*  s_cmdBuf            = nullptr;
-    static inline const vk::CommandBuffer* s_oneTimeSubmitCommandBuffer = nullptr;
-    static inline const vk::DescriptorPool* s_descriptorPool = nullptr;
+    static inline const vk::PhysicalDevice* s_physicalDevice      = nullptr;
+    static inline const vk::Device*         s_device              = nullptr;
+    static inline const vma::Allocator*     s_allocator           = nullptr;
+    static inline const vk::Queue*          s_graphicsQueue       = nullptr;
+    static inline const vk::Queue*          s_computeQueue        = nullptr;
+    static inline const vk::Queue*          s_presentationQueue   = nullptr;
+    static inline const vk::PipelineCache*  s_pipelineCache       = nullptr;
+    static inline const vk::RenderPass*     s_renderPass          = nullptr;
+    static inline const vk::CommandPool*    s_commandPool         = nullptr;
+    static inline const re::CommandBuffer*  s_cmdBuf              = nullptr;
+    static inline const re::CommandBuffer*  s_oneTimeSubmitCmdBuf = nullptr;
+    static inline const vk::DescriptorPool* s_descriptorPool      = nullptr;
     static inline const vk::DispatchLoaderDynamic* s_dispatchLoaderDynamic = nullptr;
     static inline DeletionQueue* s_deletionQueue = nullptr;
 };
