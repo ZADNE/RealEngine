@@ -35,6 +35,9 @@ struct BufferCreateInfo {
     // Initial data
     std::span<const std::byte> initData = {};
     vk::DeviceSize initDataDstOffset = {}; // Offset in bytes where initData will be placed
+
+    // Debug
+    [[no_unique_address]] DebugName<> debugName;
 };
 
 /**

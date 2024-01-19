@@ -52,6 +52,8 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
     } else { // Stage is not required
         std::tie(m_buffer, m_allocation) = allocateBuffer(createInfo, pointerToMapped);
     }
+
+    setDebugUtilsObjectName(m_buffer, createInfo.debugName);
 }
 
 Buffer::Buffer(Buffer&& other) noexcept

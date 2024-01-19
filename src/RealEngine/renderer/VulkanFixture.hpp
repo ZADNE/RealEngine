@@ -129,6 +129,8 @@ private:
     FrameDoubleBuffered<vk::raii::Semaphore>     m_renderingFinishedSems;
     FrameDoubleBuffered<vk::raii::Fence>         m_inFlightFences;
     bool                                         m_recreteSwapchain = false;
+    vk::DispatchLoaderDynamic                    m_dispatchLoaderDynamic{
+        *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr};
     DeletionQueue m_deletionQueue{*m_device, m_allocator};
     // Implementations
     void assignImplementationReferences();

@@ -93,6 +93,10 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         m_sampler = device().createSampler(vk::SamplerCreateInfo{
             {}, createInfo.magFilter, createInfo.minFilter, createInfo.mipmapMode});
     }
+
+    setDebugUtilsObjectName(m_image, createInfo.debugName);
+    setDebugUtilsObjectName(m_imageView, createInfo.debugName);
+    setDebugUtilsObjectName(m_sampler, createInfo.debugName);
 }
 
 Texture::Texture(Texture&& other) noexcept

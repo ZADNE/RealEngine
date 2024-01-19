@@ -286,7 +286,7 @@ vk::raii::Instance VulkanFixture::createInstance() {
     );
     vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo{
         {},
-        /*eVerbose | eInfo |*/ eWarning | eError,
+        eVerbose | eInfo | eWarning | eError,
         eGeneral | eValidation | ePerformance,
         &VulkanFixture::debugMessengerCallback};
     return vk::raii::Instance{
@@ -298,7 +298,7 @@ vk::raii::Instance VulkanFixture::createInstance() {
 vk::raii::DebugUtilsMessengerEXT VulkanFixture::createDebugUtilsMessenger() {
     vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo{
         {},
-        /*eVerbose | eInfo |*/ eWarning | eError,
+        eVerbose | eInfo | eWarning | eError,
         eGeneral | eValidation | ePerformance,
         &VulkanFixture::debugMessengerCallback};
     return vk::raii::DebugUtilsMessengerEXT{m_instance, debugMessengerCreateInfo};
@@ -594,9 +594,20 @@ VkBool32 VulkanFixture::debugMessengerCallback(
     const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
     void*                                       userData
 ) {
-    if (sev != VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT &&
-        std::strcmp(callbackData->pMessageIdName, "Loader Message") != 0) {
-        error(callbackData->pMessage);
+    if (std::strcmp(callbackData->pMessageIdName, "Loader Message") != 0) {
+        switch (static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(sev)) {
+        case eVerbose:
+        case eInfo:
+        case eWarning:
+            log(callbackData->pMessage, false);
+            log("\n\n", false);
+            break;
+        case eError:
+        default:
+            error(callbackData->pMessage, false);
+            error("\n\n", false);
+            break;
+        }
     }
     return false;
 }
@@ -700,7 +711,8 @@ void VulkanFixture::assignImplementationReferences() {
     VulkanObject::s_pipelineCache  = &(*m_pipelineCache);
     VulkanObject::s_renderPass     = &(*m_renderPass);
     VulkanObject::s_oneTimeSubmitCommandBuffer = &(*m_oneTimeSubmitCommandBuffer);
-    VulkanObject::s_deletionQueue = &m_deletionQueue;
+    VulkanObject::s_dispatchLoaderDynamic = &(m_dispatchLoaderDynamic);
+    VulkanObject::s_deletionQueue         = &m_deletionQueue;
 }
 
 void VulkanFixture::clearImplementationReferences() {
@@ -714,6 +726,7 @@ void VulkanFixture::clearImplementationReferences() {
     VulkanObject::s_pipelineCache              = nullptr;
     VulkanObject::s_renderPass                 = nullptr;
     VulkanObject::s_oneTimeSubmitCommandBuffer = nullptr;
+    VulkanObject::s_dispatchLoaderDynamic      = nullptr;
     VulkanObject::s_deletionQueue              = nullptr;
 }
 

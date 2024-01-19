@@ -124,6 +124,8 @@ Pipeline::Pipeline(
     for (uint32_t i = 0; i < shaderCount; i++) {
         device().destroyShaderModule(modules[i]);
     }
+
+    setDebugUtilsObjectName(m_pipeline, createInfo.debugName);
 }
 
 Pipeline::Pipeline(
@@ -155,6 +157,8 @@ Pipeline::Pipeline(
 
     // Destroy compute shader module
     device().destroyShaderModule(compShader);
+
+    setDebugUtilsObjectName(m_pipeline, createInfo.debugName);
 }
 
 Pipeline::Pipeline(Pipeline&& other) noexcept

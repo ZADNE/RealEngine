@@ -6,6 +6,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
+#include <RealEngine/utility/DebugName.hpp>
 
 namespace re {
 
@@ -43,7 +44,27 @@ protected:
     static const vk::DescriptorPool& descriptorPool() {
         return *s_descriptorPool;
     }
+    static const vk::DispatchLoaderDynamic& dispatchLoaderDynamic() {
+        return *s_dispatchLoaderDynamic;
+    }
     static DeletionQueue& deletionQueue() { return *s_deletionQueue; }
+
+    /**
+     * @brief Assign a debug name to a given object, does nothing in release build
+     */
+    template<typename T>
+        requires vk::isVulkanHandleType<T>::value
+    static void setDebugUtilsObjectName(T object, DebugName<> debugName) {
+        if constexpr (k_buildType == BuildType::Debug) {
+            device().setDebugUtilsObjectNameEXT(
+                vk::DebugUtilsObjectNameInfoEXT{
+                    T::objectType,
+                    reinterpret_cast<uint64_t>(static_cast<T::NativeType>(object)),
+                    static_cast<const char*>(debugName)},
+                dispatchLoaderDynamic()
+            );
+        }
+    }
 
 private:
     static inline const vk::PhysicalDevice* s_physicalDevice    = nullptr;
@@ -58,7 +79,8 @@ private:
     static inline const vk::CommandBuffer*  s_cmdBuf            = nullptr;
     static inline const vk::CommandBuffer* s_oneTimeSubmitCommandBuffer = nullptr;
     static inline const vk::DescriptorPool* s_descriptorPool = nullptr;
-    static inline DeletionQueue*            s_deletionQueue  = nullptr;
+    static inline const vk::DispatchLoaderDynamic* s_dispatchLoaderDynamic = nullptr;
+    static inline DeletionQueue* s_deletionQueue = nullptr;
 };
 
 } // namespace re
