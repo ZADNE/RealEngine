@@ -4,6 +4,8 @@
 #pragma once
 #include <concepts>
 
+#include <glm/vec4.hpp>
+
 #include <RealEngine/renderer/VulkanObject.hpp>
 
 namespace re {
@@ -32,8 +34,7 @@ public:
      * @warning Waits for device to become idle which is very expensive!
      *          Use only when performance is not critical (e.g. outside of main loop)
      */
-    template<typename F>
-        requires std::invocable<F, const CommandBuffer&>
+    template<std::invocable<const CommandBuffer&> F>
     static void doOneTimeSubmit(F op) {
         oneTimeSubmitCmdBuf()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit}
         );
@@ -55,6 +56,24 @@ public:
 
     void submitToGraphicsQueue(const vk::Fence& signalFence = nullptr) const;
     void submitToComputeQueue(const vk::Fence& signalFence = nullptr) const;
+
+    /**
+     * @brief Begins a labeled debug region in the command buffer
+     * @note  Does nothing in release build
+     */
+    void beginDebugUtilsLabel(const char* label, glm::vec4 color = {}) const;
+
+    /**
+     * @brief Ends a labeled debug region in the command buffer
+     * @note  Does nothing in release build
+     */
+    void endDebugUtilsLabel() const;
+
+    /**
+     * @brief Inserts a single debug label in the command buffer
+     * @note  Does nothing in release build
+     */
+    void insertDebugUtilsLabel(const char* label, glm::vec4 color = {}) const;
 
     const vk::CommandBuffer& operator*() const { return m_cmdBuf; }
     const vk::CommandBuffer* operator->() const { return &m_cmdBuf; }

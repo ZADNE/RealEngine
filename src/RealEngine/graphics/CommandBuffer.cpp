@@ -40,6 +40,30 @@ void CommandBuffer::submitToComputeQueue(
     computeQueue().submit2(submits, signalFence);
 }
 
+void CommandBuffer::beginDebugUtilsLabel(const char* label, glm::vec4 color /* = {}*/) const {
+    if constexpr (k_buildType == BuildType::Debug) {
+        m_cmdBuf.beginDebugUtilsLabelEXT(
+            vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
+            dispatchLoaderDynamic()
+        );
+    }
+}
+
+void CommandBuffer::endDebugUtilsLabel() const {
+    if constexpr (k_buildType == BuildType::Debug) {
+        m_cmdBuf.endDebugUtilsLabelEXT(dispatchLoaderDynamic());
+    }
+}
+
+void CommandBuffer::insertDebugUtilsLabel(const char* label, glm::vec4 color /* = {}*/) const {
+    if constexpr (k_buildType == BuildType::Debug) {
+        m_cmdBuf.insertDebugUtilsLabelEXT(
+            vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
+            dispatchLoaderDynamic()
+        );
+    }
+}
+
 void CommandBuffer::submitToGraphicsQueue(const vk::Fence& signalFence /* = nullptr*/) const {
     graphicsQueue().submit(vk::SubmitInfo{{}, {}, m_cmdBuf}, signalFence);
 }

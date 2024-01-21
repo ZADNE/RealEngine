@@ -587,19 +587,22 @@ VkBool32 VulkanFixture::debugMessengerCallback(
     const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
     void*                                       userData
 ) {
-    if (std::strcmp(callbackData->pMessageIdName, "Loader Message") != 0) {
+    if (!callbackData->pMessageIdName ||
+        std::strcmp(callbackData->pMessageIdName, "Loader Message") != 0) {
+        std::string str{"##"};
+        for (int i = 0; i < callbackData->cmdBufLabelCount; i++) {
+            str += callbackData->pCmdBufLabels[i].pLabelName;
+            if (i < callbackData->cmdBufLabelCount - 1) {
+                str += "->";
+            }
+        }
+        str += "\n  ";
         switch (static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(sev)) {
         case eVerbose:
         case eInfo:
-        case eWarning:
-            log(callbackData->pMessage, false);
-            log("\n\n", false);
-            break;
+        case eWarning: log(str + callbackData->pMessage); break;
         case eError:
-        default:
-            error(callbackData->pMessage, false);
-            error("\n\n", false);
-            break;
+        default: error(str + callbackData->pMessage); break;
         }
     }
     return false;
