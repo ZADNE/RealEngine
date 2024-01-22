@@ -4,7 +4,7 @@
 #pragma once
 #include <glm/vec3.hpp>
 
-#include <RealEngine/graphics/CommandBuffer.hpp>
+#include <RealEngine/graphics/commands/CommandBuffer.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
 
 namespace re {

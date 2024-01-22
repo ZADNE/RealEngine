@@ -3,8 +3,8 @@
  */
 #include <cassert>
 
-#include <RealEngine/graphics/CommandBuffer.hpp>
 #include <RealEngine/graphics/buffers/Buffer.hpp>
+#include <RealEngine/graphics/commands/CommandBuffer.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 using enum vk::BufferUsageFlagBits;

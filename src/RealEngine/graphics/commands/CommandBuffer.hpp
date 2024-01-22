@@ -30,6 +30,8 @@ public:
 
     ~CommandBuffer();
 
+#pragma region Queue submission (static)
+
     /**
      * @warning Waits for device to become idle which is very expensive!
      *          Use only when performance is not critical (e.g. outside of main loop)
@@ -57,23 +59,76 @@ public:
     void submitToGraphicsQueue(const vk::Fence& signalFence = nullptr) const;
     void submitToComputeQueue(const vk::Fence& signalFence = nullptr) const;
 
+#pragma endregion
+
+#pragma region Debug support
+
     /**
      * @brief Begins a labeled debug region in the command buffer
      * @note  Does nothing in release build
      */
-    void beginDebugUtilsLabel(const char* label, glm::vec4 color = {}) const;
+    void beginDebugRegion(const char* label, glm::vec4 color = {}) const {
+        if constexpr (k_buildType == BuildType::Debug) {
+            m_cmdBuf.beginDebugUtilsLabelEXT(
+                vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
+                dispatchLoaderDynamic()
+            );
+        }
+    }
 
     /**
-     * @brief Ends a labeled debug region in the command buffer
+     * @brief Ends a labeled debug region into the command buffer
      * @note  Does nothing in release build
      */
-    void endDebugUtilsLabel() const;
+    void endDebugRegion() const {
+        if constexpr (k_buildType == BuildType::Debug) {
+            m_cmdBuf.endDebugUtilsLabelEXT(dispatchLoaderDynamic());
+        }
+    }
 
     /**
      * @brief Inserts a single debug label in the command buffer
      * @note  Does nothing in release build
      */
-    void insertDebugUtilsLabel(const char* label, glm::vec4 color = {}) const;
+    void insertDebugLabel(const char* label, glm::vec4 color = {}) const {
+        if constexpr (k_buildType == BuildType::Debug) {
+            m_cmdBuf.insertDebugUtilsLabelEXT(
+                vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
+                dispatchLoaderDynamic()
+            );
+        }
+    }
+
+    /**
+     * @brief Is a RAII wrapper of labelled debug regions
+     * @note  Effectively does nothing in release build
+     */
+    class [[nodiscard]] DebugRegion {
+    public:
+        DebugRegion(
+            const re::CommandBuffer& cmdBuf, const char* label, glm::vec4 color = {}
+        )
+            : m_cmdBuf(cmdBuf) {
+            m_cmdBuf.beginDebugRegion(label, color);
+        }
+
+        DebugRegion(const DebugRegion&)            = delete; /**< Noncopyable */
+        DebugRegion& operator=(const DebugRegion&) = delete; /**< Noncopyable */
+
+        DebugRegion(DebugRegion&&)            = delete; /**< Nonmovable */
+        DebugRegion& operator=(DebugRegion&&) = delete; /**< Nonmovable */
+
+        ~DebugRegion() { m_cmdBuf.endDebugRegion(); }
+
+    private:
+        const re::CommandBuffer& m_cmdBuf;
+    };
+
+    DebugRegion createDebugRegion(const char* label, glm::vec4 color = {}) const {
+        return DebugRegion{*this, label, color};
+    }
+
+#pragma endregion
 
     const vk::CommandBuffer& operator*() const { return m_cmdBuf; }
     const vk::CommandBuffer* operator->() const { return &m_cmdBuf; }

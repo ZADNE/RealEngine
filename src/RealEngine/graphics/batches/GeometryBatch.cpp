@@ -1,9 +1,9 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/CommandBuffer.hpp>
 #include <RealEngine/graphics/batches/GeometryBatch.hpp>
 #include <RealEngine/graphics/batches/shaders/AllShaders.hpp>
+#include <RealEngine/graphics/commands/CommandBuffer.hpp>
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 
 using enum vk::BufferUsageFlagBits;
