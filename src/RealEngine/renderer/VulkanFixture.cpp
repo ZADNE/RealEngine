@@ -76,10 +76,10 @@ VulkanFixture::VulkanFixture(
         assignImplementationReferences(); // Deliberate side effect, ref to device
                                           // and pool is required to construct a cmd buf
         return FrameDoubleBuffered{
-            CommandBuffer{vk::CommandBufferLevel::ePrimary},
-            CommandBuffer{vk::CommandBufferLevel::ePrimary}};
+            CommandBuffer{{.debugName = "re::VulkanFixture::cmdBufs[0]"}},
+            CommandBuffer{{.debugName = "re::VulkanFixture::cmdBufs[1]"}}};
     }())
-    , m_oneTimeSubmitCmdBuf(vk::CommandBufferLevel::ePrimary)
+    , m_oneTimeSubmitCmdBuf({.debugName = "re::VulkanFixture::oneTimeSubmit"})
     , m_pipelineCache(createPipelineCache())
     , m_descriptorPool(createDescriptorPool())
     , m_imageAvailableSems(createSemaphores())
@@ -88,6 +88,7 @@ VulkanFixture::VulkanFixture(
     // Implementations
     assignImplementationReferences();
     FrameDoubleBufferingState::setTotalIndex(m_frame++);
+
     // Initialize ImGui
     if (!ImGui_ImplSDL2_InitForVulkan(m_sdlWindow)) {
         throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
@@ -587,8 +588,10 @@ VkBool32 VulkanFixture::debugMessengerCallback(
     const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
     void*                                       userData
 ) {
+    // If not a loader message...
     if (!callbackData->pMessageIdName ||
         std::strcmp(callbackData->pMessageIdName, "Loader Message") != 0) {
+        // Show nested debug labels
         std::string str{"##"};
         for (int i = 0; i < callbackData->cmdBufLabelCount; i++) {
             str += callbackData->pCmdBufLabels[i].pLabelName;
@@ -597,12 +600,27 @@ VkBool32 VulkanFixture::debugMessengerCallback(
             }
         }
         str += "\n  ";
+
+        // Do not show the silly beginning of the message
+        const char* msg   = callbackData->pMessage;
+        int         skips = 0;
+        while (*msg != '\0') {
+            bool pipe = *msg == '|';
+            msg++;
+            if (pipe) {
+                skips++;
+                if (skips == 2)
+                    break;
+            }
+        }
+
+        // Report the message
         switch (static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(sev)) {
         case eVerbose:
         case eInfo:
-        case eWarning: log(str + callbackData->pMessage); break;
+        case eWarning: log(str + msg); break;
         case eError:
-        default: error(str + callbackData->pMessage); break;
+        default: error(str + msg); break;
         }
     }
     return false;

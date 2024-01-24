@@ -102,12 +102,14 @@ private:
 #ifndef NDEBUG
     vk::raii::DebugUtilsMessengerEXT m_debugUtilsMessenger;
 #endif // !NDEBUG
-    vk::raii::SurfaceKHR                     m_surface;
-    uint32_t                                 m_graphicsQueueFamilyIndex;
-    uint32_t                                 m_computeQueueFamilyIndex;
-    uint32_t                                 m_presentationQueueFamilyIndex;
-    vk::raii::PhysicalDevice                 m_physicalDevice;
-    vk::raii::Device                         m_device;
+    vk::raii::SurfaceKHR      m_surface;
+    uint32_t                  m_graphicsQueueFamilyIndex;
+    uint32_t                  m_computeQueueFamilyIndex;
+    uint32_t                  m_presentationQueueFamilyIndex;
+    vk::raii::PhysicalDevice  m_physicalDevice;
+    vk::raii::Device          m_device;
+    vk::DispatchLoaderDynamic m_dispatchLoaderDynamic{
+        *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr};
     Allocator                                m_allocator;
     vk::raii::Queue                          m_graphicsQueue;
     vk::raii::Queue                          m_computeQueue;
@@ -129,8 +131,6 @@ private:
     FrameDoubleBuffered<vk::raii::Semaphore> m_renderingFinishedSems;
     FrameDoubleBuffered<vk::raii::Fence>     m_inFlightFences;
     bool                                     m_recreteSwapchain = false;
-    vk::DispatchLoaderDynamic                m_dispatchLoaderDynamic{
-        *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr};
     DeletionQueue m_deletionQueue{*m_device, m_allocator};
 
     // Implementations

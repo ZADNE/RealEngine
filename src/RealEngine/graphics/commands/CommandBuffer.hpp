@@ -11,6 +11,17 @@
 namespace re {
 
 /**
+ * @brief Specifies parameters for CommandBuffer creation
+ */
+struct CommandBufferCreateInfo {
+    // Level
+    vk::CommandBufferLevel level = vk::CommandBufferLevel::ePrimary;
+
+    // Debug
+    [[no_unique_address]] DebugName<> debugName;
+};
+
+/**
  * @brief Records commands to be executed by device (= GPU)
  */
 class CommandBuffer: public VulkanObject {
@@ -20,7 +31,7 @@ public:
      */
     explicit CommandBuffer() {}
 
-    explicit CommandBuffer(vk::CommandBufferLevel level);
+    explicit CommandBuffer(const CommandBufferCreateInfo& createInfo);
 
     CommandBuffer(const CommandBuffer&)            = delete; /**< Noncopyable */
     CommandBuffer& operator=(const CommandBuffer&) = delete; /**< Noncopyable */

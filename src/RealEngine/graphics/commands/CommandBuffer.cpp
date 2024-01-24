@@ -5,11 +5,13 @@
 
 namespace re {
 
-CommandBuffer::CommandBuffer(vk::CommandBufferLevel level)
+CommandBuffer::CommandBuffer(const CommandBufferCreateInfo& createInfo)
     : m_cmdBuf(device()
                    .allocateCommandBuffers(vk::CommandBufferAllocateInfo{
-                       commandPool(), level, 1u})
+                       commandPool(), createInfo.level, 1u})
                    .back()) {
+
+    setDebugUtilsObjectName(m_cmdBuf, createInfo.debugName);
 }
 
 CommandBuffer::CommandBuffer(CommandBuffer&& other) noexcept
