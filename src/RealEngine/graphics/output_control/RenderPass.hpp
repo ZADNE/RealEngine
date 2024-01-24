@@ -7,6 +7,18 @@
 namespace re {
 
 /**
+ * @brief Specifies parameters for RenderPass creation
+ */
+struct RenderPassCreateInfo {
+    vk::ArrayProxyNoTemporaries<const vk::AttachmentDescription2> attachments;
+    vk::ArrayProxyNoTemporaries<const vk::SubpassDescription2>    subpasses;
+    vk::ArrayProxyNoTemporaries<const vk::SubpassDependency2>     dependencies;
+
+    // Debug
+    [[no_unique_address]] DebugName<> debugName;
+};
+
+/**
  * @brief Represents a collection of attachments, subpasses, and dependencies
  * between the subpasses, and describes how the attachments are used over the
  * course of the subpasses.
@@ -21,7 +33,7 @@ public:
     /**
      * @brief Constructs a renderpass that can be used for rendering
      */
-    explicit RenderPass(const vk::RenderPassCreateInfo2& createInfo);
+    explicit RenderPass(const RenderPassCreateInfo& createInfo);
 
     RenderPass(const RenderPass&)            = delete; /**< Noncopyable */
     RenderPass& operator=(const RenderPass&) = delete; /**< Noncopyable */
