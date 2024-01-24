@@ -6,6 +6,7 @@
 
 #include <glm/vec4.hpp>
 
+#include <RealEngine/graphics/commands/BarrierHelperFuncs.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
 
 namespace re {
