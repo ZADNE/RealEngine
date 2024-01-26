@@ -1,4 +1,4 @@
-# RealEngine: An engine-like library
+# RealEngine: A Vulkan-based engine-like library
 
 ## Features:
 - A set of convenient classes to ease Vulkan 1.3 rendering
@@ -11,13 +11,22 @@
 
 - A lightweight library, not a full-fledged engine with all sorts of subsystems
 - As little runtime overhead as possible
-- A modern C++20 library following the [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
+- A modern type-safe C++20 library following [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
 - Doxygen documented at least at class level
 
 ## The library was used to develop:
 
-- [RealWorld: A tile-based world simulation demo](https://github.com/ZADNE/RealWorld)
-- [Meadow: A real-time grass rendering demo](https://github.com/ZADNE/Meadow)
+#### [RealWorld](https://github.com/ZADNE/RealWorld): A real-time tile-based game world simulation demo
+
+![RealWorld](readme_img/realworld.png)
+
+#### [Meadow](https://github.com/ZADNE/Meadow): A real-time grass rendering demo
+
+![Meadow](readme_img/meadow.png)
+
+#### [Waves](https://github.com/ZADNE/Waves): A Fresnel equations visualizer
+
+![Waves](readme_img/waves.png)
 
 ## The following libraries are required to build:
 
