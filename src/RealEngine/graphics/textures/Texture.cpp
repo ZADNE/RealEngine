@@ -1,7 +1,6 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/CommandBuffer.hpp>
 #include <RealEngine/graphics/buffers/BufferMapped.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/utility/Error.hpp>
@@ -61,7 +60,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         initializeTexels(createInfo);
     } else if (createInfo.initialLayout != eUndefined) {
         // Transit to initial layout
-        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& cmdBuf) {
+        CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cmdBuf) {
             pipelineImageBarrier(
                 cmdBuf,
                 eUndefined,
@@ -93,6 +92,10 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         m_sampler = device().createSampler(vk::SamplerCreateInfo{
             {}, createInfo.magFilter, createInfo.minFilter, createInfo.mipmapMode});
     }
+
+    setDebugUtilsObjectName(m_image, createInfo.debugName);
+    setDebugUtilsObjectName(m_imageView, createInfo.debugName);
+    setDebugUtilsObjectName(m_sampler, createInfo.debugName);
 }
 
 Texture::Texture(Texture&& other) noexcept
@@ -133,7 +136,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
         stagingBuffer.mapped(), createInfo.texels.data(), createInfo.texels.size()
     );
     // Copy data from staging buffer to the image
-    CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& cmdBuf) {
+    CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cmdBuf) {
         pipelineImageBarrier(
             cmdBuf,
             eUndefined,
@@ -144,7 +147,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
             vk::AccessFlagBits::eTransferWrite, // Access flags
             createInfo.layers                   // Array layer count
         );
-        cmdBuf.copyBufferToImage(
+        cmdBuf->copyBufferToImage(
             stagingBuffer.buffer(),
             m_image,
             eTransferDstOptimal,
@@ -176,16 +179,16 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
 }
 
 void Texture::pipelineImageBarrier(
-    const vk::CommandBuffer& cmdBuf,
-    vk::ImageLayout          oldLayout,
-    vk::ImageLayout          newLayout,
-    vk::PipelineStageFlags   srcStage,
-    vk::PipelineStageFlags   dstStage,
-    vk::AccessFlags          srcAccess,
-    vk::AccessFlags          dstAccess,
-    uint32_t                 layerCount
+    const CommandBuffer&   cmdBuf,
+    vk::ImageLayout        oldLayout,
+    vk::ImageLayout        newLayout,
+    vk::PipelineStageFlags srcStage,
+    vk::PipelineStageFlags dstStage,
+    vk::AccessFlags        srcAccess,
+    vk::AccessFlags        dstAccess,
+    uint32_t               layerCount
 ) {
-    cmdBuf.pipelineBarrier(
+    cmdBuf->pipelineBarrier(
         srcStage,
         dstStage,
         vk::DependencyFlags{},

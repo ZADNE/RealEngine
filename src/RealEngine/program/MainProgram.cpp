@@ -150,7 +150,7 @@ void MainProgram::step() {
     m_roomManager.currentRoom()->step();
 }
 
-void MainProgram::render(const vk::CommandBuffer& cmdBuf, double interpolationFactor) {
+void MainProgram::render(const CommandBuffer& cmdBuf, double interpolationFactor) {
     m_roomManager.currentRoom()->render(cmdBuf, interpolationFactor);
 }
 

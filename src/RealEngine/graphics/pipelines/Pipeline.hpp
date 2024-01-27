@@ -30,12 +30,19 @@ struct PipelineGraphicsCreateInfo {
     vk::PipelineLayout pipelineLayout = nullptr;
     vk::RenderPass renderPass = nullptr; // The main renderpass is used if unspecified
     uint32_t subpassIndex = 0;
+
+    // Debug
+    [[no_unique_address]] DebugName<> debugName;
 };
 
 struct PipelineComputeCreateInfo {
     // Specialization
     const vk::SpecializationInfo* specializationInfo = nullptr;
-    vk::PipelineLayout            pipelineLayout     = nullptr;
+
+    vk::PipelineLayout pipelineLayout = nullptr;
+
+    // Debug
+    [[no_unique_address]] DebugName<> debugName;
 };
 
 /**

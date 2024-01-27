@@ -50,7 +50,7 @@ public:
      * @param cmdBuf Command buffer used for rendering
      * @param mvpMat Transformation matrix applied to the batch
      */
-    void drawBatch(const vk::CommandBuffer& cmdBuf, const glm::mat4& mvpMat);
+    void drawBatch(const CommandBuffer& cmdBuf, const glm::mat4& mvpMat);
 
     void add(const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect);
 
@@ -88,7 +88,7 @@ private:
     static Pipeline       createPipeline(
               const PipelineLayout& pipelineLayout, unsigned int maxTextures
           );
-    DescriptorSet m_descSet{m_pipelineLayout.descriptorSetLayout(0)};
+    DescriptorSet m_descSet{{.layout = m_pipelineLayout.descriptorSetLayout(0)}};
 
     static inline constexpr Color k_white{255, 255, 255, 255};
 };

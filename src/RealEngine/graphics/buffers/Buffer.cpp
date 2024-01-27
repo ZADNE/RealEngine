@@ -3,8 +3,8 @@
  */
 #include <cassert>
 
-#include <RealEngine/graphics/CommandBuffer.hpp>
 #include <RealEngine/graphics/buffers/Buffer.hpp>
+#include <RealEngine/graphics/commands/CommandBuffer.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 using enum vk::BufferUsageFlagBits;
@@ -39,8 +39,8 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
             stageMapped, createInfo.initData.data(), createInfo.initData.size_bytes()
         );
         // Copy from staging to main buffer
-        CommandBuffer::doOneTimeSubmit([&](const vk::CommandBuffer& cmdBuf) {
-            cmdBuf.copyBuffer(
+        CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cmdBuf) {
+            cmdBuf->copyBuffer(
                 stage.first,
                 m_buffer,
                 vk::BufferCopy{
@@ -52,6 +52,8 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
     } else { // Stage is not required
         std::tie(m_buffer, m_allocation) = allocateBuffer(createInfo, pointerToMapped);
     }
+
+    setDebugUtilsObjectName(m_buffer, createInfo.debugName);
 }
 
 Buffer::Buffer(Buffer&& other) noexcept

@@ -75,7 +75,7 @@ public:
      *                              Use it to interpolate between discrete
      *                              simulation steps.
      */
-    virtual void render(const vk::CommandBuffer& cmdBuf, double interpolationFactor) = 0;
+    virtual void render(const CommandBuffer& cmdBuf, double interpolationFactor) = 0;
 
     /**
      * @brief Callback used to notify that the window's size has changed

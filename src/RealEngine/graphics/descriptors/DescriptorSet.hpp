@@ -9,6 +9,16 @@
 namespace re {
 
 /**
+ * @brief Specifies parameters for DescriptorSet creation
+ */
+struct DescriptorSetCreateInfo {
+    vk::DescriptorSetLayout layout{};
+
+    // Debug
+    [[no_unique_address]] DebugName<> debugName;
+};
+
+/**
  * @brief Describes (= refers to) concrete resources (= buffers, images, etc)
  */
 class DescriptorSet: public VulkanObject {
@@ -21,7 +31,7 @@ public:
     /**
      * @brief Constructs set for given layout
      */
-    explicit DescriptorSet(const vk::DescriptorSetLayout& descSetLayout);
+    explicit DescriptorSet(const DescriptorSetCreateInfo& createInfo);
 
     DescriptorSet(const DescriptorSet&)            = delete; /**< Noncopyable */
     DescriptorSet& operator=(const DescriptorSet&) = delete; /**< Noncopyable */

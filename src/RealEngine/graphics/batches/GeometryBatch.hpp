@@ -53,7 +53,7 @@ public:
      * @param cmdBuf Command buffer used for rendering
      * @param mvpMat Transformation matrix applied to the sprites
      */
-    void draw(const vk::CommandBuffer& cmdBuf, const glm::mat4& mvpMat);
+    void draw(const CommandBuffer& cmdBuf, const glm::mat4& mvpMat);
 
 private:
     BufferMapped<VertexPoCo> m_verticesBuf;

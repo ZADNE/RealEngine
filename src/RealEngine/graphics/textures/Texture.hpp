@@ -4,6 +4,7 @@
 #pragma once
 #include <glm/vec3.hpp>
 
+#include <RealEngine/graphics/commands/CommandBuffer.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
 
 namespace re {
@@ -37,6 +38,9 @@ struct TextureCreateInfo {
 
     // Raster-related
     std::span<unsigned char> texels; // Only for 1 layer color images
+
+    // Debug
+    [[no_unique_address]] DebugName<> debugName;
 };
 
 /**
@@ -75,14 +79,14 @@ protected:
     void initializeTexels(const TextureCreateInfo& createInfo);
 
     void pipelineImageBarrier(
-        const vk::CommandBuffer& cmdBuf,
-        vk::ImageLayout          oldLayout,
-        vk::ImageLayout          newLayout,
-        vk::PipelineStageFlags   srcStage,
-        vk::PipelineStageFlags   dstStage,
-        vk::AccessFlags          srcAccess,
-        vk::AccessFlags          dstAccess,
-        uint32_t                 layerCount
+        const CommandBuffer&   cmdBuf,
+        vk::ImageLayout        oldLayout,
+        vk::ImageLayout        newLayout,
+        vk::PipelineStageFlags srcStage,
+        vk::PipelineStageFlags dstStage,
+        vk::AccessFlags        srcAccess,
+        vk::AccessFlags        dstAccess,
+        uint32_t               layerCount
     );
 };
 

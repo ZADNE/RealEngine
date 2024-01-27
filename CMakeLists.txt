@@ -29,6 +29,7 @@ include("cmake/RealShaders/RealShaders.cmake")
     set_target_properties(RealEngine PROPERTIES
         CXX_STANDARD 20
         REALSHADERS_CXX_NAMESPACE "re"
+        INTERPROCEDURAL_OPTIMIZATION TRUE
     )
     target_link_libraries(RealEngine PUBLIC
         ${CMAKE_DL_LIBS}
@@ -63,7 +64,10 @@ include("cmake/RealShaders/RealShaders.cmake")
     if(WIN32)
         add_executable(RTICreator)
         target_include_directories(RTICreator PRIVATE tools)
-        set_target_properties(RTICreator PROPERTIES CXX_STANDARD 20)
+        set_target_properties(RTICreator PROPERTIES
+            CXX_STANDARD 20
+            INTERPROCEDURAL_OPTIMIZATION TRUE
+        )
         target_link_libraries(RTICreator PUBLIC RealEngine)
         add_subdirectory(tools)
     endif()
