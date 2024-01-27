@@ -5,11 +5,13 @@
 
 namespace re {
 
-DescriptorSet::DescriptorSet(const vk::DescriptorSetLayout& descSetLayout)
+DescriptorSet::DescriptorSet(const DescriptorSetCreateInfo& createInfo)
     : m_descriptorSet(device()
                           .allocateDescriptorSets(vk::DescriptorSetAllocateInfo{
-                              descriptorPool(), descSetLayout})
+                              descriptorPool(), createInfo.layout})
                           .back()) {
+
+    setDebugUtilsObjectName(m_descriptorSet, createInfo.debugName);
 }
 
 DescriptorSet::DescriptorSet(DescriptorSet&& other) noexcept

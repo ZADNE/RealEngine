@@ -49,7 +49,7 @@ Window::~Window() {
     SDL_DestroyWindow(m_SDLwindow);
 }
 
-const re::CommandBuffer& Window::prepareNewFrame() {
+const CommandBuffer& Window::prepareNewFrame() {
     return m_vk13.prepareFrame(m_usingImGui);
 }
 

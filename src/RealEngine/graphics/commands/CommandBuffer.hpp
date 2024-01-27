@@ -118,7 +118,7 @@ public:
     class [[nodiscard]] DebugRegion {
     public:
         DebugRegion(
-            const re::CommandBuffer& cmdBuf, const char* label, glm::vec4 color = {}
+            const CommandBuffer& cmdBuf, const char* label, glm::vec4 color = {}
         )
             : m_cmdBuf(cmdBuf) {
             m_cmdBuf.beginDebugRegion(label, color);
@@ -133,7 +133,7 @@ public:
         ~DebugRegion() { m_cmdBuf.endDebugRegion(); }
 
     private:
-        const re::CommandBuffer& m_cmdBuf;
+        const CommandBuffer& m_cmdBuf;
     };
 
     DebugRegion createDebugRegion(const char* label, glm::vec4 color = {}) const {

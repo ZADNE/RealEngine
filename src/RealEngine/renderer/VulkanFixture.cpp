@@ -119,7 +119,7 @@ VulkanFixture::~VulkanFixture() {
     ImGui_ImplSDL2_Shutdown();
 }
 
-const re::CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
+const CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
     // Wait for the previous frame to finish
     checkSuccess(m_device.waitForFences(*m_inFlightFences.write(), true, k_maxTimeout)
     );

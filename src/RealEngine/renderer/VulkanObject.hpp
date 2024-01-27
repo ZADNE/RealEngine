@@ -78,8 +78,8 @@ private:
     static inline const vk::PipelineCache*  s_pipelineCache       = nullptr;
     static inline const vk::RenderPass*     s_renderPass          = nullptr;
     static inline const vk::CommandPool*    s_commandPool         = nullptr;
-    static inline const re::CommandBuffer*  s_cmdBuf              = nullptr;
-    static inline const re::CommandBuffer*  s_oneTimeSubmitCmdBuf = nullptr;
+    static inline const CommandBuffer*      s_cmdBuf              = nullptr;
+    static inline const CommandBuffer*      s_oneTimeSubmitCmdBuf = nullptr;
     static inline const vk::DescriptorPool* s_descriptorPool      = nullptr;
     static inline const vk::DispatchLoaderDynamic* s_dispatchLoaderDynamic = nullptr;
     static inline DeletionQueue* s_deletionQueue = nullptr;

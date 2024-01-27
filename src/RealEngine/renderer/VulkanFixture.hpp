@@ -78,7 +78,7 @@ public:
 
     ~VulkanFixture();
 
-    const re::CommandBuffer& prepareFrame(bool useImGui);
+    const CommandBuffer& prepareFrame(bool useImGui);
 
     void mainRenderPassBegin(std::span<const vk::ClearValue> clearValues);
     void mainRenderPassNextSubpass();
