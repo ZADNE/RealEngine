@@ -89,6 +89,13 @@ VulkanFixture::VulkanFixture(
     assignImplementationReferences();
     FrameDoubleBufferingState::setTotalIndex(m_frame++);
 
+    VulkanObject::setDebugUtilsObjectName(
+        *m_graphicsQueue, "re::VulkanFixture::graphicsQueue"
+    );
+    VulkanObject::setDebugUtilsObjectName(
+        *m_computeQueue, "re::VulkanFixture::computeQueue"
+    );
+
     // Initialize ImGui
     if (!ImGui_ImplSDL2_InitForVulkan(m_sdlWindow)) {
         throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
