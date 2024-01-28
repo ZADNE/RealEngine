@@ -2,6 +2,7 @@
 
 ## Features:
 - A set of convenient classes to ease Vulkan 1.3 rendering
+- Automatic generation of C++ wrappers representing SPIR-V of shaders
 - Handling of mouse & keyboard input
 - Simulation speed decoupled from variable frame rate
 - A system of rooms / scenes / worlds with well defined transitions
