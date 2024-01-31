@@ -75,14 +75,12 @@ void MainMenuRoom::step() {
     }
 }
 
-void MainMenuRoom::render(
-    const vk::CommandBuffer& commandBuffer, double interpolationFactor
-) {
+void MainMenuRoom::render(const re::CommandBuffer& cmdBuf, double interpolationFactor) {
     engine().mainRenderPassBegin();
 
     // Texture
     if (m_texture) {
-        drawTexture(commandBuffer);
+        drawTexture(cmdBuf);
     }
 
     // Menu
@@ -206,7 +204,7 @@ void MainMenuRoom::load(const std::string& loc) {
     m_pivot            = m_texture->pivot();
 }
 
-void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
+void MainMenuRoom::drawTexture(const re::CommandBuffer& cmdBuf) {
     glm::vec2 windowDims = glm::vec2(engine().windowDims());
     auto texDims = m_texture->subimagesSpritesCount() * m_texture->subimageDims();
     auto botLeft = -texDims * 0.5f;
@@ -217,7 +215,7 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
 
     m_sb.clearAndBeginFirstBatch();
     m_sb.add(*m_texture, posSizeRect, uvRect);
-    m_sb.drawBatch(commandBuffer, m_texView.viewMatrix());
+    m_sb.drawBatch(cmdBuf, m_texView.viewMatrix());
 
     m_gb.begin();
     std::vector<re::VertexPoCo> vertices;
@@ -272,7 +270,7 @@ void MainMenuRoom::drawTexture(const vk::CommandBuffer& commandBuffer) {
     m_gb.addVertices(vertices);
 
     m_gb.end();
-    m_gb.draw(commandBuffer, m_texView.viewMatrix());
+    m_gb.draw(cmdBuf, m_texView.viewMatrix());
 }
 
 void MainMenuRoom::resetView() {

@@ -72,6 +72,10 @@ void GeometryBatch::addVertices(std::span<const VertexPoCo> vertices) {
         sizeof(VertexPoCo) * vertices.size()
     );
     m_nextVertexIndex += vertices.size();
+    assert(
+        (m_nextVertexIndex -
+         m_maxVertices * FrameDoubleBufferingState::writeIndex()) <= m_maxVertices
+    );
 }
 
 void GeometryBatch::draw(const CommandBuffer& cmdBuf, const glm::mat4& mvpMat) {

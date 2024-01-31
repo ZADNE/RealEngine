@@ -26,7 +26,7 @@ public:
      * (relevant only if the topology is a part of the line class)
      */
     GeometryBatch(
-        vk::PrimitiveTopology topology, unsigned int maxVertices, float lineWidth
+        vk::PrimitiveTopology topology, unsigned int maxVertices, float lineWidth = 1.0f
     );
 
     /**

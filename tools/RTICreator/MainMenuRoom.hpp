@@ -20,7 +20,7 @@ public:
     void sessionStart(const re::RoomTransitionArguments& args) override;
     void sessionEnd() override;
     void step() override;
-    void render(const vk::CommandBuffer& commandBuffer, double interpolationFactor) override;
+    void render(const re::CommandBuffer& cmdBuf, double interpolationFactor) override;
     void windowResizedCallback(glm::ivec2 oldSize, glm::ivec2 newSize) override;
 
 private:
@@ -31,7 +31,7 @@ private:
     void load(const std::string& filePath);
 
     re::SpriteBatch   m_sb{1, 1};
-    re::GeometryBatch m_gb{vk::PrimitiveTopology::eLineList, 128u, 1.0f};
+    re::GeometryBatch m_gb{vk::PrimitiveTopology::eLineList, 16777216u, 1.0f};
 
     // Texture
     std::optional<re::TextureShaped> m_texture;
@@ -51,7 +51,7 @@ private:
     glm::vec2  m_subimageDims{1.0f};
     glm::vec2  m_pivot{};
 
-    void drawTexture(const vk::CommandBuffer& commandBuffer);
+    void drawTexture(const re::CommandBuffer& commandBuffer);
     void resetView();
 
     float m_drawScale = 1.0f;
