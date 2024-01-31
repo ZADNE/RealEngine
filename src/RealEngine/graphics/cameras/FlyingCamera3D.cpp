@@ -1,10 +1,9 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <glm/geometric.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
-#include <glm/gtx/rotate_vector.hpp>
 
 #include <RealEngine/graphics/cameras/FlyingCamera3D.hpp>
 

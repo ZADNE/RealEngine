@@ -11,11 +11,11 @@ include("cmake/RealShaders/RealShaders.cmake")
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
     find_package(SDL2 REQUIRED)
     #SPIRV-Cross
-    FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/sdk-1.3.261.1.tar.gz)
+    FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.275.0.tar.gz)
     #OpenGL Mathematics
-    FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/refs/tags/0.9.9.8.tar.gz)
+    FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/refs/tags/1.0.0.tar.gz)
     #nlohmann json
-    FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+    FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 
     #Download remote libs
     FetchContent_MakeAvailable(SPIRV-Cross glm json)
