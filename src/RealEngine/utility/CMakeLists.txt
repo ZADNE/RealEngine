@@ -3,4 +3,5 @@
     DebugName.hpp               
     Endianness.hpp              
     Error.hpp                   Error.cpp
+    Math.hpp                    
 )
