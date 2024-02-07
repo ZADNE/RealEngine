@@ -11,8 +11,8 @@
 #define VMA_IMPLEMENTATION
 #include <vma/vk_mem_alloc.hpp>
 
+#include <RealEngine/renderer/DebugMessageHandler.hpp>
 #include <RealEngine/renderer/VulkanFixture.hpp>
-#include <RealEngine/utility/Error.hpp>
 #include <RealEngine/window/WindowSubsystems.hpp>
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
@@ -298,7 +298,7 @@ vk::raii::Instance VulkanFixture::createInstance() {
         {},
         eVerbose | eInfo | eWarning | eError,
         eGeneral | eValidation | ePerformance,
-        &VulkanFixture::debugMessengerCallback};
+        &debugMessengerCallbackHandler};
     return vk::raii::Instance{
         m_context,
         vk::InstanceCreateInfo{
@@ -310,7 +310,7 @@ vk::raii::DebugUtilsMessengerEXT VulkanFixture::createDebugUtilsMessenger() {
         {},
         eVerbose | eInfo | eWarning | eError,
         eGeneral | eValidation | ePerformance,
-        &VulkanFixture::debugMessengerCallback};
+        &debugMessengerCallbackHandler};
     return vk::raii::DebugUtilsMessengerEXT{m_instance, debugMessengerCreateInfo};
 }
 
@@ -587,50 +587,6 @@ vk::raii::DescriptorPool VulkanFixture::createDescriptorPool() {
         static_cast<uint32_t>(m_swapchainImageViews.size()) * 8u,
         poolSizes};
     return vk::raii::DescriptorPool{m_device, createInfo};
-}
-
-VkBool32 VulkanFixture::debugMessengerCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT      sev,
-    VkDebugUtilsMessageTypeFlagsEXT             type,
-    const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
-    void*                                       userData
-) {
-    // If not a loader message...
-    if (!callbackData->pMessageIdName ||
-        std::strcmp(callbackData->pMessageIdName, "Loader Message") != 0) {
-        // Show nested debug labels
-        std::string str{"##"};
-        for (int i = 0; i < callbackData->cmdBufLabelCount; i++) {
-            str += callbackData->pCmdBufLabels[i].pLabelName;
-            if (i < callbackData->cmdBufLabelCount - 1) {
-                str += "->";
-            }
-        }
-        str += "\n  ";
-
-        // Do not show the silly beginning of the message
-        const char* msg   = callbackData->pMessage;
-        int         skips = 0;
-        while (*msg != '\0') {
-            bool pipe = *msg == '|';
-            msg++;
-            if (pipe) {
-                skips++;
-                if (skips == 2)
-                    break;
-            }
-        }
-
-        // Report the message
-        switch (static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(sev)) {
-        case eVerbose:
-        case eInfo:
-        case eWarning: log(str + msg); break;
-        case eError:
-        default: error(str + msg); break;
-        }
-    }
-    return false;
 }
 
 bool VulkanFixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice

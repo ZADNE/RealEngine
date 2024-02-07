@@ -57,4 +57,17 @@ constexpr vk::BufferMemoryBarrier2 bufferMemoryBarrier(
         size};
 }
 
+/**
+ * @brief Is a helper function that creates a debug all commands to all commands
+ * global memory barrier
+ */
+constexpr vk::MemoryBarrier2 debugBarrier() {
+    return vk::MemoryBarrier2{
+        vk::PipelineStageFlagBits2::eAllCommands,
+        vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite,
+        vk::PipelineStageFlagBits2::eAllCommands,
+        vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite,
+    };
+}
+
 } // namespace re

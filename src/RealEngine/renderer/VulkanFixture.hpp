@@ -155,12 +155,6 @@ private:
     vk::raii::PipelineCache                  createPipelineCache();
     vk::raii::DescriptorPool                 createDescriptorPool();
 
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallback(
-        VkDebugUtilsMessageSeverityFlagBitsEXT      sev,
-        VkDebugUtilsMessageTypeFlagsEXT             type,
-        const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
-        void*                                       userData
-    );
     bool areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice);
     bool isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice);
     bool findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice);
