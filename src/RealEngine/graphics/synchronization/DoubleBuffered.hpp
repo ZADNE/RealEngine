@@ -32,8 +32,15 @@ public:
     DoubleBuffered(T&& first, T&& second)
         : m_ts{std::move(first), std::move(second)} {}
 
+    /**
+     * @brief Accesses the object that should be used for writing from CPU
+     */
+    const T& write() const { return m_ts[State::writeIndex()]; }
     T&       write() { return m_ts[State::writeIndex()]; }
-    const T& read() const { return m_ts[State::readIndex()]; }
+    const T& operator*() const { return write(); }
+    const T* operator->() const { return &write(); }
+    T&       operator*() { return write(); }
+    T*       operator->() { return &write(); }
 
     void forEach(std::invocable<T&> auto func) {
         for (auto& t : m_ts) { func(t); }

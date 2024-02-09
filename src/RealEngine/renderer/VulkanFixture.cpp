@@ -128,8 +128,7 @@ VulkanFixture::~VulkanFixture() {
 
 const CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
     // Wait for the previous frame to finish
-    checkSuccess(m_device.waitForFences(*m_inFlightFences.write(), true, k_maxTimeout)
-    );
+    checkSuccess(m_device.waitForFences(**m_inFlightFences, true, k_maxTimeout));
 
     m_deletionQueue.deleteNextGroup();
     m_deletionQueue.beginNewGroup();
@@ -140,11 +139,11 @@ const CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
         m_recreteSwapchain = false;
     }
 
-    m_device.resetFences(*m_inFlightFences.write());
+    m_device.resetFences(**m_inFlightFences);
 
     // Acquire next image
     vk::AcquireNextImageInfoKHR acquireNextImageInfo{
-        *m_swapchain, k_maxTimeout, *m_imageAvailableSems.write(), nullptr, 1u};
+        *m_swapchain, k_maxTimeout, **m_imageAvailableSems, nullptr, 1u};
     auto [res, imageIndex] = m_device.acquireNextImage2KHR(acquireNextImageInfo);
     checkSuccess(res);
     m_imageIndex = imageIndex;
@@ -155,7 +154,7 @@ const CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
     }
 
     // Restart command buffer
-    auto& cmdBuf = m_cmdBufs.write();
+    auto& cmdBuf = *m_cmdBufs;
     cmdBuf->reset();
     cmdBuf->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 
@@ -214,12 +213,11 @@ void VulkanFixture::mainRenderPassNextSubpass() {
 
 void VulkanFixture::mainRenderPassDrawImGui() {
     ImGui::Render();
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *m_cmdBufs.write());
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), **m_cmdBufs);
 }
 
 void VulkanFixture::mainRenderPassEnd() {
-    auto& cmdBuf = m_cmdBufs.write();
-    cmdBuf->endRenderPass2(vk::SubpassEndInfo{});
+    m_cmdBufs.write()->endRenderPass2(vk::SubpassEndInfo{});
 }
 
 void VulkanFixture::finishFrame() {
@@ -230,17 +228,17 @@ void VulkanFixture::finishFrame() {
     vk::PipelineStageFlags waitDstStageMask =
         vk::PipelineStageFlagBits::eColorAttachmentOutput;
     vk::SubmitInfo submitInfo{
-        *m_imageAvailableSems.write(), // Wait for image to be available
-        waitDstStageMask,              // Wait just before writing output
+        **m_imageAvailableSems, // Wait for image to be available
+        waitDstStageMask,       // Wait just before writing output
         *cmdBuf,
-        *m_renderingFinishedSems.write() // Signal that the rendering has
-                                         // finished once done
+        **m_renderingFinishedSems // Signal that the rendering has
+                                  // finished once done
     };
-    m_graphicsQueue.submit(submitInfo, *m_inFlightFences.write());
+    m_graphicsQueue.submit(submitInfo, **m_inFlightFences);
 
     // Present new image
     vk::PresentInfoKHR presentInfo{
-        *m_renderingFinishedSems.write(), // Wait for rendering to finish
+        **m_renderingFinishedSems, // Wait for rendering to finish
         *m_swapchain,
         m_imageIndex};
 
@@ -269,7 +267,7 @@ vk::raii::Instance VulkanFixture::createInstance() {
     };
     std::vector<const char*> validationLayers = {
 #ifndef NDEBUG
-        "VK_LAYER_KHRONOS_validation", "VK_LAYER_KHRONOS_synchronization2"
+        "VK_LAYER_KHRONOS_validation"
 #endif // !NDEBUG
     };
 
