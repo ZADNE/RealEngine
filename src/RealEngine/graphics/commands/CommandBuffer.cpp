@@ -50,4 +50,9 @@ void CommandBuffer::submitToComputeQueue(const vk::Fence& signalFence /* = nullp
     computeQueue().submit(vk::SubmitInfo{{}, {}, m_cmdBuf}, signalFence);
 }
 
+void CommandBuffer::debugBarrier() const {
+    auto barrier = re::debugBarrier();
+    m_cmdBuf.pipelineBarrier2(vk::DependencyInfo{{}, barrier, {}, {}});
+}
+
 } // namespace re

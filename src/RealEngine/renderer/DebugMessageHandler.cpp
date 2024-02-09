@@ -32,9 +32,11 @@ const char* skipFunctionName(const char* msg) {
             break;
         }
     }
-    while (*msg != '\0') {
+    int spacesSkipped = 0;
+    while (*msg != '\0' && spacesSkipped <= 1) {
         if (*msg == ' ') {
             msg++;
+            spacesSkipped++;
         } else {
             break;
         }
@@ -81,7 +83,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallbackHandler(
     case 0x0: // Ignore loader messages
         break;
     case 0x76589099: // Log debug printf
-        log(skipFunctionName(skipMessageHeader(callbackData->pMessage)));
+        log(skipFunctionName(skipMessageHeader(callbackData->pMessage)), false);
         break;
     default: // Log validation message
         handleValidationMessage(sev, type, callbackData, userData);

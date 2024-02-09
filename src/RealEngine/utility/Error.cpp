@@ -8,9 +8,9 @@
 
 namespace re {
 
-[[noreturn]] void fatalError(std::string_view error, int exitCode /* = EXIT_FAILURE*/) {
+void fatalError(std::string_view error, int exitCode /* = EXIT_FAILURE*/) {
     std::cerr << error << std::endl;
-    exit(EXIT_FAILURE);
+    exit(exitCode);
 }
 
 void error(std::string_view error, bool appendEOL /* = true*/) {

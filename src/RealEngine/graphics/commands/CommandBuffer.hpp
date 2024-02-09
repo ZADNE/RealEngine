@@ -76,6 +76,12 @@ public:
 #pragma region Debug support
 
     /**
+     * @brief Inserts a global memory all-commands to all-commands barrier
+     * @note  Use for debug purposes only, do not use for release
+     */
+    void debugBarrier() const;
+
+    /**
      * @brief Begins a labeled debug region in the command buffer
      * @note  Does nothing in release build
      */
