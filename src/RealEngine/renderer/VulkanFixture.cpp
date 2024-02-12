@@ -325,13 +325,14 @@ vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice() {
         if (areExtensionsSupported(physicalDevice) &&
             isSwapchainSupported(physicalDevice) &&
             findQueueFamilyIndices(physicalDevice)) {
-            auto props = physicalDevice.getProperties2();
-            auto major = vk::versionMajor(props.properties.apiVersion);
-            auto minor = vk::versionMinor(props.properties.apiVersion);
-            auto patch = vk::versionPatch(props.properties.apiVersion);
+            auto props = physicalDevice.getProperties2().properties;
+            auto major = vk::versionMajor(props.apiVersion);
+            auto minor = vk::versionMinor(props.apiVersion);
+            auto patch = vk::versionPatch(props.apiVersion);
             if (major == 1 && minor >= 3) {
                 std::cout << "Vulkan:       " << major << '.' << minor << '.'
-                          << patch << std::endl;
+                          << patch << '\n';
+                std::cout << "Device:       " << props.deviceName << std::endl;
                 return physicalDevice;
             }
         }
