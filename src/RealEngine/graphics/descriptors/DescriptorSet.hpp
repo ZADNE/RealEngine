@@ -46,8 +46,8 @@ public:
         uint32_t           binding,
         uint32_t           arrayIndex,
         const Buffer&      buf,
-        vk::DeviceSize     offset,
-        vk::DeviceSize     range
+        vk::DeviceSize     offset = 0ull,
+        vk::DeviceSize     range  = vk::WholeSize
     );
     void write(
         vk::DescriptorType type,

@@ -33,8 +33,7 @@ protected:
     }
     static const vk::Device&     device() { return *s_device; }
     static const vma::Allocator& allocator() { return *s_allocator; }
-    static const vk::Queue&      graphicsQueue() { return *s_graphicsQueue; }
-    static const vk::Queue&      computeQueue() { return *s_computeQueue; }
+    static const vk::Queue& graphicsCompQueue() { return *s_graphicsCompQueue; }
     static const vk::Queue& presentationQueue() { return *s_presentationQueue; }
     static const vk::PipelineCache& pipelineCache() { return *s_pipelineCache; }
     static const vk::RenderPass&    renderPass() { return *s_renderPass; }
@@ -72,8 +71,7 @@ private:
     static inline const vk::PhysicalDevice* s_physicalDevice      = nullptr;
     static inline const vk::Device*         s_device              = nullptr;
     static inline const vma::Allocator*     s_allocator           = nullptr;
-    static inline const vk::Queue*          s_graphicsQueue       = nullptr;
-    static inline const vk::Queue*          s_computeQueue        = nullptr;
+    static inline const vk::Queue*          s_graphicsCompQueue   = nullptr;
     static inline const vk::Queue*          s_presentationQueue   = nullptr;
     static inline const vk::PipelineCache*  s_pipelineCache       = nullptr;
     static inline const vk::RenderPass*     s_renderPass          = nullptr;

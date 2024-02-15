@@ -28,6 +28,8 @@ class DoubleBuffered {
     friend class DoubleBuffered;
 
 public:
+    using Type = T;
+
     DoubleBuffered() {}
     DoubleBuffered(T&& first, T&& second)
         : m_ts{std::move(first), std::move(second)} {}

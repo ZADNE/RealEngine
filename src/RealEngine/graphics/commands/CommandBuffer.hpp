@@ -42,11 +42,13 @@ public:
 
     ~CommandBuffer();
 
-#pragma region Queue submission (static)
+#pragma region Queue submission
 
     /**
+     * @brief Records a command buffer and submits it
      * @warning Waits for device to become idle which is very expensive!
-     *          Use only when performance is not critical (e.g. outside of main loop)
+     *          Use only when performance is not critical (e.g. outside of main
+     * loop)
      */
     template<std::invocable<const CommandBuffer&> F>
     static void doOneTimeSubmit(F op) {
@@ -54,22 +56,24 @@ public:
         );
         op(oneTimeSubmitCmdBuf());
         oneTimeSubmitCmdBuf()->end();
-        graphicsQueue().submit(vk::SubmitInfo{{}, {}, *oneTimeSubmitCmdBuf()});
+        graphicsCompQueue().submit(vk::SubmitInfo{{}, {}, *oneTimeSubmitCmdBuf()});
         device().waitIdle();
     }
 
-    static void submitToGraphicsQueue(
+    /**
+     * @brief Submits the work to a queue which support graphics, compute and
+     * transfer work
+     */
+    static void submitToGraphicsCompQueue(
         const vk::ArrayProxy<const vk::SubmitInfo2>& submits,
         const vk::Fence&                             signalFence = nullptr
     );
 
-    static void submitToComputeQueue(
-        const vk::ArrayProxy<const vk::SubmitInfo2>& submits,
-        const vk::Fence&                             signalFence = nullptr
-    );
-
-    void submitToGraphicsQueue(const vk::Fence& signalFence = nullptr) const;
-    void submitToComputeQueue(const vk::Fence& signalFence = nullptr) const;
+    /**
+     * @brief Submits the command buffer to a queue which support graphics,
+     * compute and transfer work
+     */
+    void submitToGraphicsCompQueue(const vk::Fence& signalFence = nullptr) const;
 
 #pragma endregion
 

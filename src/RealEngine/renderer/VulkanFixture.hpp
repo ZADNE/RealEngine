@@ -103,16 +103,14 @@ private:
     vk::raii::DebugUtilsMessengerEXT m_debugUtilsMessenger;
 #endif // !NDEBUG
     vk::raii::SurfaceKHR      m_surface;
-    uint32_t                  m_graphicsQueueFamilyIndex;
-    uint32_t                  m_computeQueueFamilyIndex;
-    uint32_t                  m_presentationQueueFamilyIndex;
+    uint32_t                  m_graphicsCompQueueFamIndex;
+    uint32_t                  m_presentationQueueFamIndex;
     vk::raii::PhysicalDevice  m_physicalDevice;
     vk::raii::Device          m_device;
     vk::DispatchLoaderDynamic m_dispatchLoaderDynamic{
         *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr};
     Allocator                                m_allocator;
-    vk::raii::Queue                          m_graphicsQueue;
-    vk::raii::Queue                          m_computeQueue;
+    vk::raii::Queue                          m_graphicsCompQueue;
     vk::raii::Queue                          m_presentationQueue;
     uint32_t                                 m_minImageCount;
     vk::Extent2D                             m_swapchainExtent;
@@ -143,7 +141,7 @@ private:
     vk::raii::PhysicalDevice         createPhysicalDevice();
     vk::raii::Device       createDevice(const void* deviceCreateInfoChain);
     vma::Allocator         createAllocator();
-    vk::raii::Queue        createQueue(uint32_t familyIndex);
+    vk::raii::Queue        getQueue(uint32_t familyIndex);
     vk::raii::SwapchainKHR createSwapchain();
     std::vector<vk::raii::ImageView>         createSwapchainImageViews();
     std::vector<Texture>                     createAdditionalBuffers();

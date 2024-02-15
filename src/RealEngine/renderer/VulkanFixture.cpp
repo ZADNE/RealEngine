@@ -56,9 +56,8 @@ VulkanFixture::VulkanFixture(
     , m_physicalDevice(createPhysicalDevice())
     , m_device(createDevice(initInfo.deviceCreateInfoChain))
     , m_allocator(createAllocator())
-    , m_graphicsQueue(createQueue(m_graphicsQueueFamilyIndex))
-    , m_computeQueue(createQueue(m_computeQueueFamilyIndex))
-    , m_presentationQueue(createQueue(m_presentationQueueFamilyIndex))
+    , m_graphicsCompQueue(getQueue(m_graphicsCompQueueFamIndex))
+    , m_presentationQueue(getQueue(m_presentationQueueFamIndex))
     , m_swapchain(createSwapchain())
     , m_swapchainImageViews(createSwapchainImageViews())
     , m_additionalBufferDescrs(
@@ -90,10 +89,7 @@ VulkanFixture::VulkanFixture(
     FrameDoubleBufferingState::setTotalIndex(m_frame++);
 
     VulkanObject::setDebugUtilsObjectName(
-        *m_graphicsQueue, "re::VulkanFixture::graphicsQueue"
-    );
-    VulkanObject::setDebugUtilsObjectName(
-        *m_computeQueue, "re::VulkanFixture::computeQueue"
+        *m_graphicsCompQueue, "re::VulkanFixture::graphicsCompQueue"
     );
 
     // Initialize ImGui
@@ -104,8 +100,8 @@ VulkanFixture::VulkanFixture(
         .Instance        = *m_instance,
         .PhysicalDevice  = *m_physicalDevice,
         .Device          = *m_device,
-        .QueueFamily     = m_graphicsQueueFamilyIndex,
-        .Queue           = *m_graphicsQueue,
+        .QueueFamily     = m_graphicsCompQueueFamIndex,
+        .Queue           = *m_graphicsCompQueue,
         .PipelineCache   = *m_pipelineCache,
         .DescriptorPool  = *m_descriptorPool,
         .Subpass         = initInfo.imGuiSubpassIndex,
@@ -234,7 +230,7 @@ void VulkanFixture::finishFrame() {
         **m_renderingFinishedSems // Signal that the rendering has
                                   // finished once done
     };
-    m_graphicsQueue.submit(submitInfo, **m_inFlightFences);
+    m_graphicsCompQueue.submit(submitInfo, **m_inFlightFences);
 
     // Present new image
     vk::PresentInfoKHR presentInfo{
@@ -344,16 +340,11 @@ vk::raii::Device VulkanFixture::createDevice(const void* deviceCreateInfoChain) 
     float                                  deviceQueuePriority = 1.0f;
     std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos;
     deviceQueueCreateInfos.emplace_back(
-        vk::DeviceQueueCreateFlags{}, m_graphicsQueueFamilyIndex, 1, &deviceQueuePriority
+        vk::DeviceQueueCreateFlags{}, m_graphicsCompQueueFamIndex, 1, &deviceQueuePriority
     );
-    if (m_graphicsQueueFamilyIndex != m_presentationQueueFamilyIndex) {
+    if (m_graphicsCompQueueFamIndex != m_presentationQueueFamIndex) {
         deviceQueueCreateInfos.emplace_back(
-            vk::DeviceQueueCreateFlags{}, m_presentationQueueFamilyIndex, 1, &deviceQueuePriority
-        );
-    }
-    if (m_graphicsQueueFamilyIndex != m_computeQueueFamilyIndex) {
-        deviceQueueCreateInfos.emplace_back(
-            vk::DeviceQueueCreateFlags{}, m_computeQueueFamilyIndex, 1, &deviceQueuePriority
+            vk::DeviceQueueCreateFlags{}, m_presentationQueueFamIndex, 1, &deviceQueuePriority
         );
     }
     auto createInfo =
@@ -391,7 +382,7 @@ vma::Allocator VulkanFixture::createAllocator() {
     });
 }
 
-vk::raii::Queue VulkanFixture::createQueue(uint32_t familyIndex) {
+vk::raii::Queue VulkanFixture::getQueue(uint32_t familyIndex) {
     return vk::raii::Queue{m_device, familyIndex, 0u};
 }
 
@@ -423,11 +414,10 @@ vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
     }
 
     // Sharing mode
-    bool oneQueueFamily = m_graphicsQueueFamilyIndex ==
-                          m_presentationQueueFamilyIndex;
+    bool oneQueueFamily = m_graphicsCompQueueFamIndex == m_presentationQueueFamIndex;
     auto       sharingMode        = oneQueueFamily ? eExclusive : eConcurrent;
     std::array queueFamilyIndices = {
-        m_graphicsQueueFamilyIndex, m_presentationQueueFamilyIndex};
+        m_graphicsCompQueueFamIndex, m_presentationQueueFamIndex};
     vk::SwapchainCreateInfoKHR createInfo{
         {},
         *m_surface,
@@ -543,7 +533,7 @@ std::vector<vk::raii::Framebuffer> VulkanFixture::createSwapchainFramebuffers() 
 vk::raii::CommandPool VulkanFixture::createCommandPool() {
     vk::CommandPoolCreateInfo createInfo{
         vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
-        m_graphicsQueueFamilyIndex};
+        m_graphicsCompQueueFamIndex};
     return vk::raii::CommandPool{m_device, createInfo};
 }
 
@@ -623,26 +613,23 @@ bool VulkanFixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physica
 
 bool VulkanFixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice
 ) {
-    bool                                   graphicsQueueFound = false;
-    bool                                   computeQueueFound  = false;
-    bool                                   presentQueueFound  = false;
+    using enum vk::QueueFlagBits;
+    bool                                   graphicsCompQueueFound = false;
+    bool                                   presentQueueFound      = false;
     std::vector<vk::QueueFamilyProperties> queueFamilyProperties =
         physicalDevice.getQueueFamilyProperties();
+
     for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size());
          i++) { // Iterate over all queue families
-        if (queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eGraphics) {
-            m_graphicsQueueFamilyIndex = i;
-            graphicsQueueFound         = true;
-        }
-        if (queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eCompute) {
-            m_computeQueueFamilyIndex = i;
-            computeQueueFound         = true;
+        if (queueFamilyProperties[i].queueFlags & (eGraphics | eTransfer)) {
+            m_graphicsCompQueueFamIndex = i;
+            graphicsCompQueueFound      = true;
         }
         if (physicalDevice.getSurfaceSupportKHR(i, *m_surface)) {
-            m_presentationQueueFamilyIndex = i;
-            presentQueueFound              = true;
+            m_presentationQueueFamIndex = i;
+            presentQueueFound           = true;
         }
-        if (graphicsQueueFound && computeQueueFound && presentQueueFound) {
+        if (graphicsCompQueueFound && presentQueueFound) {
             return true;
         }
     }
@@ -672,7 +659,7 @@ void VulkanFixture::recreateImGuiFontTexture() {
     m_cmdBufs.write()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
     ImGui_ImplVulkan_CreateFontsTexture(*m_cmdBufs.write());
     m_cmdBufs.write()->end();
-    m_graphicsQueue.submit(vk::SubmitInfo{{}, {}, *m_cmdBufs.write()}, *uploadFence);
+    m_graphicsCompQueue.submit(vk::SubmitInfo{{}, {}, *m_cmdBufs.write()}, *uploadFence);
     checkSuccess(m_device.waitForFences(*uploadFence, true, k_maxTimeout));
 }
 
@@ -680,8 +667,7 @@ void VulkanFixture::assignImplementationReferences() {
     VulkanObject::s_physicalDevice        = &(*m_physicalDevice);
     VulkanObject::s_device                = &(*m_device);
     VulkanObject::s_allocator             = &m_allocator;
-    VulkanObject::s_graphicsQueue         = &(*m_graphicsQueue);
-    VulkanObject::s_computeQueue          = &(*m_computeQueue);
+    VulkanObject::s_graphicsCompQueue     = &(*m_graphicsCompQueue);
     VulkanObject::s_commandPool           = &(*m_commandPool);
     VulkanObject::s_descriptorPool        = &(*m_descriptorPool);
     VulkanObject::s_pipelineCache         = &(*m_pipelineCache);

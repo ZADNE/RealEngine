@@ -28,26 +28,16 @@ CommandBuffer::~CommandBuffer() {
     device().freeCommandBuffers(commandPool(), m_cmdBuf);
 }
 
-void CommandBuffer::submitToGraphicsQueue(
+void CommandBuffer::submitToGraphicsCompQueue(
     const vk::ArrayProxy<const vk::SubmitInfo2>& submits,
     const vk::Fence&                             signalFence /* = nullptr*/
 ) {
-    graphicsQueue().submit2(submits, signalFence);
+    graphicsCompQueue().submit2(submits, signalFence);
 }
 
-void CommandBuffer::submitToComputeQueue(
-    const vk::ArrayProxy<const vk::SubmitInfo2>& submits,
-    const vk::Fence&                             signalFence /* = nullptr*/
-) {
-    computeQueue().submit2(submits, signalFence);
-}
-
-void CommandBuffer::submitToGraphicsQueue(const vk::Fence& signalFence /* = nullptr*/) const {
-    graphicsQueue().submit(vk::SubmitInfo{{}, {}, m_cmdBuf}, signalFence);
-}
-
-void CommandBuffer::submitToComputeQueue(const vk::Fence& signalFence /* = nullptr*/) const {
-    computeQueue().submit(vk::SubmitInfo{{}, {}, m_cmdBuf}, signalFence);
+void CommandBuffer::submitToGraphicsCompQueue(const vk::Fence&
+                                                  signalFence /* = nullptr*/) const {
+    graphicsCompQueue().submit(vk::SubmitInfo{{}, {}, m_cmdBuf}, signalFence);
 }
 
 void CommandBuffer::debugBarrier() const {
