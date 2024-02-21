@@ -12,7 +12,7 @@
 
 - A lightweight library, not a full-fledged engine with all sorts of subsystems
 - As little runtime overhead as possible
-- A modern type-safe C++20 library following [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
+- A modern type-safe C++23 library following [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
 - Doxygen documented at least at class level
 
 ## The library was used to develop:
