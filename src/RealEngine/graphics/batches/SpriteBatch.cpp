@@ -37,16 +37,16 @@ void SpriteBatch::nextBatch() {
     m_batchFirstSpriteIndex = m_nextSpriteIndex;
 }
 
-void SpriteBatch::drawBatch(const CommandBuffer& cmdBuf, const glm::mat4& mvpMat) {
-    cmdBuf->bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
-    cmdBuf->bindDescriptorSets(
+void SpriteBatch::drawBatch(const CommandBuffer& cb, const glm::mat4& mvpMat) {
+    cb->bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
+    cb->bindDescriptorSets(
         vk::PipelineBindPoint::eGraphics, *m_pipelineLayout, 0u, *m_descSet, {}
     );
-    cmdBuf->bindVertexBuffers(0u, m_spritesBuf.buffer(), vk::DeviceSize{0});
-    cmdBuf->pushConstants<glm::mat4>(
+    cb->bindVertexBuffers(0u, m_spritesBuf.buffer(), vk::DeviceSize{0});
+    cb->pushConstants<glm::mat4>(
         *m_pipelineLayout, vk::ShaderStageFlagBits::eTessellationEvaluation, 0u, mvpMat
     );
-    cmdBuf->draw(
+    cb->draw(
         m_nextSpriteIndex - m_batchFirstSpriteIndex, 1u, m_batchFirstSpriteIndex, 0u
     );
 }

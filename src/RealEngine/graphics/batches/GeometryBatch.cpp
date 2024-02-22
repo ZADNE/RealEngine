@@ -78,13 +78,13 @@ void GeometryBatch::addVertices(std::span<const VertexPoCo> vertices) {
     );
 }
 
-void GeometryBatch::draw(const CommandBuffer& cmdBuf, const glm::mat4& mvpMat) {
-    cmdBuf->bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
-    cmdBuf->bindVertexBuffers(0u, m_verticesBuf.buffer(), vk::DeviceSize{0});
-    cmdBuf->pushConstants<glm::mat4>(
+void GeometryBatch::draw(const CommandBuffer& cb, const glm::mat4& mvpMat) {
+    cb->bindPipeline(vk::PipelineBindPoint::eGraphics, *m_pipeline);
+    cb->bindVertexBuffers(0u, m_verticesBuf.buffer(), vk::DeviceSize{0});
+    cb->pushConstants<glm::mat4>(
         *m_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0u, mvpMat
     );
-    cmdBuf->draw(
+    cb->draw(
         m_nextVertexIndex - m_maxVertices * FrameDoubleBufferingState::writeIndex(),
         1u,
         m_maxVertices * FrameDoubleBufferingState::writeIndex(),

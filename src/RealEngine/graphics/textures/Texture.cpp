@@ -60,9 +60,9 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         initializeTexels(createInfo);
     } else if (createInfo.initialLayout != eUndefined) {
         // Transit to initial layout
-        CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cmdBuf) {
+        CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cb) {
             pipelineImageBarrier(
-                cmdBuf,
+                cb,
                 eUndefined,
                 createInfo.initialLayout, // Image layouts
                 eTopOfPipe,
@@ -136,9 +136,9 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
         stagingBuffer.mapped(), createInfo.texels.data(), createInfo.texels.size()
     );
     // Copy data from staging buffer to the image
-    CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cmdBuf) {
+    CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cb) {
         pipelineImageBarrier(
-            cmdBuf,
+            cb,
             eUndefined,
             eTransferDstOptimal, // Image layouts
             eAllCommands,
@@ -147,7 +147,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
             vk::AccessFlagBits::eTransferWrite, // Access flags
             createInfo.layers                   // Array layer count
         );
-        cmdBuf->copyBufferToImage(
+        cb->copyBufferToImage(
             stagingBuffer.buffer(),
             m_image,
             eTransferDstOptimal,
@@ -166,7 +166,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
         );
         using enum vk::AccessFlagBits;
         pipelineImageBarrier(
-            cmdBuf,
+            cb,
             eTransferDstOptimal,
             createInfo.initialLayout, // Image layouts
             eTransfer,
@@ -179,7 +179,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
 }
 
 void Texture::pipelineImageBarrier(
-    const CommandBuffer&   cmdBuf,
+    const CommandBuffer&   cb,
     vk::ImageLayout        oldLayout,
     vk::ImageLayout        newLayout,
     vk::PipelineStageFlags srcStage,
@@ -188,7 +188,7 @@ void Texture::pipelineImageBarrier(
     vk::AccessFlags        dstAccess,
     uint32_t               layerCount
 ) {
-    cmdBuf->pipelineBarrier(
+    cb->pipelineBarrier(
         srcStage,
         dstStage,
         vk::DependencyFlags{},

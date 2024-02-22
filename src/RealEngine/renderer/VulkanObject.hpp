@@ -38,7 +38,6 @@ protected:
     static const vk::PipelineCache& pipelineCache() { return *s_pipelineCache; }
     static const vk::RenderPass&    renderPass() { return *s_renderPass; }
     static const vk::CommandPool&   commandPool() { return *s_commandPool; }
-    static const CommandBuffer&     cmdBuf() { return *s_cmdBuf; }
     static const CommandBuffer&     oneTimeSubmitCmdBuf() {
         return *s_oneTimeSubmitCmdBuf;
     }
@@ -76,7 +75,6 @@ private:
     static inline const vk::PipelineCache*  s_pipelineCache       = nullptr;
     static inline const vk::RenderPass*     s_renderPass          = nullptr;
     static inline const vk::CommandPool*    s_commandPool         = nullptr;
-    static inline const CommandBuffer*      s_cmdBuf              = nullptr;
     static inline const CommandBuffer*      s_oneTimeSubmitCmdBuf = nullptr;
     static inline const vk::DescriptorPool* s_descriptorPool      = nullptr;
     static inline const vk::DispatchLoaderDynamic* s_dispatchLoaderDynamic = nullptr;

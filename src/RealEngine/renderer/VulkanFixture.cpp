@@ -71,12 +71,12 @@ VulkanFixture::VulkanFixture(
       )
     , m_swapChainFramebuffers(createSwapchainFramebuffers())
     , m_commandPool(createCommandPool())
-    , m_cmdBufs([&]() {
+    , m_cbs([&]() {
         assignImplementationReferences(); // Deliberate side effect, ref to device
                                           // and pool is required to construct a cmd buf
         return FrameDoubleBuffered{
-            CommandBuffer{{.debugName = "re::VulkanFixture::cmdBufs[0]"}},
-            CommandBuffer{{.debugName = "re::VulkanFixture::cmdBufs[1]"}}};
+            CommandBuffer{{.debugName = "re::VulkanFixture::cbs[0]"}},
+            CommandBuffer{{.debugName = "re::VulkanFixture::cbs[1]"}}};
     }())
     , m_oneTimeSubmitCmdBuf({.debugName = "re::VulkanFixture::oneTimeSubmit"})
     , m_pipelineCache(createPipelineCache())
@@ -150,12 +150,9 @@ const CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
     }
 
     // Restart command buffer
-    auto& cmdBuf = *m_cmdBufs;
-    cmdBuf->reset();
-    cmdBuf->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-
-    // Set current commandbuffer
-    VulkanObject::s_cmdBuf = &cmdBuf;
+    auto& cb = *m_cbs;
+    cb->reset();
+    cb->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 
     // Begin ImGui frame
     if (useImGui) {
@@ -164,13 +161,13 @@ const CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
         ImGui::NewFrame();
     }
 
-    return cmdBuf;
+    return cb;
 }
 
 void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues
 ) {
-    auto& cmdBuf = m_cmdBufs.write();
-    cmdBuf->beginRenderPass2(
+    auto& cb = m_cbs.write();
+    cb->beginRenderPass2(
         vk::RenderPassBeginInfo{
             *m_renderPass,
             *m_swapChainFramebuffers[m_imageIndex],
@@ -181,7 +178,7 @@ void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearVal
 
     // Set default viewport & scissor
     glm::vec2 extent{m_swapchainExtent.width, m_swapchainExtent.height};
-    cmdBuf->setViewport(
+    cb->setViewport(
         0u,
         vk::Viewport{
             0.0f,      // x
@@ -192,7 +189,7 @@ void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearVal
             1.0f       // maxDepth
         }
     );
-    cmdBuf->setScissor(
+    cb->setScissor(
         0u,
         vk::Rect2D{
             {0, 0},                                             // x, y
@@ -202,23 +199,23 @@ void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearVal
 }
 
 void VulkanFixture::mainRenderPassNextSubpass() {
-    m_cmdBufs.write()->nextSubpass2(
+    m_cbs.write()->nextSubpass2(
         vk::SubpassBeginInfo{vk::SubpassContents::eInline}, vk::SubpassEndInfo{}
     );
 }
 
 void VulkanFixture::mainRenderPassDrawImGui() {
     ImGui::Render();
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), **m_cmdBufs);
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), **m_cbs);
 }
 
 void VulkanFixture::mainRenderPassEnd() {
-    m_cmdBufs.write()->endRenderPass2(vk::SubpassEndInfo{});
+    m_cbs.write()->endRenderPass2(vk::SubpassEndInfo{});
 }
 
 void VulkanFixture::finishFrame() {
-    auto& cmdBuf = m_cmdBufs.write();
-    cmdBuf->end();
+    auto& cb = m_cbs.write();
+    cb->end();
 
     // Submit the command buffer
     vk::PipelineStageFlags waitDstStageMask =
@@ -226,7 +223,7 @@ void VulkanFixture::finishFrame() {
     vk::SubmitInfo submitInfo{
         **m_imageAvailableSems, // Wait for image to be available
         waitDstStageMask,       // Wait just before writing output
-        *cmdBuf,
+        *cb,
         **m_renderingFinishedSems // Signal that the rendering has
                                   // finished once done
     };
@@ -656,10 +653,10 @@ void VulkanFixture::recreateSwapchain() {
 
 void VulkanFixture::recreateImGuiFontTexture() {
     vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
-    m_cmdBufs.write()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-    ImGui_ImplVulkan_CreateFontsTexture(*m_cmdBufs.write());
-    m_cmdBufs.write()->end();
-    m_graphicsCompQueue.submit(vk::SubmitInfo{{}, {}, *m_cmdBufs.write()}, *uploadFence);
+    m_cbs.write()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+    ImGui_ImplVulkan_CreateFontsTexture(*m_cbs.write());
+    m_cbs.write()->end();
+    m_graphicsCompQueue.submit(vk::SubmitInfo{{}, {}, *m_cbs.write()}, *uploadFence);
     checkSuccess(m_device.waitForFences(*uploadFence, true, k_maxTimeout));
 }
 

@@ -79,7 +79,7 @@ protected:
     void initializeTexels(const TextureCreateInfo& createInfo);
 
     void pipelineImageBarrier(
-        const CommandBuffer&   cmdBuf,
+        const CommandBuffer&   cb,
         vk::ImageLayout        oldLayout,
         vk::ImageLayout        newLayout,
         vk::PipelineStageFlags srcStage,

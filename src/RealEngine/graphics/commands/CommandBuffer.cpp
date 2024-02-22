@@ -6,26 +6,26 @@
 namespace re {
 
 CommandBuffer::CommandBuffer(const CommandBufferCreateInfo& createInfo)
-    : m_cmdBuf(device()
-                   .allocateCommandBuffers(vk::CommandBufferAllocateInfo{
-                       commandPool(), createInfo.level, 1u})
-                   .back()) {
+    : m_cb(device()
+               .allocateCommandBuffers(vk::CommandBufferAllocateInfo{
+                   commandPool(), createInfo.level, 1u})
+               .back()) {
 
-    setDebugUtilsObjectName(m_cmdBuf, createInfo.debugName);
+    setDebugUtilsObjectName(m_cb, createInfo.debugName);
 }
 
 CommandBuffer::CommandBuffer(CommandBuffer&& other) noexcept
-    : m_cmdBuf(other.m_cmdBuf) {
-    other.m_cmdBuf = nullptr;
+    : m_cb(other.m_cb) {
+    other.m_cb = nullptr;
 }
 
 CommandBuffer& CommandBuffer::operator=(CommandBuffer&& other) noexcept {
-    std::swap(m_cmdBuf, other.m_cmdBuf);
+    std::swap(m_cb, other.m_cb);
     return *this;
 }
 
 CommandBuffer::~CommandBuffer() {
-    device().freeCommandBuffers(commandPool(), m_cmdBuf);
+    device().freeCommandBuffers(commandPool(), m_cb);
 }
 
 void CommandBuffer::submitToGraphicsCompQueue(
@@ -37,12 +37,12 @@ void CommandBuffer::submitToGraphicsCompQueue(
 
 void CommandBuffer::submitToGraphicsCompQueue(const vk::Fence&
                                                   signalFence /* = nullptr*/) const {
-    graphicsCompQueue().submit(vk::SubmitInfo{{}, {}, m_cmdBuf}, signalFence);
+    graphicsCompQueue().submit(vk::SubmitInfo{{}, {}, m_cb}, signalFence);
 }
 
 void CommandBuffer::debugBarrier() const {
     auto barrier = re::debugBarrier();
-    m_cmdBuf.pipelineBarrier2(vk::DependencyInfo{{}, barrier, {}, {}});
+    m_cb.pipelineBarrier2(vk::DependencyInfo{{}, barrier, {}, {}});
 }
 
 } // namespace re
