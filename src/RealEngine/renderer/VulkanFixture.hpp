@@ -158,8 +158,6 @@ private:
     bool findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice);
 
     void recreateSwapchain();
-
-    void recreateImGuiFontTexture();
 };
 
 } // namespace re

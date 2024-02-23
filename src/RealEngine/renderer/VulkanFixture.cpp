@@ -144,15 +144,15 @@ const CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
     checkSuccess(res);
     m_imageIndex = imageIndex;
 
-    // Rebuild fonts if new font were added
-    if (!ImGui::GetIO().Fonts->IsBuilt()) {
-        recreateImGuiFontTexture();
-    }
-
     // Restart command buffer
     auto& cb = *m_cbs;
     cb->reset();
     cb->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+
+    // Rebuild fonts if new fonts have been added
+    if (!ImGui::GetIO().Fonts->IsBuilt()) {
+        ImGui_ImplVulkan_CreateFontsTexture(*cb);
+    }
 
     // Begin ImGui frame
     if (useImGui) {
@@ -649,15 +649,6 @@ void VulkanFixture::recreateSwapchain() {
     ){createAdditionalBuffers()};
     new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers
     ){createSwapchainFramebuffers()};
-}
-
-void VulkanFixture::recreateImGuiFontTexture() {
-    vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
-    m_cbs.write()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-    ImGui_ImplVulkan_CreateFontsTexture(*m_cbs.write());
-    m_cbs.write()->end();
-    m_graphicsCompQueue.submit(vk::SubmitInfo{{}, {}, *m_cbs.write()}, *uploadFence);
-    checkSuccess(m_device.waitForFences(*uploadFence, true, k_maxTimeout));
 }
 
 void VulkanFixture::assignImplementationReferences() {
