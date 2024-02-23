@@ -73,8 +73,13 @@ public:
     /**
      * @brief Assigns concrete image to an image name
      */
-    void track(ImageName name, const re::Texture& tex, vk::ImageLayout layout) {
-        state(name) = ImageState{tex.image(), {}, {}, layout};
+    void track(
+        ImageName          name,
+        const re::Texture& tex,
+        vk::ImageLayout    layout,
+        uint32_t           layerCount = 1
+    ) {
+        state(name) = ImageState{tex.image(), {}, {}, layout, layerCount};
     }
 
     /**
@@ -135,6 +140,7 @@ private:
         vk::PipelineStageFlags2 lastStage{};
         vk::AccessFlags2        lastAccess{};
         vk::ImageLayout         layout{};
+        uint32_t                layerCount{};
     };
     mutable std::array<ImageState, k_trackedImageCount> m_imageStates;
 
@@ -216,7 +222,8 @@ private:
                 vk::QueueFamilyIgnored,
                 vk::QueueFamilyIgnored,
                 last.image,
-                vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+                vk::ImageSubresourceRange{
+                    vk::ImageAspectFlagBits::eColor, 0, 1, 0, last.layerCount}
             );
             last.lastStage  = access.stage;
             last.lastAccess = access.access;
