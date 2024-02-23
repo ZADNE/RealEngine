@@ -101,6 +101,17 @@ public:
         action(*cb());
     }
 
+    void assumeActionsFinished() {
+        for (auto& buf : m_bufferStates) {
+            buf.lastStage  = {};
+            buf.lastAccess = {};
+        }
+        for (auto& img : m_imageStates) {
+            img.lastStage  = {};
+            img.lastAccess = {};
+        }
+    }
+
     const re::CommandBuffer& operator*() const { return *cb(); }
     const re::CommandBuffer* operator->() const { return cb(); }
 
