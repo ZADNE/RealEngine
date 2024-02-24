@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <RealEngine/graphics/output_control/RenderPass.hpp>
 #include <RealEngine/graphics/pipelines/PipelineSources.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
 
@@ -28,8 +29,7 @@ struct PipelineGraphicsCreateInfo {
     bool enableBlend = true;
 
     vk::PipelineLayout pipelineLayout = nullptr;
-    vk::RenderPass renderPass = nullptr; // The main renderpass is used if unspecified
-    uint32_t subpassIndex = 0;
+    RenderPassSubpass  renderPassSubpass{};
 
     // Debug
     [[no_unique_address]] DebugName<> debugName;

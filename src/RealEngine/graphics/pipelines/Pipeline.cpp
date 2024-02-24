@@ -38,18 +38,17 @@ Pipeline::Pipeline(
                 {{}, srcs[st].vk13.size() * 4, srcs[st].vk13.data()}
             );
             stages[shaderCount] = vk::PipelineShaderStageCreateInfo{
-                {},
-                convert(st),
-                modules[shaderCount],
-                "main",
-                createInfo.specializationInfo};
+                {}, convert(st), modules[shaderCount], "main", createInfo.specializationInfo
+            };
             shaderCount++;
         }
     }
     vk::PipelineInputAssemblyStateCreateInfo inputAssembly{
-        {}, createInfo.topology, createInfo.enablePrimitiveRestart};
+        {}, createInfo.topology, createInfo.enablePrimitiveRestart
+    };
     vk::PipelineTessellationStateCreateInfo tessellation{
-        {}, createInfo.patchControlPoints};
+        {}, createInfo.patchControlPoints
+    };
     vk::PipelineViewportStateCreateInfo viewport{
         {},
         1u,
@@ -72,7 +71,8 @@ Pipeline::Pipeline(
     };
     vk::PipelineMultisampleStateCreateInfo  multisample{};
     vk::PipelineDepthStencilStateCreateInfo depthStencil{
-        {}, createInfo.enableDepth, createInfo.enableDepth, vk::CompareOp::eLess};
+        {}, createInfo.enableDepth, createInfo.enableDepth, vk::CompareOp::eLess
+    };
     vk::PipelineColorBlendAttachmentState colorBlendAttachment{
         createInfo.enableBlend,
         eSrcAlpha,         // Src color
@@ -87,7 +87,8 @@ Pipeline::Pipeline(
         {},
         false,
         vk::LogicOp::eClear, // Logic op (disable)
-        colorBlendAttachment};
+        colorBlendAttachment
+    };
     std::array dynamicStates = std::to_array<vk::DynamicState>(
         {vk::DynamicState::eViewport, vk::DynamicState::eScissor}
     );
@@ -112,8 +113,8 @@ Pipeline::Pipeline(
                     &colorBlend,
                     &dynamic,
                     createInfo.pipelineLayout,
-                    createInfo.renderPass ? createInfo.renderPass : renderPass(),
-                    createInfo.subpassIndex,
+                    createInfo.renderPassSubpass.renderPass,
+                    createInfo.renderPassSubpass.subpassIndex,
                     nullptr,
                     -1 // No base pipeline
                 }
@@ -133,7 +134,8 @@ Pipeline::Pipeline(
 ) {
     // Create compute shader module
     vk::ShaderModule compShader = device().createShaderModule(vk::ShaderModuleCreateInfo{
-        {}, srcs.comp.vk13.size() * 4, srcs.comp.vk13.data()});
+        {}, srcs.comp.vk13.size() * 4, srcs.comp.vk13.data()
+    });
 
     // Create pipeline
     m_pipeline =
@@ -147,7 +149,8 @@ Pipeline::Pipeline(
                         vk::ShaderStageFlagBits::eCompute,
                         compShader,
                         "main",
-                        createInfo.specializationInfo},
+                        createInfo.specializationInfo
+                    },
                     createInfo.pipelineLayout,
                     nullptr,
                     -1 // No base pipeline

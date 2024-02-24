@@ -36,7 +36,6 @@ protected:
     static const vk::Queue& graphicsCompQueue() { return *s_graphicsCompQueue; }
     static const vk::Queue& presentationQueue() { return *s_presentationQueue; }
     static const vk::PipelineCache& pipelineCache() { return *s_pipelineCache; }
-    static const vk::RenderPass&    renderPass() { return *s_renderPass; }
     static const vk::CommandPool&   commandPool() { return *s_commandPool; }
     static const CommandBuffer&     oneTimeSubmitCmdBuf() {
         return *s_oneTimeSubmitCmdBuf;
@@ -60,7 +59,8 @@ protected:
                 vk::DebugUtilsObjectNameInfoEXT{
                     T::objectType,
                     reinterpret_cast<uint64_t>(static_cast<T::NativeType>(object)),
-                    static_cast<const char*>(debugName)},
+                    static_cast<const char*>(debugName)
+                },
                 dispatchLoaderDynamic()
             );
         }
@@ -73,7 +73,6 @@ private:
     static inline const vk::Queue*          s_graphicsCompQueue   = nullptr;
     static inline const vk::Queue*          s_presentationQueue   = nullptr;
     static inline const vk::PipelineCache*  s_pipelineCache       = nullptr;
-    static inline const vk::RenderPass*     s_renderPass          = nullptr;
     static inline const vk::CommandPool*    s_commandPool         = nullptr;
     static inline const CommandBuffer*      s_oneTimeSubmitCmdBuf = nullptr;
     static inline const vk::DescriptorPool* s_descriptorPool      = nullptr;

@@ -13,16 +13,11 @@
 #include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/renderer/Allocator.hpp>
 #include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/rooms/RoomDisplaySettings.hpp>
 
 struct SDL_Window;
 
 namespace re {
-
-/**
- * @brief Surface format that is used for default surface
- */
-constexpr vk::SurfaceFormatKHR k_surfaceFormat{
-    vk::Format::eB8G8R8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear};
 
 /**
  * @brief Describes how to initialize Vulkan.
@@ -40,16 +35,6 @@ struct VulkanInitInfo {
      * needed by the engine are initialized.
      */
     const void* deviceCreateInfoChain = nullptr;
-    /**
-     * @brief Is used to create custom main RenderPass. A default
-     * single-subpass Renderpass is created instead if this is nullptr.
-     */
-    vk::RenderPassCreateInfo2* mainRenderPass = nullptr;
-    /**
-     * @brief Index of subpass within main RenderPass in which ImGui will be
-     * rendered
-     */
-    uint32_t imGuiSubpassIndex = 0;
     /**
      * @brief Additional buffers that should be created.
      * Extent of all of these is the extent of the swapchain.
@@ -78,7 +63,9 @@ public:
 
     ~VulkanFixture();
 
-    const CommandBuffer& prepareFrame(bool useImGui);
+    void setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex);
+
+    const CommandBuffer& prepareFrame();
 
     void mainRenderPassBegin(std::span<const vk::ClearValue> clearValues);
     void mainRenderPassNextSubpass();
@@ -108,7 +95,8 @@ private:
     vk::raii::PhysicalDevice  m_physicalDevice;
     vk::raii::Device          m_device;
     vk::DispatchLoaderDynamic m_dispatchLoaderDynamic{
-        *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr};
+        *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr
+    };
     Allocator                                m_allocator;
     vk::raii::Queue                          m_graphicsCompQueue;
     vk::raii::Queue                          m_presentationQueue;
@@ -118,7 +106,6 @@ private:
     std::vector<vk::raii::ImageView>         m_swapchainImageViews;
     std::vector<VulkanInitInfo::BufferDescr> m_additionalBufferDescrs;
     std::vector<Texture>                     m_additionalBuffers;
-    vk::raii::RenderPass                     m_renderPass;
     std::vector<vk::raii::Framebuffer>       m_swapChainFramebuffers;
     vk::raii::CommandPool                    m_commandPool;
     FrameDoubleBuffered<CommandBuffer>       m_cbs;
@@ -130,6 +117,10 @@ private:
     FrameDoubleBuffered<vk::raii::Fence>     m_inFlightFences;
     bool                                     m_recreteSwapchain = false;
     DeletionQueue m_deletionQueue{*m_device, m_allocator};
+
+    // Active room dependent
+    const RenderPass* m_mainRenderPass{};
+    uint32_t          m_imGuiSubpassIndex{};
 
     // Implementations
     void assignImplementationReferences();
@@ -145,7 +136,6 @@ private:
     vk::raii::SwapchainKHR createSwapchain();
     std::vector<vk::raii::ImageView>         createSwapchainImageViews();
     std::vector<Texture>                     createAdditionalBuffers();
-    vk::raii::RenderPass                     createRenderPass();
     std::vector<vk::raii::Framebuffer>       createSwapchainFramebuffers();
     vk::raii::CommandPool                    createCommandPool();
     FrameDoubleBuffered<vk::raii::Semaphore> createSemaphores();

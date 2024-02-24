@@ -48,13 +48,15 @@ public:
 
     ~Window();
 
+    void setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex);
+
     /**
      * @brief Prepares for rendering of new frame
      * @return The command buffer that should be used for rendering of this frame
      */
     const CommandBuffer& prepareNewFrame();
 
-    void mainRenderPassBegin();
+    void mainRenderPassBegin(std::span<const vk::ClearValue> clearValues);
     void mainRenderPassNextSubpass();
     void mainRenderPassDrawImGui();
     void mainRenderPassEnd();
@@ -71,23 +73,6 @@ public:
      * @return True if the event has been consumed, false otherwise
      */
     bool passSDLEvent(const SDL_Event& evnt);
-
-    /**
-     * @brief Sets clear values that will be used to clear render outputs
-     */
-    void setClearValues(std::span<const vk::ClearValue> clearValues) {
-        m_clearValues.assign(clearValues.begin(), clearValues.end());
-    }
-
-    /**
-     * @brief Enables/disables ImGui
-     */
-    void useImGui(bool use) { m_usingImGui = use; }
-
-    /**
-     * @brief Checks whether ImGui is used
-     */
-    bool isImGuiUsed() { return m_usingImGui; }
 
     /**
      * @brief Switches fullscreen on and off.
@@ -165,10 +150,6 @@ private:
     RendererID m_usedRenderer; /**< The actual renderer (may be different from
                                   the preferred one) */
     std::string m_windowTitle; /**< Title of the window */
-
-    // Room-dependent state variables
-    std::vector<vk::ClearValue> m_clearValues;
-    bool                        m_usingImGui = false;
 };
 
 } // namespace re

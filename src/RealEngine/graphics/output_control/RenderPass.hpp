@@ -10,12 +10,21 @@ namespace re {
  * @brief Specifies parameters for RenderPass creation
  */
 struct RenderPassCreateInfo {
-    vk::ArrayProxyNoTemporaries<const vk::AttachmentDescription2> attachments;
-    vk::ArrayProxyNoTemporaries<const vk::SubpassDescription2>    subpasses;
-    vk::ArrayProxyNoTemporaries<const vk::SubpassDependency2>     dependencies;
+    std::span<const vk::AttachmentDescription2> attachments;
+    std::span<const vk::SubpassDescription2>    subpasses;
+    std::span<const vk::SubpassDependency2>     dependencies;
 
     // Debug
     [[no_unique_address]] DebugName<> debugName;
+};
+
+/**
+ * @brief Identifies a subpass within a renderpass
+ * @note This does not hold ownership of the renderpass!
+ */
+struct RenderPassSubpass {
+    vk::RenderPass renderPass{};
+    uint32_t       subpassIndex{};
 };
 
 /**
@@ -42,6 +51,10 @@ public:
     RenderPass& operator=(RenderPass&& other) noexcept; /**< Movable */
 
     ~RenderPass();
+
+    RenderPassSubpass subpass(uint32_t index) const {
+        return RenderPassSubpass{m_renderPass, index};
+    }
 
     const vk::RenderPass& operator*() const { return m_renderPass; }
     const vk::RenderPass* operator->() const { return &m_renderPass; }

@@ -3,7 +3,7 @@
  */
 #include <iostream>
 
-#include <ImGui/imgui_impl_sdl.h>
+#include <ImGui/imgui_impl_sdl2.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_video.h>
 
@@ -49,12 +49,16 @@ Window::~Window() {
     SDL_DestroyWindow(m_SDLwindow);
 }
 
-const CommandBuffer& Window::prepareNewFrame() {
-    return m_vk13.prepareFrame(m_usingImGui);
+void Window::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex) {
+    m_vk13.setMainRenderPass(rp, imGuiSubpassIndex);
 }
 
-void Window::mainRenderPassBegin() {
-    m_vk13.mainRenderPassBegin(m_clearValues);
+const CommandBuffer& Window::prepareNewFrame() {
+    return m_vk13.prepareFrame();
+}
+
+void Window::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues) {
+    m_vk13.mainRenderPassBegin(clearValues);
 }
 
 void Window::mainRenderPassNextSubpass() {

@@ -13,21 +13,35 @@
 
 namespace re {
 
+struct GeometryBatchCreateInfo {
+    /**
+     * @brief The topology that the batch will draw
+     */
+    vk::PrimitiveTopology topology = vk::PrimitiveTopology::eTriangleList;
+    /**
+     * @brief The renderpass that the batch will always draw in
+     */
+    RenderPassSubpass renderPassSubpass{};
+    /**
+     * @brief Is the maximum number of vertices that can be in the batch
+     */
+    unsigned int maxVertices = 0u;
+    /**
+     * @brief Width of the lines, in pixels
+     * (relevant only if the topology is a part of the line class)
+     */
+    float lineWidthPx = 1.0f;
+};
+
 /**
  * @brief Draws geometric primitives
  */
 class GeometryBatch {
 public:
     /**
-     * @brief Constructs GeometryBatch
-     * @param topology The topology that the batch will draw
-     * @param maxVertices Maximum number of vertices that can be in the batch
-     * @param lineWidth Width of the lines, in pixels
-     * (relevant only if the topology is a part of the line class)
+     * @brief Constructs a GeometryBatch
      */
-    GeometryBatch(
-        vk::PrimitiveTopology topology, unsigned int maxVertices, float lineWidth = 1.0f
-    );
+    explicit GeometryBatch(const GeometryBatchCreateInfo& createInfo);
 
     /**
      * @brief   Begins new batch

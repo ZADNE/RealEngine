@@ -189,10 +189,15 @@ public:
 
 #pragma region Main RenderPass
 
+    constexpr static vk::ClearValue k_defaultClearColor =
+        vk::ClearColorValue{1.0f, 1.0f, 1.0f, 1.0f};
+
     /**
      * @copydoc Window::mainRenderPassBegin()
      */
-    void mainRenderPassBegin();
+    void mainRenderPassBegin(
+        std::span<const vk::ClearValue> clearValues = {&k_defaultClearColor, 1}
+    );
 
     /**
      * @copydoc Window::mainRenderPassNextSubpass()

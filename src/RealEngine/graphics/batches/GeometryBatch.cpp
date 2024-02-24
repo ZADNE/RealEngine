@@ -35,24 +35,26 @@ constexpr std::array k_attributes = std::to_array<vk::VertexInputAttributeDescri
 vk::PipelineVertexInputStateCreateInfo k_vertexInput{{}, k_bindings, k_attributes};
 } // namespace
 
-GeometryBatch::GeometryBatch(
-    vk::PrimitiveTopology topology, unsigned int maxVertices, float lineWidth
-)
+GeometryBatch::GeometryBatch(const GeometryBatchCreateInfo& createInfo)
     : m_verticesBuf(BufferCreateInfo{
           .allocFlags  = eMapped | eHostAccessSequentialWrite,
-          .sizeInBytes = sizeof(VertexPoCo) * maxVertices * k_maxFramesInFlight,
-          .usage       = eVertexBuffer})
-    , m_maxVertices(maxVertices)
+          .sizeInBytes = sizeof(VertexPoCo) * createInfo.maxVertices *
+                         k_maxFramesInFlight,
+          .usage = eVertexBuffer
+      })
+    , m_maxVertices(createInfo.maxVertices)
     , m_pipelineLayout(
           PipelineLayoutCreateInfo{},
           PipelineGraphicsSources{.vert = geometry_vert, .frag = geometry_frag}
       )
     , m_pipeline(
           PipelineGraphicsCreateInfo{
-              .vertexInput    = &k_vertexInput,
-              .topology       = topology,
-              .lineWidth      = lineWidth,
-              .pipelineLayout = *m_pipelineLayout},
+              .vertexInput       = &k_vertexInput,
+              .topology          = createInfo.topology,
+              .lineWidth         = createInfo.lineWidthPx,
+              .pipelineLayout    = *m_pipelineLayout,
+              .renderPassSubpass = createInfo.renderPassSubpass
+          },
           PipelineGraphicsSources{.vert = geometry_vert, .frag = geometry_frag}
       ) {
 }

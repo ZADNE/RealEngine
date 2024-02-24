@@ -5,6 +5,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
+#include <RealEngine/graphics/output_control/RenderPass.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/rooms/RoomToEngineAccess.hpp>
 #include <RealEngine/rooms/RoomTransitionArguments.hpp>
@@ -117,7 +118,7 @@ public:
     /**
      * @brief This is set by the MainProgram at startup
      */
-    static void setRoomSystemAccess(RoomToEngineAccess* systemAccess) {
+    static void setRoomToEngineAccess(RoomToEngineAccess* systemAccess) {
         s_engineAccess = systemAccess;
     }
 
@@ -126,6 +127,8 @@ public:
      */
     static void setStaticReferences(MainProgram* mainProgram, RoomManager* roomManager);
 
+    const RenderPass& mainRenderPass() const { return m_mainRenderPass; }
+
 protected:
     /**
      * @brief Dynamically changes the room's display settings
@@ -133,8 +136,9 @@ protected:
     void setDisplaySettings(const RoomDisplaySettings& displaySettings);
 
 private:
-    RoomDisplaySettings m_displaySettings;
     size_t              m_name; /**< Unique identifier of the room */
+    RoomDisplaySettings m_displaySettings;
+    RenderPass          m_mainRenderPass;
 
     inline static RoomToEngineAccess* s_engineAccess = nullptr;
     inline static MainProgram*        s_mainProgram  = nullptr;

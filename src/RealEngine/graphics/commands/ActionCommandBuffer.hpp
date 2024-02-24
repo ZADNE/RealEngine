@@ -66,7 +66,7 @@ public:
     /**
      * @brief Assigns concrete buffer to a buffer name
      */
-    void track(BufferName name, const re::Buffer& buf) {
+    void track(BufferName name, const Buffer& buf) {
         state(name) = BufferState{buf.buffer(), {}, {}};
     }
 
@@ -74,10 +74,10 @@ public:
      * @brief Assigns concrete image to an image name
      */
     void track(
-        ImageName          name,
-        const re::Texture& tex,
-        vk::ImageLayout    layout,
-        uint32_t           layerCount = 1
+        ImageName       name,
+        const Texture&  tex,
+        vk::ImageLayout layout,
+        uint32_t        layerCount = 1
     ) {
         state(name) = ImageState{tex.image(), {}, {}, layout, layerCount};
     }
@@ -117,10 +117,10 @@ public:
         }
     }
 
-    const re::CommandBuffer& operator*() const { return *cb(); }
-    const re::CommandBuffer* operator->() const { return cb(); }
+    const CommandBuffer& operator*() const { return *cb(); }
+    const CommandBuffer* operator->() const { return cb(); }
 
-    const re::CommandBuffer& commandBuffer() const { return *cb(); }
+    const CommandBuffer& commandBuffer() const { return *cb(); }
 
 private:
     const CommandBuffer*         m_cb    = nullptr;
@@ -178,8 +178,9 @@ private:
         m_imageBarriers.clear();
         composeBarriers(accesses...);
         if (!m_bufferBarriers.empty() || !m_imageBarriers.empty()) {
-            (*cb())->pipelineBarrier2(vk::DependencyInfo{
-                {}, {}, m_bufferBarriers, m_imageBarriers});
+            (*cb())->pipelineBarrier2(
+                vk::DependencyInfo{{}, {}, m_bufferBarriers, m_imageBarriers}
+            );
         }
     }
 
@@ -223,7 +224,8 @@ private:
                 vk::QueueFamilyIgnored,
                 last.image,
                 vk::ImageSubresourceRange{
-                    vk::ImageAspectFlagBits::eColor, 0, 1, 0, last.layerCount}
+                    vk::ImageAspectFlagBits::eColor, 0, 1, 0, last.layerCount
+                }
             );
             last.lastStage  = access.stage;
             last.lastAccess = access.access;

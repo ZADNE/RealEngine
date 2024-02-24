@@ -86,10 +86,8 @@ void MainProgram::setRelativeCursorMode(bool relative) {
 }
 
 void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
-    m_window.setClearValues(s.clearValues);
     m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
     m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
-    m_window.useImGui(s.usingImGui);
 }
 
 int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
@@ -211,6 +209,10 @@ void MainProgram::doRoomTransitionIfScheduled() {
     auto prev    = m_roomManager.currentRoom();
     auto current = m_roomManager.goToRoom(m_nextRoomName, m_roomTransitionArgs);
     if (prev != current) { // If successfully changed the room
+        // Update main renderpass
+        m_window.setMainRenderPass(
+            current->mainRenderPass(), current->displaySettings().imGuiSubpassIndex
+        );
         // Adopt the display settings of the entered room
         adoptRoomDisplaySettings(current->displaySettings());
         // Pressed/released events belong to the previous room
@@ -232,7 +234,8 @@ void MainProgram::scheduleRoomTransition(
 
 void MainProgram::pollEvents() {
     SDL_Event evnt;
-    if (m_window.isImGuiUsed()) {
+    const auto& displaySettings = m_roomManager.currentRoom()->displaySettings();
+    if (displaySettings.imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
         while (SDL_PollEvent(&evnt)) {
             if (!m_window.passSDLEvent(evnt)) {
                 // Pass the event to main application if it has not been consumed by ImGui
@@ -248,7 +251,7 @@ MainProgram::MainProgram(const VulkanInitInfo& initInfo)
     : m_window{WindowSettings{}, WindowSubsystems::RealEngineVersionString(), initInfo}
     , s_roomToEngineAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
 
-    Room::setRoomSystemAccess(&s_roomToEngineAccess);
+    Room::setRoomToEngineAccess(&s_roomToEngineAccess);
     Room::setStaticReferences(this, &m_roomManager);
 }
 
