@@ -30,8 +30,16 @@ private:
     void save(const std::string& loc);
     void load(const std::string& filePath);
 
-    re::SpriteBatch   m_sb{1, 1};
-    re::GeometryBatch m_gb{vk::PrimitiveTopology::eLineList, 16777216u, 1.0f};
+    re::SpriteBatch   m_sb{re::SpriteBatchCreateInfo{
+          .renderPassSubpass = mainRenderPass().subpass(0),
+          .maxSprites        = 1,
+          .maxTextures       = 1
+    }};
+    re::GeometryBatch m_gb{re::GeometryBatchCreateInfo{
+        .topology          = vk::PrimitiveTopology::eLineList,
+        .renderPassSubpass = mainRenderPass().subpass(0),
+        .maxVertices       = 16777216u
+    }};
 
     // Texture
     std::optional<re::TextureShaped> m_texture;

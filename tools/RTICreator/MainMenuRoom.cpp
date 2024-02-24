@@ -17,17 +17,8 @@
 
 using namespace ImGui;
 
-constexpr vk::ClearValue k_defaultClearColor =
-    vk::ClearColorValue{0.1f, 0.1f, 0.1f, 1.0f};
-
 MainMenuRoom::MainMenuRoom(re::CommandLineArguments args)
-    : Room(
-          0,
-          re::RoomDisplaySettings{
-              .clearValues          = {&k_defaultClearColor, 1},
-              .framesPerSecondLimit = 144,
-              .usingImGui           = true}
-      )
+    : Room(0, re::RoomDisplaySettings{.framesPerSecondLimit = 144, .imGuiSubpassIndex = 0})
     , m_texView(engine().windowDims()) {
 
     engine().setWindowTitle("RTICreator v4.0.0");
@@ -76,7 +67,10 @@ void MainMenuRoom::step() {
 }
 
 void MainMenuRoom::render(const re::CommandBuffer& cmdBuf, double interpolationFactor) {
-    engine().mainRenderPassBegin();
+    vk::ClearValue clearVal = vk::ClearColorValue{
+        m_backgroundColor.r, m_backgroundColor.g, m_backgroundColor.b, 1.0f
+    };
+    engine().mainRenderPassBegin({&clearVal, 1});
 
     // Texture
     if (m_texture) {
@@ -102,16 +96,7 @@ void MainMenuRoom::render(const re::CommandBuffer& cmdBuf, double interpolationF
                     SliderFloat2("Overlap (to see wrapping)", &m_overlap.x, 0.0f, 1.0f);
                     if (Button("Reset view"))
                         resetView();
-                    if (ColorPicker3("Background color", &m_backgroundColor.x)) {
-                        auto           ds  = displaySettings();
-                        vk::ClearValue val = vk::ClearColorValue{
-                            m_backgroundColor.r,
-                            m_backgroundColor.g,
-                            m_backgroundColor.b,
-                            1.0f};
-                        ds.clearValues = {&val, 1};
-                        setDisplaySettings(ds);
-                    }
+                    ColorPicker3("Background color", &m_backgroundColor.x);
                     EndTabItem();
                 }
             }
@@ -183,7 +168,8 @@ void MainMenuRoom::save(const std::string& loc) {
         re::TextureShape{
             .subimageDims          = m_subimageDims,
             .pivot                 = m_pivot,
-            .subimagesSpritesCount = m_subimagesSprites}
+            .subimagesSpritesCount = m_subimagesSprites
+        }
     );
 }
 
@@ -210,7 +196,8 @@ void MainMenuRoom::drawTexture(const re::CommandBuffer& cmdBuf) {
     auto botLeft = -texDims * 0.5f;
 
     glm::vec4 posSizeRect = {
-        -texDims * (m_overlap + 0.5f), texDims * (1.0f + 2.0f * m_overlap)};
+        -texDims * (m_overlap + 0.5f), texDims * (1.0f + 2.0f * m_overlap)
+    };
     glm::vec4 uvRect = {-m_overlap, 1.0f + m_overlap * 2.0f};
 
     m_sb.clearAndBeginFirstBatch();
