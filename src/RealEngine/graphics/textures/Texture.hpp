@@ -22,10 +22,10 @@ struct TextureCreateInfo {
     vk::ImageType        type   = vk::ImageType::e2D;
     vk::Format           format = vk::Format::eR8G8B8A8Unorm;
     glm::uvec3           extent{};
-    uint32_t             layers        = 1u;
-    vk::ImageUsageFlags  usage         = vk::ImageUsageFlagBits::eSampled;
-    vk::ImageLayout      initialLayout = vk::ImageLayout::eReadOnlyOptimal;
-    const void*          pNext         = nullptr;
+    uint32_t             layers   = 1u;
+    vk::ImageUsageFlags  usage    = vk::ImageUsageFlagBits::eSampled;
+    vk::ImageLayout initialLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+    const void*     pNext         = nullptr;
 
     // ImageView-related
     vk::ImageAspectFlags aspects = vk::ImageAspectFlagBits::eColor;

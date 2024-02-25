@@ -113,7 +113,7 @@ unsigned int SpriteBatch::texToIndex(const Texture& tex) {
             0u,
             newIndex,
             tex,
-            vk::ImageLayout::eReadOnlyOptimal
+            vk::ImageLayout::eShaderReadOnlyOptimal
         );
         m_texToIndex.emplace_back(&tex);
         return newIndex;
