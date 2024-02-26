@@ -45,10 +45,9 @@ const char* skipFunctionName(const char* msg) {
 }
 
 void handleValidationMessage(
-    VkDebugUtilsMessageSeverityFlagBitsEXT      sev,
-    VkDebugUtilsMessageTypeFlagsEXT             type,
-    const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
-    void*                                       userData
+    VkDebugUtilsMessageSeverityFlagBitsEXT sev,
+    VkDebugUtilsMessageTypeFlagsEXT type,
+    const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData
 ) {
     std::string str{"##"};
     // Show nested debug labels
@@ -67,20 +66,19 @@ void handleValidationMessage(
     case eInfo:
     case eWarning: log(str + msg); break;
     case eError:
-    default: error(str + msg); break;
+    default:       error(str + msg); break;
     }
 }
 
 } // namespace
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallbackHandler(
-    VkDebugUtilsMessageSeverityFlagBitsEXT      sev,
-    VkDebugUtilsMessageTypeFlagsEXT             type,
-    const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
-    void*                                       userData
+    VkDebugUtilsMessageSeverityFlagBitsEXT sev,
+    VkDebugUtilsMessageTypeFlagsEXT type,
+    const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData
 ) {
     switch (callbackData->messageIdNumber) {
-    case 0x0: // Ignore loader messages
+    case 0x0:        // Ignore loader messages
         break;
     case 0x76589099: // Log debug printf
         log(skipFunctionName(skipMessageHeader(callbackData->pMessage)), false);

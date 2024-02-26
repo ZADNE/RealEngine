@@ -186,10 +186,8 @@ void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearVal
     auto& cb = m_cbs.write();
     cb->beginRenderPass2(
         vk::RenderPassBeginInfo{
-            **m_mainRenderPass,
-            *m_swapChainFramebuffers[m_imageIndex],
-            vk::Rect2D{{}, m_swapchainExtent},
-            clearValues
+            **m_mainRenderPass, *m_swapChainFramebuffers[m_imageIndex],
+            vk::Rect2D{{}, m_swapchainExtent}, clearValues
         },
         vk::SubpassBeginInfo{vk::SubpassContents::eInline}
     );
@@ -239,8 +237,8 @@ void VulkanFixture::finishFrame() {
     vk::PipelineStageFlags waitDstStageMask =
         vk::PipelineStageFlagBits::eColorAttachmentOutput;
     vk::SubmitInfo submitInfo{
-        **m_imageAvailableSems, // Wait for image to be available
-        waitDstStageMask,       // Wait just before writing output
+        **m_imageAvailableSems,   // Wait for image to be available
+        waitDstStageMask,         // Wait just before writing output
         *cb,
         **m_renderingFinishedSems // Signal that the rendering has
                                   // finished once done
@@ -250,8 +248,7 @@ void VulkanFixture::finishFrame() {
     // Present new image
     vk::PresentInfoKHR presentInfo{
         **m_renderingFinishedSems, // Wait for rendering to finish
-        *m_swapchain,
-        m_imageIndex
+        *m_swapchain, m_imageIndex
     };
 
     try {
@@ -357,14 +354,15 @@ vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice() {
 }
 
 vk::raii::Device VulkanFixture::createDevice(const void* deviceCreateInfoChain) {
-    float                                  deviceQueuePriority = 1.0f;
+    float deviceQueuePriority = 1.0f;
     std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos;
     deviceQueueCreateInfos.emplace_back(
         vk::DeviceQueueCreateFlags{}, m_graphicsCompQueueFamIndex, 1, &deviceQueuePriority
     );
     if (m_graphicsCompQueueFamIndex != m_presentationQueueFamIndex) {
         deviceQueueCreateInfos.emplace_back(
-            vk::DeviceQueueCreateFlags{}, m_presentationQueueFamIndex, 1, &deviceQueuePriority
+            vk::DeviceQueueCreateFlags{}, m_presentationQueueFamIndex, 1,
+            &deviceQueuePriority
         );
     }
     auto createInfo =
@@ -391,15 +389,13 @@ vk::raii::Device VulkanFixture::createDevice(const void* deviceCreateInfoChain) 
 vma::Allocator VulkanFixture::createAllocator() {
     return vma::createAllocator(vma::AllocatorCreateInfo{
         vma::AllocatorCreateFlagBits::eExternallySynchronized,
-        *m_physicalDevice,
-        *m_device,
+        *m_physicalDevice, *m_device,
         0,       // Use default large heap block size (256 MB as of writing)
         nullptr, // Use default CPU memory allocation callbacks
         nullptr, // Do not receive informative callbacks from VMA
         nullptr, // No heap size limits
         nullptr, // Let VMA load Vulkan functions on its own
-        *m_instance,
-        vk::ApiVersion13,
+        *m_instance, vk::ApiVersion13,
         nullptr, // No external memory handles
     });
 }
@@ -412,8 +408,7 @@ vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
     auto caps = m_physicalDevice.getSurfaceCapabilitiesKHR(*m_surface);
     // Minimum image count
     m_minImageCount = glm::clamp(
-        caps.minImageCount + 1,
-        caps.minImageCount,
+        caps.minImageCount + 1, caps.minImageCount,
         caps.maxImageCount ? caps.maxImageCount : 8u
     );
 
@@ -424,20 +419,18 @@ vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
         glm::ivec2 windowPx;
         SDL_Vulkan_GetDrawableSize(m_sdlWindow, &windowPx.x, &windowPx.y);
         m_swapchainExtent.width = std::clamp(
-            static_cast<uint32_t>(windowPx.x),
-            caps.minImageExtent.width,
+            static_cast<uint32_t>(windowPx.x), caps.minImageExtent.width,
             caps.maxImageExtent.width
         );
         m_swapchainExtent.height = std::clamp(
-            static_cast<uint32_t>(windowPx.y),
-            caps.minImageExtent.height,
+            static_cast<uint32_t>(windowPx.y), caps.minImageExtent.height,
             caps.maxImageExtent.height
         );
     }
 
     // Sharing mode
     bool oneQueueFamily = m_graphicsCompQueueFamIndex == m_presentationQueueFamIndex;
-    auto       sharingMode        = oneQueueFamily ? eExclusive : eConcurrent;
+    auto sharingMode              = oneQueueFamily ? eExclusive : eConcurrent;
     std::array queueFamilyIndices = {
         m_graphicsCompQueueFamIndex, m_presentationQueueFamIndex
     };
@@ -462,7 +455,7 @@ vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
 }
 
 std::vector<vk::raii::ImageView> VulkanFixture::createSwapchainImageViews() {
-    auto                             images = m_swapchain.getImages();
+    auto images = m_swapchain.getImages();
     std::vector<vk::raii::ImageView> imageViews;
     imageViews.reserve(images.size());
     for (const auto& image : images) {
@@ -612,8 +605,8 @@ bool VulkanFixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physica
 bool VulkanFixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice
 ) {
     using enum vk::QueueFlagBits;
-    bool                                   graphicsCompQueueFound = false;
-    bool                                   presentQueueFound      = false;
+    bool graphicsCompQueueFound = false;
+    bool presentQueueFound      = false;
     std::vector<vk::QueueFamilyProperties> queueFamilyProperties =
         physicalDevice.getQueueFamilyProperties();
 

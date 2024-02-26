@@ -69,8 +69,7 @@ void GeometryBatch::end() {
 
 void GeometryBatch::addVertices(std::span<const VertexPoCo> vertices) {
     std::memcpy(
-        &m_verticesBuf[m_nextVertexIndex],
-        vertices.data(),
+        &m_verticesBuf[m_nextVertexIndex], vertices.data(),
         sizeof(VertexPoCo) * vertices.size()
     );
     m_nextVertexIndex += vertices.size();
@@ -88,9 +87,7 @@ void GeometryBatch::draw(const CommandBuffer& cb, const glm::mat4& mvpMat) {
     );
     cb->draw(
         m_nextVertexIndex - m_maxVertices * FrameDoubleBufferingState::writeIndex(),
-        1u,
-        m_maxVertices * FrameDoubleBufferingState::writeIndex(),
-        0u
+        1u, m_maxVertices * FrameDoubleBufferingState::writeIndex(), 0u
     );
 }
 

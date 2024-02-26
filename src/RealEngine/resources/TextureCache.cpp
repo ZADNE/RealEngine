@@ -6,7 +6,7 @@
 namespace re {
 
 SharedTexture TextureCache::texture(const std::string& filePathPNG) {
-    auto          mapIterator = m_textureMap.find(filePathPNG);
+    auto mapIterator = m_textureMap.find(filePathPNG);
     SharedTexture stored;
     if (mapIterator != m_textureMap.end() &&
         (stored = mapIterator->second.lock())) {

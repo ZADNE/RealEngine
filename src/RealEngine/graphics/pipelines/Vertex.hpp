@@ -38,7 +38,7 @@ struct VertexPoCo {
         , color(col) {}
 
     glm::vec2 position;
-    Color     color;
+    Color color;
 };
 
 /**
@@ -52,7 +52,7 @@ struct VertexPoCoUv {
         , uv(uv) {}
 
     glm::vec2 position;
-    Color     color;
+    Color color;
     glm::vec2 uv;
 };
 

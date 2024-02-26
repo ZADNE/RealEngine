@@ -26,7 +26,7 @@ constexpr T reverseByteOrder(const T& val) {
     union U {
         U()
             : raw() {}
-        T                                val;
+        T val;
         std::array<std::byte, sizeof(T)> raw;
     };
     U source;
@@ -47,7 +47,7 @@ template<typename T>
 constexpr T ntoh(const T& net) {
     if constexpr (isSystemBigEndian()) { // Big endian
         return net;
-    } else { // Little endian
+    } else {                             // Little endian
         return reverseByteOrder(net);
     }
 }
@@ -62,7 +62,7 @@ template<typename T>
 constexpr T hton(const T& host) {
     if constexpr (isSystemBigEndian()) { // Big endian
         return host;
-    } else { // Little endian
+    } else {                             // Little endian
         return reverseByteOrder(host);
     }
 }

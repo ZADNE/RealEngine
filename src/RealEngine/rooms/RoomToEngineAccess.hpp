@@ -24,11 +24,8 @@ public:
      * Room::engine()
      */
     RoomToEngineAccess(
-        MainProgram&  mainProgram,
-        InputManager& inputManager,
-        Synchronizer& synchronizer,
-        Window&       window,
-        RoomManager&  roomManager
+        MainProgram& mainProgram, InputManager& inputManager,
+        Synchronizer& synchronizer, Window& window, RoomManager& roomManager
     )
         : m_mainProgram(mainProgram)
         , m_inputManager(inputManager)
@@ -217,11 +214,11 @@ public:
 #pragma endregion
 
 private:
-    MainProgram&  m_mainProgram;
+    MainProgram& m_mainProgram;
     InputManager& m_inputManager;
     Synchronizer& m_synchronizer;
-    Window&       m_window;
-    RoomManager&  m_roomManager;
+    Window& m_window;
+    RoomManager& m_roomManager;
 };
 
 } // namespace re

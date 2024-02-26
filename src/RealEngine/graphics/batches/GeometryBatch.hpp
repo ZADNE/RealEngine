@@ -71,10 +71,10 @@ public:
 
 private:
     BufferMapped<VertexPoCo> m_verticesBuf;
-    uint32_t                 m_nextVertexIndex;
-    uint32_t                 m_maxVertices;
-    PipelineLayout           m_pipelineLayout;
-    Pipeline                 m_pipeline;
+    uint32_t m_nextVertexIndex;
+    uint32_t m_maxVertices;
+    PipelineLayout m_pipelineLayout;
+    Pipeline m_pipeline;
 };
 
 } // namespace re

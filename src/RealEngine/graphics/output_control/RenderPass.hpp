@@ -11,8 +11,8 @@ namespace re {
  */
 struct RenderPassCreateInfo {
     std::span<const vk::AttachmentDescription2> attachments;
-    std::span<const vk::SubpassDescription2>    subpasses;
-    std::span<const vk::SubpassDependency2>     dependencies;
+    std::span<const vk::SubpassDescription2> subpasses;
+    std::span<const vk::SubpassDependency2> dependencies;
 
     // Debug
     [[no_unique_address]] DebugName<> debugName;
@@ -24,7 +24,7 @@ struct RenderPassCreateInfo {
  */
 struct RenderPassSubpass {
     vk::RenderPass renderPass{};
-    uint32_t       subpassIndex{};
+    uint32_t subpassIndex{};
 };
 
 /**
@@ -44,8 +44,8 @@ public:
      */
     explicit RenderPass(const RenderPassCreateInfo& createInfo);
 
-    RenderPass(const RenderPass&)            = delete; /**< Noncopyable */
-    RenderPass& operator=(const RenderPass&) = delete; /**< Noncopyable */
+    RenderPass(const RenderPass&)            = delete;  /**< Noncopyable */
+    RenderPass& operator=(const RenderPass&) = delete;  /**< Noncopyable */
 
     RenderPass(RenderPass&& other) noexcept;            /**< Movable */
     RenderPass& operator=(RenderPass&& other) noexcept; /**< Movable */

@@ -13,7 +13,8 @@
 namespace re {
 
 Window::Window(
-    const WindowSettings& settings, const std::string& title, const VulkanInitInfo& initInfo
+    const WindowSettings& settings, const std::string& title,
+    const VulkanInitInfo& initInfo
 )
     : WindowSettings(settings)
     , m_subsystems()
@@ -86,12 +87,12 @@ bool Window::passSDLEvent(const SDL_Event& evnt) {
     auto& io = ImGui::GetIO();
     switch (evnt.type) {
     case SDL_KEYUP:
-    case SDL_KEYDOWN: return io.WantCaptureKeyboard;
+    case SDL_KEYDOWN:         return io.WantCaptureKeyboard;
     case SDL_MOUSEBUTTONDOWN:
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEMOTION:
-    case SDL_MOUSEWHEEL: return io.WantCaptureMouse;
-    default: return false;
+    case SDL_MOUSEWHEEL:      return io.WantCaptureMouse;
+    default:                  return false;
     }
 }
 
@@ -141,7 +142,7 @@ void Window::setDims(glm::ivec2 newDims, bool save) {
 void Window::initForRenderer(RendererID renderer, const VulkanInitInfo& initInfo) {
     switch (renderer) {
     case RendererID::Vulkan13: initForVulkan13(initInfo); break;
-    default: break;
+    default:                   break;
     }
 }
 
@@ -184,12 +185,8 @@ bool Window::createSDLWindow(RendererID renderer) {
 
     // Create the window
     m_SDLwindow = SDL_CreateWindow(
-        m_windowTitle.c_str(),
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        m_dims.x,
-        m_dims.y,
-        SDL_flags
+        m_windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        m_dims.x, m_dims.y, SDL_flags
     );
     if (!m_SDLwindow) {
         log(SDL_GetError());

@@ -74,7 +74,7 @@ private:
 
     glm::vec2 m_minXY;
     glm::vec2 m_maxXY;
-    bool      m_clippingEnabled = false;
+    bool m_clippingEnabled = false;
 };
 
 } // namespace re

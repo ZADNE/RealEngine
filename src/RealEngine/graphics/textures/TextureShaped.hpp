@@ -56,7 +56,7 @@ public:
     TextureShaped(const TextureShaped&)            = delete; /**< Noncopyable */
     TextureShaped& operator=(const TextureShaped&) = delete; /**< Noncopyable */
 
-    TextureShaped(TextureShaped&& other) noexcept;            /**< Movable */
+    TextureShaped(TextureShaped&& other) noexcept;           /**< Movable */
     TextureShaped& operator=(TextureShaped&& other) noexcept; /**< Movable */
 
     ~TextureShaped() = default;

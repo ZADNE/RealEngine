@@ -8,13 +8,14 @@
 namespace re {
 
 struct PipelineLayoutCreateInfo {
-    vk::ArrayProxy<vk::ArrayProxy<vk::DescriptorBindingFlags>> descriptorBindingFlags{};
+    vk::ArrayProxy<vk::ArrayProxy<vk::DescriptorBindingFlags>> descriptorBindingFlags{
+    };
     vk::SpecializationInfo specializationInfo{};
 };
 
 struct PipelineLayoutDescription {
     std::vector<std::vector<vk::DescriptorSetLayoutBinding>> bindings;
-    std::vector<vk::PushConstantRange>                       ranges;
+    std::vector<vk::PushConstantRange> ranges;
 };
 
 /**
@@ -46,14 +47,14 @@ public:
      * @brief Constructs pipeline layout from given description
      */
     PipelineLayout(
-        const PipelineLayoutCreateInfo&  createInfo,
+        const PipelineLayoutCreateInfo& createInfo,
         const PipelineLayoutDescription& description
     );
 
     PipelineLayout(const PipelineLayout&) = delete; /**< Noncopyable */
     PipelineLayout& operator=(const PipelineLayout&) = delete; /**< Noncopyable */
 
-    PipelineLayout(PipelineLayout&& other) noexcept;            /**< Movable */
+    PipelineLayout(PipelineLayout&& other) noexcept;           /**< Movable */
     PipelineLayout& operator=(PipelineLayout&& other) noexcept; /**< Movable */
 
     ~PipelineLayout();
@@ -91,14 +92,12 @@ private:
      * @brief Reflects a single shader
      */
     void reflectSource(
-        const ShaderSourceRef&        src,
-        vk::ShaderStageFlagBits       st,
-        const vk::SpecializationInfo& specInfo,
-        PipelineLayoutDescription&    description
+        const ShaderSourceRef& src, vk::ShaderStageFlagBits st,
+        const vk::SpecializationInfo& specInfo, PipelineLayoutDescription& description
     ) const;
 
     std::vector<vk::DescriptorSetLayout> m_descriptorSetLayouts{};
-    vk::PipelineLayout                   m_pipelineLayout{};
+    vk::PipelineLayout m_pipelineLayout{};
 };
 
 } // namespace re

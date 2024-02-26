@@ -140,7 +140,7 @@ void MainMenuRoom::parametersGUI() {
 }
 
 void MainMenuRoom::selectAndLoad() {
-    char          filename[MAX_PATH] = {};
+    char filename[MAX_PATH] = {};
     OPENFILENAMEA ofn;
     ZeroMemory(&ofn, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
@@ -209,7 +209,7 @@ void MainMenuRoom::drawTexture(const re::CommandBuffer& cmdBuf) {
     glm::vec2 subimageSprite = m_texture->subimagesSpritesCount();
     vertices.reserve((size_t)(subimageSprite.x * subimageSprite.y) * 4u);
     re::Color color{0, 255u, 0u, 255u};
-    auto      subimageDims = m_texture->subimageDims();
+    auto subimageDims = m_texture->subimageDims();
     // Subimages
     for (float x = 1.0f; x < subimageSprite.x; ++x) {
         glm::vec2 coord = botLeft + glm::vec2(x, 0.0f) * subimageDims;
@@ -228,7 +228,7 @@ void MainMenuRoom::drawTexture(const re::CommandBuffer& cmdBuf) {
     // Pivots
     color                 = {0u, 0u, 255u, 255u};
     glm::vec2 pivotOffset = m_texture->pivot();
-    float     pivotRadius = glm::min(subimageDims.x, subimageDims.y) * 0.45f;
+    float pivotRadius     = glm::min(subimageDims.x, subimageDims.y) * 0.45f;
     for (float x = 0.0f; x < m_texture->subimagesSpritesCount().x; ++x) {
         for (float y = 0.0f; y < m_texture->subimagesSpritesCount().y; ++y) {
             glm::vec2 pivotPos = botLeft + glm::vec2(x, y) * subimageDims +

@@ -37,7 +37,7 @@ public:
     CommandBuffer(const CommandBuffer&)            = delete; /**< Noncopyable */
     CommandBuffer& operator=(const CommandBuffer&) = delete; /**< Noncopyable */
 
-    CommandBuffer(CommandBuffer&& other) noexcept;            /**< Movable */
+    CommandBuffer(CommandBuffer&& other) noexcept;           /**< Movable */
     CommandBuffer& operator=(CommandBuffer&& other) noexcept; /**< Movable */
 
     ~CommandBuffer();
@@ -52,8 +52,8 @@ public:
      */
     template<std::invocable<const CommandBuffer&> F>
     static void doOneTimeSubmit(F op) {
-        oneTimeSubmitCmdBuf()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit}
-        );
+        oneTimeSubmitCmdBuf()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit
+        });
         op(oneTimeSubmitCmdBuf());
         oneTimeSubmitCmdBuf()->end();
         graphicsCompQueue().submit(vk::SubmitInfo{{}, {}, *oneTimeSubmitCmdBuf()});
@@ -66,7 +66,7 @@ public:
      */
     static void submitToGraphicsCompQueue(
         const vk::ArrayProxy<const vk::SubmitInfo2>& submits,
-        const vk::Fence&                             signalFence = nullptr
+        const vk::Fence& signalFence = nullptr
     );
 
     /**
@@ -135,8 +135,8 @@ public:
         DebugRegion(const DebugRegion&)            = delete; /**< Noncopyable */
         DebugRegion& operator=(const DebugRegion&) = delete; /**< Noncopyable */
 
-        DebugRegion(DebugRegion&&)            = delete; /**< Nonmovable */
-        DebugRegion& operator=(DebugRegion&&) = delete; /**< Nonmovable */
+        DebugRegion(DebugRegion&&)            = delete;      /**< Nonmovable */
+        DebugRegion& operator=(DebugRegion&&) = delete;      /**< Nonmovable */
 
         ~DebugRegion() { m_cb.endDebugRegion(); }
 

@@ -67,10 +67,10 @@ protected:
      */
     void reset();
 
-    glm::ivec2  m_dims;              /**< dimensions of the window */
-    WindowFlags m_flags;             /**< flags of the window */
-    RendererID  m_preferredRenderer; /**< The preffed renderer may be different
-                                        from the actual renderer */
+    glm::ivec2 m_dims;              /**< dimensions of the window */
+    WindowFlags m_flags;            /**< flags of the window */
+    RendererID m_preferredRenderer; /**< The preffed renderer may be different
+                                       from the actual renderer */
 };
 
 } // namespace re

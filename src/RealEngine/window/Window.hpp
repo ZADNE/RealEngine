@@ -35,16 +35,15 @@ public:
      * @param title Title for the window
      */
     Window(
-        const WindowSettings& settings,
-        const std::string&    title,
+        const WindowSettings& settings, const std::string& title,
         const VulkanInitInfo& initInfo
     );
 
     Window(const Window&)         = delete; /**< Noncopyable */
     void operator=(const Window&) = delete; /**< Noncopyable */
 
-    Window(Window&&)         = delete; /**< Nonmovable */
-    void operator=(Window&&) = delete; /**< Nonmovable */
+    Window(Window&&)         = delete;      /**< Nonmovable */
+    void operator=(Window&&) = delete;      /**< Nonmovable */
 
     ~Window();
 

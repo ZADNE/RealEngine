@@ -38,11 +38,11 @@ public:
      * @brief Accesses the object that should be used for writing from CPU
      */
     const T& write() const { return m_ts[State::writeIndex()]; }
-    T&       write() { return m_ts[State::writeIndex()]; }
+    T& write() { return m_ts[State::writeIndex()]; }
     const T& operator*() const { return write(); }
     const T* operator->() const { return &write(); }
-    T&       operator*() { return write(); }
-    T*       operator->() { return &write(); }
+    T& operator*() { return write(); }
+    T* operator->() { return &write(); }
 
     void forEach(std::invocable<T&> auto func) {
         for (auto& t : m_ts) { func(t); }
@@ -51,11 +51,10 @@ public:
     template<typename Arg>
     void forEach(
         std::invocable<T&, const Arg&> auto func,
-        const DoubleBuffered<Arg, State>&   arg
+        const DoubleBuffered<Arg, State>& arg
     ) {
         for (auto it = std::make_pair(m_ts.begin(), arg.m_ts.cbegin());
-             it.first != m_ts.end();
-             ++it.first, ++it.second) {
+             it.first != m_ts.end(); ++it.first, ++it.second) {
             func(*it.first, *it.second);
         }
     }

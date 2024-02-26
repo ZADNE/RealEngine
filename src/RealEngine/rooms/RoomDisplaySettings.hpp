@@ -36,7 +36,7 @@ constexpr vk::SubpassDescription2 k_subpassDescription{
     vk::PipelineBindPoint::eGraphics,
     0u,
     0u,
-    nullptr, // Input attachments
+    nullptr,         // Input attachments
     1u,
     &k_attachmentRef // Color attachments
 };

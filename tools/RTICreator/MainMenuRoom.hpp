@@ -30,10 +30,10 @@ private:
     void save(const std::string& loc);
     void load(const std::string& filePath);
 
-    re::SpriteBatch   m_sb{re::SpriteBatchCreateInfo{
-          .renderPassSubpass = mainRenderPass().subpass(0),
-          .maxSprites        = 1,
-          .maxTextures       = 1
+    re::SpriteBatch m_sb{re::SpriteBatchCreateInfo{
+        .renderPassSubpass = mainRenderPass().subpass(0),
+        .maxSprites        = 1,
+        .maxTextures       = 1
     }};
     re::GeometryBatch m_gb{re::GeometryBatchCreateInfo{
         .topology          = vk::PrimitiveTopology::eLineList,
@@ -43,8 +43,8 @@ private:
 
     // Texture
     std::optional<re::TextureShaped> m_texture;
-    std::string                      m_textureLoc;
-    std::string                      m_lastVisitedLoc;
+    std::string m_textureLoc;
+    std::string m_lastVisitedLoc;
 
     glm::vec2 m_cursorPosPrev = glm::vec2(0.0f, 0.0f);
 
@@ -56,8 +56,8 @@ private:
 
     // Texture parameters
     glm::ivec2 m_subimagesSprites{};
-    glm::vec2  m_subimageDims{1.0f};
-    glm::vec2  m_pivot{};
+    glm::vec2 m_subimageDims{1.0f};
+    glm::vec2 m_pivot{};
 
     void drawTexture(const re::CommandBuffer& commandBuffer);
     void resetView();

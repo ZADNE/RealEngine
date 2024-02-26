@@ -36,8 +36,8 @@ public:
     Room(const Room&)            = delete; /**< Noncopyable */
     Room& operator=(const Room&) = delete; /**< Noncopyable */
 
-    Room(Room&&)            = default; /**< Movable */
-    Room& operator=(Room&&) = default; /**< Movable */
+    Room(Room&&)            = default;     /**< Movable */
+    Room& operator=(Room&&) = default;     /**< Movable */
 
     virtual ~Room() = default;
 
@@ -136,13 +136,13 @@ protected:
     void setDisplaySettings(const RoomDisplaySettings& displaySettings);
 
 private:
-    size_t              m_name; /**< Unique identifier of the room */
+    size_t m_name; /**< Unique identifier of the room */
     RoomDisplaySettings m_displaySettings;
-    RenderPass          m_mainRenderPass;
+    RenderPass m_mainRenderPass;
 
     inline static RoomToEngineAccess* s_engineAccess = nullptr;
-    inline static MainProgram*        s_mainProgram  = nullptr;
-    inline static RoomManager*        s_roomManager  = nullptr;
+    inline static MainProgram* s_mainProgram         = nullptr;
+    inline static RoomManager* s_roomManager         = nullptr;
 };
 
 } // namespace re

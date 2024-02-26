@@ -15,21 +15,21 @@ struct PipelineGraphicsCreateInfo {
     // Input assembly
     const vk::PipelineVertexInputStateCreateInfo* vertexInput = nullptr;
     vk::PrimitiveTopology topology = vk::PrimitiveTopology::eTriangleList;
-    bool                  enablePrimitiveRestart = false;
+    bool enablePrimitiveRestart    = false;
 
     // Tessellation
     uint32_t patchControlPoints = 0; // Zero means that tesselation is not used
 
     // Rasterization
-    vk::PolygonMode   polygonMode = vk::PolygonMode::eFill;
-    vk::CullModeFlags cullMode    = vk::CullModeFlagBits::eNone;
-    float             lineWidth   = 1.0f;
+    vk::PolygonMode polygonMode = vk::PolygonMode::eFill;
+    vk::CullModeFlags cullMode  = vk::CullModeFlagBits::eNone;
+    float lineWidth             = 1.0f;
 
     bool enableDepth = false;
     bool enableBlend = true;
 
     vk::PipelineLayout pipelineLayout = nullptr;
-    RenderPassSubpass  renderPassSubpass{};
+    RenderPassSubpass renderPassSubpass{};
 
     // Debug
     [[no_unique_address]] DebugName<> debugName;
@@ -60,7 +60,7 @@ public:
      */
     Pipeline(
         const PipelineGraphicsCreateInfo& createInfo,
-        const PipelineGraphicsSources&    srcs
+        const PipelineGraphicsSources& srcs
     );
 
     /**
@@ -70,8 +70,8 @@ public:
         const PipelineComputeCreateInfo& createInfo, const PipelineComputeSources& srcs
     );
 
-    Pipeline(const Pipeline&)            = delete; /**< Noncopyable */
-    Pipeline& operator=(const Pipeline&) = delete; /**< Noncopyable */
+    Pipeline(const Pipeline&)            = delete;  /**< Noncopyable */
+    Pipeline& operator=(const Pipeline&) = delete;  /**< Noncopyable */
 
     Pipeline(Pipeline&& other) noexcept;            /**< Movable */
     Pipeline& operator=(Pipeline&& other) noexcept; /**< Movable */

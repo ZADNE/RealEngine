@@ -15,9 +15,9 @@ namespace re {
 template<typename BufferName>
     requires std::is_enum_v<BufferName>
 struct BufferAccess {
-    BufferName              name;
+    BufferName name;
     vk::PipelineStageFlags2 stage;
-    vk::AccessFlags2        access;
+    vk::AccessFlags2 access;
 };
 
 /**
@@ -27,10 +27,10 @@ struct BufferAccess {
 template<typename ImageName>
     requires std::is_enum_v<ImageName>
 struct ImageAccess {
-    ImageName               name;
+    ImageName name;
     vk::PipelineStageFlags2 stage;
-    vk::AccessFlags2        access;
-    vk::ImageLayout         layout = vk::ImageLayout::eGeneral;
+    vk::AccessFlags2 access;
+    vk::ImageLayout layout = vk::ImageLayout::eGeneral;
 };
 
 /**
@@ -74,10 +74,8 @@ public:
      * @brief Assigns concrete image to an image name
      */
     void track(
-        ImageName       name,
-        const Texture&  tex,
-        vk::ImageLayout layout,
-        uint32_t        layerCount = 1
+        ImageName name, const Texture& tex, vk::ImageLayout layout,
+        uint32_t layerCount = 1
     ) {
         state(name) = ImageState{tex.image(), {}, {}, layout, layerCount};
     }
@@ -123,29 +121,29 @@ public:
     const CommandBuffer& commandBuffer() const { return *cb(); }
 
 private:
-    const CommandBuffer*         m_cb    = nullptr;
+    const CommandBuffer* m_cb            = nullptr;
     mutable const CommandBuffer* m_secCb = nullptr; // Secondary command buffer
 
     const CommandBuffer* cb() const { return m_secCb ? m_secCb : m_cb; }
 
     struct BufferState {
-        vk::Buffer              buffer{};
+        vk::Buffer buffer{};
         vk::PipelineStageFlags2 lastStage{};
-        vk::AccessFlags2        lastAccess{};
+        vk::AccessFlags2 lastAccess{};
     };
     mutable std::array<BufferState, k_trackedBufferCount> m_bufferStates;
 
     struct ImageState {
-        vk::Image               image{};
+        vk::Image image{};
         vk::PipelineStageFlags2 lastStage{};
-        vk::AccessFlags2        lastAccess{};
-        vk::ImageLayout         layout{};
-        uint32_t                layerCount{};
+        vk::AccessFlags2 lastAccess{};
+        vk::ImageLayout layout{};
+        uint32_t layerCount{};
     };
     mutable std::array<ImageState, k_trackedImageCount> m_imageStates;
 
     mutable std::vector<vk::BufferMemoryBarrier2> m_bufferBarriers;
-    mutable std::vector<vk::ImageMemoryBarrier2>  m_imageBarriers;
+    mutable std::vector<vk::ImageMemoryBarrier2> m_imageBarriers;
 
     static constexpr vk::AccessFlags2 k_writeAccessBits =
         vk::AccessFlagBits2::eShaderWrite |
@@ -189,14 +187,8 @@ private:
         BufferState& last = state(access.name);
         if (isHazardAccess(last.lastAccess, access.access)) {
             m_bufferBarriers.emplace_back(
-                last.lastStage,
-                last.lastAccess,
-                access.stage,
-                access.access,
-                vk::QueueFamilyIgnored,
-                vk::QueueFamilyIgnored,
-                last.buffer,
-                0,
+                last.lastStage, last.lastAccess, access.stage, access.access,
+                vk::QueueFamilyIgnored, vk::QueueFamilyIgnored, last.buffer, 0,
                 vk::WholeSize
             );
             last.lastStage  = access.stage;
@@ -214,15 +206,9 @@ private:
         if (isHazardAccess(last.lastAccess, access.access) ||
             (last.layout != access.layout)) {
             m_imageBarriers.emplace_back(
-                last.lastStage,
-                last.lastAccess,
-                access.stage,
-                access.access,
-                last.layout,
-                access.layout,
-                vk::QueueFamilyIgnored,
-                vk::QueueFamilyIgnored,
-                last.image,
+                last.lastStage, last.lastAccess, access.stage, access.access,
+                last.layout, access.layout, vk::QueueFamilyIgnored,
+                vk::QueueFamilyIgnored, last.image,
                 vk::ImageSubresourceRange{
                     vk::ImageAspectFlagBits::eColor, 0, 1, 0, last.layerCount
                 }

@@ -12,7 +12,8 @@ TextureShaped::TextureShaped(PNGLoader::PNGData&& pngData)
                               ? glm::vec2{pngData.dims}
                               : pngData.shape.subimageDims,
           .pivot        = pngData.shape.pivot,
-          .subimagesSpritesCount = pngData.shape.subimagesSpritesCount})
+          .subimagesSpritesCount = pngData.shape.subimagesSpritesCount
+      })
     , m_trueDims(pngData.dims) {
 }
 

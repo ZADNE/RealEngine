@@ -24,8 +24,8 @@ namespace re {
  */
 struct VulkanInitInfo {
     struct BufferDescr {
-        vk::Format           format;
-        vk::ImageUsageFlags  usage;
+        vk::Format format;
+        vk::ImageUsageFlags usage;
         vk::ImageAspectFlags aspects;
     };
 
@@ -58,8 +58,8 @@ public:
     VulkanFixture(const VulkanFixture&)            = delete; /**< Noncopyable */
     VulkanFixture& operator=(const VulkanFixture&) = delete; /**< Noncopyable */
 
-    VulkanFixture(VulkanFixture&&)            = delete; /**< Nonmovable */
-    VulkanFixture& operator=(VulkanFixture&&) = delete; /**< Nonmovable */
+    VulkanFixture(VulkanFixture&&)            = delete;      /**< Nonmovable */
+    VulkanFixture& operator=(VulkanFixture&&) = delete;      /**< Nonmovable */
 
     ~VulkanFixture();
 
@@ -80,68 +80,68 @@ public:
 
 private:
     // Vulkan objects
-    uint32_t           m_imageIndex = 0u;
-    int                m_frame      = 0;
-    SDL_Window*        m_sdlWindow  = nullptr;
-    bool               m_vSync      = false;
-    vk::raii::Context  m_context{};
+    uint32_t m_imageIndex   = 0u;
+    int m_frame             = 0;
+    SDL_Window* m_sdlWindow = nullptr;
+    bool m_vSync            = false;
+    vk::raii::Context m_context{};
     vk::raii::Instance m_instance;
 #ifndef NDEBUG
     vk::raii::DebugUtilsMessengerEXT m_debugUtilsMessenger;
 #endif // !NDEBUG
-    vk::raii::SurfaceKHR      m_surface;
-    uint32_t                  m_graphicsCompQueueFamIndex;
-    uint32_t                  m_presentationQueueFamIndex;
-    vk::raii::PhysicalDevice  m_physicalDevice;
-    vk::raii::Device          m_device;
+    vk::raii::SurfaceKHR m_surface;
+    uint32_t m_graphicsCompQueueFamIndex;
+    uint32_t m_presentationQueueFamIndex;
+    vk::raii::PhysicalDevice m_physicalDevice;
+    vk::raii::Device m_device;
     vk::DispatchLoaderDynamic m_dispatchLoaderDynamic{
         *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr
     };
-    Allocator                                m_allocator;
-    vk::raii::Queue                          m_graphicsCompQueue;
-    vk::raii::Queue                          m_presentationQueue;
-    uint32_t                                 m_minImageCount;
-    vk::Extent2D                             m_swapchainExtent;
-    vk::raii::SwapchainKHR                   m_swapchain;
-    std::vector<vk::raii::ImageView>         m_swapchainImageViews;
+    Allocator m_allocator;
+    vk::raii::Queue m_graphicsCompQueue;
+    vk::raii::Queue m_presentationQueue;
+    uint32_t m_minImageCount;
+    vk::Extent2D m_swapchainExtent;
+    vk::raii::SwapchainKHR m_swapchain;
+    std::vector<vk::raii::ImageView> m_swapchainImageViews;
     std::vector<VulkanInitInfo::BufferDescr> m_additionalBufferDescrs;
-    std::vector<Texture>                     m_additionalBuffers;
-    std::vector<vk::raii::Framebuffer>       m_swapChainFramebuffers;
-    vk::raii::CommandPool                    m_commandPool;
-    FrameDoubleBuffered<CommandBuffer>       m_cbs;
-    CommandBuffer                            m_oneTimeSubmitCmdBuf;
-    vk::raii::PipelineCache                  m_pipelineCache;
-    vk::raii::DescriptorPool                 m_descriptorPool;
+    std::vector<Texture> m_additionalBuffers;
+    std::vector<vk::raii::Framebuffer> m_swapChainFramebuffers;
+    vk::raii::CommandPool m_commandPool;
+    FrameDoubleBuffered<CommandBuffer> m_cbs;
+    CommandBuffer m_oneTimeSubmitCmdBuf;
+    vk::raii::PipelineCache m_pipelineCache;
+    vk::raii::DescriptorPool m_descriptorPool;
     FrameDoubleBuffered<vk::raii::Semaphore> m_imageAvailableSems;
     FrameDoubleBuffered<vk::raii::Semaphore> m_renderingFinishedSems;
-    FrameDoubleBuffered<vk::raii::Fence>     m_inFlightFences;
-    bool                                     m_recreteSwapchain = false;
+    FrameDoubleBuffered<vk::raii::Fence> m_inFlightFences;
+    bool m_recreteSwapchain = false;
     DeletionQueue m_deletionQueue{*m_device, m_allocator};
 
     // Active room dependent
     const RenderPass* m_mainRenderPass{};
-    uint32_t          m_imGuiSubpassIndex{};
+    uint32_t m_imGuiSubpassIndex{};
 
     // Implementations
     void assignImplementationReferences();
 
     // Create object helpers
-    vk::raii::Instance               createInstance();
+    vk::raii::Instance createInstance();
     vk::raii::DebugUtilsMessengerEXT createDebugUtilsMessenger();
-    vk::raii::SurfaceKHR             createSurface();
-    vk::raii::PhysicalDevice         createPhysicalDevice();
-    vk::raii::Device       createDevice(const void* deviceCreateInfoChain);
-    vma::Allocator         createAllocator();
-    vk::raii::Queue        getQueue(uint32_t familyIndex);
+    vk::raii::SurfaceKHR createSurface();
+    vk::raii::PhysicalDevice createPhysicalDevice();
+    vk::raii::Device createDevice(const void* deviceCreateInfoChain);
+    vma::Allocator createAllocator();
+    vk::raii::Queue getQueue(uint32_t familyIndex);
     vk::raii::SwapchainKHR createSwapchain();
-    std::vector<vk::raii::ImageView>         createSwapchainImageViews();
-    std::vector<Texture>                     createAdditionalBuffers();
-    std::vector<vk::raii::Framebuffer>       createSwapchainFramebuffers();
-    vk::raii::CommandPool                    createCommandPool();
+    std::vector<vk::raii::ImageView> createSwapchainImageViews();
+    std::vector<Texture> createAdditionalBuffers();
+    std::vector<vk::raii::Framebuffer> createSwapchainFramebuffers();
+    vk::raii::CommandPool createCommandPool();
     FrameDoubleBuffered<vk::raii::Semaphore> createSemaphores();
-    FrameDoubleBuffered<vk::raii::Fence>     createFences();
-    vk::raii::PipelineCache                  createPipelineCache();
-    vk::raii::DescriptorPool                 createDescriptorPool();
+    FrameDoubleBuffered<vk::raii::Fence> createFences();
+    vk::raii::PipelineCache createPipelineCache();
+    vk::raii::DescriptorPool createDescriptorPool();
 
     bool areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice);
     bool isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice);

@@ -44,7 +44,7 @@ void MainProgram::pollEventsInMainThread(bool poll) {
 
 std::vector<DisplayInfo> MainProgram::searchDisplays() const {
     std::vector<DisplayInfo> infos;
-    int                      numberOfDisplays = SDL_GetNumVideoDisplays();
+    int numberOfDisplays = SDL_GetNumVideoDisplays();
     if (numberOfDisplays < 0) {
         return infos;
     }
@@ -184,8 +184,7 @@ void MainProgram::processEvent(SDL_Event* evnt) {
         m_inputManager.setCursor(
             glm::clamp(
                 {evnt->motion.x, m_window.dims().y - evnt->motion.y - 1},
-                glm::ivec2(0),
-                m_window.dims() - 1
+                glm::ivec2(0), m_window.dims() - 1
             ),
             {evnt->motion.xrel, -evnt->motion.yrel}
         );

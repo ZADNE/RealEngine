@@ -109,10 +109,7 @@ unsigned int SpriteBatch::texToIndex(const Texture& tex) {
     } else {
         unsigned int newIndex = m_texToIndex.size() + m_textureIndexOffset;
         m_descSet.write(
-            vk::DescriptorType::eCombinedImageSampler,
-            0u,
-            newIndex,
-            tex,
+            vk::DescriptorType::eCombinedImageSampler, 0u, newIndex, tex,
             vk::ImageLayout::eShaderReadOnlyOptimal
         );
         m_texToIndex.emplace_back(&tex);

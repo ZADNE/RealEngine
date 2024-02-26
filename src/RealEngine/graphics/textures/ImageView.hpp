@@ -20,8 +20,8 @@ public:
 
     explicit ImageView(const vk::ImageViewCreateInfo& createInfo);
 
-    ImageView(const ImageView&)            = delete; /**< Noncopyable */
-    ImageView& operator=(const ImageView&) = delete; /**< Noncopyable */
+    ImageView(const ImageView&)            = delete;  /**< Noncopyable */
+    ImageView& operator=(const ImageView&) = delete;  /**< Noncopyable */
 
     ImageView(ImageView&& other) noexcept;            /**< Movable */
     ImageView& operator=(ImageView&& other) noexcept; /**< Movable */

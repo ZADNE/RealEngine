@@ -19,8 +19,8 @@ public:
      */
     SpriteStatic(const TextureShaped& tex, float sprite, float subimage = 0.0f);
 
-    virtual float     speed() const;
-    virtual Color     color() const;
+    virtual float speed() const;
+    virtual Color color() const;
     virtual glm::vec2 scale() const;
     virtual glm::vec2 subimageSprite() const;
 
@@ -39,10 +39,8 @@ protected:
 class SpriteAnimated: public SpriteStatic {
 public:
     SpriteAnimated(
-        const TextureShaped& tex,
-        float                sprite,
-        float                subimage   = 0.0f,
-        float                imageSpeed = 1.0f
+        const TextureShaped& tex, float sprite, float subimage = 0.0f,
+        float imageSpeed = 1.0f
     );
 
     void step() override;
@@ -62,23 +60,19 @@ protected:
 class SpriteComplex: public SpriteAnimated {
 public:
     SpriteComplex(
-        const TextureShaped& tex,
-        float                sprite,
-        float                subimage,
-        float                imageSpeed,
-        Color                color,
-        glm::vec2            scale
+        const TextureShaped& tex, float sprite, float subimage,
+        float imageSpeed, Color color, glm::vec2 scale
     );
 
     void setColor(Color color);
     void setScale(glm::vec2 scale);
 
-    Color     color() const override;
+    Color color() const override;
     glm::vec2 scale() const override;
 
 protected:
     glm::vec2 m_scale;
-    Color     m_color;
+    Color m_color;
 };
 
 } // namespace re

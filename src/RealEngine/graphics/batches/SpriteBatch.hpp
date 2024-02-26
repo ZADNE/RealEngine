@@ -82,24 +82,24 @@ private:
         glm::vec4 pos;
         glm::vec4 uvs;
         glm::uint tex;
-        Color     col;
+        Color col;
     };
-    BufferMapped<Sprite>        m_spritesBuf;
+    BufferMapped<Sprite> m_spritesBuf;
     std::vector<const Texture*> m_texToIndex;
-    unsigned int                m_maxSprites;
-    unsigned int                m_maxTextures;
-    unsigned int                m_nextSpriteIndex       = 0;
-    unsigned int                m_batchFirstSpriteIndex = 0;
-    unsigned int                m_textureIndexOffset    = 0;
+    unsigned int m_maxSprites;
+    unsigned int m_maxTextures;
+    unsigned int m_nextSpriteIndex       = 0;
+    unsigned int m_batchFirstSpriteIndex = 0;
+    unsigned int m_textureIndexOffset    = 0;
 
     unsigned int texToIndex(const Texture& tex);
 
-    PipelineLayout        m_pipelineLayout;
+    PipelineLayout m_pipelineLayout;
     static PipelineLayout createPipelineLayout(unsigned int maxTextures);
-    Pipeline              m_pipeline;
-    static Pipeline       createPipeline(
-              const PipelineLayout& pipelineLayout, const SpriteBatchCreateInfo& createInfo
-          );
+    Pipeline m_pipeline;
+    static Pipeline createPipeline(
+        const PipelineLayout& pipelineLayout, const SpriteBatchCreateInfo& createInfo
+    );
     DescriptorSet m_descSet{{.layout = m_pipelineLayout.descriptorSetLayout(0)}};
 
     static inline constexpr Color k_white{255, 255, 255, 255};

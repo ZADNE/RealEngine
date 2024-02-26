@@ -12,12 +12,12 @@ namespace re {
 namespace {
 vk::ShaderStageFlagBits convert(size_t st) {
     switch (st) {
-    case 0: return vk::ShaderStageFlagBits::eVertex;
-    case 1: return vk::ShaderStageFlagBits::eTessellationControl;
-    case 2: return vk::ShaderStageFlagBits::eTessellationEvaluation;
-    case 3: return vk::ShaderStageFlagBits::eGeometry;
-    case 4: return vk::ShaderStageFlagBits::eFragment;
-    case 5: return vk::ShaderStageFlagBits::eCompute;
+    case 0:  return vk::ShaderStageFlagBits::eVertex;
+    case 1:  return vk::ShaderStageFlagBits::eTessellationControl;
+    case 2:  return vk::ShaderStageFlagBits::eTessellationEvaluation;
+    case 3:  return vk::ShaderStageFlagBits::eGeometry;
+    case 4:  return vk::ShaderStageFlagBits::eFragment;
+    case 5:  return vk::ShaderStageFlagBits::eCompute;
     default: throw Exception{"Unknown shader type"};
     }
 }
@@ -29,9 +29,9 @@ Pipeline::Pipeline(
 ) {
     // Create shader modules
     constexpr auto k_numStages = PipelineGraphicsSources::k_numStages;
-    std::array<vk::ShaderModule, k_numStages>                  modules;
+    std::array<vk::ShaderModule, k_numStages> modules;
     std::array<vk::PipelineShaderStageCreateInfo, k_numStages> stages;
-    uint32_t                                                   shaderCount = 0;
+    uint32_t shaderCount = 0;
     for (size_t st = 0; st < k_numStages; ++st) {
         if (!srcs[st].vk13.empty()) {
             modules[shaderCount] = device().createShaderModule(
@@ -54,7 +54,7 @@ Pipeline::Pipeline(
         1u,
         nullptr, // Viewport
         1u,
-        nullptr // Scissor
+        nullptr  // Scissor
     };
     vk::PipelineRasterizationStateCreateInfo rasterization{
         {},
@@ -69,7 +69,7 @@ Pipeline::Pipeline(
         0.0f,                // Depth bias slope factor
         createInfo.lineWidth // Line width
     };
-    vk::PipelineMultisampleStateCreateInfo  multisample{};
+    vk::PipelineMultisampleStateCreateInfo multisample{};
     vk::PipelineDepthStencilStateCreateInfo depthStencil{
         {}, createInfo.enableDepth, createInfo.enableDepth, vk::CompareOp::eLess
     };
