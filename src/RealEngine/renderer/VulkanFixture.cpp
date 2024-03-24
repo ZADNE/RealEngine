@@ -47,13 +47,13 @@ VulkanFixture::VulkanFixture(
     SDL_Window* sdlWindow, bool vSync, const VulkanInitInfo& initInfo
 )
     : m_sdlWindow(sdlWindow)
-    , m_vSync(vSync)
     , m_instance(createInstance())
 #ifndef NDEBUG
     , m_debugUtilsMessenger(createDebugUtilsMessenger())
 #endif // !NDEBUG
     , m_surface(createSurface())
     , m_physicalDevice(createPhysicalDevice())
+    , m_presentMode(selectClosestPresentMode(vSync))
     , m_device(createDevice(initInfo.deviceCreateInfoChain))
     , m_allocator(createAllocator())
     , m_graphicsCompQueue(getQueue(m_graphicsCompQueueFamIndex))
@@ -259,7 +259,7 @@ void VulkanFixture::finishFrame() {
 }
 
 void VulkanFixture::changePresentation(bool vSync) {
-    m_vSync            = vSync;
+    m_presentMode      = selectClosestPresentMode(vSync);
     m_recreteSwapchain = true;
 }
 
@@ -339,9 +339,9 @@ vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice() {
             isSwapchainSupported(physicalDevice) &&
             findQueueFamilyIndices(physicalDevice)) {
             auto props = physicalDevice.getProperties2().properties;
-            auto major = vk::versionMajor(props.apiVersion);
-            auto minor = vk::versionMinor(props.apiVersion);
-            auto patch = vk::versionPatch(props.apiVersion);
+            auto major = vk::apiVersionMajor(props.apiVersion);
+            auto minor = vk::apiVersionMinor(props.apiVersion);
+            auto patch = vk::apiVersionPatch(props.apiVersion);
             if (major == 1 && minor >= 3) {
                 std::cout << "Vulkan:       " << major << '.' << minor << '.'
                           << patch << '\n';
@@ -351,6 +351,24 @@ vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice() {
         }
     }
     throw std::runtime_error("No physical device is suitable!");
+}
+
+vk::PresentModeKHR VulkanFixture::selectClosestPresentMode(bool vSync) {
+    auto modes     = m_physicalDevice.getSurfacePresentModesKHR(*m_surface);
+    auto idealMode = vSync ? eMailbox : eImmediate;
+    auto acceptableMode  = vSync ? eFifo : eFifoRelaxed;
+    bool idealAvail      = false;
+    bool acceptableAvail = false;
+
+    for (auto mode : modes) {
+        if (mode == idealMode) {
+            idealAvail = true;
+        } else if (mode == acceptableMode) {
+            acceptableAvail = true;
+        }
+    }
+
+    return idealAvail ? idealMode : (acceptableAvail ? acceptableMode : eFifo);
 }
 
 vk::raii::Device VulkanFixture::createDevice(const void* deviceCreateInfoChain) {
@@ -448,7 +466,7 @@ vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
                        : queueFamilyIndices,
         caps.currentTransform,
         eOpaque,
-        m_vSync ? eMailbox : eImmediate,
+        m_presentMode,
         true
     };
     return vk::raii::SwapchainKHR{m_device, createInfo};
@@ -591,15 +609,7 @@ bool VulkanFixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physica
             break;
         }
     }
-    bool mailboxSupported = false;
-    for (const auto& presentMode :
-         physicalDevice.getSurfacePresentModesKHR(*m_surface)) {
-        if (presentMode == vk::PresentModeKHR::eMailbox) {
-            mailboxSupported = true;
-            break;
-        }
-    }
-    return formatSupported && mailboxSupported;
+    return formatSupported;
 }
 
 bool VulkanFixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice

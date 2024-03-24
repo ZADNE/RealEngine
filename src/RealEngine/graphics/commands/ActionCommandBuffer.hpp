@@ -2,6 +2,8 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <utility>
+
 #include <RealEngine/graphics/buffers/Buffer.hpp>
 #include <RealEngine/graphics/commands/CommandBuffer.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>

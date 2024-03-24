@@ -83,7 +83,6 @@ private:
     uint32_t m_imageIndex   = 0u;
     int m_frame             = 0;
     SDL_Window* m_sdlWindow = nullptr;
-    bool m_vSync            = false;
     vk::raii::Context m_context{};
     vk::raii::Instance m_instance;
 #ifndef NDEBUG
@@ -93,6 +92,7 @@ private:
     uint32_t m_graphicsCompQueueFamIndex;
     uint32_t m_presentationQueueFamIndex;
     vk::raii::PhysicalDevice m_physicalDevice;
+    vk::PresentModeKHR m_presentMode;
     vk::raii::Device m_device;
     vk::DispatchLoaderDynamic m_dispatchLoaderDynamic{
         *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr
@@ -130,6 +130,7 @@ private:
     vk::raii::DebugUtilsMessengerEXT createDebugUtilsMessenger();
     vk::raii::SurfaceKHR createSurface();
     vk::raii::PhysicalDevice createPhysicalDevice();
+    vk::PresentModeKHR selectClosestPresentMode(bool vSync);
     vk::raii::Device createDevice(const void* deviceCreateInfoChain);
     vma::Allocator createAllocator();
     vk::raii::Queue getQueue(uint32_t familyIndex);
