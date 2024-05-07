@@ -45,7 +45,7 @@ public:
     /**
      * @brief Position of cursor relative to the view
      */
-    glm::vec2 cursorRel() { return m_cursorRel; }
+    glm::vec2 cursorRel() const { return m_cursorRel; }
 
     /**
      * @brief Gets the projection matrix of the view
