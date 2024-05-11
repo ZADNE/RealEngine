@@ -19,7 +19,7 @@ struct DescriptorSetCreateInfo {
 };
 
 /**
- * @brief Describes (= refers to) concrete resources (= buffers, images, etc)
+ * @brief Refers to concrete resources to be used by a pipeline
  */
 class DescriptorSet: public VulkanObject {
 public:

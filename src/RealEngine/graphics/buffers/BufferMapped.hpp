@@ -7,7 +7,7 @@
 namespace re {
 
 /**
- * @brief Is a buffer that is persistently mapped throughout its lifetime
+ * @brief Is a buffer that is persistently mapped to CPU address space
  * @tparam T The type that this buffer represents
  */
 template<typename T = std::byte>

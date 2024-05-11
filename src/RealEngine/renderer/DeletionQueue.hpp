@@ -13,7 +13,7 @@ namespace re {
 /**
  * @brief   Allows delayed deletion of Vulkan and Vma objects
  * @details Objects in the queue are batched into groups.
- *          Object are deleted in the order they were added in.
+ *          Objects are deleted in the order they were added in.
  */
 class DeletionQueue {
     friend class VulkanFixture;

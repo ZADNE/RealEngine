@@ -19,8 +19,9 @@ struct PipelineLayoutDescription {
 };
 
 /**
- * @brief Creates interface between pipeline and other resources (textures,
+ * @brief Creates an interface between pipelines and other resources (textures,
  * buffers, etc)
+ * @details DescriptorSet 'implements' a part of this interface.
  */
 class PipelineLayout: public VulkanObject {
 public:

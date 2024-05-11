@@ -17,8 +17,8 @@ namespace re {
  * time.
  *
  * Rooms allow separation of program into multiple units where only one unit
- * is active at a time (= receives step and render calls, inactive rooms
- * are resident in the memory but do not receive updates).
+ * is active at a time, i.e. receives step and render callbacks. Inactive rooms
+ * are resident in the memory but do not receive updates.
  * Transitions between rooms are mamaged by RoomManager.
  *
  * You use RealEngine by inheriting Room and adding your behavior to step(),

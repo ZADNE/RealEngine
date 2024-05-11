@@ -34,7 +34,7 @@ struct GeometryBatchCreateInfo {
 };
 
 /**
- * @brief Draws geometric primitives
+ * @brief Draws geometric primitives (points, lines, triangles)
  */
 class GeometryBatch {
 public:

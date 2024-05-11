@@ -42,7 +42,7 @@ struct BufferCreateInfo {
 };
 
 /**
- * @brief Is a continuous block of memory
+ * @brief Is a continuous block of memory allocated by Vulkan
  * @note Use BufferMapped if you intend to map the buffer to CPU memory
  */
 class Buffer: public VulkanObject {

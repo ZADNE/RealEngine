@@ -46,7 +46,7 @@ struct PipelineComputeCreateInfo {
 };
 
 /**
- * @brief Controls how vertices are rendered to screen.
+ * @brief Controls how vertices are transformed and shaded or describes compute work
  */
 class Pipeline: public VulkanObject {
 public:

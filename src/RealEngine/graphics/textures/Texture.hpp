@@ -44,7 +44,7 @@ struct TextureCreateInfo {
 };
 
 /**
- * @brief Represents one (or more) images
+ * @brief Represents one (or more) images and, optionally, a sampler
  */
 class Texture: public VulkanObject {
 public:

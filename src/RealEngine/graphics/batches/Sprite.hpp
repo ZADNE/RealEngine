@@ -54,8 +54,7 @@ protected:
 };
 
 /**
- * @brief Represents an animated subimage within a texture that can be tinted or
- * scaled
+ * @brief Represents an animated subimage within a texture that is tinted and scaled
  */
 class SpriteComplex: public SpriteAnimated {
 public:

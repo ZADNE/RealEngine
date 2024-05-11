@@ -8,7 +8,7 @@
 namespace re {
 
 /**
- * @brief Represents an orthographic projection.
+ * @brief Represents an orthographic projection camera aligned with Z axis
  */
 class View2D {
 public:

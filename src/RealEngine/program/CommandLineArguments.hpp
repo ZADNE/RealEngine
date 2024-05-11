@@ -8,4 +8,4 @@ namespace re {
 
 using CommandLineArguments = std::span<char*>;
 
-}
+} // namespace re

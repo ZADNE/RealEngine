@@ -14,16 +14,16 @@ class CommandBuffer;
 
 /**
  * @brief   Provides access to global Vulkan objects (such as device)
- *          to lower-level vulkan objects (such as pipeline)
+ *          to children Vulkan objects
+ * @details Children Vulkan objects (e.g. buffers, textures, pipelines) derive
+ * from this.
  */
 class VulkanObject {
     friend class VulkanFixture;
 
 protected:
     /**
-     * @brief Concrete Vulkan objects (e.g. buffers, textures, pipelines) are
-     * supposed to derive from this.
-     * @details This constructor is deliberately protected as the VulkanObject
+     * @brief This constructor is deliberately protected as the VulkanObject
      * does not do anything on its own
      */
     VulkanObject() {}

@@ -7,7 +7,7 @@
 namespace re {
 
 /**
- * @brief Is a helper function that fills rarely chaning fields
+ * @brief Is a helper function that fills rarely changing fields
  */
 constexpr vk::ImageMemoryBarrier2 imageMemoryBarrier(
     vk::PipelineStageFlags2 srcStageMask, vk::AccessFlags2 srcAccessMask,
@@ -31,7 +31,7 @@ constexpr vk::ImageMemoryBarrier2 imageMemoryBarrier(
 }
 
 /**
- * @brief Is a helper function that fills rarely chaning fields
+ * @brief Is a helper function that fills rarely changing fields
  */
 constexpr vk::BufferMemoryBarrier2 bufferMemoryBarrier(
     vk::PipelineStageFlags2 srcStageMask, vk::AccessFlags2 srcAccessMask,

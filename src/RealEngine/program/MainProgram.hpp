@@ -44,7 +44,7 @@ struct DisplayInfo {
  * Then you can add your rooms via MainProgram::addRoom. Rooms contain the main
  * bussiness logic. Once you have added all the room, you call MainProgram::run
  * to start the simulation. The return value of the run function should be
- * return back to OS.
+ * returned back to OS.
  *
  * @see Room
  */

@@ -27,7 +27,7 @@ private:
 };
 
 /**
- * @brief Is a 2D texture with associated shape
+ * @brief Is a 2D texture with associated shape, typically loaded from a PNG file
  */
 class TextureShaped: public Texture {
 public:

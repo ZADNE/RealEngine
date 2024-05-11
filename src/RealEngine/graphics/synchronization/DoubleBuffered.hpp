@@ -44,10 +44,16 @@ public:
     T& operator*() { return write(); }
     T* operator->() { return &write(); }
 
+    /**
+     * @brief Calls 'func' on each buffer
+     */
     void forEach(std::invocable<T&> auto func) {
         for (auto& t : m_ts) { func(t); }
     }
 
+    /**
+     * @brief Calls 'func' on each buffer of this and 'arg'
+     */
     template<typename Arg>
     void forEach(
         std::invocable<T&, const Arg&> auto func,
