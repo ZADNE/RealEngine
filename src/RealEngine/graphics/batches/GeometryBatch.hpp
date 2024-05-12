@@ -13,21 +13,35 @@
 
 namespace re {
 
+struct GeometryBatchCreateInfo {
+    /**
+     * @brief The topology that the batch will draw
+     */
+    vk::PrimitiveTopology topology = vk::PrimitiveTopology::eTriangleList;
+    /**
+     * @brief The renderpass that the batch will always draw in
+     */
+    RenderPassSubpass renderPassSubpass{};
+    /**
+     * @brief Is the maximum number of vertices that can be in the batch
+     */
+    unsigned int maxVertices = 0u;
+    /**
+     * @brief Width of the lines, in pixels
+     * (relevant only if the topology is a part of the line class)
+     */
+    float lineWidthPx = 1.0f;
+};
+
 /**
- * @brief Draws geometric primitives
+ * @brief Draws geometric primitives (points, lines, triangles)
  */
 class GeometryBatch {
 public:
     /**
-     * @brief Constructs GeometryBatch
-     * @param topology The topology that the batch will draw
-     * @param maxVertices Maximum number of vertices that can be in the batch
-     * @param lineWidth Width of the lines, in pixels
-     * (relevant only if the topology is a part of the line class)
+     * @brief Constructs a GeometryBatch
      */
-    GeometryBatch(
-        vk::PrimitiveTopology topology, unsigned int maxVertices, float lineWidth = 1.0f
-    );
+    explicit GeometryBatch(const GeometryBatchCreateInfo& createInfo);
 
     /**
      * @brief   Begins new batch
@@ -50,17 +64,17 @@ public:
     /**
      * @brief   Draws the batch
      * @details The whole geometry is drawn in the order it was added in
-     * @param cmdBuf Command buffer used for rendering
+     * @param cb Command buffer used for rendering
      * @param mvpMat Transformation matrix applied to the sprites
      */
-    void draw(const CommandBuffer& cmdBuf, const glm::mat4& mvpMat);
+    void draw(const CommandBuffer& cb, const glm::mat4& mvpMat);
 
 private:
     BufferMapped<VertexPoCo> m_verticesBuf;
-    uint32_t                 m_nextVertexIndex;
-    uint32_t                 m_maxVertices;
-    PipelineLayout           m_pipelineLayout;
-    Pipeline                 m_pipeline;
+    uint32_t m_nextVertexIndex;
+    uint32_t m_maxVertices;
+    PipelineLayout m_pipelineLayout;
+    Pipeline m_pipeline;
 };
 
 } // namespace re

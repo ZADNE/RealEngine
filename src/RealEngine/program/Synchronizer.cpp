@@ -75,7 +75,7 @@ void Synchronizer::beginFrame() {
     m_framesPerSecondThisSecond++;
     if (frameTime > m_maxFrameTimeThisSecond) {
         // Update max frame time if it is the highest
-        m_maxFrameTimeThisSecond = frameTime; 
+        m_maxFrameTimeThisSecond = frameTime;
     }
 
     m_lastFrameTime = now;
@@ -95,7 +95,7 @@ bool Synchronizer::shouldStepHappen() {
     }
 
     // If accumulated enough time for the next step to happen
-    if (m_stepTimeAccumulator >= m_timePerStep) { 
+    if (m_stepTimeAccumulator >= m_timePerStep) {
         m_stepTimeAccumulator -= m_timePerStep; // Reduce accumulated time
         return true;
     } else {

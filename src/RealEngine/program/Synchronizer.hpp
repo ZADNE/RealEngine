@@ -20,7 +20,7 @@ public:
     using TimePoint =
         std::chrono::steady_clock::time_point; /**< Time point type alias */
     using Duration =
-        std::chrono::steady_clock::duration; /**< Time duration type alias */
+        std::chrono::steady_clock::duration;   /**< Time duration type alias */
 
     constexpr static unsigned int k_doNotLimitFramesPerSecond =
         0u; /**< Constant which denotes that frames per second should not be limited */
@@ -28,17 +28,17 @@ public:
     /**
      * @brief Constructs new synchronizer.
      *
-     * @param stepsPerSecond        Number of steps per second, steps will happen
-     * at this constant rate per second
+     * @param stepsPerSecond        Number of steps per second, steps will
+     * happen at this constant rate per second
      * @param framesPerSecondLimit  Maximum number of frames per second (frame
      * draws will happen at most at this constant rate per second), or use
      * k_doNotLimitFramesPerSecond to not limit frames per second.
-     * @param beginResumed          If true, steps will be resumed from the beginning.
+     * @param beginResumed          If true, steps will be resumed from the
+     * beginning.
      */
     Synchronizer(
-        unsigned int stepsPerSecond,
-        unsigned int framesPerSecondLimit,
-        bool         beginResumed = false
+        unsigned int stepsPerSecond, unsigned int framesPerSecondLimit,
+        bool beginResumed = false
     );
 
     /**
@@ -131,19 +131,19 @@ private:
     TimePoint m_lastFrameTime; /**< Time point of the last frame start - used to
                                   determine its period */
 
-    Duration m_timePerStep;  /**< Time duration for each step */
-    Duration m_timePerFrame; /**< Time duration for each frame, zero if not
-                                limiting FPS (time per frame can vary) */
+    Duration m_timePerStep;    /**< Time duration for each step */
+    Duration m_timePerFrame;   /**< Time duration for each frame, zero if not
+                                  limiting FPS (time per frame can vary) */
 
-    Duration m_stepTimeAccumulator{
-        Duration::zero()}; /**< Accumulator of time for next step */
+    Duration m_stepTimeAccumulator{Duration::zero()
+    }; /**< Accumulator of time for next step */
 
     unsigned int m_framesPerSecond = 0; /**< Frames drawn last second */
     unsigned int m_framesPerSecondThisSecond = 0; /**< Frames drawn this second */
 
     Duration m_maxFrameTime{Duration::zero()}; /**< Max frame time last second */
-    Duration m_maxFrameTimeThisSecond{
-        Duration::zero()}; /**< Max frame time this second */
+    Duration m_maxFrameTimeThisSecond{Duration::zero()
+    };                          /**< Max frame time this second */
 
     bool m_stepsPaused = false; /**< True if steps are paused */
 };

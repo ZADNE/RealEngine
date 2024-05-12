@@ -37,7 +37,7 @@ public:
     CommandBuffer(const CommandBuffer&)            = delete; /**< Noncopyable */
     CommandBuffer& operator=(const CommandBuffer&) = delete; /**< Noncopyable */
 
-    CommandBuffer(CommandBuffer&& other) noexcept;            /**< Movable */
+    CommandBuffer(CommandBuffer&& other) noexcept;           /**< Movable */
     CommandBuffer& operator=(CommandBuffer&& other) noexcept; /**< Movable */
 
     ~CommandBuffer();
@@ -52,8 +52,8 @@ public:
      */
     template<std::invocable<const CommandBuffer&> F>
     static void doOneTimeSubmit(F op) {
-        oneTimeSubmitCmdBuf()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit}
-        );
+        oneTimeSubmitCmdBuf()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit
+        });
         op(oneTimeSubmitCmdBuf());
         oneTimeSubmitCmdBuf()->end();
         graphicsCompQueue().submit(vk::SubmitInfo{{}, {}, *oneTimeSubmitCmdBuf()});
@@ -66,7 +66,7 @@ public:
      */
     static void submitToGraphicsCompQueue(
         const vk::ArrayProxy<const vk::SubmitInfo2>& submits,
-        const vk::Fence&                             signalFence = nullptr
+        const vk::Fence& signalFence = nullptr
     );
 
     /**
@@ -91,7 +91,7 @@ public:
      */
     void beginDebugRegion(const char* label, glm::vec4 color = {}) const {
         if constexpr (k_buildType == BuildType::Debug) {
-            m_cmdBuf.beginDebugUtilsLabelEXT(
+            m_cb.beginDebugUtilsLabelEXT(
                 vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
                 dispatchLoaderDynamic()
             );
@@ -104,7 +104,7 @@ public:
      */
     void endDebugRegion() const {
         if constexpr (k_buildType == BuildType::Debug) {
-            m_cmdBuf.endDebugUtilsLabelEXT(dispatchLoaderDynamic());
+            m_cb.endDebugUtilsLabelEXT(dispatchLoaderDynamic());
         }
     }
 
@@ -114,7 +114,7 @@ public:
      */
     void insertDebugLabel(const char* label, glm::vec4 color = {}) const {
         if constexpr (k_buildType == BuildType::Debug) {
-            m_cmdBuf.insertDebugUtilsLabelEXT(
+            m_cb.insertDebugUtilsLabelEXT(
                 vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
                 dispatchLoaderDynamic()
             );
@@ -127,23 +127,21 @@ public:
      */
     class [[nodiscard]] DebugRegion {
     public:
-        DebugRegion(
-            const CommandBuffer& cmdBuf, const char* label, glm::vec4 color = {}
-        )
-            : m_cmdBuf(cmdBuf) {
-            m_cmdBuf.beginDebugRegion(label, color);
+        DebugRegion(const CommandBuffer& cb, const char* label, glm::vec4 color = {})
+            : m_cb(cb) {
+            m_cb.beginDebugRegion(label, color);
         }
 
         DebugRegion(const DebugRegion&)            = delete; /**< Noncopyable */
         DebugRegion& operator=(const DebugRegion&) = delete; /**< Noncopyable */
 
-        DebugRegion(DebugRegion&&)            = delete; /**< Nonmovable */
-        DebugRegion& operator=(DebugRegion&&) = delete; /**< Nonmovable */
+        DebugRegion(DebugRegion&&)            = delete;      /**< Nonmovable */
+        DebugRegion& operator=(DebugRegion&&) = delete;      /**< Nonmovable */
 
-        ~DebugRegion() { m_cmdBuf.endDebugRegion(); }
+        ~DebugRegion() { m_cb.endDebugRegion(); }
 
     private:
-        const CommandBuffer& m_cmdBuf;
+        const CommandBuffer& m_cb;
     };
 
     DebugRegion createDebugRegion(const char* label, glm::vec4 color = {}) const {
@@ -152,13 +150,13 @@ public:
 
 #pragma endregion
 
-    const vk::CommandBuffer& operator*() const { return m_cmdBuf; }
-    const vk::CommandBuffer* operator->() const { return &m_cmdBuf; }
+    const vk::CommandBuffer& operator*() const { return m_cb; }
+    const vk::CommandBuffer* operator->() const { return &m_cb; }
 
-    const vk::CommandBuffer& commandBuffer() const { return m_cmdBuf; }
+    const vk::CommandBuffer& commandBuffer() const { return m_cb; }
 
 private:
-    vk::CommandBuffer m_cmdBuf{};
+    vk::CommandBuffer m_cb{};
 };
 
 } // namespace re

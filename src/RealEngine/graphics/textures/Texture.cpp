@@ -49,9 +49,11 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         vk::SharingMode::eExclusive,
         {},
         eUndefined,
-        createInfo.pNext};
+        createInfo.pNext
+    };
     vma::AllocationCreateInfo allocCreateInfo{
-        createInfo.allocFlags, createInfo.memoryUsage};
+        createInfo.allocFlags, createInfo.memoryUsage
+    };
     // Create the image
     std::tie(m_image, m_allocation) =
         allocator().createImage(imageCreateInfo, allocCreateInfo);
@@ -60,16 +62,13 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         initializeTexels(createInfo);
     } else if (createInfo.initialLayout != eUndefined) {
         // Transit to initial layout
-        CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cmdBuf) {
+        CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cb) {
             pipelineImageBarrier(
-                cmdBuf,
-                eUndefined,
+                cb, eUndefined,
                 createInfo.initialLayout, // Image layouts
                 eTopOfPipe,
-                eTransfer, // Pipeline stage
-                {},
-                {},
-                createInfo.layers
+                eTransfer,                // Pipeline stage
+                {}, {}, createInfo.layers
             );
         });
     }
@@ -86,11 +85,13 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
             1u,               // Mip level count
             0u,               // Base array layer
             createInfo.layers // Array layer count
-        }});
+        }
+    });
     // Create sampler
     if (createInfo.hasSampler) {
         m_sampler = device().createSampler(vk::SamplerCreateInfo{
-            {}, createInfo.magFilter, createInfo.minFilter, createInfo.mipmapMode});
+            {}, createInfo.magFilter, createInfo.minFilter, createInfo.mipmapMode
+        });
     }
 
     setDebugUtilsObjectName(m_image, createInfo.debugName);
@@ -130,27 +131,25 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
         .allocFlags  = eHostAccessSequentialWrite | eMapped,
         .memoryUsage = eAutoPreferHost,
         .sizeInBytes = createInfo.texels.size(),
-        .usage       = vk::BufferUsageFlagBits::eTransferSrc}};
+        .usage       = vk::BufferUsageFlagBits::eTransferSrc
+    }};
     // Copy texels to the staging buffer
     std::memcpy(
         stagingBuffer.mapped(), createInfo.texels.data(), createInfo.texels.size()
     );
     // Copy data from staging buffer to the image
-    CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cmdBuf) {
+    CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cb) {
         pipelineImageBarrier(
-            cmdBuf,
-            eUndefined,
-            eTransferDstOptimal, // Image layouts
+            cb, eUndefined,
+            eTransferDstOptimal,                // Image layouts
             eAllCommands,
-            eAllCommands, // Pipeline stage
+            eAllCommands,                       // Pipeline stage
             {},
             vk::AccessFlagBits::eTransferWrite, // Access flags
             createInfo.layers                   // Array layer count
         );
-        cmdBuf->copyBufferToImage(
-            stagingBuffer.buffer(),
-            m_image,
-            eTransferDstOptimal,
+        cb->copyBufferToImage(
+            stagingBuffer.buffer(), m_image, eTransferDstOptimal,
             vk::BufferImageCopy{
                 0u,
                 0u,
@@ -162,43 +161,32 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
                     1u  // Array layer count
                 },
                 vk::Offset3D{0u, 0u, 0u},
-                {createInfo.extent.x, createInfo.extent.y, createInfo.extent.z}}
+                {createInfo.extent.x, createInfo.extent.y, createInfo.extent.z}
+            }
         );
         using enum vk::AccessFlagBits;
         pipelineImageBarrier(
-            cmdBuf,
-            eTransferDstOptimal,
+            cb, eTransferDstOptimal,
             createInfo.initialLayout, // Image layouts
             eTransfer,
-            eFragmentShader, // Pipeline stage
+            eFragmentShader,          // Pipeline stage
             eTransferWrite,
-            eShaderRead,      // Access flags
-            createInfo.layers // Array layer count
+            eShaderRead,              // Access flags
+            createInfo.layers         // Array layer count
         );
     });
 }
 
 void Texture::pipelineImageBarrier(
-    const CommandBuffer&   cmdBuf,
-    vk::ImageLayout        oldLayout,
-    vk::ImageLayout        newLayout,
-    vk::PipelineStageFlags srcStage,
-    vk::PipelineStageFlags dstStage,
-    vk::AccessFlags        srcAccess,
-    vk::AccessFlags        dstAccess,
-    uint32_t               layerCount
+    const CommandBuffer& cb, vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
+    vk::PipelineStageFlags srcStage, vk::PipelineStageFlags dstStage,
+    vk::AccessFlags srcAccess, vk::AccessFlags dstAccess, uint32_t layerCount
 ) {
-    cmdBuf->pipelineBarrier(
-        srcStage,
-        dstStage,
-        vk::DependencyFlags{},
-        {}, // Memory barriers
-        {}, // Buffer memory barrier
+    cb->pipelineBarrier(
+        srcStage, dstStage, vk::DependencyFlags{}, {}, // Memory barriers
+        {},                                            // Buffer memory barrier
         vk::ImageMemoryBarrier{
-            srcAccess,
-            dstAccess,
-            oldLayout,
-            newLayout,
+            srcAccess, dstAccess, oldLayout, newLayout,
             vk::QueueFamilyIgnored, // Source queue family index
             vk::QueueFamilyIgnored, // Dest queue family index
             m_image,
@@ -208,7 +196,8 @@ void Texture::pipelineImageBarrier(
                 1u,        // Mip level count
                 0u,        // Base array layer
                 layerCount // Array layer count
-            }}
+            }
+        }
     );
 }
 

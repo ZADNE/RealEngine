@@ -7,7 +7,7 @@
 namespace re {
 
 /**
- * @brief Is a buffer that is persistently mapped throughout its lifetime
+ * @brief Is a buffer that is persistently mapped to CPU address space
  * @tparam T The type that this buffer represents
  */
 template<typename T = std::byte>
@@ -27,14 +27,14 @@ public:
         : BufferMapped(createInfo, nullptr) {}
 
     const T& operator[](auto i) const { return m_mapped[i]; }
-    T&       operator[](auto i) { return m_mapped[i]; }
+    T& operator[](auto i) { return m_mapped[i]; }
     const T& operator*() const { return *m_mapped; }
-    T&       operator*() { return *m_mapped; }
+    T& operator*() { return *m_mapped; }
     const T* operator->() const { return m_mapped; }
-    T*       operator->() { return m_mapped; }
+    T* operator->() { return m_mapped; }
 
     const T* mapped() const { return m_mapped; }
-    T*       mapped() { return m_mapped; }
+    T* mapped() { return m_mapped; }
 
 protected:
     BufferMapped(const BufferCreateInfo& createInfo, void* holder)

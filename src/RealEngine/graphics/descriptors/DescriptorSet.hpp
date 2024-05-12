@@ -19,7 +19,7 @@ struct DescriptorSetCreateInfo {
 };
 
 /**
- * @brief Describes (= refers to) concrete resources (= buffers, images, etc)
+ * @brief Refers to concrete resources to be used by a pipeline
  */
 class DescriptorSet: public VulkanObject {
 public:
@@ -36,30 +36,22 @@ public:
     DescriptorSet(const DescriptorSet&)            = delete; /**< Noncopyable */
     DescriptorSet& operator=(const DescriptorSet&) = delete; /**< Noncopyable */
 
-    DescriptorSet(DescriptorSet&& other) noexcept;            /**< Movable */
+    DescriptorSet(DescriptorSet&& other) noexcept;           /**< Movable */
     DescriptorSet& operator=(DescriptorSet&& other) noexcept; /**< Movable */
 
     ~DescriptorSet();
 
     void write(
-        vk::DescriptorType type,
-        uint32_t           binding,
-        uint32_t           arrayIndex,
-        const Buffer&      buf,
-        vk::DeviceSize     offset = 0ull,
-        vk::DeviceSize     range  = vk::WholeSize
+        vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex,
+        const Buffer& buf, vk::DeviceSize offset = 0ull,
+        vk::DeviceSize range = vk::WholeSize
     );
     void write(
-        vk::DescriptorType type,
-        uint32_t           binding,
-        uint32_t           arrayIndex,
-        const Texture&     tex,
-        vk::ImageLayout    layout
+        vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex,
+        const Texture& tex, vk::ImageLayout layout
     );
     void write(
-        vk::DescriptorType             type,
-        uint32_t                       binding,
-        uint32_t                       arrayIndex,
+        vk::DescriptorType type, uint32_t binding, uint32_t arrayIndex,
         const vk::DescriptorImageInfo& imageInfo
     );
 

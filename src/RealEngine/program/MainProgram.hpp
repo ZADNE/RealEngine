@@ -24,12 +24,12 @@ namespace re {
 class Room;
 
 struct DisplayInfo {
-    std::string name;         /**< @brief UTF-8 encoded 'name' */
-    glm::ivec4  bounds;       /**< @brief Bounds in pixels; XYWH */
-    glm::ivec4  boundsUsable; /**< @brief Usable bounds in pixels; XYWH;
-                                 system-reserved parts removed */
-    glm::ivec2 dims;          /**< @brief Dimensions */
-    int        refreshRate;   /**< @brief Refresh rate */
+    std::string name;        /**< @brief UTF-8 encoded 'name' */
+    glm::ivec4 bounds;       /**< @brief Bounds in pixels; XYWH */
+    glm::ivec4 boundsUsable; /**< @brief Usable bounds in pixels; XYWH;
+                                system-reserved parts removed */
+    glm::ivec2 dims;         /**< @brief Dimensions */
+    int refreshRate;         /**< @brief Refresh rate */
     Uint32 pixelFormat; /**< @brief Pixel format @see SDL2's SDL_PixelFormatEnum */
     void* driverSpecific;
 };
@@ -44,7 +44,7 @@ struct DisplayInfo {
  * Then you can add your rooms via MainProgram::addRoom. Rooms contain the main
  * bussiness logic. Once you have added all the room, you call MainProgram::run
  * to start the simulation. The return value of the run function should be
- * return back to OS.
+ * returned back to OS.
  *
  * @see Room
  */
@@ -53,8 +53,8 @@ public:
     MainProgram(const MainProgram&)            = delete; /**< Noncopyable */
     MainProgram& operator=(const MainProgram&) = delete; /**< Noncopyable */
 
-    MainProgram(MainProgram&&)            = delete; /**< Nonmovable */
-    MainProgram& operator=(MainProgram&&) = delete; /**< Nonmovable */
+    MainProgram(MainProgram&&)            = delete;      /**< Nonmovable */
+    MainProgram& operator=(MainProgram&&) = delete;      /**< Nonmovable */
 
     /**
      * @brief Must be called before any Room is added
@@ -143,7 +143,7 @@ private:
     int doRun(size_t roomName, const RoomTransitionArguments& args);
 
     void step();
-    void render(const CommandBuffer& cmdBuf, double interpolationFactor);
+    void render(const CommandBuffer& cb, double interpolationFactor);
 
     void pollEvents();
     void processEvent(SDL_Event* evnt);
@@ -158,15 +158,15 @@ private:
                                                 from within Rooms, see Room::engine */
 
     bool m_programShouldRun = false;
-    int  m_programExitCode  = EXIT_SUCCESS;
-    int  m_stepN            = 0;
+    int m_programExitCode   = EXIT_SUCCESS;
+    int m_stepN             = 0;
 
     bool m_pollEventsInMainThread = true;
 
     void doRoomTransitionIfScheduled();
 
-    static constexpr size_t k_noNextRoom   = std::numeric_limits<size_t>::max();
-    size_t                  m_nextRoomName = k_noNextRoom;
+    static constexpr size_t k_noNextRoom = std::numeric_limits<size_t>::max();
+    size_t m_nextRoomName                = k_noNextRoom;
     RoomTransitionArguments m_roomTransitionArgs;
 };
 

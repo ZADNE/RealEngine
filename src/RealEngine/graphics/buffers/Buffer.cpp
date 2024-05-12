@@ -26,7 +26,8 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
                 .allocFlags  = eHostAccessSequentialWrite | eMapped,
                 .memoryUsage = eAutoPreferHost,
                 .sizeInBytes = createInfo.initData.size_bytes(),
-                .usage       = eTransferSrc},
+                .usage       = eTransferSrc
+            },
             &stageMapped
         );
         // Create the main buffer
@@ -36,15 +37,17 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
             allocateBuffer(mainCreateInfo, pointerToMapped);
         // Copy data to staging buffer
         std::memcpy(
-            stageMapped, createInfo.initData.data(), createInfo.initData.size_bytes()
+            stageMapped, createInfo.initData.data(),
+            createInfo.initData.size_bytes()
         );
         // Copy from staging to main buffer
-        CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cmdBuf) {
-            cmdBuf->copyBuffer(
-                stage.first,
-                m_buffer,
+        CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cb) {
+            cb->copyBuffer(
+                stage.first, m_buffer,
                 vk::BufferCopy{
-                    0u, createInfo.initDataDstOffset, createInfo.initData.size_bytes()}
+                    0u, createInfo.initDataDstOffset,
+                    createInfo.initData.size_bytes()
+                }
             );
         });
         // Destroy the temporary stage
@@ -77,11 +80,13 @@ Buffer::~Buffer() {
 std::pair<vk::Buffer, vma::Allocation> Buffer::allocateBuffer(
     const BufferCreateInfo& createInfo, void** pointerToMapped
 ) const {
-    vma::AllocationInfo  allocInfo;
+    vma::AllocationInfo allocInfo;
     vk::BufferCreateInfo bufCreateInfo{
-        {}, createInfo.sizeInBytes, createInfo.usage, vk::SharingMode::eExclusive};
+        {}, createInfo.sizeInBytes, createInfo.usage, vk::SharingMode::eExclusive
+    };
     vma::AllocationCreateInfo allocCreateInfo{
-        createInfo.allocFlags, createInfo.memoryUsage};
+        createInfo.allocFlags, createInfo.memoryUsage
+    };
     auto pair = allocator().createBuffer(bufCreateInfo, allocCreateInfo, allocInfo);
     if (pointerToMapped) {
         *pointerToMapped = allocInfo.pMappedData;

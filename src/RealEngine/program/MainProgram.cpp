@@ -44,7 +44,7 @@ void MainProgram::pollEventsInMainThread(bool poll) {
 
 std::vector<DisplayInfo> MainProgram::searchDisplays() const {
     std::vector<DisplayInfo> infos;
-    int                      numberOfDisplays = SDL_GetNumVideoDisplays();
+    int numberOfDisplays = SDL_GetNumVideoDisplays();
     if (numberOfDisplays < 0) {
         return infos;
     }
@@ -86,10 +86,8 @@ void MainProgram::setRelativeCursorMode(bool relative) {
 }
 
 void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
-    m_window.setClearValues(s.clearValues);
     m_synchronizer.setStepsPerSecond(s.stepsPerSecond);
     m_synchronizer.setFramesPerSecondLimit(s.framesPerSecondLimit);
-    m_window.useImGui(s.usingImGui);
 }
 
 int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
@@ -124,10 +122,10 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
         }
 
         // Prepare for drawing
-        const auto& cmdBuf = m_window.prepareNewFrame();
+        const auto& cb = m_window.prepareNewFrame();
 
         // Draw the frame
-        render(cmdBuf, m_synchronizer.drawInterpolationFactor());
+        render(cb, m_synchronizer.drawInterpolationFactor());
 
         // Finish the drawing
         m_window.finishNewFrame();
@@ -150,8 +148,8 @@ void MainProgram::step() {
     m_roomManager.currentRoom()->step();
 }
 
-void MainProgram::render(const CommandBuffer& cmdBuf, double interpolationFactor) {
-    m_roomManager.currentRoom()->render(cmdBuf, interpolationFactor);
+void MainProgram::render(const CommandBuffer& cb, double interpolationFactor) {
+    m_roomManager.currentRoom()->render(cb, interpolationFactor);
 }
 
 void MainProgram::processEvent(SDL_Event* evnt) {
@@ -186,8 +184,7 @@ void MainProgram::processEvent(SDL_Event* evnt) {
         m_inputManager.setCursor(
             glm::clamp(
                 {evnt->motion.x, m_window.dims().y - evnt->motion.y - 1},
-                glm::ivec2(0),
-                m_window.dims() - 1
+                glm::ivec2(0), m_window.dims() - 1
             ),
             {evnt->motion.xrel, -evnt->motion.yrel}
         );
@@ -211,6 +208,10 @@ void MainProgram::doRoomTransitionIfScheduled() {
     auto prev    = m_roomManager.currentRoom();
     auto current = m_roomManager.goToRoom(m_nextRoomName, m_roomTransitionArgs);
     if (prev != current) { // If successfully changed the room
+        // Update main renderpass
+        m_window.setMainRenderPass(
+            current->mainRenderPass(), current->displaySettings().imGuiSubpassIndex
+        );
         // Adopt the display settings of the entered room
         adoptRoomDisplaySettings(current->displaySettings());
         // Pressed/released events belong to the previous room
@@ -232,7 +233,8 @@ void MainProgram::scheduleRoomTransition(
 
 void MainProgram::pollEvents() {
     SDL_Event evnt;
-    if (m_window.isImGuiUsed()) {
+    const auto& displaySettings = m_roomManager.currentRoom()->displaySettings();
+    if (displaySettings.imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
         while (SDL_PollEvent(&evnt)) {
             if (!m_window.passSDLEvent(evnt)) {
                 // Pass the event to main application if it has not been consumed by ImGui
@@ -248,7 +250,7 @@ MainProgram::MainProgram(const VulkanInitInfo& initInfo)
     : m_window{WindowSettings{}, WindowSubsystems::RealEngineVersionString(), initInfo}
     , s_roomToEngineAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
 
-    Room::setRoomSystemAccess(&s_roomToEngineAccess);
+    Room::setRoomToEngineAccess(&s_roomToEngineAccess);
     Room::setStaticReferences(this, &m_roomManager);
 }
 

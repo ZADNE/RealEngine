@@ -24,8 +24,8 @@ public:
      */
     Semaphore(uint64_t initialValue);
 
-    Semaphore(const Semaphore&)            = delete; /**< Noncopyable */
-    Semaphore& operator=(const Semaphore&) = delete; /**< Noncopyable */
+    Semaphore(const Semaphore&)            = delete;  /**< Noncopyable */
+    Semaphore& operator=(const Semaphore&) = delete;  /**< Noncopyable */
 
     Semaphore(Semaphore&& other) noexcept;            /**< Movable */
     Semaphore& operator=(Semaphore&& other) noexcept; /**< Movable */

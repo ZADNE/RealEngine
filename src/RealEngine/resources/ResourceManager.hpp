@@ -7,7 +7,7 @@
 namespace re {
 
 /**
- * @brief Ensures there is at most one copy of shared resources.
+ * @brief Ensures that there is at most one copy of shared resources.
  *
  * Resources managed by resource manager: textures, shader programs.
  * Resources are released once there are no references to them.
@@ -31,7 +31,7 @@ private:
 };
 
 /**
- * @brief Is abbreviation for ResourceManager
+ * @brief Is an abbreviation type alias for ResourceManager
  */
 using RM = class ResourceManager;
 

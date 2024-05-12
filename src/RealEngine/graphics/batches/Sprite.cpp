@@ -32,10 +32,8 @@ void SpriteStatic::step() {
 }
 
 SpriteAnimated::SpriteAnimated(
-    const TextureShaped& tex,
-    float                sprite,
-    float                subimage /* = 0.0f*/,
-    float                imageSpeed /* = 1.0f*/
+    const TextureShaped& tex, float sprite, float subimage /* = 0.0f*/,
+    float imageSpeed /* = 1.0f*/
 )
     : SpriteStatic(tex, sprite, subimage)
     , m_imageSpeed(imageSpeed) {
@@ -59,12 +57,8 @@ float SpriteAnimated::speed() const {
 }
 
 SpriteComplex::SpriteComplex(
-    const TextureShaped& tex,
-    float                sprite,
-    float                subimage,
-    float                imageSpeed,
-    Color                color,
-    glm::vec2            scale
+    const TextureShaped& tex, float sprite, float subimage, float imageSpeed,
+    Color color, glm::vec2 scale
 )
     : SpriteAnimated(tex, sprite, subimage, imageSpeed)
     , m_color(color)

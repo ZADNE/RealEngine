@@ -19,8 +19,8 @@ public:
      */
     struct PNGData {
         std::vector<unsigned char> texels;
-        glm::uvec2                 dims;
-        TextureShape               shape;
+        glm::uvec2 dims;
+        TextureShape shape;
     };
 
     /**

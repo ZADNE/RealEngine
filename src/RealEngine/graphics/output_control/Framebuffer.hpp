@@ -22,8 +22,8 @@ public:
      */
     explicit Framebuffer(const vk::FramebufferCreateInfo& createInfo);
 
-    Framebuffer(const Framebuffer&)            = delete; /**< Noncopyable */
-    Framebuffer& operator=(const Framebuffer&) = delete; /**< Noncopyable */
+    Framebuffer(const Framebuffer&)            = delete;  /**< Noncopyable */
+    Framebuffer& operator=(const Framebuffer&) = delete;  /**< Noncopyable */
 
     Framebuffer(Framebuffer&& other) noexcept;            /**< Movable */
     Framebuffer& operator=(Framebuffer&& other) noexcept; /**< Movable */

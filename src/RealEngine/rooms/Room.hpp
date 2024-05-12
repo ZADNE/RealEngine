@@ -5,6 +5,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
+#include <RealEngine/graphics/output_control/RenderPass.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/rooms/RoomToEngineAccess.hpp>
 #include <RealEngine/rooms/RoomTransitionArguments.hpp>
@@ -16,8 +17,8 @@ namespace re {
  * time.
  *
  * Rooms allow separation of program into multiple units where only one unit
- * is active at a time (= receives step and render calls, inactive rooms
- * are resident in the memory but do not receive updates).
+ * is active at a time, i.e. receives step and render callbacks. Inactive rooms
+ * are resident in the memory but do not receive updates.
  * Transitions between rooms are mamaged by RoomManager.
  *
  * You use RealEngine by inheriting Room and adding your behavior to step(),
@@ -35,8 +36,8 @@ public:
     Room(const Room&)            = delete; /**< Noncopyable */
     Room& operator=(const Room&) = delete; /**< Noncopyable */
 
-    Room(Room&&)            = default; /**< Movable */
-    Room& operator=(Room&&) = default; /**< Movable */
+    Room(Room&&)            = default;     /**< Movable */
+    Room& operator=(Room&&) = default;     /**< Movable */
 
     virtual ~Room() = default;
 
@@ -69,13 +70,13 @@ public:
      * This function is called at a variable rate, depending on
      * the speed of hardware. Upper limit can be set via Synchronizer.
      *
-     * @param cmdBuf The command buffer that should be used for rendering
+     * @param cb The command buffer that should be used for rendering
      * @param interpolationFactor   Represents relative time between last
      *                              performed step and the upcoming step.
      *                              Use it to interpolate between discrete
      *                              simulation steps.
      */
-    virtual void render(const CommandBuffer& cmdBuf, double interpolationFactor) = 0;
+    virtual void render(const CommandBuffer& cb, double interpolationFactor) = 0;
 
     /**
      * @brief Callback used to notify that the window's size has changed
@@ -117,7 +118,7 @@ public:
     /**
      * @brief This is set by the MainProgram at startup
      */
-    static void setRoomSystemAccess(RoomToEngineAccess* systemAccess) {
+    static void setRoomToEngineAccess(RoomToEngineAccess* systemAccess) {
         s_engineAccess = systemAccess;
     }
 
@@ -126,6 +127,8 @@ public:
      */
     static void setStaticReferences(MainProgram* mainProgram, RoomManager* roomManager);
 
+    const RenderPass& mainRenderPass() const { return m_mainRenderPass; }
+
 protected:
     /**
      * @brief Dynamically changes the room's display settings
@@ -133,12 +136,13 @@ protected:
     void setDisplaySettings(const RoomDisplaySettings& displaySettings);
 
 private:
+    size_t m_name; /**< Unique identifier of the room */
     RoomDisplaySettings m_displaySettings;
-    size_t              m_name; /**< Unique identifier of the room */
+    RenderPass m_mainRenderPass;
 
     inline static RoomToEngineAccess* s_engineAccess = nullptr;
-    inline static MainProgram*        s_mainProgram  = nullptr;
-    inline static RoomManager*        s_roomManager  = nullptr;
+    inline static MainProgram* s_mainProgram         = nullptr;
+    inline static RoomManager* s_roomManager         = nullptr;
 };
 
 } // namespace re

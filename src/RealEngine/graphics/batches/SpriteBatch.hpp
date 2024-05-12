@@ -16,6 +16,21 @@
 
 namespace re {
 
+struct SpriteBatchCreateInfo {
+    /**
+     * @brief The renderpass that the batch will always draw in
+     */
+    RenderPassSubpass renderPassSubpass{};
+    /**
+     * @brief Maximum number of sprites that can be in the batch
+     */
+    unsigned int maxSprites = 0u;
+    /**
+     * @brief Maximum number of unique textures that the sprites
+     */
+    unsigned int maxTextures = 0u;
+};
+
 /**
  * @brief   Draws 2D sprites efficiently
  * @details Can draw multiple batches per frame.
@@ -24,12 +39,9 @@ namespace re {
 class SpriteBatch {
 public:
     /**
-     * @brief Construct Spritebatch
-     * @param maxSprites Maximum number of sprites that can be in the batch
-     * @param maxTextures Maximum number of unique textures that the sprites
-     * can refer to
+     * @brief Constructs a Spritebatch
      */
-    SpriteBatch(unsigned int maxSprites, unsigned int maxTextures);
+    explicit SpriteBatch(const SpriteBatchCreateInfo& createInfo);
 
     /**
      * @brief   Resets the sprite batch, also begins first batch
@@ -46,11 +58,11 @@ public:
 
     /**
      * @brief   Draws the last batch
-     * @details Sprite in the batch are drawn in the order they were added in
-     * @param cmdBuf Command buffer used for rendering
+     * @details Sprites of the batch are drawn in the order they were added in
+     * @param cb Command buffer used for rendering
      * @param mvpMat Transformation matrix applied to the batch
      */
-    void drawBatch(const CommandBuffer& cmdBuf, const glm::mat4& mvpMat);
+    void drawBatch(const CommandBuffer& cb, const glm::mat4& mvpMat);
 
     void add(const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect);
 
@@ -70,24 +82,24 @@ private:
         glm::vec4 pos;
         glm::vec4 uvs;
         glm::uint tex;
-        Color     col;
+        Color col;
     };
-    BufferMapped<Sprite>        m_spritesBuf;
+    BufferMapped<Sprite> m_spritesBuf;
     std::vector<const Texture*> m_texToIndex;
-    unsigned int                m_maxSprites;
-    unsigned int                m_maxTextures;
-    unsigned int                m_nextSpriteIndex       = 0;
-    unsigned int                m_batchFirstSpriteIndex = 0;
-    unsigned int                m_textureIndexOffset    = 0;
+    unsigned int m_maxSprites;
+    unsigned int m_maxTextures;
+    unsigned int m_nextSpriteIndex       = 0;
+    unsigned int m_batchFirstSpriteIndex = 0;
+    unsigned int m_textureIndexOffset    = 0;
 
     unsigned int texToIndex(const Texture& tex);
 
-    PipelineLayout        m_pipelineLayout;
+    PipelineLayout m_pipelineLayout;
     static PipelineLayout createPipelineLayout(unsigned int maxTextures);
-    Pipeline              m_pipeline;
-    static Pipeline       createPipeline(
-              const PipelineLayout& pipelineLayout, unsigned int maxTextures
-          );
+    Pipeline m_pipeline;
+    static Pipeline createPipeline(
+        const PipelineLayout& pipelineLayout, const SpriteBatchCreateInfo& createInfo
+    );
     DescriptorSet m_descSet{{.layout = m_pipelineLayout.descriptorSetLayout(0)}};
 
     static inline constexpr Color k_white{255, 255, 255, 255};

@@ -44,8 +44,7 @@ void View2D::update() {
     // Translate
     glm::vec3 translate(
         -m_position.x + m_viewDimensions.x * 0.5f,
-        -m_position.y + m_viewDimensions.y * 0.5f,
-        0.0f
+        -m_position.y + m_viewDimensions.y * 0.5f, 0.0f
     );
     m_viewMatrix = glm::translate(m_orthoMatrix, translate);
     // Scale
@@ -70,8 +69,7 @@ void View2D::clip() {
         return;
     }
     m_position = glm::clamp(
-        m_position,
-        m_minXY + m_viewDimensions / m_scale * 0.5f,
+        m_position, m_minXY + m_viewDimensions / m_scale * 0.5f,
         m_maxXY - m_viewDimensions / m_scale * 0.5f
     );
 }

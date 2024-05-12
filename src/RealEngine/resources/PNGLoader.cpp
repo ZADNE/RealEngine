@@ -23,7 +23,7 @@ TextureShape decodeTextureShape(const unsigned char* data, unsigned length) {
         switch (version) {
         case 0:
             if (length == sizeof(glm::vec2) * 3) {
-                int          i = 0;
+                int i = 0;
                 const float* fData =
                     reinterpret_cast<const float*>(&data[sizeof(version)]);
                 shape.subimageDims.x          = ntoh(fData[i++]);
@@ -43,7 +43,7 @@ RealTextureInformation encodeTextureShape(const TextureShape& shape) {
     RealTextureInformation rti{};
     *reinterpret_cast<uint32_t*>(rti.data()) = hton<uint32_t>(0);
     float* v = reinterpret_cast<float*>(&rti[4]);
-    int    i = 0;
+    int i    = 0;
     v[i++]   = hton(shape.subimageDims.x);
     v[i++]   = hton(shape.subimageDims.y);
     v[i++]   = hton(shape.pivot.x);
@@ -58,8 +58,8 @@ PNGLoader::PNGData PNGLoader::load(const std::string& filePathPNG) {
     lodepng::State state{};
     state.decoder.remember_unknown_chunks = 1;
     std::vector<unsigned char> encoded;
-    unsigned int               code;
-    PNGData                    decoded{};
+    unsigned int code;
+    PNGData decoded{};
 
     // Decode PNG
     if ((code = lodepng::load_file(encoded, filePathPNG)) ||
@@ -93,14 +93,12 @@ PNGLoader::PNGData PNGLoader::load(const std::string& filePathPNG) {
 void PNGLoader::save(const std::string& filePathPNG, const PNGData& data) {
     // Create RTI chunk
     lodepng::State state{};
-    unsigned int   code;
-    auto           rti = encodeTextureShape(data.shape);
+    unsigned int code;
+    auto rti = encodeTextureShape(data.shape);
     if (code = lodepng_chunk_create(
             &state.info_png.unknown_chunks_data[0],
             &state.info_png.unknown_chunks_size[0],
-            static_cast<unsigned int>(rti.size()),
-            "reAl",
-            rti.data()
+            static_cast<unsigned int>(rti.size()), "reAl", rti.data()
         )) {
         throw Exception{lodepng_error_text(code)}; // Chunk creation failed
     }

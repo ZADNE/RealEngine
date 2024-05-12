@@ -6,7 +6,10 @@
 
 namespace re {
 
-enum class BuildType { Debug, Release };
+enum class BuildType {
+    Debug,
+    Release
+};
 
 /**
  * @brief Represents the current build type (Debug/Release)

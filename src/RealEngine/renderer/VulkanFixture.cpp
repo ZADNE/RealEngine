@@ -4,7 +4,7 @@
 #include <bitset>
 #include <iostream>
 
-#include <ImGui/imgui_impl_sdl.h>
+#include <ImGui/imgui_impl_sdl2.h>
 #include <ImGui/imgui_impl_vulkan.h>
 #include <SDL2/SDL_vulkan.h>
 #include <glm/common.hpp>
@@ -47,13 +47,13 @@ VulkanFixture::VulkanFixture(
     SDL_Window* sdlWindow, bool vSync, const VulkanInitInfo& initInfo
 )
     : m_sdlWindow(sdlWindow)
-    , m_vSync(vSync)
     , m_instance(createInstance())
 #ifndef NDEBUG
     , m_debugUtilsMessenger(createDebugUtilsMessenger())
 #endif // !NDEBUG
     , m_surface(createSurface())
     , m_physicalDevice(createPhysicalDevice())
+    , m_presentMode(selectClosestPresentMode(vSync))
     , m_device(createDevice(initInfo.deviceCreateInfoChain))
     , m_allocator(createAllocator())
     , m_graphicsCompQueue(getQueue(m_graphicsCompQueueFamIndex))
@@ -64,19 +64,14 @@ VulkanFixture::VulkanFixture(
           {initInfo.additionalBuffers.begin(), initInfo.additionalBuffers.end()}
       )
     , m_additionalBuffers(createAdditionalBuffers())
-    , m_renderPass(
-          initInfo.mainRenderPass
-              ? vk::raii::RenderPass{m_device, *initInfo.mainRenderPass}
-              : createRenderPass()
-      )
-    , m_swapChainFramebuffers(createSwapchainFramebuffers())
     , m_commandPool(createCommandPool())
-    , m_cmdBufs([&]() {
+    , m_cbs([&]() {
         assignImplementationReferences(); // Deliberate side effect, ref to device
                                           // and pool is required to construct a cmd buf
         return FrameDoubleBuffered{
-            CommandBuffer{{.debugName = "re::VulkanFixture::cmdBufs[0]"}},
-            CommandBuffer{{.debugName = "re::VulkanFixture::cmdBufs[1]"}}};
+            CommandBuffer{{.debugName = "re::VulkanFixture::cbs[0]"}},
+            CommandBuffer{{.debugName = "re::VulkanFixture::cbs[1]"}}
+        };
     }())
     , m_oneTimeSubmitCmdBuf({.debugName = "re::VulkanFixture::oneTimeSubmit"})
     , m_pipelineCache(createPipelineCache())
@@ -92,27 +87,9 @@ VulkanFixture::VulkanFixture(
         *m_graphicsCompQueue, "re::VulkanFixture::graphicsCompQueue"
     );
 
-    // Initialize ImGui
+    // Initialize ImGui for SDL2
     if (!ImGui_ImplSDL2_InitForVulkan(m_sdlWindow)) {
         throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
-    }
-    ImGui_ImplVulkan_InitInfo imGuiInitInfo{
-        .Instance        = *m_instance,
-        .PhysicalDevice  = *m_physicalDevice,
-        .Device          = *m_device,
-        .QueueFamily     = m_graphicsCompQueueFamIndex,
-        .Queue           = *m_graphicsCompQueue,
-        .PipelineCache   = *m_pipelineCache,
-        .DescriptorPool  = *m_descriptorPool,
-        .Subpass         = initInfo.imGuiSubpassIndex,
-        .MinImageCount   = m_minImageCount,
-        .ImageCount      = static_cast<uint32_t>(m_swapchainImageViews.size()),
-        .MSAASamples     = VK_SAMPLE_COUNT_1_BIT,
-        .Allocator       = nullptr,
-        .CheckVkResultFn = &checkSuccessImGui};
-    if (!ImGui_ImplVulkan_Init(&imGuiInitInfo, *m_renderPass)) {
-        ImGui_ImplSDL2_Shutdown();
-        throw std::runtime_error{"Could not initialize ImGui for Vulkan!"};
     }
 }
 
@@ -122,7 +99,46 @@ VulkanFixture::~VulkanFixture() {
     ImGui_ImplSDL2_Shutdown();
 }
 
-const CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
+void VulkanFixture::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex) {
+    if (m_mainRenderPass) {
+        if (m_imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
+            ImGui_ImplVulkan_Shutdown();
+        }
+        m_swapChainFramebuffers.~vector();
+    }
+
+    m_mainRenderPass    = &rp;
+    m_imGuiSubpassIndex = imGuiSubpassIndex;
+
+    new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers
+    ){createSwapchainFramebuffers()};
+
+    if (m_imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
+        // Initialize ImGui for the new renderpass
+        ImGui_ImplVulkan_InitInfo imGuiInitInfo{
+            .Instance       = *m_instance,
+            .PhysicalDevice = *m_physicalDevice,
+            .Device         = *m_device,
+            .QueueFamily    = m_graphicsCompQueueFamIndex,
+            .Queue          = *m_graphicsCompQueue,
+            .DescriptorPool = *m_descriptorPool,
+            .RenderPass     = **m_mainRenderPass,
+            .MinImageCount  = m_minImageCount,
+            .ImageCount  = static_cast<uint32_t>(m_swapchainImageViews.size()),
+            .MSAASamples = VK_SAMPLE_COUNT_1_BIT,
+            .PipelineCache       = *m_pipelineCache,
+            .Subpass             = imGuiSubpassIndex,
+            .UseDynamicRendering = false,
+            .Allocator           = nullptr,
+            .CheckVkResultFn     = &checkSuccessImGui
+        };
+        if (!ImGui_ImplVulkan_Init(&imGuiInitInfo)) {
+            throw std::runtime_error{"Could not initialize ImGui for Vulkan!"};
+        }
+    }
+}
+
+const CommandBuffer& VulkanFixture::prepareFrame() {
     // Wait for the previous frame to finish
     checkSuccess(m_device.waitForFences(**m_inFlightFences, true, k_maxTimeout));
 
@@ -139,49 +155,46 @@ const CommandBuffer& VulkanFixture::prepareFrame(bool useImGui) {
 
     // Acquire next image
     vk::AcquireNextImageInfoKHR acquireNextImageInfo{
-        *m_swapchain, k_maxTimeout, **m_imageAvailableSems, nullptr, 1u};
+        *m_swapchain, k_maxTimeout, **m_imageAvailableSems, nullptr, 1u
+    };
     auto [res, imageIndex] = m_device.acquireNextImage2KHR(acquireNextImageInfo);
     checkSuccess(res);
     m_imageIndex = imageIndex;
 
-    // Rebuild fonts if new font were added
-    if (!ImGui::GetIO().Fonts->IsBuilt()) {
-        recreateImGuiFontTexture();
-    }
-
     // Restart command buffer
-    auto& cmdBuf = *m_cmdBufs;
-    cmdBuf->reset();
-    cmdBuf->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-
-    // Set current commandbuffer
-    VulkanObject::s_cmdBuf = &cmdBuf;
+    auto& cb = *m_cbs;
+    cb->reset();
+    cb->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
 
     // Begin ImGui frame
-    if (useImGui) {
+    if (m_imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
+        // Rebuild fonts if new fonts have been added
+        if (!ImGui::GetIO().Fonts->IsBuilt()) {
+            ImGui_ImplVulkan_CreateFontsTexture();
+        }
+
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
     }
 
-    return cmdBuf;
+    return cb;
 }
 
 void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues
 ) {
-    auto& cmdBuf = m_cmdBufs.write();
-    cmdBuf->beginRenderPass2(
+    auto& cb = m_cbs.write();
+    cb->beginRenderPass2(
         vk::RenderPassBeginInfo{
-            *m_renderPass,
-            *m_swapChainFramebuffers[m_imageIndex],
-            vk::Rect2D{{}, m_swapchainExtent},
-            clearValues},
+            **m_mainRenderPass, *m_swapChainFramebuffers[m_imageIndex],
+            vk::Rect2D{{}, m_swapchainExtent}, clearValues
+        },
         vk::SubpassBeginInfo{vk::SubpassContents::eInline}
     );
 
     // Set default viewport & scissor
     glm::vec2 extent{m_swapchainExtent.width, m_swapchainExtent.height};
-    cmdBuf->setViewport(
+    cb->setViewport(
         0u,
         vk::Viewport{
             0.0f,      // x
@@ -192,7 +205,7 @@ void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearVal
             1.0f       // maxDepth
         }
     );
-    cmdBuf->setScissor(
+    cb->setScissor(
         0u,
         vk::Rect2D{
             {0, 0},                                             // x, y
@@ -202,31 +215,31 @@ void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearVal
 }
 
 void VulkanFixture::mainRenderPassNextSubpass() {
-    m_cmdBufs.write()->nextSubpass2(
+    m_cbs.write()->nextSubpass2(
         vk::SubpassBeginInfo{vk::SubpassContents::eInline}, vk::SubpassEndInfo{}
     );
 }
 
 void VulkanFixture::mainRenderPassDrawImGui() {
     ImGui::Render();
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), **m_cmdBufs);
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), **m_cbs);
 }
 
 void VulkanFixture::mainRenderPassEnd() {
-    m_cmdBufs.write()->endRenderPass2(vk::SubpassEndInfo{});
+    m_cbs.write()->endRenderPass2(vk::SubpassEndInfo{});
 }
 
 void VulkanFixture::finishFrame() {
-    auto& cmdBuf = m_cmdBufs.write();
-    cmdBuf->end();
+    auto& cb = m_cbs.write();
+    cb->end();
 
     // Submit the command buffer
     vk::PipelineStageFlags waitDstStageMask =
         vk::PipelineStageFlagBits::eColorAttachmentOutput;
     vk::SubmitInfo submitInfo{
-        **m_imageAvailableSems, // Wait for image to be available
-        waitDstStageMask,       // Wait just before writing output
-        *cmdBuf,
+        **m_imageAvailableSems,   // Wait for image to be available
+        waitDstStageMask,         // Wait just before writing output
+        *cb,
         **m_renderingFinishedSems // Signal that the rendering has
                                   // finished once done
     };
@@ -235,8 +248,8 @@ void VulkanFixture::finishFrame() {
     // Present new image
     vk::PresentInfoKHR presentInfo{
         **m_renderingFinishedSems, // Wait for rendering to finish
-        *m_swapchain,
-        m_imageIndex};
+        *m_swapchain, m_imageIndex
+    };
 
     try {
         checkSuccess(m_presentationQueue.presentKHR(presentInfo));
@@ -246,7 +259,7 @@ void VulkanFixture::finishFrame() {
 }
 
 void VulkanFixture::changePresentation(bool vSync) {
-    m_vSync            = vSync;
+    m_presentMode      = selectClosestPresentMode(vSync);
     m_recreteSwapchain = true;
 }
 
@@ -292,11 +305,14 @@ vk::raii::Instance VulkanFixture::createInstance() {
         {},
         eVerbose | eInfo | eWarning | eError,
         eGeneral | eValidation | ePerformance,
-        &debugMessengerCallbackHandler};
+        &debugMessengerCallbackHandler
+    };
     return vk::raii::Instance{
         m_context,
         vk::InstanceCreateInfo{
-            {}, &applicationInfo, validationLayers, extensions, &debugMessengerCreateInfo}};
+            {}, &applicationInfo, validationLayers, extensions, &debugMessengerCreateInfo
+        }
+    };
 }
 
 vk::raii::DebugUtilsMessengerEXT VulkanFixture::createDebugUtilsMessenger() {
@@ -304,7 +320,8 @@ vk::raii::DebugUtilsMessengerEXT VulkanFixture::createDebugUtilsMessenger() {
         {},
         eVerbose | eInfo | eWarning | eError,
         eGeneral | eValidation | ePerformance,
-        &debugMessengerCallbackHandler};
+        &debugMessengerCallbackHandler
+    };
     return vk::raii::DebugUtilsMessengerEXT{m_instance, debugMessengerCreateInfo};
 }
 
@@ -322,9 +339,9 @@ vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice() {
             isSwapchainSupported(physicalDevice) &&
             findQueueFamilyIndices(physicalDevice)) {
             auto props = physicalDevice.getProperties2().properties;
-            auto major = vk::versionMajor(props.apiVersion);
-            auto minor = vk::versionMinor(props.apiVersion);
-            auto patch = vk::versionPatch(props.apiVersion);
+            auto major = vk::apiVersionMajor(props.apiVersion);
+            auto minor = vk::apiVersionMinor(props.apiVersion);
+            auto patch = vk::apiVersionPatch(props.apiVersion);
             if (major == 1 && minor >= 3) {
                 std::cout << "Vulkan:       " << major << '.' << minor << '.'
                           << patch << '\n';
@@ -336,15 +353,34 @@ vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice() {
     throw std::runtime_error("No physical device is suitable!");
 }
 
+vk::PresentModeKHR VulkanFixture::selectClosestPresentMode(bool vSync) {
+    auto modes     = m_physicalDevice.getSurfacePresentModesKHR(*m_surface);
+    auto idealMode = vSync ? eMailbox : eImmediate;
+    auto acceptableMode  = vSync ? eFifo : eFifoRelaxed;
+    bool idealAvail      = false;
+    bool acceptableAvail = false;
+
+    for (auto mode : modes) {
+        if (mode == idealMode) {
+            idealAvail = true;
+        } else if (mode == acceptableMode) {
+            acceptableAvail = true;
+        }
+    }
+
+    return idealAvail ? idealMode : (acceptableAvail ? acceptableMode : eFifo);
+}
+
 vk::raii::Device VulkanFixture::createDevice(const void* deviceCreateInfoChain) {
-    float                                  deviceQueuePriority = 1.0f;
+    float deviceQueuePriority = 1.0f;
     std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos;
     deviceQueueCreateInfos.emplace_back(
         vk::DeviceQueueCreateFlags{}, m_graphicsCompQueueFamIndex, 1, &deviceQueuePriority
     );
     if (m_graphicsCompQueueFamIndex != m_presentationQueueFamIndex) {
         deviceQueueCreateInfos.emplace_back(
-            vk::DeviceQueueCreateFlags{}, m_presentationQueueFamIndex, 1, &deviceQueuePriority
+            vk::DeviceQueueCreateFlags{}, m_presentationQueueFamIndex, 1,
+            &deviceQueuePriority
         );
     }
     auto createInfo =
@@ -352,13 +388,15 @@ vk::raii::Device VulkanFixture::createDevice(const void* deviceCreateInfoChain) 
 
     auto defaultChain = vk::StructureChain{
         vk::PhysicalDeviceFeatures2{
-            vk::PhysicalDeviceFeatures{}.setTessellationShader(true)},
+            vk::PhysicalDeviceFeatures{}.setTessellationShader(true)
+        },
         vk::PhysicalDeviceVulkan12Features{}
             .setShaderSampledImageArrayNonUniformIndexing(true)
             .setDescriptorBindingUpdateUnusedWhilePending(true)
             .setDescriptorBindingPartiallyBound(true)
             .setTimelineSemaphore(true),
-        vk::PhysicalDeviceVulkan13Features{}.setSynchronization2(true)};
+        vk::PhysicalDeviceVulkan13Features{}.setSynchronization2(true)
+    };
 
     createInfo.pNext = deviceCreateInfoChain
                            ? deviceCreateInfoChain
@@ -369,15 +407,13 @@ vk::raii::Device VulkanFixture::createDevice(const void* deviceCreateInfoChain) 
 vma::Allocator VulkanFixture::createAllocator() {
     return vma::createAllocator(vma::AllocatorCreateInfo{
         vma::AllocatorCreateFlagBits::eExternallySynchronized,
-        *m_physicalDevice,
-        *m_device,
+        *m_physicalDevice, *m_device,
         0,       // Use default large heap block size (256 MB as of writing)
         nullptr, // Use default CPU memory allocation callbacks
         nullptr, // Do not receive informative callbacks from VMA
         nullptr, // No heap size limits
         nullptr, // Let VMA load Vulkan functions on its own
-        *m_instance,
-        vk::ApiVersion13,
+        *m_instance, vk::ApiVersion13,
         nullptr, // No external memory handles
     });
 }
@@ -390,8 +426,7 @@ vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
     auto caps = m_physicalDevice.getSurfaceCapabilitiesKHR(*m_surface);
     // Minimum image count
     m_minImageCount = glm::clamp(
-        caps.minImageCount + 1,
-        caps.minImageCount,
+        caps.minImageCount + 1, caps.minImageCount,
         caps.maxImageCount ? caps.maxImageCount : 8u
     );
 
@@ -402,22 +437,21 @@ vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
         glm::ivec2 windowPx;
         SDL_Vulkan_GetDrawableSize(m_sdlWindow, &windowPx.x, &windowPx.y);
         m_swapchainExtent.width = std::clamp(
-            static_cast<uint32_t>(windowPx.x),
-            caps.minImageExtent.width,
+            static_cast<uint32_t>(windowPx.x), caps.minImageExtent.width,
             caps.maxImageExtent.width
         );
         m_swapchainExtent.height = std::clamp(
-            static_cast<uint32_t>(windowPx.y),
-            caps.minImageExtent.height,
+            static_cast<uint32_t>(windowPx.y), caps.minImageExtent.height,
             caps.maxImageExtent.height
         );
     }
 
     // Sharing mode
     bool oneQueueFamily = m_graphicsCompQueueFamIndex == m_presentationQueueFamIndex;
-    auto       sharingMode        = oneQueueFamily ? eExclusive : eConcurrent;
+    auto sharingMode              = oneQueueFamily ? eExclusive : eConcurrent;
     std::array queueFamilyIndices = {
-        m_graphicsCompQueueFamIndex, m_presentationQueueFamIndex};
+        m_graphicsCompQueueFamIndex, m_presentationQueueFamIndex
+    };
     vk::SwapchainCreateInfoKHR createInfo{
         {},
         *m_surface,
@@ -432,13 +466,14 @@ vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
                        : queueFamilyIndices,
         caps.currentTransform,
         eOpaque,
-        m_vSync ? eMailbox : eImmediate,
-        true};
+        m_presentMode,
+        true
+    };
     return vk::raii::SwapchainKHR{m_device, createInfo};
 }
 
 std::vector<vk::raii::ImageView> VulkanFixture::createSwapchainImageViews() {
-    auto                             images = m_swapchain.getImages();
+    auto images = m_swapchain.getImages();
     std::vector<vk::raii::ImageView> imageViews;
     imageViews.reserve(images.size());
     for (const auto& image : images) {
@@ -450,8 +485,8 @@ std::vector<vk::raii::ImageView> VulkanFixture::createSwapchainImageViews() {
                 e2D,
                 k_surfaceFormat.format,
                 {},
-                vk::ImageSubresourceRange{
-                    vk::ImageAspectFlagBits::eColor, 0u, 1u, 0u, 1u}}
+                vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0u, 1u, 0u, 1u}
+            }
         );
     }
     return imageViews;
@@ -471,49 +506,23 @@ std::vector<Texture> VulkanFixture::createAdditionalBuffers() {
             .usage         = descr.usage,
             .initialLayout = vk::ImageLayout::eUndefined,
             .aspects       = descr.aspects,
-            .hasSampler    = false});
+            .hasSampler    = false
+        });
     }
     return buffers;
-}
-
-vk::raii::RenderPass VulkanFixture::createRenderPass() {
-    vk::AttachmentDescription2 attachmentDescription{
-        {},
-        k_surfaceFormat.format,
-        vk::SampleCountFlagBits::e1,
-        vk::AttachmentLoadOp::eClear,     // Color
-        vk::AttachmentStoreOp::eStore,    // Color
-        vk::AttachmentLoadOp::eDontCare,  // Stencil
-        vk::AttachmentStoreOp::eDontCare, // Stencil
-        vk::ImageLayout::eUndefined,      // Initial
-        vk::ImageLayout::ePresentSrcKHR   // Final
-    };
-    vk::AttachmentReference2 attachmentRef{0, vk::ImageLayout::eColorAttachmentOptimal};
-    vk::SubpassDescription2 subpassDescription{
-        {},
-        vk::PipelineBindPoint::eGraphics,
-        0u,
-        {},           // Input attachments
-        attachmentRef // Color attachments
-    };
-    vk::SubpassDependency2 subpassDependency{
-        vk::SubpassExternal,                                 // Src subpass
-        0u,                                                  // Dst subpass
-        {vk::PipelineStageFlagBits::eColorAttachmentOutput}, // Src stage mask
-        {vk::PipelineStageFlagBits::eColorAttachmentOutput}, // Dst stage mask
-        vk::AccessFlags{},                                   // Src access mask
-        {vk::AccessFlagBits::eColorAttachmentWrite}          // Dst access mask
-    };
-    vk::RenderPassCreateInfo2 createInfo{
-        {}, attachmentDescription, subpassDescription, subpassDependency};
-    return vk::raii::RenderPass{m_device, createInfo};
 }
 
 std::vector<vk::raii::Framebuffer> VulkanFixture::createSwapchainFramebuffers() {
     std::vector<vk::ImageView> views;
     views.resize(1 + m_additionalBuffers.size());
     vk::FramebufferCreateInfo createInfo{
-        {}, *m_renderPass, views, m_swapchainExtent.width, m_swapchainExtent.height, 1};
+        {},
+        **m_mainRenderPass,
+        views,
+        m_swapchainExtent.width,
+        m_swapchainExtent.height,
+        1
+    };
 
     // Additional buffer are shared among the framebuffers
     for (size_t addtBuf = 0; addtBuf < m_additionalBuffers.size(); ++addtBuf) {
@@ -532,8 +541,8 @@ std::vector<vk::raii::Framebuffer> VulkanFixture::createSwapchainFramebuffers() 
 
 vk::raii::CommandPool VulkanFixture::createCommandPool() {
     vk::CommandPoolCreateInfo createInfo{
-        vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
-        m_graphicsCompQueueFamIndex};
+        vk::CommandPoolCreateFlagBits::eResetCommandBuffer, m_graphicsCompQueueFamIndex
+    };
     return vk::raii::CommandPool{m_device, createInfo};
 }
 
@@ -541,14 +550,13 @@ FrameDoubleBuffered<vk::raii::Semaphore> VulkanFixture::createSemaphores() {
     vk::SemaphoreCreateInfo createInfo{};
     return {
         vk::raii::Semaphore{m_device, createInfo},
-        vk::raii::Semaphore{m_device, createInfo}};
+        vk::raii::Semaphore{m_device, createInfo}
+    };
 }
 
 FrameDoubleBuffered<vk::raii::Fence> VulkanFixture::createFences() {
     vk::FenceCreateInfo createInfo{vk::FenceCreateFlagBits::eSignaled};
-    return {
-        vk::raii::Fence{m_device, createInfo},
-        vk::raii::Fence{m_device, createInfo}};
+    return {vk::raii::Fence{m_device, createInfo}, vk::raii::Fence{m_device, createInfo}};
 }
 
 vk::raii::PipelineCache VulkanFixture::createPipelineCache() {
@@ -574,7 +582,8 @@ vk::raii::DescriptorPool VulkanFixture::createDescriptorPool() {
         {},
         // 8 is 'just enough' - deserves a better solution
         static_cast<uint32_t>(m_swapchainImageViews.size()) * 8u,
-        poolSizes};
+        poolSizes
+    };
     return vk::raii::DescriptorPool{m_device, createInfo};
 }
 
@@ -600,22 +609,14 @@ bool VulkanFixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physica
             break;
         }
     }
-    bool mailboxSupported = false;
-    for (const auto& presentMode :
-         physicalDevice.getSurfacePresentModesKHR(*m_surface)) {
-        if (presentMode == vk::PresentModeKHR::eMailbox) {
-            mailboxSupported = true;
-            break;
-        }
-    }
-    return formatSupported && mailboxSupported;
+    return formatSupported;
 }
 
 bool VulkanFixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice
 ) {
     using enum vk::QueueFlagBits;
-    bool                                   graphicsCompQueueFound = false;
-    bool                                   presentQueueFound      = false;
+    bool graphicsCompQueueFound = false;
+    bool presentQueueFound      = false;
     std::vector<vk::QueueFamilyProperties> queueFamilyProperties =
         physicalDevice.getQueueFamilyProperties();
 
@@ -654,15 +655,6 @@ void VulkanFixture::recreateSwapchain() {
     ){createSwapchainFramebuffers()};
 }
 
-void VulkanFixture::recreateImGuiFontTexture() {
-    vk::raii::Fence uploadFence{m_device, vk::FenceCreateInfo{}};
-    m_cmdBufs.write()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
-    ImGui_ImplVulkan_CreateFontsTexture(*m_cmdBufs.write());
-    m_cmdBufs.write()->end();
-    m_graphicsCompQueue.submit(vk::SubmitInfo{{}, {}, *m_cmdBufs.write()}, *uploadFence);
-    checkSuccess(m_device.waitForFences(*uploadFence, true, k_maxTimeout));
-}
-
 void VulkanFixture::assignImplementationReferences() {
     VulkanObject::s_physicalDevice        = &(*m_physicalDevice);
     VulkanObject::s_device                = &(*m_device);
@@ -671,7 +663,6 @@ void VulkanFixture::assignImplementationReferences() {
     VulkanObject::s_commandPool           = &(*m_commandPool);
     VulkanObject::s_descriptorPool        = &(*m_descriptorPool);
     VulkanObject::s_pipelineCache         = &(*m_pipelineCache);
-    VulkanObject::s_renderPass            = &(*m_renderPass);
     VulkanObject::s_oneTimeSubmitCmdBuf   = &m_oneTimeSubmitCmdBuf;
     VulkanObject::s_dispatchLoaderDynamic = &(m_dispatchLoaderDynamic);
     VulkanObject::s_deletionQueue         = &m_deletionQueue;

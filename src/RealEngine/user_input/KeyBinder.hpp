@@ -42,8 +42,7 @@ using KeyBindingInfoList =
  * @tparam infoList         Array with info about each binding point.
  */
 template<
-    typename KeyBindings,
-    typename KeyBindingInfo,
+    typename KeyBindings, typename KeyBindingInfo,
     const KeyBindingInfoList<KeyBindings, KeyBindingInfo>& infoList>
 class KeyBinder {
     friend class MainProgram;
@@ -102,7 +101,7 @@ public:
      */
     bool loadBindings() {
         nlohmann::json j;
-        std::ifstream  i(m_bindingFileName);
+        std::ifstream i(m_bindingFileName);
         i >> j;
 
         for (auto item = j.begin(); item != j.end(); item++) {
@@ -158,13 +157,15 @@ public:
      */
     template<typename CallbackReceiver, void (CallbackReceiver::*callback)(Key)>
     void listenChangeBinding(
-        KeyBindings binding, CallbackReceiver& callbackReceiver, Key stopKey = Key::Delete
+        KeyBindings binding, CallbackReceiver& callbackReceiver,
+        Key stopKey = Key::Delete
     ) {
         auto info = new ListeningInfo<CallbackReceiver>{
             .binding          = binding,
             .keyBinder        = (*this),
             .stopKey          = stopKey,
-            .callbackReceiver = callbackReceiver};
+            .callbackReceiver = callbackReceiver
+        };
 
         auto thread = SDL_CreateThread(
             (listenForKey<CallbackReceiver, callback>), "keybind_listener", info
@@ -184,16 +185,16 @@ private:
 
     template<typename CallbackReceiver>
     struct ListeningInfo {
-        KeyBindings       binding;
-        KeyBinder&        keyBinder;
-        Key               stopKey;
+        KeyBindings binding;
+        KeyBinder& keyBinder;
+        Key stopKey;
         CallbackReceiver& callbackReceiver;
     };
 
     template<typename CallbackReceiver, void (CallbackReceiver::*func)(Key)>
     static int listenForKey(void* ptr) {
         SDL_Event evnt;
-        Key       newKey = Key::UnknownKey;
+        Key newKey = Key::UnknownKey;
         MainProgram::pollEventsInMainThread(false);
         ListeningInfo<CallbackReceiver>* info =
             reinterpret_cast<ListeningInfo<CallbackReceiver>*>(ptr);

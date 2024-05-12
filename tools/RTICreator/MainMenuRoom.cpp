@@ -17,17 +17,8 @@
 
 using namespace ImGui;
 
-constexpr vk::ClearValue k_defaultClearColor =
-    vk::ClearColorValue{0.1f, 0.1f, 0.1f, 1.0f};
-
 MainMenuRoom::MainMenuRoom(re::CommandLineArguments args)
-    : Room(
-          0,
-          re::RoomDisplaySettings{
-              .clearValues          = {&k_defaultClearColor, 1},
-              .framesPerSecondLimit = 144,
-              .usingImGui           = true}
-      )
+    : Room(0, re::RoomDisplaySettings{.framesPerSecondLimit = 144, .imGuiSubpassIndex = 0})
     , m_texView(engine().windowDims()) {
 
     engine().setWindowTitle("RTICreator v4.0.0");
@@ -76,7 +67,10 @@ void MainMenuRoom::step() {
 }
 
 void MainMenuRoom::render(const re::CommandBuffer& cmdBuf, double interpolationFactor) {
-    engine().mainRenderPassBegin();
+    vk::ClearValue clearVal = vk::ClearColorValue{
+        m_backgroundColor.r, m_backgroundColor.g, m_backgroundColor.b, 1.0f
+    };
+    engine().mainRenderPassBegin({&clearVal, 1});
 
     // Texture
     if (m_texture) {
@@ -102,16 +96,7 @@ void MainMenuRoom::render(const re::CommandBuffer& cmdBuf, double interpolationF
                     SliderFloat2("Overlap (to see wrapping)", &m_overlap.x, 0.0f, 1.0f);
                     if (Button("Reset view"))
                         resetView();
-                    if (ColorPicker3("Background color", &m_backgroundColor.x)) {
-                        auto           ds  = displaySettings();
-                        vk::ClearValue val = vk::ClearColorValue{
-                            m_backgroundColor.r,
-                            m_backgroundColor.g,
-                            m_backgroundColor.b,
-                            1.0f};
-                        ds.clearValues = {&val, 1};
-                        setDisplaySettings(ds);
-                    }
+                    ColorPicker3("Background color", &m_backgroundColor.x);
                     EndTabItem();
                 }
             }
@@ -155,7 +140,7 @@ void MainMenuRoom::parametersGUI() {
 }
 
 void MainMenuRoom::selectAndLoad() {
-    char          filename[MAX_PATH] = {};
+    char filename[MAX_PATH] = {};
     OPENFILENAMEA ofn;
     ZeroMemory(&ofn, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
@@ -183,7 +168,8 @@ void MainMenuRoom::save(const std::string& loc) {
         re::TextureShape{
             .subimageDims          = m_subimageDims,
             .pivot                 = m_pivot,
-            .subimagesSpritesCount = m_subimagesSprites}
+            .subimagesSpritesCount = m_subimagesSprites
+        }
     );
 }
 
@@ -210,7 +196,8 @@ void MainMenuRoom::drawTexture(const re::CommandBuffer& cmdBuf) {
     auto botLeft = -texDims * 0.5f;
 
     glm::vec4 posSizeRect = {
-        -texDims * (m_overlap + 0.5f), texDims * (1.0f + 2.0f * m_overlap)};
+        -texDims * (m_overlap + 0.5f), texDims * (1.0f + 2.0f * m_overlap)
+    };
     glm::vec4 uvRect = {-m_overlap, 1.0f + m_overlap * 2.0f};
 
     m_sb.clearAndBeginFirstBatch();
@@ -222,7 +209,7 @@ void MainMenuRoom::drawTexture(const re::CommandBuffer& cmdBuf) {
     glm::vec2 subimageSprite = m_texture->subimagesSpritesCount();
     vertices.reserve((size_t)(subimageSprite.x * subimageSprite.y) * 4u);
     re::Color color{0, 255u, 0u, 255u};
-    auto      subimageDims = m_texture->subimageDims();
+    auto subimageDims = m_texture->subimageDims();
     // Subimages
     for (float x = 1.0f; x < subimageSprite.x; ++x) {
         glm::vec2 coord = botLeft + glm::vec2(x, 0.0f) * subimageDims;
@@ -241,7 +228,7 @@ void MainMenuRoom::drawTexture(const re::CommandBuffer& cmdBuf) {
     // Pivots
     color                 = {0u, 0u, 255u, 255u};
     glm::vec2 pivotOffset = m_texture->pivot();
-    float     pivotRadius = glm::min(subimageDims.x, subimageDims.y) * 0.45f;
+    float pivotRadius     = glm::min(subimageDims.x, subimageDims.y) * 0.45f;
     for (float x = 0.0f; x < m_texture->subimagesSpritesCount().x; ++x) {
         for (float y = 0.0f; y < m_texture->subimagesSpritesCount().y; ++y) {
             glm::vec2 pivotPos = botLeft + glm::vec2(x, y) * subimageDims +

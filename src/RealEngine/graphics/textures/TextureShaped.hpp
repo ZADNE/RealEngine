@@ -27,7 +27,7 @@ private:
 };
 
 /**
- * @brief Is a 2D texture with associated shape
+ * @brief Is a 2D texture with associated shape, typically loaded from a PNG file
  */
 class TextureShaped: public Texture {
 public:
@@ -56,7 +56,7 @@ public:
     TextureShaped(const TextureShaped&)            = delete; /**< Noncopyable */
     TextureShaped& operator=(const TextureShaped&) = delete; /**< Noncopyable */
 
-    TextureShaped(TextureShaped&& other) noexcept;            /**< Movable */
+    TextureShaped(TextureShaped&& other) noexcept;           /**< Movable */
     TextureShaped& operator=(TextureShaped&& other) noexcept; /**< Movable */
 
     ~TextureShaped() = default;

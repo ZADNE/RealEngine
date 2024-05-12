@@ -148,8 +148,10 @@ void RoomToEngineAccess::saveWindowSettings() {
 
 #pragma region Main RenderPass
 
-void RoomToEngineAccess::mainRenderPassBegin() {
-    m_window.mainRenderPassBegin();
+void RoomToEngineAccess::mainRenderPassBegin(
+    std::span<const vk::ClearValue> clearValues /* = {&k_defaultClearColor, 1}*/
+) {
+    m_window.mainRenderPassBegin(clearValues);
 }
 
 void RoomToEngineAccess::mainRenderPassNextSubpass() {

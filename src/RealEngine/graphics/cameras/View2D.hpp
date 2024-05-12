@@ -8,7 +8,7 @@
 namespace re {
 
 /**
- * @brief Represents an orthographic projection.
+ * @brief Represents an orthographic projection camera aligned with Z axis
  */
 class View2D {
 public:
@@ -45,7 +45,7 @@ public:
     /**
      * @brief Position of cursor relative to the view
      */
-    glm::vec2 cursorRel() { return m_cursorRel; }
+    glm::vec2 cursorRel() const { return m_cursorRel; }
 
     /**
      * @brief Gets the projection matrix of the view
@@ -74,7 +74,7 @@ private:
 
     glm::vec2 m_minXY;
     glm::vec2 m_maxXY;
-    bool      m_clippingEnabled = false;
+    bool m_clippingEnabled = false;
 };
 
 } // namespace re

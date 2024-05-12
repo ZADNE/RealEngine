@@ -21,8 +21,8 @@ public:
 
     explicit Fence(vk::FenceCreateFlags createFlags);
 
-    Fence(const Fence&)            = delete; /**< Noncopyable */
-    Fence& operator=(const Fence&) = delete; /**< Noncopyable */
+    Fence(const Fence&)            = delete;  /**< Noncopyable */
+    Fence& operator=(const Fence&) = delete;  /**< Noncopyable */
 
     Fence(Fence&& other) noexcept;            /**< Movable */
     Fence& operator=(Fence&& other) noexcept; /**< Movable */

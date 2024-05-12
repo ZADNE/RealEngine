@@ -16,7 +16,7 @@ namespace re {
 
 WindowSettings::WindowSettings() {
     std::ifstream i(SETTINGS_FILENAME);
-    json          j;
+    json j;
     try {
         i >> j;
         m_dims.x           = j["window"]["width"].get<int>();
@@ -75,7 +75,8 @@ void WindowSettings::save() {
           {"fullscreen", (bool)m_flags.fullscreen},
           {"borderless", (bool)m_flags.borderless},
           {"vsync", (bool)m_flags.vSync},
-          {"preferred_renderer", to_string(m_preferredRenderer)}}}};
+          {"preferred_renderer", to_string(m_preferredRenderer)}}}
+    };
 
     std::ofstream o(SETTINGS_FILENAME, std::ofstream::trunc);
     o << j.dump(2);
