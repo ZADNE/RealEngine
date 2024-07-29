@@ -31,10 +31,11 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     // Count the expected number of characters
     int glyphCount = std::accumulate(
         createInfo.ranges.begin(), createInfo.ranges.end(), 0,
-        [](int c, UnicodeRange r) { return c + (r.lastChar - r.firstChar); }
+        [](int c, UnicodeRange r) { return c + (r.lastChar - r.firstChar + 1); }
     );
 
     // Reserve space
+    m_offsets.reserve(glyphCount);
     m_glyphs.reserve(glyphCount);
     std::vector<SDL_SurfaceRAII> surfs;
     surfs.reserve(glyphCount);
@@ -46,28 +47,26 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     for (const UnicodeRange& r : createInfo.ranges) {
         assert(r.firstChar <= r.lastChar);
         for (char32_t c = r.firstChar; c <= r.lastChar; ++c) {
-            if (TTF_GlyphIsProvided32(font, c)) {
+            const SDL_Surface* surf =
                 surfs.emplace_back(TTF_RenderGlyph32_Blended(font, c, k_fgCol));
-                const SDL_Surface* surf = surfs.back();
+            if (surf) { // If there is a glyph for the character
                 totalWidth += surf->w;
                 int advance{};
                 TTF_GlyphMetrics32(
                     font, c, &dontCare, &dontCare, &dontCare, &dontCare, &advance
                 );
                 m_glyphs.emplace_back(
-                    c, static_cast<float>(advance), glm::vec2{surf->w, surf->h},
-                    glm::vec4{}
+                    glm::vec4{}, glm::vec2{surf->w, surf->h},
+                    static_cast<float>(advance)
                 );
             } else {
-                throw Exception{std::format(
-                    "Font {} does not contain glyph for character at UNICODE "
-                    "index {}",
-                    createInfo.filePath, static_cast<int>(c)
-                )};
+                m_glyphs.emplace_back();
             }
         }
+        m_offsets.emplace_back(r.lastChar, static_cast<int>(m_glyphs.size()) - 1);
     }
-    int height = TTF_FontHeight(font);
+    int height   = TTF_FontHeight(font);
+    m_lineSkipPx = static_cast<float>(TTF_FontLineSkip(font));
 
     // Calculate size of the texture and prepare stage
     const uint32_t minArea    = totalWidth * height;
@@ -100,18 +99,19 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     glm::vec2 texSizeInv = 1.0f / glm::vec2{texWidth, texHeight};
     glm::ivec2 botLeft   = glm::ivec2{0, 0};
     for (int i = 0; i < glyphCount; i++) {
-        const SDL_Surface* surf = surfs[i];
-        auto& glyph             = m_glyphs[i];
-        if (botLeft.x + surf->w >= texWidth) {           // If would not fit
-            botLeft = glm::ivec2{0, botLeft.y + height}; // Jump to next row
-            assert(botLeft.y <= texHeight);
+        if (const SDL_Surface* surf = surfs[i]) {
+            auto& glyph = m_glyphs[i];
+            if (botLeft.x + surf->w >= texWidth) {           // If would not fit
+                botLeft = glm::ivec2{0, botLeft.y + height}; // Jump to next row
+                assert(botLeft.y <= texHeight);
+            }
+            copyGlyph(surf, botLeft);
+            glyph.uvSizeRect = glm::vec4{
+                glm::vec2{botLeft.x, texHeight - botLeft.y - height - 1} * texSizeInv,
+                glyph.sizePx * texSizeInv
+            };
+            botLeft.x += surf->w;
         }
-        copyGlyph(surf, botLeft);
-        glyph.uvSizeRect = glm::vec4{
-            glm::vec2{botLeft.x, texHeight - botLeft.y - height - 1} * texSizeInv,
-            glyph.sizePx * texSizeInv
-        };
-        botLeft.x += surf->w;
     }
 
     // Create the final texture
@@ -129,14 +129,32 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
 void RasterizedFont::add(
     SpriteBatch& batch, std::u8string_view str, glm::vec2 posPx
 ) const {
+    glm::vec2 lineBeginPx = posPx;
     while (!str.empty()) {
         char32_t c = readCode(str);
-        if (c != k_invalidCode) {
-            const Glyph& glyph = m_glyphs[c - 32];
+        switch (c) {
+        case U'\n':
+            lineBeginPx.y -= m_lineSkipPx;
+            posPx = lineBeginPx;
+            break;
+        case k_invalidCode: break;
+        default:
+            const Glyph& glyph = m_glyphs[codeToOffset(c)];
             batch.add(m_glyphTex, glm::vec4{posPx, glyph.sizePx}, glyph.uvSizeRect);
             posPx.x += glyph.advancePx;
+            break;
         }
     }
+}
+
+int RasterizedFont::codeToOffset(char32_t c) const {
+    for (const GlyphOffset& offset : m_offsets) {
+        if (offset.lastChar >= c) {
+            return offset.baseOffset - (offset.lastChar - c);
+        }
+    }
+    assert(!"Character not found");
+    return 0;
 }
 
 } // namespace re

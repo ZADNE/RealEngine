@@ -3,6 +3,7 @@
  *  @file      A minimalistic set of functions concerned with UNICODE
  */
 #pragma once
+#include <array>
 #include <bit>
 #include <string_view>
 
@@ -17,10 +18,30 @@ namespace re {
 constexpr char32_t k_invalidCode = 0xffff;
 
 /**
+ * @brief Denotes a range of Unicode characters
+ */
+struct UnicodeRange {
+    char32_t firstChar{}; /**< Inclusive */
+    char32_t lastChar{};  /**< Inclusive */
+};
+
+/**
+ * @brief Range of ASCII characters that have printable glyph assigned
+ */
+constexpr std::array k_asciiPrintableUnicodeRanges =
+    std::to_array<UnicodeRange>({{.firstChar = U' ', .lastChar = U'~'}});
+
+/**
+ * @brief Range of czech unicode characters
+ */
+constexpr std::array k_czechUnicodeRanges =
+    std::to_array<UnicodeRange>({{.firstChar = ' ', .lastChar = U'ž'}});
+
+/**
  * @brief Counts number of bytes representing the first character
  */
 constexpr int codeSize(std::u8string_view str) {
-    uint8_t c = str[0] & 0b11110000;
+    uint8_t c = str[0] & 0b1111'0000;
     int ones  = std::countl_one(c);
     return ones + static_cast<int>(!ones);
 }
@@ -30,7 +51,7 @@ constexpr int codeSize(std::u8string_view str) {
  */
 constexpr char32_t readCode(std::u8string_view& str) {
     if (str.empty()) {
-        return 0x0000;
+        return U'\0';
     }
 
     const int size = codeSize(str);
