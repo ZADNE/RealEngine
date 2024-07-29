@@ -7,7 +7,6 @@
 #include <numeric>
 
 #include <SDL2/SDL_ttf.h>
-#include <glm/vec2.hpp>
 
 #include <RealEngine/graphics/fonts/RasterizedFont.hpp>
 #include <RealEngine/utility/Error.hpp>
@@ -66,6 +65,7 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
         m_offsets.emplace_back(r.lastChar, static_cast<int>(m_glyphs.size()) - 1);
     }
     int height   = TTF_FontHeight(font);
+    m_ascentPx   = static_cast<float>(TTF_FontAscent(font));
     m_lineSkipPx = static_cast<float>(TTF_FontLineSkip(font));
 
     // Calculate size of the texture and prepare stage
@@ -127,27 +127,36 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
 }
 
 void RasterizedFont::add(
-    SpriteBatch& batch, std::u8string_view str, glm::vec2 posPx
+    SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx
 ) const {
-    glm::vec2 lineBeginPx = posPx;
-    while (!str.empty()) {
-        char32_t c = readCode(str);
-        switch (c) {
-        case U'\n':
-            lineBeginPx.y -= m_lineSkipPx;
-            posPx = lineBeginPx;
-            break;
-        case k_invalidCode: break;
-        default:
-            const Glyph& glyph = m_glyphs[codeToOffset(c)];
-            batch.add(m_glyphTex, glm::vec4{posPx, glyph.sizePx}, glyph.uvSizeRect);
-            posPx.x += glyph.advancePx;
-            break;
-        }
+    anchorPx.y += m_ascentPx;
+    auto alignLeft = [this, &anchorPx]([[maybe_unused]] std::u8string_view str) {
+        anchorPx.y -= m_lineSkipPx;
+        return anchorPx;
+    };
+    addGeneric(batch, str, alignLeft);
+}
+
+void RasterizedFont::add(
+    SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx, HorAlign horAlign
+) const {
+    switch (horAlign) {
+    case HorAlign::Left: add(batch, str, anchorPx); break;
+    case HorAlign::Center:
+    case HorAlign::Right:
+        anchorPx.y += m_ascentPx;
+        float factor = static_cast<float>(horAlign) * 0.5f;
+        auto align   = [this, &anchorPx, factor](std::u8string_view str) {
+            anchorPx.y -= m_lineSkipPx;
+            float lineWidth = measureLineWidth(str);
+            return glm::vec2{anchorPx.x - factor * lineWidth, anchorPx.y};
+        };
+        addGeneric(batch, str, align);
+        break;
     }
 }
 
-int RasterizedFont::codeToOffset(char32_t c) const {
+int RasterizedFont::codeToIndex(char32_t c) const {
     for (const GlyphOffset& offset : m_offsets) {
         if (offset.lastChar >= c) {
             return offset.baseOffset - (offset.lastChar - c);
@@ -155,6 +164,40 @@ int RasterizedFont::codeToOffset(char32_t c) const {
     }
     assert(!"Character not found");
     return 0;
+}
+
+float RasterizedFont::measureLineWidth(std::u8string_view str) const {
+    auto nonEndingChar = [](char32_t c) { return (c != U'\0' && c != U'\n'); };
+    float widthPx      = 0.0f;
+    char32_t prevC     = readCode(str);
+    if (nonEndingChar(prevC)) { // If not 0 char line
+        char32_t c;
+        while (nonEndingChar(c = readCode(str))) {
+            widthPx += m_glyphs[codeToIndex(prevC)].advancePx;
+            prevC = c;
+        };
+    }
+    widthPx += m_glyphs[codeToIndex(prevC)].sizePx.x;
+    return widthPx;
+}
+
+template<std::invocable<std::u8string_view> AlignFunc>
+void RasterizedFont::addGeneric(
+    SpriteBatch& batch, std::u8string_view str, AlignFunc&& align
+) const {
+    glm::vec2 cursorPx = align(str);
+    while (!str.empty()) {
+        char32_t c = readCode(str);
+        switch (c) {
+        case U'\n':         cursorPx = align(str); break;
+        case k_invalidCode: break;
+        default:
+            const Glyph& glyph = m_glyphs[codeToIndex(c)];
+            batch.add(m_glyphTex, glm::vec4{cursorPx, glyph.sizePx}, glyph.uvSizeRect);
+            cursorPx.x += glyph.advancePx;
+            break;
+        }
+    }
 }
 
 } // namespace re

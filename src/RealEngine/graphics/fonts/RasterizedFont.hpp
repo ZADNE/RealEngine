@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <concepts>
 #include <span>
 #include <string_view>
 
@@ -19,6 +20,15 @@ struct RasterizedFontCreateInfo {
 };
 
 /**
+ * @brief Describes horizontal alignment of text
+ */
+enum class HorAlign {
+    Left,
+    Center,
+    Right
+};
+
+/**
  * @brief   Renders TrueType fonts
  * @details The glyphs are rasterized to a texture during construction.
  *          The actual rendering uses the rasterized glyphs.
@@ -29,18 +39,33 @@ public:
     RasterizedFont(const RasterizedFontCreateInfo& createInfo);
 
     /**
-     * @brief Adds text str to batch at posPx
-     * @note  It is undefined behavior if str contains a character that wes not
+     * @brief Adds text str to batch at anchorPx
+     * @note  It is undefined behavior if str contains a character that was not
      *        in a range when the Font was constructed
      */
-    void add(SpriteBatch& batch, std::u8string_view str, glm::vec2 posPx) const;
+    void add(SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx) const;
+
+    /**
+     * @brief Adds text str to batch at anchorPx, aligned according to horAlign
+     */
+    void add(
+        SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx, HorAlign horAlign
+    ) const;
 
 private:
 
     /**
      * @brief Translates codes to indices into m_glyphs
      */
-    int codeToOffset(char32_t c) const;
+    int codeToIndex(char32_t c) const;
+
+    /**
+     * @brief Measures width (in pixels) of the first line in str
+     */
+    float measureLineWidth(std::u8string_view str) const;
+
+    template<std::invocable<std::u8string_view> AlignFunc>
+    void addGeneric(SpriteBatch& batch, std::u8string_view str, AlignFunc&& align) const;
 
     struct GlyphOffset {
         char32_t lastChar{}; // If c is less-or-equal than this
@@ -58,6 +83,7 @@ private:
     Texture m_glyphTex;
 
     float m_lineSkipPx{};
+    float m_ascentPx{};
 };
 
 } // namespace re
