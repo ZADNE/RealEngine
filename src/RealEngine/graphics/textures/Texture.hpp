@@ -28,7 +28,8 @@ struct TextureCreateInfo {
     const void* pNext             = nullptr;
 
     // ImageView-related
-    vk::ImageAspectFlags aspects = vk::ImageAspectFlagBits::eColor;
+    vk::ImageAspectFlags aspects          = vk::ImageAspectFlagBits::eColor;
+    vk::ComponentMapping componentMapping = {}; // Identity mapping
 
     // Sampler-related
     bool hasSampler      = true; // No sampler is created if this is false

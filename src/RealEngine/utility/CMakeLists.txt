@@ -5,4 +5,6 @@ target_sources(RealEngine PRIVATE
     Error.hpp                   Error.cpp
     Math.hpp                    
     OffsetOfArr.hpp             
+    RAIIWrapper.hpp             
+    Unicode.hpp                 
 )

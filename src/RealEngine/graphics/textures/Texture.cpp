@@ -78,7 +78,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         m_image,
         imageViewType(createInfo.type, createInfo.layers),
         createInfo.format,
-        vk::ComponentMapping{}, // Component mapping (= identity)
+        createInfo.componentMapping,
         vk::ImageSubresourceRange{
             createInfo.aspects,
             0u,               // Mip level
