@@ -44,6 +44,9 @@ public:
     T& operator*() { return write(); }
     T* operator->() { return &write(); }
 
+    const T& read() const { return m_ts[State::readIndex()]; }
+    T& read() { return m_ts[State::readIndex()]; }
+
     /**
      * @brief Calls 'func' on each buffer
      */
