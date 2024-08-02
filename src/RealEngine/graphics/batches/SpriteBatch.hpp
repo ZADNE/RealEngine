@@ -99,6 +99,7 @@ private:
     unsigned int m_batchFirstSpriteIndex = 0;
     unsigned int m_textureIndexOffset    = 0;
 
+    unsigned int nextSpriteIndex();
     unsigned int texToIndex(const Texture& tex);
 
     PipelineLayout m_pipelineLayout;
