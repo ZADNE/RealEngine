@@ -64,13 +64,20 @@ public:
      */
     void drawBatch(const CommandBuffer& cb, const glm::mat4& mvpMat);
 
-    void add(const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect);
+    constexpr static Color k_white{255, 255, 255, 255};
 
-    void addSprite(const SpriteStatic& sprite, glm::vec2 pos);
+    void add(
+        const Texture& tex, const glm::vec4& posSizeRect,
+        const glm::vec4& uvsSizeRect, Color col = k_white
+    );
 
-    void addSprite(const SpriteComplex& sprite, glm::vec2 pos);
+    void addSprite(const SpriteStatic& sprite, glm::vec2 pos, Color col = k_white);
 
-    void addSubimage(const TextureShaped& tex, glm::vec2 pos, glm::vec2 subimgSpr);
+    void addSprite(const SpriteComplex& sprite, glm::vec2 pos, Color col = k_white);
+
+    void addSubimage(
+        const TextureShaped& tex, glm::vec2 pos, glm::vec2 subimgSpr, Color col = k_white
+    );
 
     const Pipeline& pipeline() const { return m_pipeline; }
 
@@ -101,8 +108,6 @@ private:
         const PipelineLayout& pipelineLayout, const SpriteBatchCreateInfo& createInfo
     );
     DescriptorSet m_descSet{{.layout = m_pipelineLayout.descriptorSetLayout(0)}};
-
-    static inline constexpr Color k_white{255, 255, 255, 255};
 };
 
 } // namespace re

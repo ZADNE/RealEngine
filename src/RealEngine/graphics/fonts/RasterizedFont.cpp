@@ -127,18 +127,20 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
 }
 
 void RasterizedFont::add(
-    SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx
+    SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx,
+    Color col /* = SpriteBatch::k_white*/
 ) const {
     anchorPx.y += m_ascentPx;
     auto alignLeft = [this, &anchorPx]([[maybe_unused]] std::u8string_view str) {
         anchorPx.y -= m_lineSkipPx;
         return anchorPx;
     };
-    addGeneric(batch, str, alignLeft);
+    addGeneric(batch, str, alignLeft, col);
 }
 
 void RasterizedFont::add(
-    SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx, HorAlign horAlign
+    SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx,
+    HorAlign horAlign, Color col /* = SpriteBatch::k_white*/
 ) const {
     switch (horAlign) {
     case HorAlign::Left: add(batch, str, anchorPx); break;
@@ -151,7 +153,7 @@ void RasterizedFont::add(
             float lineWidth = measureLineWidth(str);
             return glm::vec2{anchorPx.x - factor * lineWidth, anchorPx.y};
         };
-        addGeneric(batch, str, align);
+        addGeneric(batch, str, align, col);
         break;
     }
 }
@@ -183,7 +185,7 @@ float RasterizedFont::measureLineWidth(std::u8string_view str) const {
 
 template<std::invocable<std::u8string_view> AlignFunc>
 void RasterizedFont::addGeneric(
-    SpriteBatch& batch, std::u8string_view str, AlignFunc&& align
+    SpriteBatch& batch, std::u8string_view str, AlignFunc&& align, Color col
 ) const {
     glm::vec2 cursorPx = align(str);
     while (!str.empty()) {
@@ -193,7 +195,9 @@ void RasterizedFont::addGeneric(
         case k_invalidCode: break;
         default:
             const Glyph& glyph = m_glyphs[codeToIndex(c)];
-            batch.add(m_glyphTex, glm::vec4{cursorPx, glyph.sizePx}, glyph.uvSizeRect);
+            batch.add(
+                m_glyphTex, glm::vec4{cursorPx, glyph.sizePx}, glyph.uvSizeRect, col
+            );
             cursorPx.x += glyph.advancePx;
             break;
         }

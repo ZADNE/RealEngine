@@ -53,14 +53,17 @@ void SpriteBatch::drawBatch(const CommandBuffer& cb, const glm::mat4& mvpMat) {
 }
 
 void SpriteBatch::add(
-    const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect
+    const Texture& tex, const glm::vec4& posSizeRect,
+    const glm::vec4& uvsSizeRect, Color col /* = k_white*/
 ) {
     m_spritesBuf[m_nextSpriteIndex++] = Sprite{
-        .pos = posSizeRect, .uvs = uvsSizeRect, .tex = texToIndex(tex), .col = k_white
+        .pos = posSizeRect, .uvs = uvsSizeRect, .tex = texToIndex(tex), .col = col
     };
 }
 
-void SpriteBatch::addSprite(const SpriteStatic& sprite, glm::vec2 pos) {
+void SpriteBatch::addSprite(
+    const SpriteStatic& sprite, glm::vec2 pos, Color col /* = k_white*/
+) {
     const auto& tex                   = sprite.texture();
     m_spritesBuf[m_nextSpriteIndex++] = Sprite{
         .pos = glm::vec4(pos - tex.pivot(), tex.subimageDims()),
@@ -69,11 +72,13 @@ void SpriteBatch::addSprite(const SpriteStatic& sprite, glm::vec2 pos) {
             glm::vec2(1.0f, 1.0f) / tex.subimagesSpritesCount()
         ),
         .tex = texToIndex(tex),
-        .col = k_white
+        .col = col
     };
 }
 
-void SpriteBatch::addSprite(const SpriteComplex& sprite, glm::vec2 pos) {
+void SpriteBatch::addSprite(
+    const SpriteComplex& sprite, glm::vec2 pos, Color col /* = k_white*/
+) {
     const auto& tex                   = sprite.texture();
     m_spritesBuf[m_nextSpriteIndex++] = Sprite{
         .pos = glm::vec4(
@@ -84,12 +89,13 @@ void SpriteBatch::addSprite(const SpriteComplex& sprite, glm::vec2 pos) {
             glm::vec2(1.0f, 1.0f) / tex.subimagesSpritesCount()
         ),
         .tex = texToIndex(tex),
-        .col = k_white
+        .col = col
     };
 }
 
 void SpriteBatch::addSubimage(
-    const TextureShaped& tex, glm::vec2 pos, glm::vec2 subimgSpr
+    const TextureShaped& tex, glm::vec2 pos, glm::vec2 subimgSpr,
+    Color col /* = k_white*/
 ) {
     m_spritesBuf[m_nextSpriteIndex++] = Sprite{
         .pos = glm::vec4(pos - tex.pivot(), tex.subimageDims()),
@@ -98,7 +104,7 @@ void SpriteBatch::addSubimage(
             glm::vec2(1.0f, 1.0f) / tex.subimagesSpritesCount()
         ),
         .tex = texToIndex(tex),
-        .col = k_white
+        .col = col
     };
 }
 

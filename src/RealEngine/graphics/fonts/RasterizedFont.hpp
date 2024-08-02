@@ -43,13 +43,17 @@ public:
      * @note  It is undefined behavior if str contains a character that was not
      *        in a range when the Font was constructed
      */
-    void add(SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx) const;
+    void add(
+        SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx,
+        Color col = SpriteBatch::k_white
+    ) const;
 
     /**
      * @brief Adds text str to batch at anchorPx, aligned according to horAlign
      */
     void add(
-        SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx, HorAlign horAlign
+        SpriteBatch& batch, std::u8string_view str, glm::vec2 anchorPx,
+        HorAlign horAlign, Color col = SpriteBatch::k_white
     ) const;
 
 private:
@@ -65,7 +69,9 @@ private:
     float measureLineWidth(std::u8string_view str) const;
 
     template<std::invocable<std::u8string_view> AlignFunc>
-    void addGeneric(SpriteBatch& batch, std::u8string_view str, AlignFunc&& align) const;
+    void addGeneric(
+        SpriteBatch& batch, std::u8string_view str, AlignFunc&& align, Color col
+    ) const;
 
     struct GlyphOffset {
         char32_t lastChar{}; // If c is less-or-equal than this
