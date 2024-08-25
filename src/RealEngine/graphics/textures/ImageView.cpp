@@ -10,8 +10,7 @@ ImageView::ImageView(const vk::ImageViewCreateInfo& createInfo)
 }
 
 ImageView::ImageView(ImageView&& other) noexcept
-    : m_imageView(other.m_imageView) {
-    other.m_imageView = nullptr;
+    : m_imageView(std::exchange(other.m_imageView, nullptr)) {
 }
 
 ImageView& ImageView::operator=(ImageView&& other) noexcept {

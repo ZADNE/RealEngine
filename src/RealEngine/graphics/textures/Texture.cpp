@@ -100,14 +100,10 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
 }
 
 Texture::Texture(Texture&& other) noexcept
-    : m_allocation(other.m_allocation)
-    , m_image(other.m_image)
-    , m_imageView(other.m_imageView)
-    , m_sampler(other.m_sampler) {
-    other.m_allocation = nullptr;
-    other.m_image      = nullptr;
-    other.m_imageView  = nullptr;
-    other.m_sampler    = nullptr;
+    : m_allocation(std::exchange(other.m_allocation, nullptr))
+    , m_image(std::exchange(other.m_image, nullptr))
+    , m_imageView(std::exchange(other.m_imageView, nullptr))
+    , m_sampler(std::exchange(other.m_sampler, nullptr)) {
 }
 
 Texture& Texture::operator=(Texture&& other) noexcept {

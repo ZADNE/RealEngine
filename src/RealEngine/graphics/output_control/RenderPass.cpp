@@ -14,8 +14,7 @@ RenderPass::RenderPass(const RenderPassCreateInfo& createInfo)
 }
 
 RenderPass::RenderPass(RenderPass&& other) noexcept
-    : m_renderPass(other.m_renderPass) {
-    other.m_renderPass = nullptr;
+    : m_renderPass(std::exchange(other.m_renderPass, nullptr)) {
 }
 
 RenderPass& RenderPass::operator=(RenderPass&& other) noexcept {

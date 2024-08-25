@@ -52,10 +52,8 @@ PipelineLayout::PipelineLayout(
 }
 
 PipelineLayout::PipelineLayout(PipelineLayout&& other) noexcept
-    : m_descriptorSetLayouts(other.m_descriptorSetLayouts)
-    , m_pipelineLayout(other.m_pipelineLayout) {
-    other.m_descriptorSetLayouts.clear();
-    other.m_pipelineLayout = nullptr;
+    : m_descriptorSetLayouts(std::exchange(other.m_descriptorSetLayouts, {}))
+    , m_pipelineLayout(std::exchange(other.m_pipelineLayout, nullptr)) {
 }
 
 PipelineLayout& PipelineLayout::operator=(PipelineLayout&& other) noexcept {

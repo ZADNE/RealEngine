@@ -10,8 +10,7 @@ Framebuffer::Framebuffer(const vk::FramebufferCreateInfo& createInfo)
 }
 
 Framebuffer::Framebuffer(Framebuffer&& other) noexcept
-    : m_framebuffer(other.m_framebuffer) {
-    other.m_framebuffer = nullptr;
+    : m_framebuffer(std::exchange(other.m_framebuffer, nullptr)) {
 }
 
 Framebuffer& Framebuffer::operator=(Framebuffer&& other) noexcept {

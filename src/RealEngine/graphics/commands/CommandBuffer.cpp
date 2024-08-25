@@ -16,8 +16,7 @@ CommandBuffer::CommandBuffer(const CommandBufferCreateInfo& createInfo)
 }
 
 CommandBuffer::CommandBuffer(CommandBuffer&& other) noexcept
-    : m_cb(other.m_cb) {
-    other.m_cb = nullptr;
+    : m_cb(std::exchange(other.m_cb, nullptr)) {
 }
 
 CommandBuffer& CommandBuffer::operator=(CommandBuffer&& other) noexcept {

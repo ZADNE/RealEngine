@@ -16,9 +16,12 @@ namespace re {
 constexpr auto k_hostAccess = eHostAccessRandom | eHostAccessSequentialWrite;
 
 Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
+    assert(
+        createInfo.sizeInBytes >=
+        createInfo.initData.size_bytes() + createInfo.initDataDstOffset
+    );
     // If initial data are provided but it cannot be copied directly to the main buffer
     if (!createInfo.initData.empty() && !(createInfo.allocFlags & k_hostAccess)) {
-        assert(createInfo.sizeInBytes >= createInfo.initData.size_bytes());
         void* stageMapped = nullptr;
         // Create temporary stage buffer
         auto stage = allocateBuffer(
@@ -54,16 +57,22 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
         allocator().destroyBuffer(stage.first, stage.second);
     } else { // Stage is not required
         std::tie(m_buffer, m_allocation) = allocateBuffer(createInfo, pointerToMapped);
+        if (!createInfo.initData.empty()) {
+            // Copy init data to directly to the buffer
+            std::byte* dst = reinterpret_cast<std::byte*>(*pointerToMapped) +
+                             createInfo.initDataDstOffset;
+            std::memcpy(
+                dst, createInfo.initData.data(), createInfo.initData.size_bytes()
+            );
+        }
     }
 
     setDebugUtilsObjectName(m_buffer, createInfo.debugName);
 }
 
 Buffer::Buffer(Buffer&& other) noexcept
-    : m_allocation(other.m_allocation)
-    , m_buffer(other.m_buffer) {
-    other.m_allocation = nullptr;
-    other.m_buffer     = nullptr;
+    : m_allocation(std::exchange(other.m_allocation, nullptr))
+    , m_buffer(std::exchange(other.m_buffer, nullptr)) {
 }
 
 Buffer& Buffer::operator=(Buffer&& other) noexcept {

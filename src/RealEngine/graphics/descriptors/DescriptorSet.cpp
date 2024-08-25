@@ -16,8 +16,7 @@ DescriptorSet::DescriptorSet(const DescriptorSetCreateInfo& createInfo)
 }
 
 DescriptorSet::DescriptorSet(DescriptorSet&& other) noexcept
-    : m_descriptorSet(other.m_descriptorSet) {
-    other.m_descriptorSet = nullptr;
+    : m_descriptorSet(std::exchange(other.m_descriptorSet, nullptr)) {
 }
 
 DescriptorSet& DescriptorSet::operator=(DescriptorSet&& other) noexcept {
