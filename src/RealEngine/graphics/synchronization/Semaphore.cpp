@@ -17,8 +17,7 @@ Semaphore::Semaphore(uint64_t initialValue)
 }
 
 Semaphore::Semaphore(Semaphore&& other) noexcept
-    : m_semaphore(other.m_semaphore) {
-    other.m_semaphore = nullptr;
+    : m_semaphore(std::exchange(other.m_semaphore, nullptr)) {
 }
 
 Semaphore& Semaphore::operator=(Semaphore&& other) noexcept {

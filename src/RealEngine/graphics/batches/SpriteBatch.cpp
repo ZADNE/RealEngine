@@ -53,29 +53,34 @@ void SpriteBatch::drawBatch(const CommandBuffer& cb, const glm::mat4& mvpMat) {
 }
 
 void SpriteBatch::add(
-    const Texture& tex, const glm::vec4& posSizeRect, const glm::vec4& uvsSizeRect
+    const Texture& tex, const glm::vec4& posSizeRect,
+    const glm::vec4& uvsSizeRect, Color col /* = k_white*/
 ) {
-    m_spritesBuf[m_nextSpriteIndex++] = Sprite{
-        .pos = posSizeRect, .uvs = uvsSizeRect, .tex = texToIndex(tex), .col = k_white
+    m_spritesBuf[nextSpriteIndex()] = Sprite{
+        .pos = posSizeRect, .uvs = uvsSizeRect, .tex = texToIndex(tex), .col = col
     };
 }
 
-void SpriteBatch::addSprite(const SpriteStatic& sprite, glm::vec2 pos) {
-    const auto& tex                   = sprite.texture();
-    m_spritesBuf[m_nextSpriteIndex++] = Sprite{
+void SpriteBatch::addSprite(
+    const SpriteStatic& sprite, glm::vec2 pos, Color col /* = k_white*/
+) {
+    const auto& tex                 = sprite.texture();
+    m_spritesBuf[nextSpriteIndex()] = Sprite{
         .pos = glm::vec4(pos - tex.pivot(), tex.subimageDims()),
         .uvs = glm::vec4(
             glm::floor(sprite.subimageSprite()) / tex.subimagesSpritesCount(),
             glm::vec2(1.0f, 1.0f) / tex.subimagesSpritesCount()
         ),
         .tex = texToIndex(tex),
-        .col = k_white
+        .col = col
     };
 }
 
-void SpriteBatch::addSprite(const SpriteComplex& sprite, glm::vec2 pos) {
-    const auto& tex                   = sprite.texture();
-    m_spritesBuf[m_nextSpriteIndex++] = Sprite{
+void SpriteBatch::addSprite(
+    const SpriteComplex& sprite, glm::vec2 pos, Color col /* = k_white*/
+) {
+    const auto& tex                 = sprite.texture();
+    m_spritesBuf[nextSpriteIndex()] = Sprite{
         .pos = glm::vec4(
             pos - tex.pivot() * sprite.scale(), tex.subimageDims() * sprite.scale()
         ),
@@ -84,22 +89,32 @@ void SpriteBatch::addSprite(const SpriteComplex& sprite, glm::vec2 pos) {
             glm::vec2(1.0f, 1.0f) / tex.subimagesSpritesCount()
         ),
         .tex = texToIndex(tex),
-        .col = k_white
+        .col = col
     };
 }
 
 void SpriteBatch::addSubimage(
-    const TextureShaped& tex, glm::vec2 pos, glm::vec2 subimgSpr
+    const TextureShaped& tex, glm::vec2 pos, glm::vec2 subimgSpr,
+    Color col /* = k_white*/
 ) {
-    m_spritesBuf[m_nextSpriteIndex++] = Sprite{
+    m_spritesBuf[nextSpriteIndex()] = Sprite{
         .pos = glm::vec4(pos - tex.pivot(), tex.subimageDims()),
         .uvs = glm::vec4(
             glm::floor(subimgSpr) / tex.subimagesSpritesCount(),
             glm::vec2(1.0f, 1.0f) / tex.subimagesSpritesCount()
         ),
         .tex = texToIndex(tex),
-        .col = k_white
+        .col = col
     };
+}
+
+unsigned int SpriteBatch::nextSpriteIndex() {
+    unsigned int rval = m_nextSpriteIndex++;
+    assert(
+        rval < m_maxSprites * (FrameDoubleBufferingState::writeIndex() + 1) &&
+        "Used too many different sprites"
+    );
+    return rval;
 }
 
 unsigned int SpriteBatch::texToIndex(const Texture& tex) {
@@ -108,6 +123,10 @@ unsigned int SpriteBatch::texToIndex(const Texture& tex) {
         return m_textureIndexOffset + (it - m_texToIndex.begin());
     } else {
         unsigned int newIndex = m_texToIndex.size() + m_textureIndexOffset;
+        assert(
+            m_texToIndex.size() < m_maxTextures &&
+            "Used too many different textures"
+        );
         m_descSet.write(
             vk::DescriptorType::eCombinedImageSampler, 0u, newIndex, tex,
             vk::ImageLayout::eShaderReadOnlyOptimal

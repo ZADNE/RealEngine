@@ -13,10 +13,10 @@ namespace re {
 class CommandBuffer;
 
 /**
- * @brief   Provides access to global Vulkan objects (such as device)
- *          to children Vulkan objects
+ * @brief   Provides children Vulkan objects access to global Vulkan objects
+ *          (such as device)
  * @details Children Vulkan objects (e.g. buffers, textures, pipelines) derive
- * from this.
+ *          from this.
  */
 class VulkanObject {
     friend class VulkanFixture;

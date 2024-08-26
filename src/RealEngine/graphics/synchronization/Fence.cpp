@@ -10,8 +10,7 @@ Fence::Fence(vk::FenceCreateFlags createFlags)
 }
 
 Fence::Fence(Fence&& other) noexcept
-    : m_fence(other.m_fence) {
-    other.m_fence = nullptr;
+    : m_fence(std::exchange(other.m_fence, nullptr)) {
 }
 
 Fence& Fence::operator=(Fence&& other) noexcept {

@@ -10,6 +10,7 @@ include("cmake/RealShaders/RealShaders.cmake")
     #SDL2
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
     find_package(SDL2 REQUIRED)
+    find_package(SDL2_ttf REQUIRED)
     #SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.275.0.tar.gz)
     #OpenGL Mathematics
@@ -38,6 +39,7 @@ include("cmake/RealShaders/RealShaders.cmake")
         spirv-cross-core
         spirv-cross-reflect
         SDL2::Main
+        SDL2::TTF
         glm
         nlohmann_json::nlohmann_json
         ImGui

@@ -165,8 +165,7 @@ Pipeline::Pipeline(
 }
 
 Pipeline::Pipeline(Pipeline&& other) noexcept
-    : m_pipeline(other.m_pipeline) {
-    other.m_pipeline = nullptr;
+    : m_pipeline(std::exchange(other.m_pipeline, nullptr)) {
 }
 
 Pipeline& Pipeline::operator=(Pipeline&& other) noexcept {

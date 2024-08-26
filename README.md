@@ -29,7 +29,8 @@
 
 ![Waves](readme_img/waves.png)
 
-## The following libraries are required to build:
+## The following libraries must be installed to build:
 
-- [SDL2](https://www.libsdl.org/)
-- [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/)
+- [SDL2](https://www.libsdl.org/) (for user input and window creation)
+- [SDL2_ttf](https://wiki.libsdl.org/SDL2_ttf/FrontPage) (for font rasterization)
+- [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) (for GPU-accelerated rendering and compute)

@@ -55,6 +55,14 @@ public:
      */
     WindowSubsystems();
 
+    WindowSubsystems(const WindowSubsystems&) = delete; /**< Noncopyable */
+    WindowSubsystems& operator=(const WindowSubsystems&) = delete; /**< Noncopyable */
+
+    WindowSubsystems(WindowSubsystems&&)            = delete; /**< Nonmovable */
+    WindowSubsystems& operator=(WindowSubsystems&&) = delete; /**< Nonmovable */
+
+    ~WindowSubsystems();
+
     /**
      * @brief Gets human readable string with the version of RealEngine
      * @return Human readable version string
@@ -70,27 +78,6 @@ public:
     static void printRealEngineVersion();
 
     void printSubsystemsVersions() const;
-
-private:
-    /**
-     * @brief Is a very simple RAII wrapper around SDL2
-     */
-    class SDL2_RAII {
-    public:
-        SDL2_RAII();
-
-        SDL2_RAII(const SDL2_RAII&)            = delete; /**< Noncopyable */
-        SDL2_RAII& operator=(const SDL2_RAII&) = delete; /**< Noncopyable */
-
-        SDL2_RAII(SDL2_RAII&&)            = delete;      /**< Nonmovable */
-        SDL2_RAII& operator=(SDL2_RAII&&) = delete;      /**< Nonmovable */
-
-        ~SDL2_RAII();
-
-        void printVersion() const;
-    };
-
-    SDL2_RAII m_sdl2;
 };
 
 } // namespace re
