@@ -4,7 +4,7 @@
 #pragma once
 #include <RealEngine/graphics/buffers/Buffer.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
 
@@ -21,7 +21,7 @@ struct DescriptorSetCreateInfo {
 /**
  * @brief Refers to concrete resources to be used by a pipeline
  */
-class DescriptorSet: public VulkanObject {
+class DescriptorSet: public VulkanObjectBase {
 public:
     /**
      * @brief Constructs a null descriptor set that does not describe anything

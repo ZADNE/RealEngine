@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
 
@@ -32,7 +32,7 @@ struct RenderPassSubpass {
  * between the subpasses, and describes how the attachments are used over the
  * course of the subpasses.
  */
-class RenderPass: public VulkanObject {
+class RenderPass: public VulkanObjectBase {
 public:
     /**
      * @brief Constructs a null renderpass that cannot be used for rendering

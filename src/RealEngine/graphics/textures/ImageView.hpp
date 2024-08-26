@@ -4,14 +4,14 @@
 #pragma once
 #include <glm/vec3.hpp>
 
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
 
 /**
  * @brief Represents a view to an image
  */
-class ImageView: public VulkanObject {
+class ImageView: public VulkanObjectBase {
 public:
     /**
      * @brief Constructs a null ImageView that does not view any image

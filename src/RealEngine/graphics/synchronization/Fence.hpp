@@ -5,14 +5,14 @@
 #include <limits>
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
 
 /**
  * @brief Allows synchronization between GPU and CPU
  */
-class Fence: public VulkanObject {
+class Fence: public VulkanObjectBase {
 public:
     /**
      * @brief Constructs a null fence that cannot be used for synchronization

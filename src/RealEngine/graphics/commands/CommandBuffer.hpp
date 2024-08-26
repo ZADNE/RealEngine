@@ -7,7 +7,7 @@
 #include <glm/vec4.hpp>
 
 #include <RealEngine/graphics/commands/BarrierHelperFuncs.hpp>
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
 
@@ -25,7 +25,7 @@ struct CommandBufferCreateInfo {
 /**
  * @brief Records commands to be executed by device (= GPU)
  */
-class CommandBuffer: public VulkanObject {
+class CommandBuffer: public VulkanObjectBase {
 public:
     /**
      * @brief Constructs a null CommandBuffer that cannot be used for recording

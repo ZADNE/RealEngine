@@ -3,7 +3,7 @@
  */
 #pragma once
 #include <RealEngine/graphics/pipelines/PipelineSources.hpp>
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
 
@@ -23,7 +23,7 @@ struct PipelineLayoutDescription {
  * buffers, etc)
  * @details DescriptorSet 'implements' a part of this interface.
  */
-class PipelineLayout: public VulkanObject {
+class PipelineLayout: public VulkanObjectBase {
 public:
     /**
      * @brief Constructs a null PipelineLayout that cannot be used

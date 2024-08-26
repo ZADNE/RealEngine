@@ -3,5 +3,5 @@
     DebugMessageHandler.hpp     DebugMessageHandler.cpp
     DeletionQueue.hpp           DeletionQueue.cpp
     VulkanFixture.hpp           VulkanFixture.cpp
-    VulkanObject.hpp            
+    VulkanObjectBase.hpp        
 )
