@@ -134,6 +134,13 @@ void Window::setPreferredDevice(std::string_view preferredDevice, bool save) {
         this->save();
 }
 
+std::string Window::usedDevice() const {
+    if (m_usedRenderer == RendererID::Vulkan13) {
+        return m_vk13.usedDevice();
+    }
+    return {};
+}
+
 void Window::setTitle(const std::string& title) {
     m_windowTitle = title;
     SDL_SetWindowTitle(m_SDLwindow, title.c_str());

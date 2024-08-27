@@ -120,6 +120,10 @@ void RoomToEngineAccess::setPreferredDevice(std::string_view preferredDevice, bo
     m_window.setPreferredDevice(preferredDevice, save);
 }
 
+std::string RoomToEngineAccess::usedDevice() const {
+    return m_window.usedDevice();
+}
+
 void RoomToEngineAccess::setWindowTitle(const std::string& title) {
     std::string prev = m_window.title();
     m_window.setTitle(title);

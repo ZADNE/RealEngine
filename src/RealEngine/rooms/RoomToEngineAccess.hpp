@@ -158,6 +158,11 @@ public:
     void setPreferredDevice(std::string_view preferredDevice, bool save);
 
     /**
+     * @copydoc Window::usedDevice
+     */
+    std::string usedDevice() const;
+
+    /**
      * @copydoc Window::setTitle
      */
     void setWindowTitle(const std::string& title);

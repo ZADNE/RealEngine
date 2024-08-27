@@ -89,6 +89,8 @@ public:
 
     std::vector<std::string> availableDevices() const;
 
+    std::string usedDevice() const;
+
 private:
     // Vulkan objects
     uint32_t m_imageIndex   = 0u;

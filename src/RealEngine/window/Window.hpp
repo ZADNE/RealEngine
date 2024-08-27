@@ -112,6 +112,13 @@ public:
     void setPreferredDevice(std::string_view preferredDevice, bool save);
 
     /**
+     * @brief Returns name of the device that is currently used
+     * @note  If it is different to the preferred one, it either was not found
+     *        or it was not suitable
+     */
+    std::string usedDevice() const;
+
+    /**
      * @brief Sets new title for the window
      * @param title The new title
      */

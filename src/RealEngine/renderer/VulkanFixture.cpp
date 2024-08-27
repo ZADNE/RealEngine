@@ -294,6 +294,10 @@ std::vector<std::string> VulkanFixture::availableDevices() const {
     return rval;
 }
 
+std::string VulkanFixture::usedDevice() const {
+    return m_physicalDevice.getProperties2().properties.deviceName;
+}
+
 vk::raii::Instance VulkanFixture::createInstance() {
     // Prepare default layers and extensions
     std::vector<const char*> extensions = {
