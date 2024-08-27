@@ -1,7 +1,6 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <bitset>
 #include <iostream>
 
 #include <ImGui/imgui_impl_sdl2.h>
@@ -12,6 +11,7 @@
 #include <vma/vk_mem_alloc.hpp>
 
 #include <RealEngine/renderer/DebugMessageHandler.hpp>
+#include <RealEngine/renderer/PhysDeviceSuitability.hpp>
 #include <RealEngine/renderer/VulkanFixture.hpp>
 #include <RealEngine/window/WindowSubsystems.hpp>
 
@@ -41,10 +41,24 @@ void checkSuccessImGui(VkResult res) {
 
 namespace re {
 
-constexpr std::array k_deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+const void* defaultDeviceCreateInfoChain() {
+    static auto s_default = vk::StructureChain{
+        vk::PhysicalDeviceFeatures2{
+            vk::PhysicalDeviceFeatures{}.setTessellationShader(true)
+        },
+        vk::PhysicalDeviceVulkan12Features{}
+            .setShaderSampledImageArrayNonUniformIndexing(true)
+            .setDescriptorBindingUpdateUnusedWhilePending(true)
+            .setDescriptorBindingPartiallyBound(true)
+            .setTimelineSemaphore(true),
+        vk::PhysicalDeviceVulkan13Features{}.setSynchronization2(true)
+    };
+    return &s_default.get<>();
+}
 
 VulkanFixture::VulkanFixture(
-    SDL_Window* sdlWindow, bool vSync, const VulkanInitInfo& initInfo
+    SDL_Window* sdlWindow, bool vSync, std::string_view preferredDevice,
+    const VulkanInitInfo& initInfo
 )
     : m_sdlWindow(sdlWindow)
     , m_instance(createInstance())
@@ -52,7 +66,9 @@ VulkanFixture::VulkanFixture(
     , m_debugUtilsMessenger(createDebugUtilsMessenger())
 #endif // !NDEBUG
     , m_surface(createSurface())
-    , m_physicalDevice(createPhysicalDevice())
+    , m_physicalDevice(
+          createPhysicalDevice(preferredDevice, initInfo.deviceCreateInfoChain)
+      )
     , m_presentMode(selectClosestPresentMode(vSync))
     , m_device(createDevice(initInfo.deviceCreateInfoChain))
     , m_allocator(createAllocator())
@@ -333,23 +349,35 @@ vk::raii::SurfaceKHR VulkanFixture::createSurface() {
     return vk::raii::SurfaceKHR{m_instance, surface};
 }
 
-vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice() {
-    for (const auto& physicalDevice : vk::raii::PhysicalDevices{m_instance}) {
-        if (areExtensionsSupported(physicalDevice) &&
-            isSwapchainSupported(physicalDevice) &&
-            findQueueFamilyIndices(physicalDevice)) {
-            auto props = physicalDevice.getProperties2().properties;
-            auto major = vk::apiVersionMajor(props.apiVersion);
-            auto minor = vk::apiVersionMinor(props.apiVersion);
-            auto patch = vk::apiVersionPatch(props.apiVersion);
-            if (major == 1 && minor >= 3) {
-                std::cout << "Vulkan:       " << major << '.' << minor << '.'
-                          << patch << '\n';
-                std::cout << "Device:       " << props.deviceName << std::endl;
-                return physicalDevice;
-            }
+vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice(
+    std::string_view preferredDevice, const void* deviceCreateInfoChain
+) {
+    SelectedPhysDevice res = selectSuitablePhysDevice(
+        *m_instance,
+        PhysDeviceRequirements{
+            .surface               = *m_surface,
+            .deviceCreateInfoChain = deviceCreateInfoChain,
+            .preferredDevice       = preferredDevice
         }
+    );
+
+    // If a device was selected (= suitable)
+    if (res) {
+        // Save queue famili indices
+        m_graphicsCompQueueFamIndex = res.graphicsCompQueueFamIndex;
+        m_presentationQueueFamIndex = res.presentationQueueFamIndex;
+
+        // Print device name
+        auto props = res.selected.getProperties2().properties;
+        auto major = vk::apiVersionMajor(props.apiVersion);
+        auto minor = vk::apiVersionMinor(props.apiVersion);
+        auto patch = vk::apiVersionPatch(props.apiVersion);
+        std::cout << "Vulkan:       " << major << '.' << minor << '.' << patch
+                  << '\n';
+        std::cout << "Device:       " << props.deviceName << std::endl;
+        return vk::raii::PhysicalDevice{m_instance, res.selected};
     }
+
     throw std::runtime_error("No physical device is suitable!");
 }
 
@@ -383,24 +411,10 @@ vk::raii::Device VulkanFixture::createDevice(const void* deviceCreateInfoChain) 
             &deviceQueuePriority
         );
     }
-    auto createInfo =
-        vk::DeviceCreateInfo{{}, deviceQueueCreateInfos, {}, k_deviceExtensions};
+    vk::DeviceCreateInfo createInfo{{}, deviceQueueCreateInfos,
+                                    {}, k_deviceExtensions,
+                                    {}, deviceCreateInfoChain};
 
-    auto defaultChain = vk::StructureChain{
-        vk::PhysicalDeviceFeatures2{
-            vk::PhysicalDeviceFeatures{}.setTessellationShader(true)
-        },
-        vk::PhysicalDeviceVulkan12Features{}
-            .setShaderSampledImageArrayNonUniformIndexing(true)
-            .setDescriptorBindingUpdateUnusedWhilePending(true)
-            .setDescriptorBindingPartiallyBound(true)
-            .setTimelineSemaphore(true),
-        vk::PhysicalDeviceVulkan13Features{}.setSynchronization2(true)
-    };
-
-    createInfo.pNext = deviceCreateInfoChain
-                           ? deviceCreateInfoChain
-                           : reinterpret_cast<const void*>(&defaultChain.get<>());
     return vk::raii::Device{m_physicalDevice, createInfo};
 }
 
@@ -585,56 +599,6 @@ vk::raii::DescriptorPool VulkanFixture::createDescriptorPool() {
         poolSizes
     };
     return vk::raii::DescriptorPool{m_device, createInfo};
-}
-
-bool VulkanFixture::areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice
-) {
-    std::bitset<k_deviceExtensions.size()> supported{};
-    for (const auto& ext : physicalDevice.enumerateDeviceExtensionProperties()) {
-        for (size_t i = 0; i < k_deviceExtensions.size(); ++i) {
-            if (std::strcmp(ext.extensionName.data(), k_deviceExtensions[i]) == 0) {
-                supported[i] = true;
-            }
-        }
-    }
-    return supported.all();
-}
-
-bool VulkanFixture::isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice
-) {
-    bool formatSupported = false;
-    for (const auto& format : physicalDevice.getSurfaceFormatsKHR(*m_surface)) {
-        if (format == k_surfaceFormat) {
-            formatSupported = true;
-            break;
-        }
-    }
-    return formatSupported;
-}
-
-bool VulkanFixture::findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice
-) {
-    using enum vk::QueueFlagBits;
-    bool graphicsCompQueueFound = false;
-    bool presentQueueFound      = false;
-    std::vector<vk::QueueFamilyProperties> queueFamilyProperties =
-        physicalDevice.getQueueFamilyProperties();
-
-    for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size());
-         i++) { // Iterate over all queue families
-        if (queueFamilyProperties[i].queueFlags & (eGraphics | eTransfer)) {
-            m_graphicsCompQueueFamIndex = i;
-            graphicsCompQueueFound      = true;
-        }
-        if (physicalDevice.getSurfaceSupportKHR(i, *m_surface)) {
-            m_presentationQueueFamIndex = i;
-            presentQueueFound           = true;
-        }
-        if (graphicsCompQueueFound && presentQueueFound) {
-            return true;
-        }
-    }
-    return false;
 }
 
 void VulkanFixture::recreateSwapchain() {

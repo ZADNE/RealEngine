@@ -97,6 +97,16 @@ public:
     void setVSync(bool vSync, bool save);
 
     /**
+     * @brief Sets name of the preferred device
+     * @param preferredDevice Name of the device must match exactly the name
+     *                        reported by underlying driver.
+     * @param save Changed settings are saved to file if true.
+     * @note The program must be restarted for the action to take effect and the
+     *       device must be suitable (support all requested features).
+     */
+    void setPreferredDevice(std::string_view preferredDevice, bool save);
+
+    /**
      * @brief Sets new title for the window
      * @param title The new title
      */
