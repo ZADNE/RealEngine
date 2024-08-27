@@ -120,6 +120,13 @@ void Window::setVSync(bool vSync, bool save) {
         this->save();
 }
 
+std::vector<std::string> Window::availableDevices() const {
+    if (m_usedRenderer == RendererID::Vulkan13) {
+        return m_vk13.availableDevices();
+    }
+    return {};
+}
+
 void Window::setPreferredDevice(std::string_view preferredDevice, bool save) {
     m_preferredDevice = preferredDevice;
     // Requires restart...

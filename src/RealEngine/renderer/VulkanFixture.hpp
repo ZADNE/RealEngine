@@ -87,6 +87,8 @@ public:
 
     void prepareForDestructionOfRendererObjects();
 
+    std::vector<std::string> availableDevices() const;
+
 private:
     // Vulkan objects
     uint32_t m_imageIndex   = 0u;

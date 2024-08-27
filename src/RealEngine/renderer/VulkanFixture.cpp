@@ -283,6 +283,17 @@ void VulkanFixture::prepareForDestructionOfRendererObjects() {
     m_device.waitIdle();
 }
 
+std::vector<std::string> VulkanFixture::availableDevices() const {
+    auto physDevices = m_instance.enumeratePhysicalDevices();
+    std::vector<std::string> rval;
+    rval.reserve(physDevices.size());
+    for (const auto& physDevice : physDevices) {
+        std::string temp = physDevice.getProperties2().properties.deviceName;
+        rval.emplace_back(std::move(temp));
+    }
+    return rval;
+}
+
 vk::raii::Instance VulkanFixture::createInstance() {
     // Prepare default layers and extensions
     std::vector<const char*> extensions = {

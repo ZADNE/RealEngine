@@ -143,6 +143,21 @@ public:
     bool isWindowVSynced() const;
 
     /**
+     * @copydoc Window::preferredDevice
+     */
+    std::string_view preferredDevice() const;
+
+    /**
+     * @copydoc Window::availableDevices
+     */
+    std::vector<std::string> availableDevices() const;
+
+    /**
+     * @copydoc Window::setPreferredDevice
+     */
+    void setPreferredDevice(std::string_view preferredDevice, bool save);
+
+    /**
      * @copydoc Window::setTitle
      */
     void setWindowTitle(const std::string& title);

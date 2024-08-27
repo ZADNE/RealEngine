@@ -97,6 +97,11 @@ public:
     void setVSync(bool vSync, bool save);
 
     /**
+     * @brief Fetches names of all available devices (even if they are not suitable)
+     */
+    std::vector<std::string> availableDevices() const;
+
+    /**
      * @brief Sets name of the preferred device
      * @param preferredDevice Name of the device must match exactly the name
      *                        reported by underlying driver.
