@@ -11,10 +11,12 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
         set(cpp_namespace_end "\n} // namespace ${cpp_namespace}\n")
     endif()
 
+    # Compose preamble
+    string(TIMESTAMP timestamp)
     string(CONCAT cpp_preamble
-        "//Automatically generated file by RealShaders\n")
+        "// Automatically generated file by RealShaders at ${timestamp}\n")
     string(CONCAT hpp_preamble
-        "//Automatically generated file by RealShaders\n"
+        "// Automatically generated file by RealShaders at ${timestamp}\n"
         "#pragma once\n"
         "#include <RealEngine/graphics/pipelines/PipelineSources.hpp>\n\n"
         ${cpp_namespace_start})
@@ -27,7 +29,7 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
         get_filename_component(shader_ext ${shader} LAST_EXT)
         if (${shader_ext} IN_LIST stage_exts)
             string(REPLACE "." "_" shader_ ${shader})
-            set(shader_declaration_line "extern re::ShaderSource ${shader_}\;\n")
+            set(shader_declaration_line "extern const re::ShaderSource ${shader_}\;\n")
             string(APPEND folder_hpp "${shader_declaration_line}")
 
             # Create C++ header for the shader
@@ -45,15 +47,15 @@ function(RealShaders_GenerateCppFiles target scope path_rel)
                 "#include <${path_rel}/${shader_}.hpp>\n\n"
                 ${cpp_namespace_start}
                 "#if 0\n"
-                "//Navigation section - use #includes to jump to files (Visual Studio):\n"
-                "//Source file:\n"
+                "// Navigation section - use #includes to jump to files (Visual Studio):\n"
+                "// Source file:\n"
                 "   #include <${path_rel}/${shader}>\n"
-                "//Dependency file:\n"
+                "// Dependency file:\n"
                 "   #include <${path_rel}/${shader}.d>\n"
-                "//Disassembly file:\n"
+                "// Disassembly file:\n"
                 "   #include <${path_rel}/${shader}.spv_vk13.txt>\n"
                 "#endif // 0 (navigation section)\n\n"
-                "re::ShaderSource ${shader_}{\n"
+                "const re::ShaderSource ${shader_}{\n"
                 "    .vk13 =\n"
                 "    #include <${path_rel}/${shader}.spv_vk13>\n"
                 "}\;\n"

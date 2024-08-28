@@ -10,9 +10,13 @@
 namespace re {
 
 FlyingCamera3D::FlyingCamera3D(glm::vec3 pos, glm::vec3 yawPitchRoll)
-    : m_pos(pos)
-    , m_dirQuat(yawPitchRoll)
-    , m_viewMat(calculateViewMat(m_dirQuat, m_pos)) {
+    : FlyingCamera3D(pos, glm::quat{yawPitchRoll}) {
+}
+
+FlyingCamera3D::FlyingCamera3D(glm::vec3 pos, glm::quat dirquat)
+    : m_viewMat(calculateViewMat(dirquat, pos))
+    , m_pos(pos)
+    , m_dirQuat(dirquat) {
 }
 
 void FlyingCamera3D::rotate(glm::vec3 yawPitchRoll) {

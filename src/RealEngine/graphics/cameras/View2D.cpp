@@ -21,7 +21,7 @@ void View2D::setCursorAbs(glm::vec2 cursorAbs) {
     m_cursorRel = convertAbsToRel(cursorAbs);
 }
 
-glm::vec2 View2D::convertAbsToRel(glm::uvec2 abs) {
+glm::vec2 View2D::convertAbsToRel(glm::uvec2 abs) const {
     // Center [0;0]
     glm::vec2 floatAbs = glm::vec2(abs);
     floatAbs -= m_viewDimensions * 0.5f;

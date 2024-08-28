@@ -13,11 +13,13 @@ using enum vma::AllocationCreateFlagBits;
 namespace re {
 
 namespace {
+
 constexpr std::array k_bindings = std::to_array<vk::VertexInputBindingDescription>({{
     0u,                          // Binding index
     sizeof(VertexPoCo),          // Stride
     vk::VertexInputRate::eVertex // Input rate
 }});
+
 constexpr std::array k_attributes = std::to_array<vk::VertexInputAttributeDescription>(
     {{
          0u,                              // Location
@@ -32,7 +34,9 @@ constexpr std::array k_attributes = std::to_array<vk::VertexInputAttributeDescri
          offsetof(VertexPoCo, color) // Relative offset
      }}
 );
-vk::PipelineVertexInputStateCreateInfo k_vertexInput{{}, k_bindings, k_attributes};
+
+const vk::PipelineVertexInputStateCreateInfo k_vertexInput{{}, k_bindings, k_attributes};
+
 } // namespace
 
 GeometryBatch::GeometryBatch(const GeometryBatchCreateInfo& createInfo)

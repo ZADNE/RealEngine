@@ -18,7 +18,7 @@ struct ShaderSource {
     /**
      * @brief SPIR-V compiled for Vulkan 1.3 environment
      */
-    const std::basic_string<uint32_t> vk13;
+    std::basic_string<uint32_t> vk13;
 };
 
 /**
