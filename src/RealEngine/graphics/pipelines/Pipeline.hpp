@@ -4,7 +4,7 @@
 #pragma once
 #include <RealEngine/graphics/output_control/RenderPass.hpp>
 #include <RealEngine/graphics/pipelines/PipelineSources.hpp>
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
 
@@ -48,7 +48,7 @@ struct PipelineComputeCreateInfo {
 /**
  * @brief Controls how vertices are transformed and shaded or describes compute work
  */
-class Pipeline: public VulkanObject {
+class Pipeline: public VulkanObjectBase {
 public:
     /**
      * @brief Constructs a null pipeline that cannot be used for rendering or compute

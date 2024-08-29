@@ -5,7 +5,7 @@
 #include <glm/vec3.hpp>
 
 #include <RealEngine/graphics/commands/CommandBuffer.hpp>
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
 
@@ -47,7 +47,7 @@ struct TextureCreateInfo {
 /**
  * @brief Represents one (or more) images and, optionally, a sampler
  */
-class Texture: public VulkanObject {
+class Texture: public VulkanObjectBase {
 public:
     /**
      * @brief Constructs a null Texture with no memory or images

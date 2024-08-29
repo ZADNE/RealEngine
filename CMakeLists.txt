@@ -4,28 +4,28 @@ project(RealEngine)
 include(FetchContent)
 include("cmake/RealShaders/RealShaders.cmake")
 
-#Find/fetch dependencies
-    #Vulkan
+# Find/fetch dependencies
+    # Vulkan
     find_package(Vulkan REQUIRED COMPONENTS glslc)
-    #SDL2
+    # SDL2
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
     find_package(SDL2 REQUIRED)
     find_package(SDL2_ttf REQUIRED)
-    #SPIRV-Cross
-    FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.275.0.tar.gz)
-    #OpenGL Mathematics
+    # SPIRV-Cross
+    FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.290.0.tar.gz)
+    # OpenGL Mathematics
     FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/refs/tags/1.0.0.tar.gz)
-    #nlohmann json
+    # nlohmann json
     FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 
-    #Download remote libs
+    # Download remote libs
     FetchContent_MakeAvailable(SPIRV-Cross glm json)
 
-    #Add embedded libs
+    # Add embedded libs
     add_subdirectory(external)
 
-#Declare projects
-    #RealEngine library
+# Declare projects
+    # RealEngine library
     add_library_with_shaders(RealEngine STATIC)
     set_target_properties(RealEngine PROPERTIES
         CXX_STANDARD 23
@@ -48,7 +48,7 @@ include("cmake/RealShaders/RealShaders.cmake")
     target_include_directories(RealEngine PUBLIC src external)
     add_subdirectory(src)
 
-    #Doxygen documentation
+    # Doxygen documentation
     find_package(Doxygen)
     if (DOXYGEN_FOUND)
         set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
@@ -62,8 +62,8 @@ include("cmake/RealShaders/RealShaders.cmake")
         )
     endif(DOXYGEN_FOUND)
 
-    #RTICreator (Windows only)
-    if(WIN32)
+    # RTICreator (Windows only)
+    if (WIN32)
         add_executable(RTICreator)
         target_include_directories(RTICreator PRIVATE tools)
         set_target_properties(RTICreator PROPERTIES

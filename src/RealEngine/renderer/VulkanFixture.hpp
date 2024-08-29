@@ -12,12 +12,18 @@
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/renderer/Allocator.hpp>
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 
 struct SDL_Window;
 
 namespace re {
+
+/**
+ * @brief Constructs chain which requests features needed by the engine.
+ * @note  Unfortunatelly this cannot be made constexpr.
+ */
+const void* defaultDeviceCreateInfoChain();
 
 /**
  * @brief Describes how to initialize Vulkan.
@@ -30,11 +36,11 @@ struct VulkanInitInfo {
     };
 
     /**
-     * @brief Chain of Vulkan structures specifing the
-     * features to initialize the device with. If unspecified, only features
-     * needed by the engine are initialized.
+     * @brief Chain of Vulkan structures specifing the features to initialize
+     * the device with. If unspecified, only features needed by the engine are
+     * initialized.
      */
-    const void* deviceCreateInfoChain = nullptr;
+    const void* deviceCreateInfoChain = defaultDeviceCreateInfoChain();
     /**
      * @brief Additional buffers that should be created.
      * Extent of all of these is the extent of the swapchain.
@@ -53,7 +59,10 @@ public:
      * @brief Sets up for Vulkan rendering
      * @throws If anything fails
      */
-    VulkanFixture(SDL_Window* sdlWindow, bool vSync, const VulkanInitInfo& initInfo);
+    VulkanFixture(
+        SDL_Window* sdlWindow, bool vSync, std::string_view preferredDevice,
+        const VulkanInitInfo& initInfo
+    );
 
     VulkanFixture(const VulkanFixture&)            = delete; /**< Noncopyable */
     VulkanFixture& operator=(const VulkanFixture&) = delete; /**< Noncopyable */
@@ -77,6 +86,10 @@ public:
     void changePresentation(bool vSync);
 
     void prepareForDestructionOfRendererObjects();
+
+    std::vector<std::string> availableDevices() const;
+
+    std::string usedDevice() const;
 
 private:
     // Vulkan objects
@@ -129,7 +142,9 @@ private:
     vk::raii::Instance createInstance();
     vk::raii::DebugUtilsMessengerEXT createDebugUtilsMessenger();
     vk::raii::SurfaceKHR createSurface();
-    vk::raii::PhysicalDevice createPhysicalDevice();
+    vk::raii::PhysicalDevice createPhysicalDevice(
+        std::string_view preferredDevice, const void* deviceCreateInfoChain
+    );
     vk::PresentModeKHR selectClosestPresentMode(bool vSync);
     vk::raii::Device createDevice(const void* deviceCreateInfoChain);
     vma::Allocator createAllocator();
@@ -143,10 +158,6 @@ private:
     FrameDoubleBuffered<vk::raii::Fence> createFences();
     vk::raii::PipelineCache createPipelineCache();
     vk::raii::DescriptorPool createDescriptorPool();
-
-    bool areExtensionsSupported(const vk::raii::PhysicalDevice& physicalDevice);
-    bool isSwapchainSupported(const vk::raii::PhysicalDevice& physicalDevice);
-    bool findQueueFamilyIndices(const vk::raii::PhysicalDevice& physicalDevice);
 
     void recreateSwapchain();
 };

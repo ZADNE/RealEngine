@@ -97,6 +97,28 @@ public:
     void setVSync(bool vSync, bool save);
 
     /**
+     * @brief Fetches names of all available devices (even if they are not suitable)
+     */
+    std::vector<std::string> availableDevices() const;
+
+    /**
+     * @brief Sets name of the preferred device
+     * @param preferredDevice Name of the device must match exactly the name
+     *                        reported by underlying driver.
+     * @param save Changed settings are saved to file if true.
+     * @note The program must be restarted for the action to take effect and the
+     *       device must be suitable (support all requested features).
+     */
+    void setPreferredDevice(std::string_view preferredDevice, bool save);
+
+    /**
+     * @brief Returns name of the device that is currently used
+     * @note  If it is different to the preferred one, it either was not found
+     *        or it was not suitable
+     */
+    std::string usedDevice() const;
+
+    /**
      * @brief Sets new title for the window
      * @param title The new title
      */

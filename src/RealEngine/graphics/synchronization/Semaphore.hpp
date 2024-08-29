@@ -5,14 +5,14 @@
 #include <limits>
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
 
 /**
  * @brief Allows synchronization CPU<->GPU and also GPU<->GPU
  */
-class Semaphore: public VulkanObject {
+class Semaphore: public VulkanObjectBase {
 public:
     /**
      * @brief Creates binary unsignaled semaphore

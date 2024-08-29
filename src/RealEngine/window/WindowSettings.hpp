@@ -41,7 +41,10 @@ public:
     /**
      * @brief Constructs settings from given parameters
      */
-    WindowSettings(glm::ivec2 dims, WindowFlags flags, RendererID preferredRenderer);
+    WindowSettings(
+        glm::ivec2 dims, WindowFlags flags, RendererID preferredRenderer,
+        std::string_view preferredDevice
+    );
 
     /**
      * @brief Gets a copy of the window flags
@@ -53,6 +56,8 @@ public:
     bool isVSynced() const { return m_flags.vSync; }
 
     RendererID preferredRenderer() const { return m_preferredRenderer; }
+
+    std::string_view preferredDevice() const { return m_preferredDevice; }
 
     /**
      * @brief Save current settings to a file.
@@ -69,8 +74,8 @@ protected:
 
     glm::ivec2 m_dims;              /**< dimensions of the window */
     WindowFlags m_flags;            /**< flags of the window */
-    RendererID m_preferredRenderer; /**< The preffed renderer may be different
-                                       from the actual renderer */
+    RendererID m_preferredRenderer; /**< The actual renderer may be different */
+    std::string m_preferredDevice;  /**< The actual device may be different */
 };
 
 } // namespace re

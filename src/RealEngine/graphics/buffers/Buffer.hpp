@@ -8,7 +8,7 @@
 #include <vector>
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
 
@@ -45,7 +45,7 @@ struct BufferCreateInfo {
  * @brief Is a continuous block of memory allocated by Vulkan
  * @note Use BufferMapped if you intend to map the buffer to CPU memory
  */
-class Buffer: public VulkanObject {
+class Buffer: public VulkanObjectBase {
 public:
     /**
      * @brief Constructs a null buffer without any backing memory

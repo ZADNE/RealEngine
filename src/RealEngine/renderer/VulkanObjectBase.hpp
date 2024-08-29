@@ -18,15 +18,15 @@ class CommandBuffer;
  * @details Children Vulkan objects (e.g. buffers, textures, pipelines) derive
  *          from this.
  */
-class VulkanObject {
+class VulkanObjectBase {
     friend class VulkanFixture;
 
 protected:
     /**
-     * @brief This constructor is deliberately protected as the VulkanObject
+     * @brief This constructor is deliberately protected as the VulkanObjectBase
      * does not do anything on its own
      */
-    VulkanObject() {}
+    VulkanObjectBase() {}
 
     static const vk::PhysicalDevice& physicalDevice() {
         return *s_physicalDevice;

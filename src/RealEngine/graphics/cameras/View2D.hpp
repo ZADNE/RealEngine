@@ -16,7 +16,7 @@ public:
 
     void setCursorAbs(glm::vec2 cursorAbs);
 
-    glm::vec2 convertAbsToRel(glm::uvec2 abs);
+    glm::vec2 convertAbsToRel(glm::uvec2 abs) const;
 
     void resizeView(glm::vec2 newDims);
     void setPosition(glm::vec2 newPosition) {
@@ -72,8 +72,8 @@ private:
     // Clipping
     void clip();
 
-    glm::vec2 m_minXY;
-    glm::vec2 m_maxXY;
+    glm::vec2 m_minXY{};
+    glm::vec2 m_maxXY{};
     bool m_clippingEnabled = false;
 };
 

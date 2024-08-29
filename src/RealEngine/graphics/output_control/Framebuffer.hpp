@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/renderer/VulkanObject.hpp>
+#include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
 
@@ -10,7 +10,7 @@ namespace re {
  * @brief Represents a collection of specific memory attachments,
  * to be used by a RenderPass.
  */
-class Framebuffer: public VulkanObject {
+class Framebuffer: public VulkanObjectBase {
 public:
     /**
      * @brief Constructs a null framebuffer that cannot be rendered into

@@ -120,6 +120,27 @@ void Window::setVSync(bool vSync, bool save) {
         this->save();
 }
 
+std::vector<std::string> Window::availableDevices() const {
+    if (m_usedRenderer == RendererID::Vulkan13) {
+        return m_vk13.availableDevices();
+    }
+    return {};
+}
+
+void Window::setPreferredDevice(std::string_view preferredDevice, bool save) {
+    m_preferredDevice = preferredDevice;
+    // Requires restart...
+    if (save)
+        this->save();
+}
+
+std::string Window::usedDevice() const {
+    if (m_usedRenderer == RendererID::Vulkan13) {
+        return m_vk13.usedDevice();
+    }
+    return {};
+}
+
 void Window::setTitle(const std::string& title) {
     m_windowTitle = title;
     SDL_SetWindowTitle(m_SDLwindow, title.c_str());
@@ -154,7 +175,8 @@ void Window::initForVulkan13(const VulkanInitInfo& initInfo) {
 
     // Set up Vulkan 1.3 fixture
     try {
-        new (&m_vk13) VulkanFixture{m_SDLwindow, (bool)m_flags.vSync, initInfo};
+        new (&m_vk13
+        ) VulkanFixture{m_SDLwindow, (bool)m_flags.vSync, m_preferredDevice, initInfo};
     } catch (std::exception& e) {
         std::cerr << e.what() << '\n';
         goto fail_SDLWindow;
