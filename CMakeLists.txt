@@ -3,6 +3,7 @@ project(RealEngine)
 
 include(FetchContent)
 include("cmake/RealShaders/RealShaders.cmake")
+include("cmake/IncludeSDL2WithPrefix.cmake")
 
 # Find/fetch dependencies
     # Vulkan
@@ -46,25 +47,7 @@ include("cmake/RealShaders/RealShaders.cmake")
         lodepng
     )
     target_include_directories(RealEngine PUBLIC src external)
-    # Strip SDL2 from the include path so that it can be included as <SDL2/SDL.h>
-    cmake_path(GET SDL2_INCLUDE_DIRS FILENAME RE_SDL2_INCLUDE_DIR_FILENAME)
-    if ("${RE_SDL2_INCLUDE_DIR_FILENAME}" STREQUAL SDL2)
-        cmake_path(REMOVE_FILENAME SDL2_INCLUDE_DIR
-                   OUTPUT_VARIABLE RE_SDL2_NO_SUFFIX
-        )
-        target_include_directories(RealEngine PRIVATE ${RE_SDL2_NO_SUFFIX})
-        message("IN IF SDL2")
-    endif()
-    cmake_path(GET SDL2_TTF_INCLUDE_DIRS FILENAME RE_SDL2_TTF_INCLUDE_DIR_FILENAME)
-    if ("${RE_SDL2_TTF_INCLUDE_DIR_FILENAME}" STREQUAL SDL2)
-        cmake_path(REMOVE_FILENAME SDL2_TTF_INCLUDE_DIR
-                   OUTPUT_VARIABLE RE_SDL2_TTF_NO_SUFFIX
-        )
-        target_include_directories(RealEngine PRIVATE ${RE_SDL2_TTF_NO_SUFFIX})
-        message("IN IF SDL2 TTF")
-    endif()
-    get_target_property(RE_TEST_VAR RealEngine INCLUDE_DIRECTORIES)
-    message("RE_TEST_VAR = ${RE_TEST_VAR}")
+    target_includes_sdl2_prefixed(RealEngine PUBLIC)
     add_subdirectory(src)
 
     # Doxygen documentation
