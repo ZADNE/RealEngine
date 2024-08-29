@@ -45,13 +45,13 @@ jobs:
         cache: true
 
     - name: Set up SDL2
-      uses: libsdl-org/setup-sdl@main
+      uses: libsdl-org/setup-sdl@try-node16
       id: sdl
       with:
         build-type: ${{ matrix.build_type }}
         install-linux-dependencies: true
-        version: 2-latest
-        version-sdl-ttf: 2-latest
+        version: 2.30.6
+        version-sdl-ttf: 2.22.0
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
