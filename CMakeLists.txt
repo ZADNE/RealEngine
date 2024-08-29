@@ -22,6 +22,7 @@ include("cmake/RealShaders/RealShaders.cmake")
     FetchContent_MakeAvailable(SPIRV-Cross glm json)
 
     # Add embedded libs
+    message("SDL2_INCLUDE_DIRS = ${SDL2_INCLUDE_DIRS}")
     add_subdirectory(external)
 
 # Declare projects
