@@ -1,4 +1,4 @@
-#author     Dubsky Tomas
+# author     Dubsky Tomas
 
 include("cmake/RealShaders/CollateShaders.cmake")
 include("cmake/RealShaders/GenerateCppFiles.cmake")
