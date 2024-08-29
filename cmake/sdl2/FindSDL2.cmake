@@ -175,6 +175,12 @@ find_path(SDL2_INCLUDE_DIR SDL.h
   DOC "Where the SDL2 headers can be found"
 )
 
+# Strip SDL2 from the include path so that it can be included as <SDL2/SDL.h>
+cmake_path(GET SDL2_INCLUDE_DIR FILENAME SDL2_INCLUDE_DIR_FILENAME)
+if ("${SDL2_INCLUDE_DIR_FILENAME}" STREQUAL SDL2)
+    cmake_path(REMOVE_FILENAME SDL2_INCLUDE_DIR)
+endif()
+
 set(SDL2_INCLUDE_DIRS "${SDL2_INCLUDE_DIR}")
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)

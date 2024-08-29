@@ -194,6 +194,13 @@ if(SDL2_TTF_INCLUDE_DIR AND EXISTS "${SDL2_TTF_INCLUDE_DIR}/SDL_ttf.h")
 endif()
 
 set(SDL2_TTF_LIBRARIES ${SDL2_TTF_LIBRARY})
+
+# Strip SDL2 from the include path so that it can be included as <SDL2/SDL.h>
+cmake_path(GET SDL2_TTF_INCLUDE_DIR FILENAME SDL2_TTF_INCLUDE_DIR_FILENAME)
+if (${SDL2_TTF_INCLUDE_DIR_FILENAME} STREQUAL SDL2)
+    cmake_path(REMOVE_FILENAME SDL2_TTF_INCLUDE_DIR)
+endif()
+
 set(SDL2_TTF_INCLUDE_DIRS ${SDL2_TTF_INCLUDE_DIR})
 
 include(FindPackageHandleStandardArgs)
