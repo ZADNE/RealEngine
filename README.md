@@ -1,5 +1,7 @@
 # RealEngine: A Vulkan-based engine-like library
 
+![Build](https://github.com/ZADNE/RealEngine/actions/workflows/build.yml/badge.svg) ![Formatting](https://github.com/ZADNE/RealEngine/actions/workflows/build.yml/badge.svg)
+
 ## Features:
 - A set of convenient classes to ease Vulkan 1.3 rendering
 - Automatic generation of C++ wrappers representing SPIR-V of shaders
