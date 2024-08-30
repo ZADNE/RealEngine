@@ -2,6 +2,8 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <utility>
+
 #include <vma/vk_mem_alloc.hpp>
 #include <vulkan/vulkan.hpp>
 
