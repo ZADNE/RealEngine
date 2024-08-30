@@ -1,6 +1,6 @@
 # RealEngine: A Vulkan-based engine-like library
 
-![Build](https://github.com/ZADNE/RealEngine/actions/workflows/build.yml/badge.svg) ![Formatting](https://github.com/ZADNE/RealEngine/actions/workflows/build.yml/badge.svg)
+![CMake build](https://github.com/ZADNE/RealEngine/actions/workflows/build.yml/badge.svg) ![Formatting](https://github.com/ZADNE/RealEngine/actions/workflows/formatting.yml/badge.svg)
 
 ## Features:
 - A set of convenient classes to ease Vulkan 1.3 rendering
