@@ -14,22 +14,9 @@ jobs:
         os: [ubuntu-24.04]
 
     steps:
-    - name: Clone Real
-      uses: actions/checkout@v4
+    - name: Real formatting check
+      uses: ZADNE/RealFormatting@v0.1
       with:
-        repository: ZADNE/Real
-        path: Real
-
-    - name: Clone RealEngine
-      uses: actions/checkout@v4
-      with:
-        repository: ZADNE/RealEngine
-        ref: ${{github.ref}}
-        path: Real/RealEngine
-        clean: false
-
-    - name: Check formatting
-      uses: jidicula/clang-format-action@v4.13.0
-      with:
-        clang-format-version: '17'
-        check-path: 'Real/RealEngine/src'
+        repository: ${{ github.repository }}
+        ref: ${{ github.ref }}
+        path: src
