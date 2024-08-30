@@ -19,30 +19,24 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-24.04, windows-latest]
         build_type: [Release]
-        c_compiler: [gcc-13, cl]
+        c_compiler: [gcc-14, cl]
         include:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
-          - os: ubuntu-latest
-            c_compiler: gcc-13
-            cpp_compiler: g++-13
+          - os: ubuntu-24.04
+            c_compiler: gcc-14
+            cpp_compiler: g++-14
         exclude:
           - os: windows-latest
-            c_compiler: gcc
-          - os: ubuntu-latest
+            c_compiler: gcc-14
+          - os: ubuntu-24.04
             c_compiler: cl
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Set up modern GCC
-      if: runner.os == 'Linux'
-      uses: pkgxdev/setup@v2.0.2
-      with:
-        +: gcc@13
 
     - name: Set up Vulkan SDK
       uses: humbletim/install-vulkan-sdk@v1.1.1
