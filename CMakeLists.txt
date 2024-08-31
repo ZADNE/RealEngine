@@ -3,6 +3,7 @@ project(RealEngine)
 
 include(FetchContent)
 include("cmake/RealShaders/RealShaders.cmake")
+include("cmake/IncludeSDL2WithPrefix.cmake")
 
 # Find/fetch dependencies
     # Vulkan
@@ -46,6 +47,7 @@ include("cmake/RealShaders/RealShaders.cmake")
         lodepng
     )
     target_include_directories(RealEngine PUBLIC src external)
+    target_includes_sdl2_prefixed(RealEngine PUBLIC)
     add_subdirectory(src)
 
     # Doxygen documentation
