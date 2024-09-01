@@ -61,5 +61,5 @@ jobs:
       with:
         scandir: '${{ env.source-dir }}'
         builddir: '${{ env.build-dir }}'
-        excludedirs: 'Real/RealEngine/external'
+        excludedirs: 'RealEngine/external'
         extensions: 'hpp,cpp'
