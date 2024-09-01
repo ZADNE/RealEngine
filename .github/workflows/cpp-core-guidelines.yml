@@ -57,10 +57,9 @@ jobs:
         -S ${{ env.source-dir }}
 
     - name: Run clang-tidy
-      uses: HorstBaerbel/action-clang-tidy@1.2
+      uses: ZADNE/RealLinting@v0.1
       with:
         scandir: '${{ env.source-dir }}'
         builddir: '${{ env.build-dir }}'
         excludedirs: 'Real/RealEngine/external'
         extensions: 'hpp,cpp'
-        useexistingbuild: true
