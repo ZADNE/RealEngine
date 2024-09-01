@@ -1,4 +1,5 @@
 ---
-HeaderFilterRegex: '^(RealEngine|RTICreator)\/.*$'
+HeaderFilterRegex:      '^(RealEngine|RTICreator)\/.*$'
+InheritParentConfig:    true
 ...
 

@@ -47,19 +47,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install libsdl2-dev libsdl2-2.0-0 libsdl2-ttf-dev libsdl2-ttf-2.0-0 -y;
 
-    - name: Test
-      shell: bash
-      run: |
-        cd Real
-        echo ---Real---
-        ls
-        cat .clang-tidy
-        ${{ matrix.clang_tidy }} --dump-config
-        echo ---RealEngine---
-        cd RealEngine
-        ls
-        ${{ matrix.clang_tidy }} --dump-config
-
     - name: Configure CMake
       run: >
         cmake -B ${{ env.build-dir }}
