@@ -6,13 +6,12 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  cpp-core-guidelines:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04]
-        build_type: [Release]
         clang_tidy: [clang-tidy-18]
 
     steps:
@@ -51,9 +50,9 @@ jobs:
       run: >
         cmake -B ${{ env.build-dir }}
         -DCMAKE_CXX_COMPILER=g++-14
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DCMAKE_BUILD_TYPE=Debug
         -DCMAKE_CXX_CLANG_TIDY=${{ matrix.clang_tidy }}
         -S ${{ env.source-dir }}
 
     - name: Run clang-tidy
-      run: cmake --build ${{ env.build-dir }} --config ${{ matrix.build_type }} --parallel 4
+      run: cmake --build ${{ env.build-dir }} --config Debug --parallel 4
