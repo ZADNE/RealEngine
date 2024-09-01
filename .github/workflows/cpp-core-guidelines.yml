@@ -18,11 +18,11 @@ jobs:
 
     steps:
     - name: Prepare variables
-      id: strings
       shell: bash
       run: |
         echo "repo-name=$(basename -- "${{ github.repository }}")" >> $GITHUB_ENV
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "build-dir=${{ github.workspace }}/Real/build" >> "$GITHUB_ENV"
+        echo "source-dir=${{ github.workspace }}/Real" >> "$GITHUB_ENV"
 
     - name: Clone Real
       uses: actions/checkout@v4
@@ -50,17 +50,17 @@ jobs:
 
     - name: Configure CMake
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        cmake -B ${{ env.build-dir }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -S ${{ github.workspace }}
+        -S ${{ env.source-dir }}
 
     - name: Run clang-tidy
       uses: HorstBaerbel/action-clang-tidy@1.2
       with:
-        scandir: '.'
-        builddir: '${{ steps.strings.outputs.build-output-dir }}'
+        scandir: '${{ env.source-dir }}'
+        builddir: '${{ env.build-dir }}'
         excludedirs: 'Real/RealEngine/external'
         extensions: 'hpp,cpp'
         useexistingbuild: true
