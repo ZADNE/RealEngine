@@ -70,7 +70,7 @@ private:
 
     template<std::invocable<std::u8string_view> AlignFunc>
     void addGeneric(
-        SpriteBatch& batch, std::u8string_view str, AlignFunc&& align, Color col
+        SpriteBatch& batch, std::u8string_view str, const AlignFunc& align, Color col
     ) const;
 
     struct GlyphOffset {

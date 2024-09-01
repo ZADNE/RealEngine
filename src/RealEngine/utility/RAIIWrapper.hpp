@@ -2,29 +2,28 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <concepts>
 #include <utility>
 
 namespace re {
 
 /**
- * @brief       Implements RAII for C-style pointer-to-opaque objects
- * @tparam T    The opaque type
- * @tparam Deleter The function that will be used to delete the object
+ * @brief           Implements RAII for C-style pointer-to-opaque objects
+ * @tparam T        The opaque type
+ * @tparam Deleter  A functor that, when default constructed, is used to delete T.
  */
-template<typename T, std::invocable<T*> Deleter>
-class RAIIWrapper {
+template<typename T, class Deleter>
+class RAIIWrapperFntr {
 public:
-    RAIIWrapper(T* val)
+    RAIIWrapperFntr(T* val)
         : m_val(val) {}
 
-    RAIIWrapper(const RAIIWrapper&)            = delete;  /**< Noncopyable */
-    RAIIWrapper& operator=(const RAIIWrapper&) = delete;  /**< Noncopyable */
+    RAIIWrapperFntr(const RAIIWrapperFntr&) = delete; /**< Noncopyable */
+    RAIIWrapperFntr& operator=(const RAIIWrapperFntr&) = delete; /**< Noncopyable */
 
-    RAIIWrapper(RAIIWrapper&& other) noexcept;            /**< Movable */
-    RAIIWrapper& operator=(RAIIWrapper&& other) noexcept; /**< Movable */
+    RAIIWrapperFntr(RAIIWrapperFntr&& other) noexcept;           /**< Movable */
+    RAIIWrapperFntr& operator=(RAIIWrapperFntr&& other) noexcept; /**< Movable */
 
-    ~RAIIWrapper() { Deleter(m_val); }
+    ~RAIIWrapperFntr() { Deleter{}(m_val); }
 
     operator T*() const { return m_val; } /**< Implicitly convertible */
 
@@ -34,17 +33,26 @@ private:
     T* m_val{};
 };
 
-template<typename T, std::invocable<T*> Deleter>
-inline RAIIWrapper<T, Deleter>::RAIIWrapper(RAIIWrapper<T, Deleter>&& other) noexcept
+template<typename T, class Deleter>
+inline RAIIWrapperFntr<T, Deleter>::RAIIWrapperFntr(RAIIWrapperFntr<T, Deleter>&& other
+) noexcept
     : m_val(std::exchange(other.m_val, nullptr)) {
 }
 
-template<typename T, std::invocable<T*> Deleter>
-inline RAIIWrapper<T, Deleter>& RAIIWrapper<T, Deleter>::operator=(
-    RAIIWrapper<T, Deleter>&& other
+template<typename T, class Deleter>
+inline RAIIWrapperFntr<T, Deleter>& RAIIWrapperFntr<T, Deleter>::operator=(
+    RAIIWrapperFntr<T, Deleter>&& other
 ) noexcept {
     m_val = std::exchange(other.m_val, nullptr);
     return *this;
 }
+
+/**
+ * @brief           Implements RAII for C-style pointer-to-opaque objects
+ * @tparam T        The opaque type
+ * @tparam DeleteFn The function that will be used to delete the object
+ */
+template<typename T, auto DeleteFn>
+using RAIIWrapper = RAIIWrapperFntr<T, decltype([](T* obj) { DeleteFn(obj); })>;
 
 } // namespace re

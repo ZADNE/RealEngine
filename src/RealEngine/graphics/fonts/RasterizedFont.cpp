@@ -16,8 +16,8 @@
 
 namespace re {
 
-using TTF_FontRAII    = RAIIWrapper<TTF_Font, decltype(TTF_CloseFont)*>;
-using SDL_SurfaceRAII = RAIIWrapper<SDL_Surface, decltype(SDL_FreeSurface)*>;
+using TTF_FontRAII    = RAIIWrapper<TTF_Font, TTF_CloseFont>;
+using SDL_SurfaceRAII = RAIIWrapper<SDL_Surface, SDL_FreeSurface>;
 
 RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     TTF_FontRAII font = TTF_OpenFontIndex(
@@ -69,9 +69,10 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     m_lineSkipPx = static_cast<float>(TTF_FontLineSkip(font));
 
     // Calculate size of the texture and prepare stage
-    const uint32_t minArea    = totalWidth * height;
-    const uint32_t squareRoot = std::sqrt(static_cast<float>(minArea));
-    const uint32_t texWidth   = std::bit_ceil(squareRoot);
+    const uint32_t minArea = totalWidth * height;
+    const uint32_t squareRoot =
+        static_cast<uint32_t>(std::sqrt(static_cast<float>(minArea)));
+    const uint32_t texWidth = std::bit_ceil(squareRoot);
     const uint32_t texHeight =
         roundToMultiple(ceilDiv(minArea, texWidth) + height, height);
     const uint32_t area = texWidth * texHeight;
@@ -81,16 +82,17 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     // Lambda for copying from SDL surface to stage buffer
     auto copyGlyph = [stage = stage.data(),
                       &texWidth](const SDL_Surface* surf, glm::ivec2 botLeft) {
-        const int rowCopyBytes = surf->w;
-        const int pitchBytes   = surf->pitch;
-        const auto pixels      = reinterpret_cast<unsigned char*>(surf->pixels);
+        constexpr static int k_alphaOffset = 3;
+        const int rowCopyBytes             = surf->w;
+        const int pitchBytes               = surf->pitch;
+        const auto pixels = reinterpret_cast<unsigned char*>(surf->pixels);
         for (int yGlyph = 0; yGlyph < surf->h; yGlyph++) {
             int y = yGlyph + botLeft.y;
             for (int xGlyph = 0; xGlyph < surf->w; xGlyph++) {
                 int x = xGlyph + botLeft.x;
                 // Extract alpha channel only
                 stage[x + y * texWidth] =
-                    pixels[(xGlyph * 4 + yGlyph * pitchBytes) + 3];
+                    pixels[(xGlyph * 4 + yGlyph * pitchBytes) + k_alphaOffset];
             }
         }
     };
@@ -161,7 +163,7 @@ void RasterizedFont::add(
 int RasterizedFont::codeToIndex(char32_t c) const {
     for (const GlyphOffset& offset : m_offsets) {
         if (offset.lastChar >= c) {
-            return offset.baseOffset - (offset.lastChar - c);
+            return offset.baseOffset - (offset.lastChar - c); // NOLINT(*-conversions)
         }
     }
     assert(!"Character not found");
@@ -173,7 +175,7 @@ float RasterizedFont::measureLineWidth(std::u8string_view str) const {
     float widthPx      = 0.0f;
     char32_t prevC     = readCode(str);
     if (nonEndingChar(prevC)) { // If not 0 char line
-        char32_t c;
+        char32_t c{};
         while (nonEndingChar(c = readCode(str))) {
             widthPx += m_glyphs[codeToIndex(prevC)].advancePx;
             prevC = c;
@@ -185,7 +187,7 @@ float RasterizedFont::measureLineWidth(std::u8string_view str) const {
 
 template<std::invocable<std::u8string_view> AlignFunc>
 void RasterizedFont::addGeneric(
-    SpriteBatch& batch, std::u8string_view str, AlignFunc&& align, Color col
+    SpriteBatch& batch, std::u8string_view str, const AlignFunc& align, Color col
 ) const {
     glm::vec2 cursorPx = align(str);
     while (!str.empty()) {
