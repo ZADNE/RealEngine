@@ -84,7 +84,7 @@ VulkanFixture::VulkanFixture(
     , m_cbs([&]() {
         assignImplementationReferences(); // Deliberate side effect, ref to device
                                           // and pool is required to construct a cmd buf
-        return FrameDoubleBuffered{
+        return FrameDoubleBuffered<CommandBuffer>{
             CommandBuffer{{.debugName = "re::VulkanFixture::cbs[0]"}},
             CommandBuffer{{.debugName = "re::VulkanFixture::cbs[1]"}}
         };

@@ -100,6 +100,7 @@ std::unique_ptr<std::byte[]> copyPhysDeviceCreateInfoChain(const void* chain) {
     }
 
     // Allocate the buffer
+    assert(totalSizeBytes > 0);
     auto buf = std::make_unique_for_overwrite<std::byte[]>(totalSizeBytes);
 
     // Initialize the chain

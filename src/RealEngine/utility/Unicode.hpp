@@ -5,6 +5,7 @@
 #pragma once
 #include <array>
 #include <bit>
+#include <cassert>
 #include <string_view>
 
 #include <RealEngine/utility/BuildType.hpp>
@@ -58,6 +59,7 @@ constexpr char32_t readCode(std::u8string_view& str) {
     if (size > str.size()) {
         return k_invalidCode; // Not all bytes of codepoint provided
     }
+    assert(size <= 4);
 
     // Extract bits from first byte
     char8_t mask0    = (1 << (7 - (size - static_cast<int>(!(size - 1))))) - 1;
