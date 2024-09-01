@@ -59,7 +59,7 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
         std::tie(m_buffer, m_allocation) = allocateBuffer(createInfo, pointerToMapped);
         if (!createInfo.initData.empty()) {
             // Copy init data to directly to the buffer
-            std::byte* dst = reinterpret_cast<std::byte*>(*pointerToMapped) +
+            std::byte* dst = reinterpret_cast<std::byte*>(*pointerToMapped) + // NOLINT
                              createInfo.initDataDstOffset;
             std::memcpy(
                 dst, createInfo.initData.data(), createInfo.initData.size_bytes()
