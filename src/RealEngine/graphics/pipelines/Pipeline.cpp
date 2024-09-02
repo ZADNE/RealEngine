@@ -17,7 +17,6 @@ vk::ShaderStageFlagBits convert(size_t st) {
     case 2:  return vk::ShaderStageFlagBits::eTessellationEvaluation;
     case 3:  return vk::ShaderStageFlagBits::eGeometry;
     case 4:  return vk::ShaderStageFlagBits::eFragment;
-    case 5:  return vk::ShaderStageFlagBits::eCompute;
     default: throw Exception{"Unknown shader type"};
     }
 }
@@ -31,6 +30,7 @@ Pipeline::Pipeline(
     constexpr auto k_numStages = PipelineGraphicsSources::k_numStages;
     std::array<vk::ShaderModule, k_numStages> modules;
     std::array<vk::PipelineShaderStageCreateInfo, k_numStages> stages;
+    // NOLINTBEGIN(*-array-index): shaderCount is winthin [0,k_numStages - 1]
     uint32_t shaderCount = 0;
     for (size_t st = 0; st < k_numStages; ++st) {
         if (!srcs[st].vk13.empty()) {
@@ -125,6 +125,7 @@ Pipeline::Pipeline(
     for (uint32_t i = 0; i < shaderCount; i++) {
         device().destroyShaderModule(modules[i]);
     }
+    // NOLINTEND(*-array-index)
 
     setDebugUtilsObjectName(m_pipeline, createInfo.debugName);
 }

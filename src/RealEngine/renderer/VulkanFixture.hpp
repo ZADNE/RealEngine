@@ -4,6 +4,7 @@
 #pragma once
 #include <array>
 #include <memory>
+#include <vector>
 
 #include <glm/vec4.hpp>
 #include <vma/vk_mem_alloc.hpp>
@@ -102,10 +103,10 @@ private:
     vk::raii::DebugUtilsMessengerEXT m_debugUtilsMessenger;
 #endif // !NDEBUG
     vk::raii::SurfaceKHR m_surface;
-    uint32_t m_graphicsCompQueueFamIndex;
-    uint32_t m_presentationQueueFamIndex;
+    uint32_t m_graphicsCompQueueFamIndex{};
+    uint32_t m_presentationQueueFamIndex{};
     vk::raii::PhysicalDevice m_physicalDevice;
-    vk::PresentModeKHR m_presentMode;
+    vk::PresentModeKHR m_presentMode{};
     vk::raii::Device m_device;
     vk::DispatchLoaderDynamic m_dispatchLoaderDynamic{
         *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr
@@ -113,8 +114,8 @@ private:
     Allocator m_allocator;
     vk::raii::Queue m_graphicsCompQueue;
     vk::raii::Queue m_presentationQueue;
-    uint32_t m_minImageCount;
-    vk::Extent2D m_swapchainExtent;
+    uint32_t m_minImageCount{};
+    vk::Extent2D m_swapchainExtent{};
     vk::raii::SwapchainKHR m_swapchain;
     std::vector<vk::raii::ImageView> m_swapchainImageViews;
     std::vector<VulkanInitInfo::BufferDescr> m_additionalBufferDescrs;

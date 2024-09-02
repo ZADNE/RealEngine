@@ -100,7 +100,7 @@ void PipelineLayout::reflectSource(
             vk::DescriptorType descType) {
             for (const auto& res : resources) {
                 const auto& type = compiler.get_type(res.type_id);
-                uint32_t count;
+                uint32_t count{};
                 if (!type.array.empty()) {            // If it is arrayarray
                     if (type.array_size_literal[0]) { // If size is literal
                         count = type.array[0];

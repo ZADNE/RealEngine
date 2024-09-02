@@ -82,17 +82,16 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     // Lambda for copying from SDL surface to stage buffer
     auto copyGlyph = [stage = stage.data(),
                       &texWidth](const SDL_Surface* surf, glm::ivec2 botLeft) {
-        constexpr static int k_alphaOffset = 3;
-        const int rowCopyBytes             = surf->w;
-        const int pitchBytes               = surf->pitch;
-        const auto pixels = reinterpret_cast<unsigned char*>(surf->pixels);
+        const int rowCopyBytes = surf->w;
+        const int pitchBytes   = surf->pitch;
+        const auto pixels      = reinterpret_cast<unsigned char*>(surf->pixels);
         for (int yGlyph = 0; yGlyph < surf->h; yGlyph++) {
             int y = yGlyph + botLeft.y;
             for (int xGlyph = 0; xGlyph < surf->w; xGlyph++) {
                 int x = xGlyph + botLeft.x;
                 // Extract alpha channel only
                 stage[x + y * texWidth] =
-                    pixels[(xGlyph * 4 + yGlyph * pitchBytes) + k_alphaOffset];
+                    pixels[(xGlyph * 4 + yGlyph * pitchBytes) + 3];
             }
         }
     };

@@ -1,5 +1,4 @@
 add_library(vma INTERFACE)
-set_property(TARGET vma PROPERTY COMPILE_WARNING_AS_ERROR OFF)
 
 target_sources(vma INTERFACE
     vk_mem_alloc.h

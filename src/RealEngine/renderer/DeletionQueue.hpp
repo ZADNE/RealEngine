@@ -16,8 +16,6 @@ namespace re {
  *          Objects are deleted in the order they were added in.
  */
 class DeletionQueue {
-    friend class VulkanFixture;
-
 public:
     DeletionQueue(const vk::Device& device, const vma::Allocator& allocator);
 

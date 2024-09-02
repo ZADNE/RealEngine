@@ -14,16 +14,13 @@ class MainProgram;
  * Optionally, limits the number of frames per second.
  */
 class Synchronizer {
-    friend class MainProgram;
-
 public:
     using TimePoint =
         std::chrono::steady_clock::time_point; /**< Time point type alias */
     using Duration =
         std::chrono::steady_clock::duration;   /**< Time duration type alias */
 
-    constexpr static unsigned int k_doNotLimitFramesPerSecond =
-        0u; /**< Constant which denotes that frames per second should not be limited */
+    constexpr static unsigned int k_doNotLimitFramesPerSecond = 0u;
 
     /**
      * @brief Constructs new synchronizer.
@@ -98,7 +95,6 @@ public:
      */
     Duration maxFrameTime() const;
 
-private:
     /**
      * @brief This function has to be called at the beginning of each frame
      */
@@ -119,10 +115,14 @@ private:
      */
     bool shouldStepHappen();
 
+private:
+
     /**
      * @brief Sleeps this thread until next frame should begin.
      */
     void delayTillEndOfFrame();
+
+    void resetSynchronization();
 
     unsigned int m_currFrameIndex = 0; /**< Number of frames drawn since last resume,
                                           used when limiting frames per second */
@@ -131,9 +131,9 @@ private:
     TimePoint m_lastFrameTime; /**< Time point of the last frame start - used to
                                   determine its period */
 
-    Duration m_timePerStep;    /**< Time duration for each step */
-    Duration m_timePerFrame;   /**< Time duration for each frame, zero if not
-                                  limiting FPS (time per frame can vary) */
+    Duration m_timePerStep{};  /**< Time duration for each step */
+    Duration m_timePerFrame{}; /**< Time duration for each frame, zero if not
+                                limiting FPS (time per frame can vary) */
 
     Duration m_stepTimeAccumulator{Duration::zero()
     }; /**< Accumulator of time for next step */

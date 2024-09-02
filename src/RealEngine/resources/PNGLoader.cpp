@@ -70,15 +70,18 @@ PNGLoader::PNGData PNGLoader::load(const std::string& filePathPNG) {
     }
 
     // Load parameters
-    for (size_t unknownChunkPos = 0; unknownChunkPos < 3; unknownChunkPos++) {
-        const auto& unknownData = state.info_png.unknown_chunks_data[0];
+    constexpr static size_t k_maxUnknownChunks =
+        sizeof(LodePNGInfo::unknown_chunks_size) /
+        sizeof(LodePNGInfo::unknown_chunks_size[0]);
+    for (size_t i = 0; i < k_maxUnknownChunks; i++) {
+        const auto& unknownData = state.info_png.unknown_chunks_data[i];
         const auto& unknownDataEnd =
-            &unknownData[state.info_png.unknown_chunks_size[0]];
+            &unknownData[state.info_png.unknown_chunks_size[i]];
         for (auto chunk = unknownData; chunk != unknownDataEnd;
              chunk      = lodepng_chunk_next(chunk, unknownDataEnd)) {
-            char type[5];
-            lodepng_chunk_type(type, chunk);
-            if (std::string{"reAl"} == type) {
+            std::array<char, 5> type; // NOLINT(*-magic-numbers): 4 + null char
+            lodepng_chunk_type(type.data(), chunk);
+            if (std::string{"reAl"} == type.data()) {
                 decoded.shape = decodeTextureShape(
                     lodepng_chunk_data_const(chunk), lodepng_chunk_length(chunk)
                 );
@@ -93,7 +96,7 @@ PNGLoader::PNGData PNGLoader::load(const std::string& filePathPNG) {
 void PNGLoader::save(const std::string& filePathPNG, const PNGData& data) {
     // Create RTI chunk
     lodepng::State state{};
-    unsigned int code;
+    unsigned int code{};
     auto rti = encodeTextureShape(data.shape);
     if ((code = lodepng_chunk_create(
              &state.info_png.unknown_chunks_data[0],

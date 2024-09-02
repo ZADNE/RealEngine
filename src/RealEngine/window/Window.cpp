@@ -46,6 +46,7 @@ Window::Window(
 Window::~Window() {
     switch (m_usedRenderer) {
     case RendererID::Vulkan13: m_vk13.~VulkanFixture(); break;
+    case RendererID::Any:      break;
     }
     SDL_DestroyWindow(m_SDLwindow);
 }
@@ -197,6 +198,7 @@ bool Window::createSDLWindow(RendererID renderer) {
     Uint32 SDL_flags = 0;
     switch (renderer) {
     case RendererID::Vulkan13: SDL_flags |= SDL_WINDOW_VULKAN; break;
+    case RendererID::Any:      break;
     }
     if (m_flags.invisible)
         SDL_flags |= SDL_WINDOW_HIDDEN;
