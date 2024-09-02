@@ -22,6 +22,8 @@ jobs:
         echo "repo-name=$(basename -- "${{ github.repository }}")" >> $GITHUB_ENV
         echo "build-dir=${{ github.workspace }}/Real/build" >> "$GITHUB_ENV"
         echo "source-dir=${{ github.workspace }}/Real" >> "$GITHUB_ENV"
+        echo "clang-tidy-fix-file=${{ github.workspace }}/clang-tidy-fixes.yml" >> "$GITHUB_ENV"
+        echo "clang-tidy-command=${{ matrix.clang_tidy }} --export-fixes=${{ github.workspace }}/clang-tidy-fixes.yml" >> "$GITHUB_ENV"
 
     - name: Clone Real
       uses: actions/checkout@v4
@@ -57,3 +59,12 @@ jobs:
 
     - name: Run clang-tidy
       run: cmake --build ${{ env.build-dir }} --config ${{ matrix.build_type }} --parallel 4
+
+    - name: Check if any fixes were suggested
+      shell: bash
+      run: |
+        if [ -f ${{ env.clang-tidy-fix-file }} ]; then
+        echo "Some fixes were recommended - fix them"
+        cat ${{ env.clang-tidy-fix-file }}
+        exit 1
+        fi

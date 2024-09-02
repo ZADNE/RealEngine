@@ -7,6 +7,7 @@ include("cmake/IncludeSDL2WithPrefix.cmake")
 
 function(FetchContent_MakeAvailableWithoutLinting)
     set(CMAKE_CXX_CLANG_TIDY "")
+    set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
     FetchContent_MakeAvailable(${ARGV})
 endfunction()
 

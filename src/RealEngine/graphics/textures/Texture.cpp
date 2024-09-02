@@ -19,7 +19,7 @@ vk::ImageViewType imageViewType(vk::ImageType imageType, uint32_t layers) {
         switch (imageType) {
         case vk::ImageType::e1D: return vk::ImageViewType::e1DArray;
         case vk::ImageType::e2D: return vk::ImageViewType::e2DArray;
-        default:                 break;
+        case vk::ImageType::e3D: break; // Unsupported
         }
     } else {
         switch (imageType) {
