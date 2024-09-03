@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
-import os, sys, subprocess, json
+import os, sys, subprocess, multiprocessing, json
 
 # Get arguments
-print("Arguments: " + str(sys.argv))
 clangTidyFilepath = sys.argv[1]
 jsonFilepath = sys.argv[2]
 outputFilepath = sys.argv[3]
@@ -22,14 +21,16 @@ def runClangTidy(entry):
     proc.wait()
 
 # Check files
-for entry in json:
-    runClangTidy(entry)
+pool = multiprocessing.Pool(4)
+pool.map(runClangTidy, json)
+pool.close()
+pool.join()
 
 # Report output
 if os.stat(outputFilepath).st_size > 0:
+    print(f'-------------------------------------------------')
     print(f'Some files did not pass linting! Problems follow:')
-    log = open(outputFilepath, "r")
-    for line in log:
-        print(line)
+    with open(outputFilepath, 'r') as f:
+        print(f.read())
     sys.exit(1)
 sys.exit(0)
