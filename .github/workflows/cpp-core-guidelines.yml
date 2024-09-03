@@ -55,7 +55,11 @@ jobs:
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
         -S ${{ env.source-dir }}
 
+    - name: Compile shaders
+      run: >
+        cmake --build ${{ env.build-dir }} --target RealEngine_Shaders --parallel 4
+
     - name: Run clang-tidy
       shell: bash
       run: |
-        python ${{ env.source-dir }}/RealEngine/.github/scripts/run-clang-tidy.py ${{ matrix.clang_tidy }} ${{ env.build-dir }}/compile_commands.json
+        python ${{ env.source-dir }}/RealEngine/.github/scripts/run-clang-tidy.py ${{ matrix.clang_tidy }} ${{ env.build-dir }}/compile_commands.json ${{ env.build-dir }}/clang-tidy-log.txt
