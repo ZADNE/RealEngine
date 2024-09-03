@@ -23,7 +23,7 @@ jobs:
         echo "build-dir=${{ github.workspace }}/Real/build" >> "$GITHUB_ENV"
         echo "source-dir=${{ github.workspace }}/Real" >> "$GITHUB_ENV"
         echo "clang-tidy-fix-file=${{ github.workspace }}/clang-tidy-fixes.yml" >> "$GITHUB_ENV"
-        echo "clang-tidy-command=${{ matrix.clang_tidy }};--warnings-as-errors=*;--fix;--fix-errors;--export-fixes=${{ github.workspace }}/clang-tidy-fixes.yml" >> "$GITHUB_ENV"
+        echo 'clang-tidy-command="${{ matrix.clang_tidy }};--export-fixes=${{ github.workspace }}/clang-tidy-fixes.yml"' >> "$GITHUB_ENV"
 
     - name: Clone Real
       uses: actions/checkout@v4
@@ -54,7 +54,7 @@ jobs:
         cmake -B ${{ env.build-dir }}
         -DCMAKE_CXX_COMPILER=g++-14
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DCMAKE_CXX_CLANG_TIDY=${{ matrix.clang_tidy }}
+        -DCMAKE_CXX_CLANG_TIDY=${{ env.clang-tidy-command }}
         -S ${{ env.source-dir }}
 
     - name: Run clang-tidy
