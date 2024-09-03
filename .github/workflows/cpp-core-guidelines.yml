@@ -16,14 +16,19 @@ jobs:
         clang_tidy: [clang-tidy-18]
 
     steps:
-    - name: Prepare variables
+    - name: Prepare variables 1
+      shell: bash
+      run: |
+        echo "clang-tidy-output=${{ github.workspace }}/clang-tidy-output.txt" >> "$GITHUB_ENV"
+
+    - name: Prepare variables 2
       shell: bash
       run: |
         echo "repo-name=$(basename -- "${{ github.repository }}")" >> $GITHUB_ENV
         echo "build-dir=${{ github.workspace }}/Real/build" >> "$GITHUB_ENV"
         echo "source-dir=${{ github.workspace }}/Real" >> "$GITHUB_ENV"
-        echo "clang-tidy-fix-file=${{ github.workspace }}/clang-tidy-fixes.yml" >> "$GITHUB_ENV"
-        echo 'clang-tidy-command="${{ matrix.clang_tidy }};--export-fixes=${{ github.workspace }}/clang-tidy-fixes.yml"' >> "$GITHUB_ENV"
+        touch ${{ env.clang-tidy-output }}
+        echo 'clang-tidy-command="${{ matrix.clang_tidy }};&>>;${{ env.clang-tidy-output }}"' >> "$GITHUB_ENV"
 
     - name: Clone Real
       uses: actions/checkout@v4
@@ -60,11 +65,11 @@ jobs:
     - name: Run clang-tidy
       run: cmake --build ${{ env.build-dir }} --config ${{ matrix.build_type }} --parallel 4
 
-    - name: Check if any fixes were suggested
+    - name: Check clang-tidy output
       shell: bash
       run: |
-        if [ -f ${{ env.clang-tidy-fix-file }} ]; then
-        echo "Some fixes were recommended - fix them"
-        cat ${{ env.clang-tidy-fix-file }}
-        exit 1
+        if [ -s ${{ env.clang-tidy-output }} ]; then
+          echo "Some fixes were recommended - fix them"
+          cat ${{ env.clang-tidy-output }}
+          exit 1
         fi
