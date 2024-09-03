@@ -16,19 +16,12 @@ jobs:
         clang_tidy: [clang-tidy-18]
 
     steps:
-    - name: Prepare variables 1
-      shell: bash
-      run: |
-        echo "clang-tidy-output=${{ github.workspace }}/clang-tidy-output.txt" >> "$GITHUB_ENV"
-
-    - name: Prepare variables 2
+    - name: Prepare variables
       shell: bash
       run: |
         echo "repo-name=$(basename -- "${{ github.repository }}")" >> $GITHUB_ENV
         echo "build-dir=${{ github.workspace }}/Real/build" >> "$GITHUB_ENV"
         echo "source-dir=${{ github.workspace }}/Real" >> "$GITHUB_ENV"
-        touch ${{ env.clang-tidy-output }}
-        echo 'clang-tidy-command="${{ matrix.clang_tidy }};&>>;${{ env.clang-tidy-output }}"' >> "$GITHUB_ENV"
 
     - name: Clone Real
       uses: actions/checkout@v4
@@ -59,17 +52,10 @@ jobs:
         cmake -B ${{ env.build-dir }}
         -DCMAKE_CXX_COMPILER=g++-14
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DCMAKE_CXX_CLANG_TIDY=${{ env.clang-tidy-command }}
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
         -S ${{ env.source-dir }}
 
     - name: Run clang-tidy
-      run: cmake --build ${{ env.build-dir }} --config ${{ matrix.build_type }} --parallel 4
-
-    - name: Check clang-tidy output
       shell: bash
       run: |
-        if [ -s ${{ env.clang-tidy-output }} ]; then
-          echo "Some fixes were recommended - fix them"
-          cat ${{ env.clang-tidy-output }}
-          exit 1
-        fi
+        python ${{ env.source-dir }}/RealEngine/.github/scripts/run-clang-tidy.py ${{ matrix.clang_tidy }} ${{ env.build-dir }}/compile_commands.json
