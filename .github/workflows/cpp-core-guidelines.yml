@@ -27,7 +27,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: ZADNE/Real
-        ref: ZADNE/clang-tidy-test
+        ref: main
         path: 'Real'
 
     - name: Clone RealEngine
@@ -59,7 +59,8 @@ jobs:
       run: >
         cmake --build ${{ env.build-dir }} --target RealEngine_Shaders --parallel 4
 
-    - name: Run clang-tidy
-      shell: bash
-      run: |
-        python ${{ env.source-dir }}/RealEngine/.github/scripts/run-clang-tidy.py ${{ matrix.clang_tidy }} ${{ env.build-dir }}/compile_commands.json ${{ env.build-dir }}/clang-tidy-log.txt
+    - name: Real linting check
+      uses: ZADNE/RealLinting@v0.1
+      with:
+        clang-tidy: ${{ matrix.clang_tidy }}
+        compile-commands-json: ${{ env.build-dir }}/compile_commands.json
