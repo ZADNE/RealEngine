@@ -175,8 +175,9 @@ void Window::initForVulkan13(const VulkanInitInfo& initInfo) {
 
     // Set up Vulkan 1.3 fixture
     try {
-        new (&m_vk13
-        ) VulkanFixture{sdlWindow(), (bool)m_flags.vSync, m_preferredDevice, initInfo};
+        new (&m_vk13) VulkanFixture{
+            window.get(), (bool)m_flags.vSync, m_preferredDevice, initInfo
+        };
     } catch (std::exception& e) {
         std::cerr << e.what() << '\n';
         return;
