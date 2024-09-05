@@ -5,7 +5,7 @@
 
 namespace re {
 
-TextureShaped::TextureShaped(PNGLoader::PNGData&& pngData)
+TextureShaped::TextureShaped(const PNGLoader::PNGData& pngData)
     : Texture(TextureCreateInfo{.extent = {pngData.dims, 1u}, .texels = pngData.texels})
     , m_shape(TextureShape{
           .subimageDims = pngData.shape.subimageDims == glm::vec2{0.0f, 0.0f}

@@ -5,9 +5,11 @@
 #include <string>
 
 #include <ImGui/imgui.h>
+#include <SDL2/SDL_video.h>
 #include <glm/vec2.hpp>
 
 #include <RealEngine/renderer/VulkanFixture.hpp>
+#include <RealEngine/utility/UniqueCPtr.hpp>
 #include <RealEngine/window/WindowSettings.hpp>
 #include <RealEngine/window/WindowSubsystems.hpp>
 
@@ -160,10 +162,13 @@ private:
     void initForRenderer(RendererID renderer, const VulkanInitInfo& initInfo);
     void initForVulkan13(const VulkanInitInfo& initInfo);
 
-    bool createSDLWindow(RendererID renderer);
+    using SDL_WindowRAII = UniqueCPtr<SDL_Window, SDL_DestroyWindow>;
+    SDL_WindowRAII createSDLWindow(RendererID renderer);
 
     WindowSubsystems m_subsystems; /**< Initializes and de-initializes subsystems */
-    SDL_Window* m_SDLwindow = nullptr;
+    SDL_WindowRAII m_SDLwindow;
+
+    SDL_Window* sdlWindow() { return m_SDLwindow.get(); }
 
     union {
         VulkanFixture m_vk13;

@@ -1,5 +1,4 @@
 ﻿add_library(ImGui STATIC)
-set_property(TARGET ImGui PROPERTY COMPILE_WARNING_AS_ERROR OFF)
 
 target_link_libraries(ImGui PRIVATE
     Vulkan::Vulkan

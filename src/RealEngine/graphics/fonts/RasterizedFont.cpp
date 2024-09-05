@@ -11,18 +11,18 @@
 #include <RealEngine/graphics/fonts/RasterizedFont.hpp>
 #include <RealEngine/utility/Error.hpp>
 #include <RealEngine/utility/Math.hpp>
-#include <RealEngine/utility/RAIIWrapper.hpp>
 #include <RealEngine/utility/Unicode.hpp>
+#include <RealEngine/utility/UniqueCPtr.hpp>
 
 namespace re {
 
-using TTF_FontRAII    = RAIIWrapper<TTF_Font, decltype(TTF_CloseFont)*>;
-using SDL_SurfaceRAII = RAIIWrapper<SDL_Surface, decltype(SDL_FreeSurface)*>;
+using TTF_FontRAII    = UniqueCPtr<TTF_Font, TTF_CloseFont>;
+using SDL_SurfaceRAII = UniqueCPtr<SDL_Surface, SDL_FreeSurface>;
 
 RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
-    TTF_FontRAII font = TTF_OpenFontIndex(
+    TTF_FontRAII font{TTF_OpenFontIndex(
         createInfo.filePath, createInfo.pointSize, createInfo.faceIndex
-    );
+    )};
     if (font == nullptr) {
         throw Exception{std::format("Could not load font {}", createInfo.filePath)};
     }
@@ -46,13 +46,14 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     for (const UnicodeRange& r : createInfo.ranges) {
         assert(r.firstChar <= r.lastChar);
         for (char32_t c = r.firstChar; c <= r.lastChar; ++c) {
-            const SDL_Surface* surf =
-                surfs.emplace_back(TTF_RenderGlyph32_Blended(font, c, k_fgCol));
+            const SDL_SurfaceRAII& surf = surfs.emplace_back(
+                TTF_RenderGlyph32_Blended(font.get(), c, k_fgCol)
+            );
             if (surf) { // If there is a glyph for the character
                 totalWidth += surf->w;
                 int advance{};
                 TTF_GlyphMetrics32(
-                    font, c, &dontCare, &dontCare, &dontCare, &dontCare, &advance
+                    font.get(), c, &dontCare, &dontCare, &dontCare, &dontCare, &advance
                 );
                 m_glyphs.emplace_back(
                     glm::vec4{}, glm::vec2{surf->w, surf->h},
@@ -64,14 +65,15 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
         }
         m_offsets.emplace_back(r.lastChar, static_cast<int>(m_glyphs.size()) - 1);
     }
-    int height   = TTF_FontHeight(font);
-    m_ascentPx   = static_cast<float>(TTF_FontAscent(font));
-    m_lineSkipPx = static_cast<float>(TTF_FontLineSkip(font));
+    int height   = TTF_FontHeight(font.get());
+    m_ascentPx   = static_cast<float>(TTF_FontAscent(font.get()));
+    m_lineSkipPx = static_cast<float>(TTF_FontLineSkip(font.get()));
 
     // Calculate size of the texture and prepare stage
-    const uint32_t minArea    = totalWidth * height;
-    const uint32_t squareRoot = std::sqrt(static_cast<float>(minArea));
-    const uint32_t texWidth   = std::bit_ceil(squareRoot);
+    const uint32_t minArea = totalWidth * height;
+    const uint32_t squareRoot =
+        static_cast<uint32_t>(std::sqrt(static_cast<float>(minArea)));
+    const uint32_t texWidth = std::bit_ceil(squareRoot);
     const uint32_t texHeight =
         roundToMultiple(ceilDiv(minArea, texWidth) + height, height);
     const uint32_t area = texWidth * texHeight;
@@ -99,7 +101,7 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     glm::vec2 texSizeInv = 1.0f / glm::vec2{texWidth, texHeight};
     glm::ivec2 botLeft   = glm::ivec2{0, 0};
     for (int i = 0; i < glyphCount; i++) {
-        if (const SDL_Surface* surf = surfs[i]) {
+        if (const SDL_Surface* surf = surfs[i].get()) {
             auto& glyph = m_glyphs[i];
             if (botLeft.x + surf->w >= texWidth) {           // If would not fit
                 botLeft = glm::ivec2{0, botLeft.y + height}; // Jump to next row
@@ -161,7 +163,7 @@ void RasterizedFont::add(
 int RasterizedFont::codeToIndex(char32_t c) const {
     for (const GlyphOffset& offset : m_offsets) {
         if (offset.lastChar >= c) {
-            return offset.baseOffset - (offset.lastChar - c);
+            return offset.baseOffset - (offset.lastChar - c); // NOLINT(*-conversions)
         }
     }
     assert(!"Character not found");
@@ -173,7 +175,7 @@ float RasterizedFont::measureLineWidth(std::u8string_view str) const {
     float widthPx      = 0.0f;
     char32_t prevC     = readCode(str);
     if (nonEndingChar(prevC)) { // If not 0 char line
-        char32_t c;
+        char32_t c{};
         while (nonEndingChar(c = readCode(str))) {
             widthPx += m_glyphs[codeToIndex(prevC)].advancePx;
             prevC = c;
@@ -185,7 +187,7 @@ float RasterizedFont::measureLineWidth(std::u8string_view str) const {
 
 template<std::invocable<std::u8string_view> AlignFunc>
 void RasterizedFont::addGeneric(
-    SpriteBatch& batch, std::u8string_view str, AlignFunc&& align, Color col
+    SpriteBatch& batch, std::u8string_view str, const AlignFunc& align, Color col
 ) const {
     glm::vec2 cursorPx = align(str);
     while (!str.empty()) {

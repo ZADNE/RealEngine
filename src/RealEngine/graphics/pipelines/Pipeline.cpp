@@ -17,7 +17,6 @@ vk::ShaderStageFlagBits convert(size_t st) {
     case 2:  return vk::ShaderStageFlagBits::eTessellationEvaluation;
     case 3:  return vk::ShaderStageFlagBits::eGeometry;
     case 4:  return vk::ShaderStageFlagBits::eFragment;
-    case 5:  return vk::ShaderStageFlagBits::eCompute;
     default: throw Exception{"Unknown shader type"};
     }
 }

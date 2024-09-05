@@ -7,14 +7,17 @@
 
 namespace {
 
-constexpr uint64_t mix(char m, uint64_t s) {
-    return ((s << 7) + ~(s >> 3)) + ~m;
-}
+constexpr uint64_t k_FVNOffsetBasis = 0xcbf29ce484222325;
+constexpr uint64_t k_FVNPrime       = 0x100000001b3;
 
-constexpr uint64_t hash(std::string_view string) {
-    uint64_t res = 0;
-    for (const auto& c : string) { res = mix(c, res); }
-    return res;
+// FNV-1a hash
+constexpr uint64_t hash(std::string_view sv) {
+    uint64_t hash = k_FVNOffsetBasis;
+    for (const char& c : sv) {
+        hash ^= c;
+        hash *= k_FVNPrime;
+    }
+    return hash;
 }
 
 } // namespace

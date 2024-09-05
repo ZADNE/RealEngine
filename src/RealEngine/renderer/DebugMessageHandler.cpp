@@ -80,7 +80,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallbackHandler(
     switch (callbackData->messageIdNumber) {
     case 0x0:        // Ignore loader messages
         break;
-    case 0x76589099: // Log debug printf
+    case 0x76589099: // NOLINT(*-magic-numbers): Log debug printf
         log(skipFunctionName(skipMessageHeader(callbackData->pMessage)), false);
         break;
     default: // Log validation message

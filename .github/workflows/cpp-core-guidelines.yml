@@ -1,0 +1,77 @@
+name: C++ Core Guidelines
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  cpp-core-guidelines:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04]
+        build_type: [Debug]
+        clang_tidy: [clang-tidy-18]
+
+    steps:
+    - name: Prepare variables
+      shell: bash
+      run: |
+        echo "repo-name=$(basename -- "${{ github.repository }}")" >> $GITHUB_ENV
+        echo "build-dir=${{ github.workspace }}/Real/build" >> "$GITHUB_ENV"
+        echo "source-dir=${{ github.workspace }}/Real" >> "$GITHUB_ENV"
+        echo "report-file=${{ github.workspace }}/clang-tidy-report.txt" >> "$GITHUB_ENV"
+
+    - name: Clone Real
+      uses: actions/checkout@v4
+      with:
+        repository: ZADNE/Real
+        ref: main
+        path: 'Real'
+
+    - name: Clone RealEngine
+      uses: actions/checkout@v4
+      with:
+        path: 'Real/${{ env.repo-name }}'
+
+    - name: Set up Vulkan SDK
+      uses: humbletim/install-vulkan-sdk@v1.1.1
+      with:
+        version: 1.3.290.0
+        cache: true
+
+    - name: Set up SDL2
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install libsdl2-dev libsdl2-2.0-0 libsdl2-ttf-dev libsdl2-ttf-2.0-0 -y;
+
+    - name: Configure CMake
+      run: >
+        cmake -B ${{ env.build-dir }}
+        -DCMAKE_CXX_COMPILER=g++-14
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        -S ${{ env.source-dir }}
+
+    - name: Compile shaders
+      run: >
+        cmake --build ${{ env.build-dir }} --target RealEngine_Shaders --parallel 4
+
+    - name: Real linting check
+      uses: ZADNE/RealLinting@v0.1
+      with:
+        clang-tidy: ${{ matrix.clang_tidy }}
+        compile-commands-json: ${{ env.build-dir }}/compile_commands.json
+        report-file: ${{ env.report-file }}
+
+    - name: Check report
+      shell: bash
+      run: |
+        if [ -s ${{ env.report-file }} ]; then
+          echo "Some files did not pass linting! Report follows:"
+          cat ${{ env.report-file }}
+          exit 1
+        fi

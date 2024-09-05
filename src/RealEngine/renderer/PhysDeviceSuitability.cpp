@@ -89,6 +89,7 @@ OutStruct* toOutStruct(std::byte* ptr) {
     return reinterpret_cast<OutStruct*>(ptr);
 }
 
+// NOLINTBEGIN(*-c-arrays)
 std::unique_ptr<std::byte[]> copyPhysDeviceCreateInfoChain(const void* chain) {
     assert(chain);
     assert(toInStruct(chain)->sType == vk::StructureType::ePhysicalDeviceFeatures2);
@@ -100,6 +101,7 @@ std::unique_ptr<std::byte[]> copyPhysDeviceCreateInfoChain(const void* chain) {
     }
 
     // Allocate the buffer
+    assert(totalSizeBytes > 0);
     auto buf = std::make_unique_for_overwrite<std::byte[]>(totalSizeBytes);
 
     // Initialize the chain
@@ -114,12 +116,13 @@ std::unique_ptr<std::byte[]> copyPhysDeviceCreateInfoChain(const void* chain) {
 
     return buf;
 }
+// NOLINTEND(*-c-arrays)
 
 int findPreferred(
     std::span<const vk::PhysicalDevice> physDevices, std::string_view preferredDevice
 ) {
     if (!preferredDevice.empty()) {
-        for (size_t i = 0; i < physDevices.size(); ++i) {
+        for (int i = 0; i < static_cast<int>(physDevices.size()); ++i) {
             const auto& physDev = physDevices[i];
             auto props          = physDev.getProperties2().properties;
             std::string_view name{props.deviceName};

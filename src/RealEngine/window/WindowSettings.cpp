@@ -8,7 +8,12 @@
 
 #include <nlohmann/json.hpp>
 
+namespace {
+
 const std::string k_settingFilename = "settings.json";
+constexpr glm::vec2 k_defaultWindowSize{1280.0f, 1000.0f};
+
+} // namespace
 
 namespace re {
 
@@ -63,7 +68,7 @@ WindowSettings::WindowSettings(
 }
 
 void WindowSettings::reset() {
-    m_dims              = glm::vec2(1280.0f, 1000.0f);
+    m_dims              = k_defaultWindowSize;
     m_flags             = WindowFlags{};
     m_preferredRenderer = RendererID::Any;
     m_preferredDevice.clear();

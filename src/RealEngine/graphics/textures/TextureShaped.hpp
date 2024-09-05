@@ -77,7 +77,7 @@ public:
     }
 
 private:
-    TextureShaped(PNGLoader::PNGData&& pngData);
+    TextureShaped(const PNGLoader::PNGData& pngData);
 
     TextureShape m_shape{};
 

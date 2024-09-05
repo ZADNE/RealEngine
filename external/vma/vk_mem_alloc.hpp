@@ -2,6 +2,11 @@
 #define VULKAN_MEMORY_ALLOCATOR_HPP
 
 #if !defined(AMD_VULKAN_MEMORY_ALLOCATOR_H)
+
+// Following defines supress clang-tidy errors because not all functions in vk_mem_alloc.h are marked
+#define VMA_NULLABLE
+#define VMA_NOT_NULL
+
 #include <vma/vk_mem_alloc.h>
 #endif
 

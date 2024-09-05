@@ -10,7 +10,11 @@ using namespace std::chrono_literals;
 
 namespace re {
 
-Synchronizer::Synchronizer(unsigned int stepsPerSecond, unsigned int framesPerSecondLimit, bool beginResumed /* = false*/) {
+Synchronizer::Synchronizer(
+    unsigned int stepsPerSecond, unsigned int framesPerSecondLimit,
+    bool beginResumed /* = false*/
+)
+    : m_stepsPaused(!beginResumed) {
     setStepsPerSecond(stepsPerSecond);
     setFramesPerSecondLimit(framesPerSecondLimit);
     if (beginResumed) {
@@ -27,7 +31,7 @@ void Synchronizer::setFramesPerSecondLimit(unsigned int framesPerSecondLimit) {
     m_timePerFrame = framesPerSecondLimit == k_doNotLimitFramesPerSecond
                          ? Duration::zero()
                          : 1'000'000'000ns / framesPerSecondLimit;
-    resumeSteps();
+    resetSynchronization();
 }
 
 void Synchronizer::pauseSteps() {
@@ -35,11 +39,8 @@ void Synchronizer::pauseSteps() {
 }
 
 void Synchronizer::resumeSteps() {
-    m_startTime           = std::chrono::steady_clock::now();
-    m_lastFrameTime       = m_startTime;
-    m_stepTimeAccumulator = Duration::zero();
-    m_currFrameIndex      = 0;
-    m_stepsPaused         = false;
+    resetSynchronization();
+    m_stepsPaused = false;
 }
 
 double Synchronizer::drawInterpolationFactor() const {
@@ -109,6 +110,13 @@ void Synchronizer::delayTillEndOfFrame() {
     if (now < expectedFrameEnd) { // If there is time to sleep
         std::this_thread::sleep_until(expectedFrameEnd); // Sleep   zzZZZzz
     }
+}
+
+void Synchronizer::resetSynchronization() {
+    m_startTime           = std::chrono::steady_clock::now();
+    m_lastFrameTime       = m_startTime;
+    m_stepTimeAccumulator = Duration::zero();
+    m_currFrameIndex      = 0;
 }
 
 } // namespace re

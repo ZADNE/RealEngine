@@ -5,7 +5,6 @@
 
 #include <ImGui/imgui_impl_sdl2.h>
 #include <SDL2/SDL_events.h>
-#include <SDL2/SDL_video.h>
 
 #include <RealEngine/utility/Error.hpp>
 #include <RealEngine/window/Window.hpp>
@@ -46,8 +45,8 @@ Window::Window(
 Window::~Window() {
     switch (m_usedRenderer) {
     case RendererID::Vulkan13: m_vk13.~VulkanFixture(); break;
+    case RendererID::Any:      break;
     }
-    SDL_DestroyWindow(m_SDLwindow);
 }
 
 void Window::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex) {
@@ -98,15 +97,15 @@ bool Window::passSDLEvent(const SDL_Event& evnt) {
 
 void Window::setFullscreen(bool fullscreen, bool save) {
     m_flags.fullscreen = fullscreen;
-    SDL_SetWindowFullscreen(m_SDLwindow, (fullscreen) ? SDL_WINDOW_FULLSCREEN : 0);
-    SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
+    SDL_SetWindowFullscreen(sdlWindow(), (fullscreen) ? SDL_WINDOW_FULLSCREEN : 0);
+    SDL_GetWindowSize(sdlWindow(), &m_dims.x, &m_dims.y);
     if (save)
         this->save();
 }
 
 void Window::setBorderless(bool borderless, bool save) {
     m_flags.borderless = borderless;
-    SDL_SetWindowBordered(m_SDLwindow, (borderless) ? SDL_FALSE : SDL_TRUE);
+    SDL_SetWindowBordered(sdlWindow(), (borderless) ? SDL_FALSE : SDL_TRUE);
     if (save)
         this->save();
 }
@@ -143,7 +142,7 @@ std::string Window::usedDevice() const {
 
 void Window::setTitle(const std::string& title) {
     m_windowTitle = title;
-    SDL_SetWindowTitle(m_SDLwindow, title.c_str());
+    SDL_SetWindowTitle(sdlWindow(), title.c_str());
 }
 
 void Window::setPreferredRenderer(RendererID renderer, bool save) {
@@ -153,9 +152,9 @@ void Window::setPreferredRenderer(RendererID renderer, bool save) {
 }
 
 void Window::setDims(glm::ivec2 newDims, bool save) {
-    SDL_SetWindowSize(m_SDLwindow, newDims.x, newDims.y);
-    SDL_SetWindowPosition(m_SDLwindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    SDL_GetWindowSize(m_SDLwindow, &m_dims.x, &m_dims.y);
+    SDL_SetWindowSize(sdlWindow(), newDims.x, newDims.y);
+    SDL_SetWindowPosition(sdlWindow(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    SDL_GetWindowSize(sdlWindow(), &m_dims.x, &m_dims.y);
     if (save)
         this->save();
 }
@@ -169,34 +168,32 @@ void Window::initForRenderer(RendererID renderer, const VulkanInitInfo& initInfo
 
 void Window::initForVulkan13(const VulkanInitInfo& initInfo) {
     // Create SDL window
-    if (!createSDLWindow(RendererID::Vulkan13)) {
-        goto fail;
+    SDL_WindowRAII window = createSDLWindow(RendererID::Vulkan13);
+    if (!window) {
+        return;
     }
 
     // Set up Vulkan 1.3 fixture
     try {
-        new (&m_vk13
-        ) VulkanFixture{m_SDLwindow, (bool)m_flags.vSync, m_preferredDevice, initInfo};
+        new (&m_vk13) VulkanFixture{
+            window.get(), (bool)m_flags.vSync, m_preferredDevice, initInfo
+        };
     } catch (std::exception& e) {
         std::cerr << e.what() << '\n';
-        goto fail_SDLWindow;
+        return;
     }
 
+    // Success
+    m_SDLwindow    = std::move(window);
     m_usedRenderer = RendererID::Vulkan13;
-    return;
-
-fail_SDLWindow:
-    SDL_DestroyWindow(m_SDLwindow);
-    m_SDLwindow = nullptr;
-fail:
-    m_usedRenderer = RendererID::Any;
 }
 
-bool Window::createSDLWindow(RendererID renderer) {
+Window::SDL_WindowRAII Window::createSDLWindow(RendererID renderer) {
     // Prepare window flags
     Uint32 SDL_flags = 0;
     switch (renderer) {
     case RendererID::Vulkan13: SDL_flags |= SDL_WINDOW_VULKAN; break;
+    case RendererID::Any:      break;
     }
     if (m_flags.invisible)
         SDL_flags |= SDL_WINDOW_HIDDEN;
@@ -206,16 +203,16 @@ bool Window::createSDLWindow(RendererID renderer) {
         SDL_flags |= SDL_WINDOW_BORDERLESS;
 
     // Create the window
-    m_SDLwindow = SDL_CreateWindow(
+    SDL_WindowRAII window{SDL_CreateWindow(
         m_windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         m_dims.x, m_dims.y, SDL_flags
-    );
+    )};
+
     if (!m_SDLwindow) {
         log(SDL_GetError());
-        return false;
     }
 
-    return true;
+    return window;
 }
 
 } // namespace re

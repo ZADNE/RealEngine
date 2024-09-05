@@ -1,6 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
+#include <print>
 #include <stdexcept>
 
 #include <ImGui/imgui.h>
@@ -55,14 +56,14 @@ void WindowSubsystems::printSubsystemsVersions() const {
 #ifndef NDEBUG
         SDL_version compiled;
         SDL_VERSION(&compiled);
-        std::printf(
-            "SDL compiled: %u.%u.%u\n", compiled.major, compiled.minor, compiled.patch
+        std::println(
+            "SDL compiled: {}.{}.{}", compiled.major, compiled.minor, compiled.patch
         );
 #endif // DEBUG
         SDL_version linked;
         SDL_GetVersion(&linked);
-        std::printf(
-            "SDL linked:   %u.%u.%u\n", linked.major, linked.minor, linked.patch
+        std::println(
+            "SDL linked:   {}.{}.{}", linked.major, linked.minor, linked.patch
         );
     }
 
@@ -70,19 +71,19 @@ void WindowSubsystems::printSubsystemsVersions() const {
 #ifndef NDEBUG
         SDL_version compiled;
         SDL_TTF_VERSION(&compiled);
-        std::printf(
-            "TTF compiled: %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch
+        std::println(
+            "TTF compiled: {}.{}.{}", compiled.major, compiled.minor, compiled.patch
         );
 #endif // DEBUG
         const SDL_version* linked = TTF_Linked_Version();
-        std::printf(
-            "TTF linked:   %d.%d.%d\n", linked->major, linked->minor, linked->patch
+        std::println(
+            "TTF linked:   {}.{}.{}", linked->major, linked->minor, linked->patch
         );
     }
 
     // ImGui
 #ifndef NDEBUG
-    std::printf("ImGui:        %s\n", ImGui::GetVersion());
+    std::println("ImGui:        {}\n", ImGui::GetVersion());
 #endif // DEBUG
 }
 

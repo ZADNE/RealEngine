@@ -14,8 +14,6 @@ namespace re {
  * @brief Keeps track of mouse and keyboard input.
  */
 class InputManager {
-    friend class MainProgram;
-
 public:
     InputManager() {}
 
@@ -49,11 +47,16 @@ public:
      */
     glm::ivec2 cursorRel() const;
 
-private:
+#pragma region AccessForMainProgram
+
     void step();
     void setCursor(glm::ivec2 abs, glm::ivec2 rel);
     void press(Key key, int times = 1);
     void release(Key key);
+
+#pragma endregion
+
+private:
 
     int wasDown(Key key) const;
 

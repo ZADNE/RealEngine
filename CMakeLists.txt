@@ -5,6 +5,13 @@ include(FetchContent)
 include("cmake/RealShaders/RealShaders.cmake")
 include("cmake/IncludeSDL2WithPrefix.cmake")
 
+function(FetchContent_MakeAvailableWithoutLinting)
+    set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
+    set(CMAKE_CXX_CLANG_TIDY "")
+    FetchContent_MakeAvailable(${ARGV})
+endfunction()
+
 # Find/fetch dependencies
     # Vulkan
     find_package(Vulkan REQUIRED COMPONENTS glslc)
@@ -20,7 +27,7 @@ include("cmake/IncludeSDL2WithPrefix.cmake")
     FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 
     # Download remote libs
-    FetchContent_MakeAvailable(SPIRV-Cross glm json)
+    FetchContent_MakeAvailableWithoutLinting(SPIRV-Cross glm json)
 
     # Add embedded libs
     add_subdirectory(external)

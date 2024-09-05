@@ -84,7 +84,7 @@ VulkanFixture::VulkanFixture(
     , m_cbs([&]() {
         assignImplementationReferences(); // Deliberate side effect, ref to device
                                           // and pool is required to construct a cmd buf
-        return FrameDoubleBuffered{
+        return FrameDoubleBuffered<CommandBuffer>{
             CommandBuffer{{.debugName = "re::VulkanFixture::cbs[0]"}},
             CommandBuffer{{.debugName = "re::VulkanFixture::cbs[1]"}}
         };
@@ -312,7 +312,7 @@ vk::raii::Instance VulkanFixture::createInstance() {
     };
 
     // Add extensions required by SDL2
-    unsigned int sdl2ExtensionCount;
+    unsigned int sdl2ExtensionCount{};
     if (!SDL_Vulkan_GetInstanceExtensions(m_sdlWindow, &sdl2ExtensionCount, nullptr)) {
         throw std::runtime_error(
             "Could not get number of Vulkan extensions required for SDL2!"
@@ -357,7 +357,7 @@ vk::raii::DebugUtilsMessengerEXT VulkanFixture::createDebugUtilsMessenger() {
 }
 
 vk::raii::SurfaceKHR VulkanFixture::createSurface() {
-    VkSurfaceKHR surface;
+    VkSurfaceKHR surface{};
     if (!SDL_Vulkan_CreateSurface(m_sdlWindow, *m_instance, &surface)) {
         throw std::runtime_error("SDL2 could not create Vulkan surface!");
     }
