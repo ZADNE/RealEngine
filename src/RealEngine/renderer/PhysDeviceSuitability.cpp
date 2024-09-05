@@ -15,7 +15,6 @@ bool areExtensionsSupported(vk::PhysicalDevice physicalDevice) {
     std::bitset<k_deviceExtensions.size()> supported{};
     for (const auto& ext : physicalDevice.enumerateDeviceExtensionProperties()) {
         for (size_t i = 0; i < k_deviceExtensions.size(); ++i) {
-            // NOLINTNEXTLINE(*-array-index): i is in range
             if (std::strcmp(ext.extensionName.data(), k_deviceExtensions[i]) == 0) {
                 supported[i] = true;
             }

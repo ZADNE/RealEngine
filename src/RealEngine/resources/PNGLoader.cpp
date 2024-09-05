@@ -58,7 +58,7 @@ PNGLoader::PNGData PNGLoader::load(const std::string& filePathPNG) {
     lodepng::State state{};
     state.decoder.remember_unknown_chunks = 1;
     std::vector<unsigned char> encoded;
-    unsigned int code;
+    unsigned int code{};
     PNGData decoded{};
 
     // Decode PNG
@@ -79,7 +79,7 @@ PNGLoader::PNGData PNGLoader::load(const std::string& filePathPNG) {
             &unknownData[state.info_png.unknown_chunks_size[i]];
         for (auto chunk = unknownData; chunk != unknownDataEnd;
              chunk      = lodepng_chunk_next(chunk, unknownDataEnd)) {
-            std::array<char, 5> type; // NOLINT(*-magic-numbers): 4 + null char
+            std::array<char, 5> type{}; // NOLINT(*-magic-numbers): 4 + null char
             lodepng_chunk_type(type.data(), chunk);
             if (std::string{"reAl"} == type.data()) {
                 decoded.shape = decodeTextureShape(
