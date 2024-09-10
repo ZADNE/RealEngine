@@ -2,8 +2,6 @@
 project(RealEngine)
 
 include(FetchContent)
-include("cmake/RealShaders/RealShaders.cmake")
-include("cmake/IncludeSDL2WithPrefix.cmake")
 
 function(FetchContent_MakeAvailableWithoutLinting)
     set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
@@ -16,7 +14,6 @@ endfunction()
     # Vulkan
     find_package(Vulkan REQUIRED COMPONENTS glslc)
     # SDL2
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
     find_package(SDL2 REQUIRED)
     find_package(SDL2_ttf REQUIRED)
     # SPIRV-Cross
@@ -34,10 +31,10 @@ endfunction()
 
 # Declare projects
     # RealEngine library
-    add_library_with_shaders(RealEngine STATIC)
+    add_real_library(RealEngine STATIC)
     set_target_properties(RealEngine PROPERTIES
         CXX_STANDARD 23
-        REALSHADERS_CXX_NAMESPACE "re"
+        realproject_shader_cxx_namespace "re"
         INTERPROCEDURAL_OPTIMIZATION TRUE
     )
     target_link_libraries(RealEngine PUBLIC
@@ -55,6 +52,7 @@ endfunction()
     )
     target_include_directories(RealEngine PUBLIC src external)
     target_includes_sdl2_prefixed(RealEngine PUBLIC)
+    real_target_init_file_sets(RealEngine BASE_DIR src)
     add_subdirectory(src)
 
     # Doxygen documentation
