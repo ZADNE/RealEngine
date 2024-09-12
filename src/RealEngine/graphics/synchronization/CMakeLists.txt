@@ -1,5 +1,6 @@
-﻿real_target_sources(RealEngine PRIVATE
-    DoubleBuffered.hpp          
-    Fence.hpp                   Fence.cpp
-    Semaphore.hpp               Semaphore.cpp
+﻿real_target_sources(RealEngine
+    PUBLIC
+        DoubleBuffered.hpp          
+        Fence.hpp                   Fence.cpp
+        Semaphore.hpp               Semaphore.cpp
 )

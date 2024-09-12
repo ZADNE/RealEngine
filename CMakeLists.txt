@@ -1,6 +1,8 @@
 ﻿cmake_minimum_required(VERSION 3.24)
 project(RealEngine)
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 include(FetchContent)
 
 function(FetchContent_MakeAvailableWithoutLinting)
@@ -37,20 +39,27 @@ endfunction()
         realproject_shader_cxx_namespace "re"
         INTERPROCEDURAL_OPTIMIZATION TRUE
     )
-    target_link_libraries(RealEngine PUBLIC
-        ${CMAKE_DL_LIBS}
-        Vulkan::Vulkan
-        vma
-        spirv-cross-core
-        spirv-cross-reflect
-        SDL2::Main
-        SDL2::TTF
-        glm
-        nlohmann_json::nlohmann_json
-        ImGui
-        lodepng
+    target_link_libraries(RealEngine
+        PUBLIC
+            ${CMAKE_DL_LIBS}
+            Vulkan::Vulkan
+            vma
+            spirv-cross-core
+            spirv-cross-reflect
+            SDL2::Main
+            SDL2::TTF
+            glm::glm-header-only
+            nlohmann_json::nlohmann_json
+            ImGui
+            lodepng
     )
-    target_include_directories(RealEngine PUBLIC src external)
+    target_include_directories(RealEngine
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+            $<INSTALL_INTERFACE:.>
+        PRIVATE
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external>
+    )
     target_includes_sdl2_prefixed(RealEngine PUBLIC)
     real_target_init_file_sets(RealEngine BASE_DIR src)
     add_subdirectory(src)
@@ -62,7 +71,7 @@ endfunction()
         set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
         configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
-        add_custom_target(RealEngine_Documentation ALL
+        add_custom_target(RealEngine_Documentation
             COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             VERBATIM
@@ -80,3 +89,40 @@ endfunction()
         target_link_libraries(RTICreator PUBLIC RealEngine)
         add_subdirectory(tools)
     endif()
+
+# Installation
+    install(TARGETS RealEngine vma glm-header-only nlohmann_json ImGui lodepng
+        EXPORT RealEngineTargets
+        RUNTIME
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT           RealEngine_Runtime
+        LIBRARY
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT           RealEngine_Runtime
+            NAMELINK_COMPONENT  RealEngine_Development
+        ARCHIVE
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT           RealEngine_Development
+        FILE_SET realproject_public_headers
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            COMPONENT           RealEngine_Development
+        FILE_SET HEADERS
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            COMPONENT           RealEngine_Development
+    )
+    write_basic_package_version_file(
+        RealEngineConfigVersion.cmake
+        VERSION 2.0.0
+        COMPATIBILITY SameMajorVersion
+    )
+    install(EXPORT RealEngineTargets
+        FILE RealEngineTargets.cmake
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
+    )
+    configure_file(cmake/RealEngineConfig.cmake.in RealEngineConfig.cmake @ONLY)
+    install(
+        FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
+    )

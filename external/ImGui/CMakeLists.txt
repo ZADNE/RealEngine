@@ -3,7 +3,7 @@
 target_link_libraries(ImGui PRIVATE
     Vulkan::Vulkan
     SDL2::Main
-    glm
+    glm::glm-header-only
 )
 
 target_sources(ImGui PRIVATE
