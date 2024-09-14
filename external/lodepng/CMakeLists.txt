@@ -1,5 +1,4 @@
-﻿add_library(lodepng STATIC)
-
-target_sources(lodepng PRIVATE
-    lodepng.hpp                 lodepng.cpp
+﻿real_target_sources(lodepng
+    PUBLIC
+        lodepng.hpp                 lodepng.cpp
 )

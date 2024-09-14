@@ -1,7 +1,5 @@
-add_library(vma INTERFACE)
-
-target_sources(vma
-    INTERFACE FILE_SET HEADERS BASE_DIRS ".." FILES
+real_target_sources(vma
+    PUBLIC
         vk_mem_alloc.h
         vk_mem_alloc.hpp
         vk_mem_alloc_enums.hpp

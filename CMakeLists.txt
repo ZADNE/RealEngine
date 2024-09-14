@@ -21,8 +21,10 @@ endfunction()
     # SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.290.0.tar.gz)
     # OpenGL Mathematics
+    set(GLM_BUILD_INSTALL ON CACHE INTERNAL "")
     FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/refs/tags/1.0.0.tar.gz)
     # nlohmann json
+    set(JSON_Install ON CACHE INTERNAL "")
     FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 
     # Download remote libs
@@ -44,14 +46,15 @@ endfunction()
             ${CMAKE_DL_LIBS}
             Vulkan::Vulkan
             vma
-            spirv-cross-core
-            spirv-cross-reflect
             SDL2::Main
             SDL2::TTF
             glm::glm-header-only
             nlohmann_json::nlohmann_json
             ImGui
             lodepng
+        PRIVATE
+            spirv-cross-core
+            spirv-cross-reflect
     )
     target_include_directories(RealEngine
         PUBLIC
