@@ -16,8 +16,8 @@ endfunction()
     # Vulkan
     find_package(Vulkan REQUIRED COMPONENTS glslc)
     # SDL2
-    find_package(SDL2 REQUIRED)
-    find_package(SDL2_ttf REQUIRED)
+    find_package(SDL2 CONFIG REQUIRED)
+    find_package(SDL2_ttf CONFIG REQUIRED)
     # SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.290.0.tar.gz)
     # OpenGL Mathematics
@@ -46,8 +46,9 @@ endfunction()
             ${CMAKE_DL_LIBS}
             Vulkan::Vulkan
             vma
-            SDL2::Main
-            SDL2::TTF
+            SDL2::SDL2main
+            SDL2::SDL2
+            SDL2_ttf::SDL2_ttf
             glm::glm-header-only
             nlohmann_json::nlohmann_json
             ImGui
@@ -63,7 +64,6 @@ endfunction()
         PRIVATE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external>
     )
-    target_includes_sdl2_prefixed(RealEngine PUBLIC)
     real_target_init_file_sets(RealEngine BASE_DIR src)
     add_subdirectory(src)
 

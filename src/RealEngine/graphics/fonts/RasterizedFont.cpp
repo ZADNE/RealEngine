@@ -6,7 +6,7 @@
 #include <memory>
 #include <numeric>
 
-#include <SDL2/SDL_ttf.h>
+#include <SDL_ttf.h>
 
 #include <RealEngine/graphics/fonts/RasterizedFont.hpp>
 #include <RealEngine/utility/Error.hpp>

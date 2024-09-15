@@ -4,7 +4,7 @@
 #pragma once
 #include <string>
 
-#include <SDL2/SDL_keycode.h>
+#include <SDL_keycode.h>
 
 namespace re {
 

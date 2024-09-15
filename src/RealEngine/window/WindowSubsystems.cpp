@@ -5,8 +5,8 @@
 #include <stdexcept>
 
 #include <ImGui/imgui.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_ttf.h>
 
 #include <RealEngine/utility/Error.hpp>
 #include <RealEngine/window/WindowSubsystems.hpp>

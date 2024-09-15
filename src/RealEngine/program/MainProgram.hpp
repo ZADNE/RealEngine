@@ -5,7 +5,7 @@
 #pragma once
 #include <concepts>
 
-#include <SDL2/SDL_main.h>
+#include <SDL_main.h>
 #include <glm/vec2.hpp>
 
 #include <RealEngine/program/Synchronizer.hpp>

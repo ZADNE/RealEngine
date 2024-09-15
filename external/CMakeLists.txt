@@ -9,7 +9,7 @@ real_target_init_file_sets(ImGui BASE_DIR ".")
 target_link_libraries(ImGui
     PRIVATE
         Vulkan::Vulkan
-        SDL2::Main
+        SDL2::SDL2
         glm::glm-header-only
 )
 add_subdirectory(ImGui)

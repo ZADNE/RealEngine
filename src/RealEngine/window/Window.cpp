@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include <ImGui/imgui_impl_sdl2.h>
-#include <SDL2/SDL_events.h>
+#include <SDL_events.h>
 
 #include <RealEngine/utility/Error.hpp>
 #include <RealEngine/window/Window.hpp>

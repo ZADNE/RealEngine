@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 
-#include <SDL2/SDL_events.h>
+#include <SDL_events.h>
 #include <glm/common.hpp>
 
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
