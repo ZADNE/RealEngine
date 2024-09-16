@@ -11,25 +11,43 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, windows-latest]
+        os: [ubuntu-24.04, windows-2022]
         build_type: [Release]
         c_compiler: [gcc-14, cl]
         include:
-          - os: windows-latest
+          - os: windows-2022
             c_compiler: cl
             cpp_compiler: cl
           - os: ubuntu-24.04
             c_compiler: gcc-14
             cpp_compiler: g++-14
         exclude:
-          - os: windows-latest
+          - os: windows-2022
             c_compiler: gcc-14
           - os: ubuntu-24.04
             c_compiler: cl
 
     steps:
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "repo-name=$(basename -- "${{ github.repository }}")" >> $GITHUB_ENV
+        echo "build-dir=${{ github.workspace }}/Real/build" >> "$GITHUB_ENV"
+        echo "source-dir=${{ github.workspace }}/Real" >> "$GITHUB_ENV"
+        echo "install-dir=${{ github.workspace }}/Real/install" >> "$GITHUB_ENV"
+
+    - name: Clone Real
+      uses: actions/checkout@v4
+      with:
+        repository: ZADNE/Real
+        ref: main
+        path: 'Real'
+
     - name: Clone RealEngine
       uses: actions/checkout@v4
+      with:
+        path: 'Real/${{ env.repo-name }}'
 
     - name: Set up Vulkan SDK
       uses: humbletim/install-vulkan-sdk@v1.1.1
@@ -53,23 +71,33 @@ jobs:
         sudo apt-get update
         sudo apt-get install libsdl2-dev libsdl2-2.0-0 libsdl2-ttf-dev libsdl2-ttf-2.0-0 -y;
 
-    - name: Set reusable strings
-      id: strings
-      shell: bash
-      run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-
     - name: Configure CMake
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        cmake -B ${{ env.build-dir }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -S ${{ github.workspace }}
+        -S ${{ env.source-dir }}
 
     - name: Build
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} --parallel 4
+      run: >
+        cmake --build ${{ env.build-dir }}
+        --config ${{ matrix.build_type }}
+        --parallel 4
 
     - name: Test
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      working-directory: ${{ env.build-dir }}
       run: ctest --build-config ${{ matrix.build_type }}
+
+    - name: Install
+      run: >
+        cmake --install ${{ env.build-dir }}
+        --prefix ${{ env.install-dir }}/RealEngine-${{ matrix.os }}-${{ matrix.build_type }}
+        --config ${{ matrix.build_type }}
+        --strip
+
+    - name: Archive package
+      uses: actions/upload-artifact@v4
+      with:
+        name: RealEngine
+        path: ${{ env.install-dir }}
