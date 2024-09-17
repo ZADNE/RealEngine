@@ -36,6 +36,7 @@ jobs:
         echo "build-dir=${{ github.workspace }}/Real/build" >> "$GITHUB_ENV"
         echo "source-dir=${{ github.workspace }}/Real" >> "$GITHUB_ENV"
         echo "install-dir=${{ github.workspace }}/Real/install" >> "$GITHUB_ENV"
+        echo "archive-name=RealEngine-${{ matrix.os }}-${{ matrix.build_type }}" >> "$GITHUB_ENV"
 
     - name: Clone Real
       uses: actions/checkout@v4
@@ -89,15 +90,20 @@ jobs:
       working-directory: ${{ env.build-dir }}
       run: ctest --build-config ${{ matrix.build_type }}
 
-    - name: Install
+    - name: Create archive
       run: >
         cmake --install ${{ env.build-dir }}
-        --prefix ${{ env.install-dir }}/RealEngine-${{ matrix.os }}-${{ matrix.build_type }}
+        --prefix ${{ env.install-dir }}/${{ env.archive-name }}
         --config ${{ matrix.build_type }}
         --strip
 
-    - name: Archive package
-      uses: actions/upload-artifact@v4
-      with:
-        name: RealEngine
-        path: ${{ env.install-dir }}
+        7z a ${{ env.install-dir }}/${{ env.archive-name }}.7z ${{ env.install-dir }}/*
+
+    - name: Create release
+      run: >
+        gh release create v2.0.0-${{ github.head_ref  }} --draft
+        --repo ZADNE/RealEngine
+        --target ${{ github.head_ref }}
+        ${{ env.install-dir }}/${{ env.archive-name }}.7z
+      env:
+        GH_TOKEN: ${{ github.token }}
