@@ -90,20 +90,18 @@ jobs:
       working-directory: ${{ env.build-dir }}
       run: ctest --build-config ${{ matrix.build_type }}
 
-    - name: Create archive
+    - name: Create release
       run: >
         cmake --install ${{ env.build-dir }}
         --prefix ${{ env.install-dir }}/${{ env.archive-name }}
         --config ${{ matrix.build_type }}
         --strip
-
-        7z a ${{ env.install-dir }}/${{ env.archive-name }}.7z ${{ env.install-dir }}/*
-
-    - name: Create release
-      run: >
-        gh release create v2.0.0-${{ github.head_ref  }} --draft
+        ;
+        7z a ${{ env.install-dir }}/${{ env.archive-name }}.7z
+        ${{ env.install-dir }}/*
+        ;
+        gh release upload v2.0.0-${{ github.head_ref  }} --clobber
         --repo ZADNE/RealEngine
-        --target ${{ github.head_ref }}
         ${{ env.install-dir }}/${{ env.archive-name }}.7z
       env:
         GH_TOKEN: ${{ github.token }}
