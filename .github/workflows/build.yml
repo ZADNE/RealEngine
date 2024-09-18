@@ -75,35 +75,31 @@ jobs:
     - name: Configure CMake
       run: >
         cmake -B ${{ env.build-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -S ${{ env.source-dir }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -S ${{ env.source-dir }}
 
     - name: Build
       run: >
         cmake --build ${{ env.build-dir }}
-        --config ${{ matrix.build_type }}
-        --parallel 4
+          --config ${{ matrix.build_type }}
+          --parallel 4
 
     - name: Test
       working-directory: ${{ env.build-dir }}
       run: ctest --build-config ${{ matrix.build_type }}
 
-    - name: Create archive
-      run: >
-        cmake --install ${{ env.build-dir }}
-        --prefix ${{ env.install-dir }}/${{ env.archive-name }}
-        --config ${{ matrix.build_type }}
-        --strip
-
-        7z a ${{ env.install-dir }}/${{ env.archive-name }}.7z ${{ env.install-dir }}/*
-
     - name: Create release
       run: >
-        gh release create v2.0.0-${{ github.head_ref  }} --draft
-        --repo ZADNE/RealEngine
-        --target ${{ github.head_ref }}
-        ${{ env.install-dir }}/${{ env.archive-name }}.7z
+        cmake --install ${{ env.build-dir }}
+          --prefix ${{ env.install-dir }}/${{ env.archive-name }}
+          --config ${{ matrix.build_type }}
+          --strip;
+        7z a ${{ env.install-dir }}/${{ env.archive-name }}.7z
+          ${{ env.install-dir }}/*;
+        gh release upload v2.0.0-${{ github.head_ref  }} --clobber
+          --repo ZADNE/RealEngine
+          ${{ env.install-dir }}/${{ env.archive-name }}.7z
       env:
         GH_TOKEN: ${{ github.token }}
