@@ -5,6 +5,8 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(FetchContent)
 
+include("cmake/GetRealEngineVersion.cmake")
+
 function(FetchContent_MakeAvailableWithoutLinting)
     set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
     set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
@@ -116,9 +118,10 @@ endfunction()
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
             COMPONENT           RealEngine_Development
     )
+    get_realengine_version()
     write_basic_package_version_file(
         RealEngineConfigVersion.cmake
-        VERSION 2.0.0
+        VERSION ${realengine_version}
         COMPATIBILITY SameMajorVersion
     )
     install(EXPORT RealEngineTargets

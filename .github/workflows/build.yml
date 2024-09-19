@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, windows-2022]
-        build_type: [Release]
+        build_type: [Debug, Release]
         c_compiler: [gcc-14, cl]
         include:
           - os: windows-2022
@@ -29,14 +29,12 @@ jobs:
 
     steps:
     - name: Set reusable strings
-      id: strings
       shell: bash
       run: |
         echo "repo-name=$(basename -- "${{ github.repository }}")" >> $GITHUB_ENV
         echo "build-dir=${{ github.workspace }}/Real/build" >> "$GITHUB_ENV"
         echo "source-dir=${{ github.workspace }}/Real" >> "$GITHUB_ENV"
         echo "install-dir=${{ github.workspace }}/Real/install" >> "$GITHUB_ENV"
-        echo "archive-name=RealEngine-${{ matrix.os }}-${{ matrix.build_type }}" >> "$GITHUB_ENV"
 
     - name: Clone Real
       uses: actions/checkout@v4
@@ -90,6 +88,11 @@ jobs:
       working-directory: ${{ env.build-dir }}
       run: ctest --build-config ${{ matrix.build_type }}
 
+    - name: Compose archive name
+      shell: bash
+      run: >
+        echo "archive-name=RealEngine-v$(cmake -P Real/RealEngine/cmake/GetRealEngineVersion.cmake)-${{ matrix.os }}-${{ matrix.build_type }}" >> "$GITHUB_ENV"
+
     - name: Create release
       run: >
         cmake --install ${{ env.build-dir }}
@@ -100,7 +103,7 @@ jobs:
         7z a ${{ env.install-dir }}/${{ env.archive-name }}.7z
         ${{ env.install-dir }}/*
         ;
-        gh release upload v2.0.0-${{ github.head_ref  }} --clobber
+        gh release upload ${{ github.head_ref  }} --clobber
         --repo ZADNE/RealEngine
         ${{ env.install-dir }}/${{ env.archive-name }}.7z
       env:

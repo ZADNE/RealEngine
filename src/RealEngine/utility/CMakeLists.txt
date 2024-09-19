@@ -8,4 +8,5 @@ real_target_sources(RealEngine
         OffsetOfArr.hpp             
         Unicode.hpp                 
         UniqueCPtr.hpp              
+        Version.hpp                 
 )
