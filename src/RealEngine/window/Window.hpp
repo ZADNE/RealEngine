@@ -5,7 +5,7 @@
 #include <string>
 
 #include <ImGui/imgui.h>
-#include <SDL2/SDL_video.h>
+#include <SDL_video.h>
 #include <glm/vec2.hpp>
 
 #include <RealEngine/renderer/VulkanFixture.hpp>

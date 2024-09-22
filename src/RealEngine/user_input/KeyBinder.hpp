@@ -8,8 +8,8 @@
 #include <optional>
 #include <string>
 
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_thread.h>
+#include <SDL_events.h>
+#include <SDL_thread.h>
 
 #include <RealEngine/program/MainProgram.hpp>
 #include <RealEngine/user_input/Key.hpp>

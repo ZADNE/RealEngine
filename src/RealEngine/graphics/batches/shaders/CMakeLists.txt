@@ -1,4 +1,4 @@
-﻿target_shaders(RealEngine PRIVATE
+﻿real_target_sources(RealEngine PRIVATE
     geometry.frag               
     geometry.vert               
     sprite.frag                 

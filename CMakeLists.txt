@@ -1,9 +1,11 @@
 ﻿cmake_minimum_required(VERSION 3.24)
 project(RealEngine)
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 include(FetchContent)
-include("cmake/RealShaders/RealShaders.cmake")
-include("cmake/IncludeSDL2WithPrefix.cmake")
+
+include("cmake/GetRealEngineVersion.cmake")
 
 function(FetchContent_MakeAvailableWithoutLinting)
     set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
@@ -16,14 +18,15 @@ endfunction()
     # Vulkan
     find_package(Vulkan REQUIRED COMPONENTS glslc)
     # SDL2
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
-    find_package(SDL2 REQUIRED)
-    find_package(SDL2_ttf REQUIRED)
+    find_package(SDL2 CONFIG REQUIRED)
+    find_package(SDL2_ttf CONFIG REQUIRED)
     # SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.290.0.tar.gz)
     # OpenGL Mathematics
+    set(GLM_BUILD_INSTALL ON CACHE INTERNAL "")
     FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/refs/tags/1.0.0.tar.gz)
     # nlohmann json
+    set(JSON_Install ON CACHE INTERNAL "")
     FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 
     # Download remote libs
@@ -34,27 +37,36 @@ endfunction()
 
 # Declare projects
     # RealEngine library
-    add_library_with_shaders(RealEngine STATIC)
+    add_real_library(RealEngine STATIC)
     set_target_properties(RealEngine PROPERTIES
         CXX_STANDARD 23
-        REALSHADERS_CXX_NAMESPACE "re"
+        realproject_shader_cxx_namespace "re"
         INTERPROCEDURAL_OPTIMIZATION TRUE
     )
-    target_link_libraries(RealEngine PUBLIC
-        ${CMAKE_DL_LIBS}
-        Vulkan::Vulkan
-        vma
-        spirv-cross-core
-        spirv-cross-reflect
-        SDL2::Main
-        SDL2::TTF
-        glm
-        nlohmann_json::nlohmann_json
-        ImGui
-        lodepng
+    target_link_libraries(RealEngine
+        PUBLIC
+            ${CMAKE_DL_LIBS}
+            Vulkan::Vulkan
+            vma
+            SDL2::SDL2main
+            SDL2::SDL2
+            SDL2_ttf::SDL2_ttf
+            glm::glm-header-only
+            nlohmann_json::nlohmann_json
+            ImGui
+            lodepng
+        PRIVATE
+            spirv-cross-core
+            spirv-cross-reflect
     )
-    target_include_directories(RealEngine PUBLIC src external)
-    target_includes_sdl2_prefixed(RealEngine PUBLIC)
+    target_include_directories(RealEngine
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+            $<INSTALL_INTERFACE:.>
+        PRIVATE
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external>
+    )
+    real_target_init_file_sets(RealEngine BASE_DIR src)
     add_subdirectory(src)
 
     # Doxygen documentation
@@ -64,7 +76,7 @@ endfunction()
         set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
         configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
-        add_custom_target(RealEngine_Documentation ALL
+        add_custom_target(RealEngine_Documentation
             COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             VERBATIM
@@ -81,4 +93,45 @@ endfunction()
         )
         target_link_libraries(RTICreator PUBLIC RealEngine)
         add_subdirectory(tools)
+        set(RTICreator "RTICreator")
+    else()
+        set(RTICreator "")
     endif()
+
+# Installation
+    install(TARGETS RealEngine vma glm-header-only nlohmann_json ImGui lodepng ${RTICreator}
+        EXPORT RealEngineTargets
+        RUNTIME
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT           RealEngine_Runtime
+        LIBRARY
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT           RealEngine_Runtime
+            NAMELINK_COMPONENT  RealEngine_Development
+        ARCHIVE
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT           RealEngine_Development
+        FILE_SET realproject_public_headers
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            COMPONENT           RealEngine_Development
+        FILE_SET HEADERS
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            COMPONENT           RealEngine_Development
+    )
+    get_realengine_version()
+    write_basic_package_version_file(
+        RealEngineConfigVersion.cmake
+        VERSION ${realengine_version}
+        COMPATIBILITY SameMajorVersion
+    )
+    install(EXPORT RealEngineTargets
+        FILE RealEngineTargets.cmake
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
+    )
+    configure_file(cmake/RealEngineConfig.cmake.in RealEngineConfig.cmake @ONLY)
+    install(
+        FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
+    )

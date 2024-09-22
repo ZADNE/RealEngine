@@ -1,3 +1,4 @@
-﻿target_sources(RealEngine PRIVATE
-    RasterizedFont.hpp          RasterizedFont.cpp
+﻿real_target_sources(RealEngine
+    PUBLIC
+        RasterizedFont.hpp          RasterizedFont.cpp
 )

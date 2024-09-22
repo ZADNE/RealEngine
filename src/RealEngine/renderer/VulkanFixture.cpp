@@ -5,7 +5,7 @@
 
 #include <ImGui/imgui_impl_sdl2.h>
 #include <ImGui/imgui_impl_vulkan.h>
-#include <SDL2/SDL_vulkan.h>
+#include <SDL_vulkan.h>
 #include <glm/common.hpp>
 #define VMA_IMPLEMENTATION
 #include <vma/vk_mem_alloc.hpp>
