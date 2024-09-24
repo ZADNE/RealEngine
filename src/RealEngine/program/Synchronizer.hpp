@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -15,10 +15,8 @@ class MainProgram;
  */
 class Synchronizer {
 public:
-    using TimePoint =
-        std::chrono::steady_clock::time_point; /**< Time point type alias */
-    using Duration =
-        std::chrono::steady_clock::duration;   /**< Time duration type alias */
+    using TimePoint = std::chrono::steady_clock::time_point; ///< Time point type alias
+    using Duration = std::chrono::steady_clock::duration; ///< Time duration type alias
 
     constexpr static unsigned int k_doNotLimitFramesPerSecond = 0u;
 
@@ -41,14 +39,13 @@ public:
     /**
      * @brief Sets desired number of steps to happen per second.
      *
-     * Zero is not a valid value - use pauseSteps() to stop steps.
-     * @param stepsPerSecond Desired number of steps to happen per second.
+     * @param stepsPerSecond Desired number of steps to happen per second. Zero
+     * is not a valid value - use pauseSteps() to stop steps.
      */
     void setStepsPerSecond(unsigned int stepsPerSecond);
 
     /**
      * @brief Sets new limit for frames to be drawn per second.
-     * Or use k_doNotLimitFramesPerSecond to not limit frames per second.
      *
      * @param framesPerSecondLimit  Maximum number of frames to be drawn per
      * second, or use k_doNotLimitFramesPerSecond to not limit this
@@ -57,14 +54,16 @@ public:
 
     /**
      * @brief Temporarily pauses steps.
-     * No steps will be reported to happen until resumeSteps() is called.
-     * Use this if you need to perform a time sensitive operation that will
-     * greatly exceed the time of one step.
+     *
+     * No steps will be reported to happen until resumeSteps() is
+     * called. Use this if you need to perform a time sensitive operation that
+     * will greatly exceed the time of one step.
      */
     void pauseSteps();
 
     /**
      * @brief Resumes temporarily paused steps.
+     *
      * Steps will resume as if they were not paused at all
      * (that is without rushing to compensate for the time of the pause).
      */
@@ -82,70 +81,66 @@ public:
     double drawInterpolationFactor() const;
 
     /**
-     * @brief Gets number of frames drawn last second (usually refered to as
-     * FPS). This is the most basic metric for any real-time application.
+     * @brief Gets number of frames drawn last second (aka FPS).
+     *
+     * This is the most basic metric for any real-time application.
      * @return Current frames per second
      */
     unsigned int framesPerSecond() const;
 
     /**
      * @brief Gets maximum frame time in the last second
+     *
      * This metric can be used to detect lag spikes.
      * @return Maximum frame time in the last second
      */
     Duration maxFrameTime() const;
 
-    /**
-     * @brief This function has to be called at the beginning of each frame
-     */
+    /** @brief This function has to be called at the beginning of each frame */
     void beginFrame();
 
-    /**
-     * @brief This function has to be called at the end of each frame
-     */
+    /** @brief This function has to be called at the end of each frame */
     void endFrame();
 
     /**
-     * @brief Tests whether next step should happen - that depends on the time
-     * that passed since the last step.
+     * @brief Tests whether next step should happen.
+     * @return True if step should happen immediately, false otherwise.
      *
+     * Result depends on the time that passed since the last step.
      * If it should, it assumes it will happen immediately, and it updates
      * internal counters.
-     * @return True if step should happen immediately, false otherwise.
      */
     bool shouldStepHappen();
 
 private:
 
-    /**
-     * @brief Sleeps this thread until next frame should begin.
-     */
+    /** @brief Sleeps this thread until next frame should begin. */
     void delayTillEndOfFrame();
 
     void resetSynchronization();
 
-    unsigned int m_currFrameIndex = 0; /**< Number of frames drawn since last resume,
-                                          used when limiting frames per second */
-    TimePoint m_startTime;     /**< Time point of the last resume - the center
-                                  synchronization point */
-    TimePoint m_lastFrameTime; /**< Time point of the last frame start - used to
-                                  determine its period */
+    /// Number of frames drawn since last resume, used when limiting frames per second
+    unsigned int m_currFrameIndex = 0;
+    /// Time point of the last resume - the center synchronization point
+    TimePoint m_startTime;
+    /// Time point of the last frame start - used to determine its period
+    TimePoint m_lastFrameTime;
 
-    Duration m_timePerStep{};  /**< Time duration for each step */
-    Duration m_timePerFrame{}; /**< Time duration for each frame, zero if not
-                                limiting FPS (time per frame can vary) */
+    /// Time duration for each step
+    Duration m_timePerStep{};
+    /// Time duration for each frame, zero if not limiting FPS (time per frame can vary)
+    Duration m_timePerFrame{};
 
-    Duration m_stepTimeAccumulator{Duration::zero()
-    }; /**< Accumulator of time for next step */
+    /// Accumulator of time for next step
+    Duration m_stepTimeAccumulator{Duration::zero()};
 
-    unsigned int m_framesPerSecond = 0; /**< Frames drawn last second */
-    unsigned int m_framesPerSecondThisSecond = 0; /**< Frames drawn this second */
+    unsigned int m_framesPerSecond           = 0; ///< Count drawn last second
+    unsigned int m_framesPerSecondThisSecond = 0; ///< Count drawn this second
 
-    Duration m_maxFrameTime{Duration::zero()}; /**< Max frame time last second */
-    Duration m_maxFrameTimeThisSecond{Duration::zero()
-    };                          /**< Max frame time this second */
+    Duration m_maxFrameTime{Duration::zero()};    ///< Max last second
+    Duration m_maxFrameTimeThisSecond{Duration::zero()}; ///< Max this second
 
-    bool m_stepsPaused = false; /**< True if steps are paused */
+    bool m_stepsPaused = false; ///< True if steps are paused
 };
 
 } // namespace re

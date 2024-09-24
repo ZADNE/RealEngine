@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -55,11 +55,11 @@ public:
     explicit Buffer(const BufferCreateInfo& createInfo)
         : Buffer(createInfo, nullptr) {}
 
-    Buffer(const Buffer&)            = delete;  /**< Noncopyable */
-    Buffer& operator=(const Buffer&) = delete;  /**< Noncopyable */
+    Buffer(const Buffer&)            = delete;  ///< Noncopyable
+    Buffer& operator=(const Buffer&) = delete;  ///< Noncopyable
 
-    Buffer(Buffer&& other) noexcept;            /**< Movable */
-    Buffer& operator=(Buffer&& other) noexcept; /**< Movable */
+    Buffer(Buffer&& other) noexcept;            ///< Movable
+    Buffer& operator=(Buffer&& other) noexcept; ///< Movable
 
     /**
      * @brief Frees the backing memory block on the GPU and destructs the buffer.
@@ -73,8 +73,9 @@ public:
 
 protected:
     /**
-     * @param pointerToMapped Output paramter - It is used to return pointer to
-     * the mapped buffer if persistent mapping is requested
+     * @param createInfo
+     * @param[out] pointerToMapped Used to return pointer to the mapped buffer
+     * if persistent mapping is requested
      */
     Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped);
 

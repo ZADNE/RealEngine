@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -19,11 +19,11 @@ class DeletionQueue {
 public:
     DeletionQueue(const vk::Device& device, const vma::Allocator& allocator);
 
-    DeletionQueue(const DeletionQueue&)            = delete; /**< Noncopyable */
-    DeletionQueue& operator=(const DeletionQueue&) = delete; /**< Noncopyable */
+    DeletionQueue(const DeletionQueue&)            = delete; ///< Noncopyable
+    DeletionQueue& operator=(const DeletionQueue&) = delete; ///< Noncopyable
 
-    DeletionQueue(DeletionQueue&&)            = delete;      /**< Nonmovable */
-    DeletionQueue& operator=(DeletionQueue&&) = delete;      /**< Nonmovable */
+    DeletionQueue(DeletionQueue&&)            = delete;      ///< Nonmovable
+    DeletionQueue& operator=(DeletionQueue&&) = delete;      ///< Nonmovable
 
     ~DeletionQueue();
 
@@ -81,8 +81,8 @@ private:
             , handle(_handle) {}
 
         Category cat;
-        vk::ObjectType type; /**< Determines type of the handle */
-        void* handle;        /**< Is the handle to the object to be deleted */
+        vk::ObjectType type; ///< Determines type of the handle
+        void* handle;        ///< Is the handle to the object to be deleted
         static_assert(VK_USE_64_BIT_PTR_DEFINES == 1);
     };
 

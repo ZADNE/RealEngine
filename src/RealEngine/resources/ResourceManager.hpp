@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -17,7 +17,8 @@ namespace re {
 class ResourceManager {
 public:
     /**
-     * @copydoc TextureCache::texture
+     * @brief Gets texture as a shared resource
+     * @param seed seed.toFullPath() is used as filepath
      */
     static SharedTexture texture(const TextureSeed& seed);
 

@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -35,17 +35,18 @@ public:
      *
      * @param settings Settings to initialize the window with.
      * @param title Title for the window
+     * @param initInfo
      */
     Window(
         const WindowSettings& settings, const std::string& title,
         const VulkanInitInfo& initInfo
     );
 
-    Window(const Window&)         = delete; /**< Noncopyable */
-    void operator=(const Window&) = delete; /**< Noncopyable */
+    Window(const Window&)         = delete; ///< Noncopyable
+    void operator=(const Window&) = delete; ///< Noncopyable
 
-    Window(Window&&)         = delete;      /**< Nonmovable */
-    void operator=(Window&&) = delete;      /**< Nonmovable */
+    Window(Window&&)         = delete;      ///< Nonmovable
+    void operator=(Window&&) = delete;      ///< Nonmovable
 
     ~Window();
 
@@ -67,6 +68,9 @@ public:
      */
     void finishNewFrame();
 
+    /**
+     * @brief Effectively finishes all work on GPU
+     */
     void prepareForDestructionOfRendererObjects();
 
     /**
@@ -145,6 +149,7 @@ public:
 
     /**
      * @brief       Sets the preferred renderer.
+     * @param renderer The renderer that will be used if it exists and is capable.
      * @param save  Changed settings are saved to file if true.
      * @details     Program needs to be restarted to change the renderer.
      *              It is not guaranteed that the renderer will be used - a
@@ -165,7 +170,7 @@ private:
     using SDL_WindowRAII = UniqueCPtr<SDL_Window, SDL_DestroyWindow>;
     SDL_WindowRAII createSDLWindow(RendererID renderer);
 
-    WindowSubsystems m_subsystems; /**< Initializes and de-initializes subsystems */
+    WindowSubsystems m_subsystems; ///< Initializes and de-initializes subsystems
     SDL_WindowRAII m_SDLwindow;
 
     SDL_Window* sdlWindow() { return m_SDLwindow.get(); }
@@ -173,9 +178,8 @@ private:
     union {
         VulkanFixture m_vk13;
     };
-    RendererID m_usedRenderer; /**< The actual renderer (may be different from
-                                  the preferred one) */
-    std::string m_windowTitle; /**< Title of the window */
+    RendererID m_usedRenderer; ///< May be different from the preferred one
+    std::string m_windowTitle;
 };
 
 } // namespace re

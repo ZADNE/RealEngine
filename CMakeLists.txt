@@ -67,6 +67,7 @@ endfunction()
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external>
     )
     real_target_init_file_sets(RealEngine BASE_DIR src)
+    get_realengine_version()
     add_subdirectory(src)
 
     # Doxygen documentation
@@ -118,7 +119,6 @@ endfunction()
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
             COMPONENT           RealEngine_Development
     )
-    get_realengine_version()
     write_basic_package_version_file(
         RealEngineConfigVersion.cmake
         VERSION ${realengine_version}

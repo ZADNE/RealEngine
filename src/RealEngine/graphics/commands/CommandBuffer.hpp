@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -34,11 +34,11 @@ public:
 
     explicit CommandBuffer(const CommandBufferCreateInfo& createInfo);
 
-    CommandBuffer(const CommandBuffer&)            = delete; /**< Noncopyable */
-    CommandBuffer& operator=(const CommandBuffer&) = delete; /**< Noncopyable */
+    CommandBuffer(const CommandBuffer&)            = delete;  ///< Noncopyable
+    CommandBuffer& operator=(const CommandBuffer&) = delete;  ///< Noncopyable
 
-    CommandBuffer(CommandBuffer&& other) noexcept;           /**< Movable */
-    CommandBuffer& operator=(CommandBuffer&& other) noexcept; /**< Movable */
+    CommandBuffer(CommandBuffer&& other) noexcept;            ///< Movable
+    CommandBuffer& operator=(CommandBuffer&& other) noexcept; ///< Movable
 
     ~CommandBuffer();
 
@@ -132,11 +132,11 @@ public:
             m_cb.beginDebugRegion(label, color);
         }
 
-        DebugRegion(const DebugRegion&)            = delete; /**< Noncopyable */
-        DebugRegion& operator=(const DebugRegion&) = delete; /**< Noncopyable */
+        DebugRegion(const DebugRegion&)            = delete; ///< Noncopyable
+        DebugRegion& operator=(const DebugRegion&) = delete; ///< Noncopyable
 
-        DebugRegion(DebugRegion&&)            = delete;      /**< Nonmovable */
-        DebugRegion& operator=(DebugRegion&&) = delete;      /**< Nonmovable */
+        DebugRegion(DebugRegion&&)            = delete;      ///< Nonmovable
+        DebugRegion& operator=(DebugRegion&&) = delete;      ///< Nonmovable
 
         ~DebugRegion() { m_cb.endDebugRegion(); }
 

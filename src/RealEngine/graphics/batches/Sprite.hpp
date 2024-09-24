@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -29,7 +29,7 @@ public:
     const TextureShaped& texture() const { return *m_tex; };
 
 protected:
-    glm::vec2 m_subimageSprite; /**< X = subimage of the sprite, Y = sprite of the texture */
+    glm::vec2 m_subimageSprite; ///< X = subimage of the sprite, Y = sprite of the texture
     const TextureShaped* m_tex;
 };
 
@@ -50,7 +50,7 @@ public:
     float speed() const override;
 
 protected:
-    float m_imageSpeed; /**< Is added each step to the current image position */
+    float m_imageSpeed; ///< Is added each step to the current image position
 };
 
 /**

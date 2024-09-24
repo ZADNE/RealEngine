@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/graphics/descriptors/DescriptorSet.hpp>

@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -30,9 +30,9 @@ struct SelectedPhysDevice {
  * @brief Specifies what the selected device must support
  */
 struct PhysDeviceRequirements {
-    vk::SurfaceKHR surface;              /**< Must support k_surfaceFormat */
-    const void* deviceCreateInfoChain{}; /**< Must support all features in chain */
-    std::string_view preferredDevice; /**< Takes precedence if it is suitable */
+    vk::SurfaceKHR surface;              ///< Must support k_surfaceFormat
+    const void* deviceCreateInfoChain{}; ///< Must support all features in chain
+    std::string_view preferredDevice;    ///< Takes precedence if it is suitable
 };
 
 /**

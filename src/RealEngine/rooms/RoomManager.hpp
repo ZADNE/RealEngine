@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -70,8 +70,8 @@ public:
     }
 
 protected:
-    std::vector<std::unique_ptr<Room>> m_rooms; /**< Contains all managed rooms */
-    Room* m_currentRoom = nullptr; /**< Pointer to the current room */
+    std::vector<std::unique_ptr<Room>> m_rooms; ///< Contains all managed rooms
+    Room* m_currentRoom = nullptr;              ///< Pointer to the current room
 };
 
 } // namespace re

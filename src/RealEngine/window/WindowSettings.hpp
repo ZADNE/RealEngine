@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -72,10 +72,10 @@ protected:
      */
     void reset();
 
-    glm::ivec2 m_dims{};            /**< dimensions of the window */
-    WindowFlags m_flags;            /**< flags of the window */
-    RendererID m_preferredRenderer; /**< The actual renderer may be different */
-    std::string m_preferredDevice;  /**< The actual device may be different */
+    glm::ivec2 m_dims{};            ///< Dimensions of the window
+    WindowFlags m_flags;            ///< Flags of the window
+    RendererID m_preferredRenderer; ///< The actual renderer may be different
+    std::string m_preferredDevice;  ///< The actual device may be different
 };
 
 } // namespace re

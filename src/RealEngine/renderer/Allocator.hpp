@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -17,10 +17,10 @@ public:
     Allocator(vma::Allocator&& other) noexcept
         : vma::Allocator(other) {}
 
-    Allocator(const Allocator&)            = delete; /**< Noncopyable */
-    Allocator& operator=(const Allocator&) = delete; /**< Noncopyable */
+    Allocator(const Allocator&)            = delete; ///< Noncopyable
+    Allocator& operator=(const Allocator&) = delete; ///< Noncopyable
 
-    Allocator& operator=(Allocator&&) = delete;      /**< Nonmovable */
+    Allocator& operator=(Allocator&&) = delete;      ///< Nonmovable
 
     ~Allocator() { destroy(); }
 };

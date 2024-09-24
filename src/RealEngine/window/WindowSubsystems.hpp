@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -6,7 +6,7 @@
 
 #include <RealEngine/utility/Version.hpp>
 
-/*! \mainpage RealEngine
+/** \mainpage RealEngine
  *
  * \section overview Overview
  *
@@ -29,7 +29,7 @@ namespace re {
  * preffered (or if it fails during initialization).
  */
 enum class RendererID {
-    Vulkan13, /**< Vulkan 1.3 renderer */
+    Vulkan13, ///< Vulkan 1.3 renderer
     Any
 };
 
@@ -47,11 +47,11 @@ public:
      */
     WindowSubsystems();
 
-    WindowSubsystems(const WindowSubsystems&) = delete; /**< Noncopyable */
-    WindowSubsystems& operator=(const WindowSubsystems&) = delete; /**< Noncopyable */
+    WindowSubsystems(const WindowSubsystems&) = delete; ///< Noncopyable
+    WindowSubsystems& operator=(const WindowSubsystems&) = delete; ///< Noncopyable
 
-    WindowSubsystems(WindowSubsystems&&)            = delete; /**< Nonmovable */
-    WindowSubsystems& operator=(WindowSubsystems&&) = delete; /**< Nonmovable */
+    WindowSubsystems(WindowSubsystems&&)            = delete; ///< Nonmovable
+    WindowSubsystems& operator=(WindowSubsystems&&) = delete; ///< Nonmovable
 
     ~WindowSubsystems();
 

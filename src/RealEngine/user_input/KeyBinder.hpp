@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -153,7 +153,10 @@ public:
     /**
      * @brief Asynchronously changes a keybinding
      * @param binding The binding to change
-     * @param stopKey The key that stops the listening without changing the keybind
+     * @param callbackReceiver An object that will be notified that the keybind
+     *                         has been changed
+     * @param stopKey The key that stops the listening without changing the
+     * keybind
      */
     template<typename CallbackReceiver, void (CallbackReceiver::*callback)(Key)>
     void listenChangeBinding(

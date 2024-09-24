@@ -1,6 +1,7 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
- *  @file      A minimalistic set of functions concerned with UNICODE
+ *  @file      Unicode.hpp
+ *  @brief     A minimalistic set of functions concerned with UNICODE
  */
 #pragma once
 #include <array>
@@ -22,8 +23,8 @@ constexpr char32_t k_invalidCode = 0xffff;
  * @brief Denotes a range of Unicode characters
  */
 struct UnicodeRange {
-    char32_t firstChar{}; /**< Inclusive */
-    char32_t lastChar{};  /**< Inclusive */
+    char32_t firstChar{}; ///< Inclusive
+    char32_t lastChar{};  ///< Inclusive
 };
 
 /**

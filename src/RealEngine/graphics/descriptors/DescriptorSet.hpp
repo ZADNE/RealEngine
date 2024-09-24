@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -33,11 +33,11 @@ public:
      */
     explicit DescriptorSet(const DescriptorSetCreateInfo& createInfo);
 
-    DescriptorSet(const DescriptorSet&)            = delete; /**< Noncopyable */
-    DescriptorSet& operator=(const DescriptorSet&) = delete; /**< Noncopyable */
+    DescriptorSet(const DescriptorSet&)            = delete;  ///< Noncopyable
+    DescriptorSet& operator=(const DescriptorSet&) = delete;  ///< Noncopyable
 
-    DescriptorSet(DescriptorSet&& other) noexcept;           /**< Movable */
-    DescriptorSet& operator=(DescriptorSet&& other) noexcept; /**< Movable */
+    DescriptorSet(DescriptorSet&& other) noexcept;            ///< Movable
+    DescriptorSet& operator=(DescriptorSet&& other) noexcept; ///< Movable
 
     ~DescriptorSet();
 
