@@ -52,10 +52,10 @@ public:
         const PipelineLayoutDescription& description
     );
 
-    PipelineLayout(const PipelineLayout&) = delete; ///< Noncopyable
-    PipelineLayout& operator=(const PipelineLayout&) = delete; ///< Noncopyable
+    PipelineLayout(const PipelineLayout&)            = delete;  ///< Noncopyable
+    PipelineLayout& operator=(const PipelineLayout&) = delete;  ///< Noncopyable
 
-    PipelineLayout(PipelineLayout&& other) noexcept;           ///< Movable
+    PipelineLayout(PipelineLayout&& other) noexcept;            ///< Movable
     PipelineLayout& operator=(PipelineLayout&& other) noexcept; ///< Movable
 
     ~PipelineLayout();
