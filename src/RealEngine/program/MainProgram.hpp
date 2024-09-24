@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  *  @file
  */
@@ -24,13 +24,12 @@ namespace re {
 class Room;
 
 struct DisplayInfo {
-    std::string name;        /**< @brief UTF-8 encoded 'name' */
-    glm::ivec4 bounds;       /**< @brief Bounds in pixels; XYWH */
-    glm::ivec4 boundsUsable; /**< @brief Usable bounds in pixels; XYWH;
-                                system-reserved parts removed */
-    glm::ivec2 dims;         /**< @brief Dimensions */
-    int refreshRate;         /**< @brief Refresh rate */
-    Uint32 pixelFormat; /**< @brief Pixel format @see SDL2's SDL_PixelFormatEnum */
+    std::string name;        ///< UTF-8 encoded 'name'
+    glm::ivec4 bounds;       ///< Bounds in pixels; XYWH
+    glm::ivec4 boundsUsable; ///< Usable bounds; XYWH; system-reserved parts removed
+    glm::ivec2 dims;         ///< Dimensions
+    int refreshRate;         ///< Refresh rate
+    Uint32 pixelFormat;      ///< Pixel format @see SDL2's SDL_PixelFormatEnum
     void* driverSpecific;
 };
 
@@ -50,11 +49,11 @@ struct DisplayInfo {
  */
 class MainProgram final {
 public:
-    MainProgram(const MainProgram&)            = delete; /**< Noncopyable */
-    MainProgram& operator=(const MainProgram&) = delete; /**< Noncopyable */
+    MainProgram(const MainProgram&)            = delete; ///< Noncopyable
+    MainProgram& operator=(const MainProgram&) = delete; ///< Noncopyable
 
-    MainProgram(MainProgram&&)            = delete;      /**< Nonmovable */
-    MainProgram& operator=(MainProgram&&) = delete;      /**< Nonmovable */
+    MainProgram(MainProgram&&)            = delete;      ///< Nonmovable
+    MainProgram& operator=(MainProgram&&) = delete;      ///< Nonmovable
 
     /**
      * @brief Must be called before any Room is added
@@ -148,14 +147,11 @@ private:
     void pollEvents();
     void processEvent(SDL_Event* evnt);
 
-    Window m_window; /**< Window also creates and initializes renderer backends */
-    RoomManager m_roomManager; /**< Manages rooms - you have to add at least 1
-                                  room to run the program */
-    InputManager m_inputManager; /**< Records key presses/releases, mouse movement etc. */
-    Synchronizer m_synchronizer{50u, 50u};   /**< Maintains constant speed of
-                                                simulation, can also limit FPS */
-    RoomToEngineAccess s_roomToEngineAccess; /**< Is a proxy to access RealEngine
-                                                from within Rooms, see Room::engine */
+    Window m_window; ///< Window also creates and initializes renderer backends
+    RoomManager m_roomManager;
+    InputManager m_inputManager;
+    Synchronizer m_synchronizer{50u, 50u};
+    RoomToEngineAccess s_roomToEngineAccess;
 
     bool m_programShouldRun = false;
     int m_programExitCode   = EXIT_SUCCESS;

@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -70,11 +70,11 @@ public:
         const PipelineComputeCreateInfo& createInfo, const PipelineComputeSources& srcs
     );
 
-    Pipeline(const Pipeline&)            = delete;  /**< Noncopyable */
-    Pipeline& operator=(const Pipeline&) = delete;  /**< Noncopyable */
+    Pipeline(const Pipeline&)            = delete;  ///< Noncopyable
+    Pipeline& operator=(const Pipeline&) = delete;  ///< Noncopyable
 
-    Pipeline(Pipeline&& other) noexcept;            /**< Movable */
-    Pipeline& operator=(Pipeline&& other) noexcept; /**< Movable */
+    Pipeline(Pipeline&& other) noexcept;            ///< Movable
+    Pipeline& operator=(Pipeline&& other) noexcept; ///< Movable
 
     ~Pipeline();
 

@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -65,11 +65,11 @@ public:
         const VulkanInitInfo& initInfo
     );
 
-    VulkanFixture(const VulkanFixture&)            = delete; /**< Noncopyable */
-    VulkanFixture& operator=(const VulkanFixture&) = delete; /**< Noncopyable */
+    VulkanFixture(const VulkanFixture&)            = delete; ///< Noncopyable
+    VulkanFixture& operator=(const VulkanFixture&) = delete; ///< Noncopyable
 
-    VulkanFixture(VulkanFixture&&)            = delete;      /**< Nonmovable */
-    VulkanFixture& operator=(VulkanFixture&&) = delete;      /**< Nonmovable */
+    VulkanFixture(VulkanFixture&&)            = delete;      ///< Nonmovable
+    VulkanFixture& operator=(VulkanFixture&&) = delete;      ///< Nonmovable
 
     ~VulkanFixture();
 

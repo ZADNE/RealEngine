@@ -1,4 +1,4 @@
-/*!
+/**
  *  @author    Dubsky Tomas
  */
 #version 460

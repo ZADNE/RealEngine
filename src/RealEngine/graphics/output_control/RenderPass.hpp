@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -44,11 +44,11 @@ public:
      */
     explicit RenderPass(const RenderPassCreateInfo& createInfo);
 
-    RenderPass(const RenderPass&)            = delete;  /**< Noncopyable */
-    RenderPass& operator=(const RenderPass&) = delete;  /**< Noncopyable */
+    RenderPass(const RenderPass&)            = delete;  ///< Noncopyable
+    RenderPass& operator=(const RenderPass&) = delete;  ///< Noncopyable
 
-    RenderPass(RenderPass&& other) noexcept;            /**< Movable */
-    RenderPass& operator=(RenderPass&& other) noexcept; /**< Movable */
+    RenderPass(RenderPass&& other) noexcept;            ///< Movable
+    RenderPass& operator=(RenderPass&& other) noexcept; ///< Movable
 
     ~RenderPass();
 

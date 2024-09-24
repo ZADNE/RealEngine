@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -19,7 +19,7 @@ struct TextureSeed {
 
     std::string toFullPath() const { return s_folder + file + s_fileExtension; }
 
-    const std::string& file; /**< Filepath without extension */
+    const std::string& file; ///< Filepath without extension
 
 private:
     static inline std::string s_folder        = "textures/";
@@ -53,11 +53,11 @@ public:
     explicit TextureShaped(const TextureSeed& seed)
         : TextureShaped(seed.toFullPath()) {}
 
-    TextureShaped(const TextureShaped&)            = delete; /**< Noncopyable */
-    TextureShaped& operator=(const TextureShaped&) = delete; /**< Noncopyable */
+    TextureShaped(const TextureShaped&)            = delete;  ///< Noncopyable
+    TextureShaped& operator=(const TextureShaped&) = delete;  ///< Noncopyable
 
-    TextureShaped(TextureShaped&& other) noexcept;           /**< Movable */
-    TextureShaped& operator=(TextureShaped&& other) noexcept; /**< Movable */
+    TextureShaped(TextureShaped&& other) noexcept;            ///< Movable
+    TextureShaped& operator=(TextureShaped&& other) noexcept; ///< Movable
 
     ~TextureShaped() = default;
 

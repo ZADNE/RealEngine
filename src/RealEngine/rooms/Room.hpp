@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -28,16 +28,17 @@ class Room {
 public:
     /**
      * @brief Constructs new room
-     * @note Create new rooms using MainProgram::addRoom
      * @param name Unique identifier of the room
+     * @param initialSettings Can be later changed via setDisplaySettings()
+     * @note Create new rooms using MainProgram::addRoom
      */
     Room(size_t name, RoomDisplaySettings initialSettings = RoomDisplaySettings{});
 
-    Room(const Room&)            = delete; /**< Noncopyable */
-    Room& operator=(const Room&) = delete; /**< Noncopyable */
+    Room(const Room&)            = delete; ///< Noncopyable
+    Room& operator=(const Room&) = delete; ///< Noncopyable
 
-    Room(Room&&)            = default;     /**< Movable */
-    Room& operator=(Room&&) = default;     /**< Movable */
+    Room(Room&&)            = default;     ///< Movable
+    Room& operator=(Room&&) = default;     ///< Movable
 
     virtual ~Room() = default;
 
@@ -136,7 +137,7 @@ protected:
     void setDisplaySettings(const RoomDisplaySettings& displaySettings);
 
 private:
-    size_t m_name; /**< Unique identifier of the room */
+    size_t m_name; ///< Unique identifier of the room
     RoomDisplaySettings m_displaySettings;
     RenderPass m_mainRenderPass;
 

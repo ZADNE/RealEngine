@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -59,11 +59,11 @@ public:
      */
     explicit Texture(const TextureCreateInfo& createInfo);
 
-    Texture(const Texture&)            = delete;  /**< Noncopyable */
-    Texture& operator=(const Texture&) = delete;  /**< Noncopyable */
+    Texture(const Texture&)            = delete;  ///< Noncopyable
+    Texture& operator=(const Texture&) = delete;  ///< Noncopyable
 
-    Texture(Texture&& other) noexcept;            /**< Movable */
-    Texture& operator=(Texture&& other) noexcept; /**< Movable */
+    Texture(Texture&& other) noexcept;            ///< Movable
+    Texture& operator=(Texture&& other) noexcept; ///< Movable
 
     ~Texture();
 

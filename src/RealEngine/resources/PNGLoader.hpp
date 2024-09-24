@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -33,7 +33,6 @@ public:
 
     /**
      * @brief   Saves texels and parameters to PNG file
-     * @return  0 on success, other on failure
      * @details Overwrites existing file without notice
      * @throws  Throws when the file cannot be saved/encoded
      */
@@ -41,7 +40,6 @@ public:
 
     /**
      * @brief   Replaces parameters inside PNG file
-     * @return  0 on success, other on failure
      * @throws  Throws when the file cannot be opened/decoded
      */
     static void replaceParameters(

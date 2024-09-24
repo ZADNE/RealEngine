@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -74,11 +74,11 @@ struct PipelineGraphicsSources {
         }
     }
 
-    ShaderSourceRef vert{}; /**< Vertex shader stage of the program */
-    ShaderSourceRef tesc{}; /**< Tesselation control shader stage of the program */
-    ShaderSourceRef tese{}; /**< Tesselation evaluation stage of the program */
-    ShaderSourceRef geom{}; /**< Geometry shader stage of the program */
-    ShaderSourceRef frag{}; /**< Fragment shader stage of the program */
+    ShaderSourceRef vert{}; ///< Vertex shader stage of the program
+    ShaderSourceRef tesc{}; ///< Tesselation control shader stage of the program
+    ShaderSourceRef tese{}; ///< Tesselation evaluation stage of the program
+    ShaderSourceRef geom{}; ///< Geometry shader stage of the program
+    ShaderSourceRef frag{}; ///< Fragment shader stage of the program
 };
 
 /**
@@ -111,7 +111,7 @@ struct PipelineComputeSources {
         }
     }
 
-    ShaderSourceRef comp{}; /**< Copute shader stage of the program */
+    ShaderSourceRef comp{}; ///< Copute shader stage of the program
 };
 
 } // namespace re
