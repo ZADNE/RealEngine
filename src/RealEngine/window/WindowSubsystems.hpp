@@ -6,18 +6,28 @@
 
 #include <RealEngine/utility/Version.hpp>
 
-/** \mainpage RealEngine
+/** @mainpage RealEngine
  *
- * \section overview Overview
+ * @section overview Overview
  *
  * To get a minimal working RealEngine application, you need to create your own
  * room class that inherits from Room. The typical main function then looks like
- * this: \code {cpp} int main(int argc, char* argv[]) {
+ * this: @code {cpp} int main(int argc, char* argv[]) {
  *      MainProgram::initialize();
  *      auto* myRoom = MainProgram::addRoom<MyDerivedRoom>(constructorArgs);
  *      return MainProgram::run(myRoom->name(), transitionparameters);
  *  }
- * \endcode
+ * @endcode
+ */
+
+/**
+ * @namespace re
+ * @brief Everything provided by RealEngine is inside this namespace
+ */
+
+/**
+ * @namespace re::details
+ * @brief Not to be used directly, used for internal implementation
  */
 
 namespace re {

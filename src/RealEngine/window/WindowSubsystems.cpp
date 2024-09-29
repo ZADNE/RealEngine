@@ -83,7 +83,7 @@ void WindowSubsystems::printSubsystemsVersions() const {
 
     // ImGui
 #ifndef NDEBUG
-    std::println("ImGui:        {}\n", ImGui::GetVersion());
+    std::println("ImGui:        {}", ImGui::GetVersion());
 #endif // DEBUG
 }
 
