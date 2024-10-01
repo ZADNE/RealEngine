@@ -38,6 +38,7 @@ WindowSubsystems::WindowSubsystems() {
 
     // ImGui
     ImGui::CreateContext();
+    ImGui::GetIO().IniFilename = nullptr;
     ImGui::StyleColorsDark();
 }
 
