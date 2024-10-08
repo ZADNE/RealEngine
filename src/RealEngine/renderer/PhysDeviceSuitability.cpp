@@ -80,6 +80,20 @@ size_t structSizeBytes(vk::StructureType type) {
     }
 }
 
+size_t structBoolFeatureCount(vk::StructureType type) {
+    // NOLINTBEGIN(*-magic-numbers): I wish I did not have to hardcode this...
+    switch (type) { // Reflection for the poor :-(
+    case vk::StructureType::ePhysicalDeviceFeatures2:        return 55;
+    case vk::StructureType::ePhysicalDeviceVulkan11Features: return 12;
+    case vk::StructureType::ePhysicalDeviceVulkan12Features: return 47;
+    case vk::StructureType::ePhysicalDeviceVulkan13Features: return 15;
+    default:
+        throw Exception{"Unsupported struct in device create info chain"};
+        break;
+    }
+    // NOLINTBEGIN(*-magic-numbers)
+}
+
 using InStruct = const vk::BaseInStructure;
 InStruct* toInStruct(const void* ptr) {
     return reinterpret_cast<InStruct*>(ptr);
@@ -166,8 +180,8 @@ SelectedPhysDevice isSuitable(
     InStruct* desired = toInStruct(req.deviceCreateInfoChain);
     for (InStruct* avail = toInStruct(testChain); avail;
          avail = avail->pNext, desired = desired->pNext) {
-        size_t sizeBytes = structSizeBytes(avail->sType);
-        size_t featureCount = (sizeBytes - sizeof(InStruct)) / sizeof(vk::Bool32);
+        size_t sizeBytes    = structSizeBytes(avail->sType);
+        size_t featureCount = structBoolFeatureCount(avail->sType);
         const vk::Bool32* desBool = reinterpret_cast<const vk::Bool32*>(&desired[1]);
         const vk::Bool32* avaBool = reinterpret_cast<const vk::Bool32*>(&avail[1]);
 
