@@ -15,11 +15,12 @@ public:
      * @brief Constructible only by moving a vma::Allocator in
      */
     Allocator(vma::Allocator&& other) noexcept
-        : vma::Allocator(other) {}
+        : vma::Allocator(std::move(other)) {}
 
     Allocator(const Allocator&)            = delete; ///< Noncopyable
     Allocator& operator=(const Allocator&) = delete; ///< Noncopyable
 
+    Allocator(Allocator&&)            = delete;      ///< Nonmovable
     Allocator& operator=(Allocator&&) = delete;      ///< Nonmovable
 
     ~Allocator() { destroy(); }

@@ -18,8 +18,8 @@ endfunction()
     # Vulkan
     find_package(Vulkan REQUIRED COMPONENTS glslc)
     # SDL2
-    find_package(SDL2 CONFIG REQUIRED)
-    find_package(SDL2_ttf CONFIG REQUIRED)
+    find_package(SDL2 CONFIG REQUIRED GLOBAL)
+    find_package(SDL2_ttf CONFIG REQUIRED GLOBAL)
     # SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.290.0.tar.gz)
     # OpenGL Mathematics

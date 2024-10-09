@@ -44,7 +44,7 @@ public:
 
     const vk::Semaphore& semaphore() const { return m_semaphore; }
 
-protected:
+private:
     vk::Semaphore m_semaphore{};
 };
 

@@ -61,7 +61,7 @@ jobs:
       with:
         build-type: ${{ matrix.build_type }}
         install-linux-dependencies: true
-        version: 2.30.6
+        version: 2.30.7
         version-sdl-ttf: 2.22.0
 
     - name: Set up SDL2 (Linux)

@@ -46,7 +46,7 @@ public:
 
     const vk::Fence& fence() const { return m_fence; }
 
-protected:
+private:
     vk::Fence m_fence{};
 };
 

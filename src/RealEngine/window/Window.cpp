@@ -208,8 +208,8 @@ Window::SDL_WindowRAII Window::createSDLWindow(RendererID renderer) {
         m_dims.x, m_dims.y, SDL_flags
     )};
 
-    if (!m_SDLwindow) {
-        log(SDL_GetError());
+    if (!window) {
+        error(SDL_GetError());
     }
 
     return window;

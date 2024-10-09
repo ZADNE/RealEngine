@@ -15,13 +15,10 @@ namespace re {
  * @brief Specify ancillary parameters of a window
  */
 struct WindowFlags {
-    WindowFlags()
-        : invisible(false)
-        , fullscreen(false)
-        , borderless(false)
-        , vSync(false) {}
+    WindowFlags() {}
 
-    unsigned char invisible : 1, fullscreen : 1, borderless : 1, vSync : 1;
+    unsigned char invisible : 1 {}, fullscreen : 1 {}, borderless : 1 {},
+        vSync : 1 {};
 };
 
 /**
@@ -72,10 +69,12 @@ protected:
      */
     void reset();
 
+    // NOLINTBEGIN(*-non-private-member-variables-in-classes): Intentional
     glm::ivec2 m_dims{};            ///< Dimensions of the window
     WindowFlags m_flags;            ///< Flags of the window
     RendererID m_preferredRenderer; ///< The actual renderer may be different
     std::string m_preferredDevice;  ///< The actual device may be different
+    // NOLINTEND(*-non-private-member-variables-in-classes)
 };
 
 } // namespace re

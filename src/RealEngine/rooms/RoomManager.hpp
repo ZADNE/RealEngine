@@ -69,7 +69,7 @@ public:
         for (auto& room : m_rooms) { ((*room).*callback)(args...); }
     }
 
-protected:
+private:
     std::vector<std::unique_ptr<Room>> m_rooms; ///< Contains all managed rooms
     Room* m_currentRoom = nullptr;              ///< Pointer to the current room
 };

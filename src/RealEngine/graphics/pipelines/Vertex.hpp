@@ -16,6 +16,7 @@ using Color = glm::vec<4, uint8_t, glm::qualifier::defaultp>;
 
 #pragma warning(push)
 #pragma warning(disable : 26495)
+// NOLINTBEGIN(*-member-init): Intentionally uninitialized
 
 /**
  * @brief Is POD vertex with position
@@ -56,6 +57,7 @@ struct VertexPoCoUv {
     glm::vec2 uv;
 };
 
+// NOLINTEND(*-member-init)
 #pragma warning(pop)
 
 } // namespace re

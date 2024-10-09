@@ -1,5 +1,5 @@
 ---
-HeaderFilterRegex:      '^(RealEngine|RTICreator)\/.*\.hpp$'
+HeaderFilterRegex:      'RealEngine\/(src\/RealEngine|tools\/RTICreator)\/.*\.hpp$'
 InheritParentConfig:    true
 ...
 

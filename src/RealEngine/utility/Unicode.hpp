@@ -14,6 +14,8 @@
 
 namespace re {
 
+// NOLINTBEGIN(*-magic-numbers): UTF-8
+
 /**
  * @brief Not a character code
  */
@@ -79,5 +81,7 @@ constexpr char32_t readCode(std::u8string_view& str) {
 
     return unicode;
 }
+
+// NOLINTEND(*-magic-numbers)
 
 } // namespace re

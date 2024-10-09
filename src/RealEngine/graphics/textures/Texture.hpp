@@ -71,7 +71,7 @@ public:
     const vk::ImageView& imageView() const { return m_imageView; }
     const vk::Sampler& sampler() const { return m_sampler; }
 
-protected:
+private:
     vma::Allocation m_allocation{};
     vk::Image m_image{};
     vk::ImageView m_imageView{};
