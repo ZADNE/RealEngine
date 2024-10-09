@@ -36,7 +36,7 @@ public:
     const T* mapped() const { return m_mapped; }
     T* mapped() { return m_mapped; }
 
-protected:
+private:
     BufferMapped(const BufferCreateInfo& createInfo, void* holder)
         : Buffer(createInfo, &holder)
         , m_mapped(reinterpret_cast<T*>(holder)) {}

@@ -79,6 +79,8 @@ protected:
      */
     Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped);
 
+private:
+
     std::pair<vk::Buffer, vma::Allocation> allocateBuffer(
         const BufferCreateInfo& createInfo, void** pointerToMapped
     ) const;

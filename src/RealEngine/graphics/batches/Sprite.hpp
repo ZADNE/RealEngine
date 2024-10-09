@@ -9,6 +9,8 @@
 
 namespace re {
 
+// NOLINTBEGIN(*-non-private-member-variables-in-classes): Intentional
+
 /**
  * @brief Represents a static subimage within a texture
  */
@@ -18,6 +20,14 @@ public:
      * @warning Sprite does not hold ownership of the Texture!
      */
     SpriteStatic(const TextureShaped& tex, float sprite, float subimage = 0.0f);
+
+    SpriteStatic(const SpriteStatic&)            = default; ///< Copyable
+    SpriteStatic& operator=(const SpriteStatic&) = default; ///< Copyable
+
+    SpriteStatic(SpriteStatic&&)            = default;      ///< Movable
+    SpriteStatic& operator=(SpriteStatic&&) = default;      ///< Movable
+
+    virtual ~SpriteStatic() = default;
 
     virtual float speed() const;
     virtual Color color() const;
@@ -73,5 +83,7 @@ protected:
     glm::vec2 m_scale;
     Color m_color;
 };
+
+// NOLINTEND(*-non-private-member-variables-in-classes)
 
 } // namespace re

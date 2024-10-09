@@ -24,13 +24,13 @@ namespace re {
 class Room;
 
 struct DisplayInfo {
-    std::string name;        ///< UTF-8 encoded 'name'
-    glm::ivec4 bounds;       ///< Bounds in pixels; XYWH
-    glm::ivec4 boundsUsable; ///< Usable bounds; XYWH; system-reserved parts removed
-    glm::ivec2 dims;         ///< Dimensions
-    int refreshRate;         ///< Refresh rate
-    Uint32 pixelFormat;      ///< Pixel format @see SDL2's SDL_PixelFormatEnum
-    void* driverSpecific;
+    std::string name;          ///< UTF-8 encoded 'name'
+    glm::ivec4 bounds{};       ///< Bounds in pixels; XYWH
+    glm::ivec4 boundsUsable{}; ///< Bounds with system-reserved parts removed; XYWH
+    glm::ivec2 dims{};         ///< Dimensions
+    int refreshRate{};         ///< Refresh rate
+    uint32_t pixelFormat{};    ///< Pixel format @see SDL2's SDL_PixelFormatEnum
+    void* driverSpecific{};
 };
 
 /**
@@ -54,6 +54,8 @@ public:
 
     MainProgram(MainProgram&&)            = delete;      ///< Nonmovable
     MainProgram& operator=(MainProgram&&) = delete;      ///< Nonmovable
+
+    ~MainProgram() = default;
 
     /**
      * @brief Must be called before any Room is added
@@ -150,7 +152,7 @@ private:
     Window m_window; ///< Window also creates and initializes renderer backends
     RoomManager m_roomManager;
     InputManager m_inputManager;
-    Synchronizer m_synchronizer{50u, 50u};
+    Synchronizer m_synchronizer{k_defaultStepsPerSecond, k_defaultFramesPerSecondLimit};
     RoomToEngineAccess s_roomToEngineAccess;
 
     bool m_programShouldRun = false;

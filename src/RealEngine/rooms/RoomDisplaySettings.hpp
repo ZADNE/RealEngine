@@ -58,6 +58,9 @@ constexpr RenderPassCreateInfo k_createInfo{
 
 } // namespace default_renderpass
 
+constexpr unsigned int k_defaultStepsPerSecond       = 50;
+constexpr unsigned int k_defaultFramesPerSecondLimit = 100;
+
 /**
  * @brief Specifies parameters that determine how the room is drawn
  */
@@ -65,11 +68,11 @@ struct RoomDisplaySettings {
     /**
      * @brief The number of steps per second that this romm runs at
      */
-    unsigned int stepsPerSecond = 50;
+    unsigned int stepsPerSecond = k_defaultStepsPerSecond;
     /**
      * @brief The limit of frames per second that this room will be rendered in
      */
-    unsigned int framesPerSecondLimit = 100;
+    unsigned int framesPerSecondLimit = k_defaultFramesPerSecondLimit;
     /**
      * @brief Is the create info used to construct the main renderpass of the room
      */

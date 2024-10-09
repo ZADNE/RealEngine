@@ -33,7 +33,7 @@ public:
 
     const vk::ImageView& imageView() const { return m_imageView; }
 
-protected:
+private:
     vk::ImageView m_imageView{};
 };
 

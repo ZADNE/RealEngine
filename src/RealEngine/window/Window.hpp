@@ -178,7 +178,7 @@ private:
     union {
         VulkanFixture m_vk13;
     };
-    RendererID m_usedRenderer; ///< May be different from the preferred one
+    RendererID m_usedRenderer{}; ///< May be different from the preferred one
     std::string m_windowTitle;
 };
 

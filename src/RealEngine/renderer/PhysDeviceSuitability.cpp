@@ -91,7 +91,7 @@ size_t structBoolFeatureCount(vk::StructureType type) {
         throw Exception{"Unsupported struct in device create info chain"};
         break;
     }
-    // NOLINTBEGIN(*-magic-numbers)
+    // NOLINTEND(*-magic-numbers)
 }
 
 using InStruct = const vk::BaseInStructure;
