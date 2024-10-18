@@ -16,7 +16,7 @@ endfunction()
 
 # Find/fetch dependencies
     # Vulkan
-    find_package(Vulkan REQUIRED COMPONENTS glslc)
+    find_package(Vulkan REQUIRED COMPONENTS glslc shaderc_combined)
     # SDL2
     find_package(SDL2 CONFIG REQUIRED GLOBAL)
     find_package(SDL2_ttf CONFIG REQUIRED GLOBAL)
@@ -86,18 +86,32 @@ endfunction()
 
     # RTICreator (Windows only)
     if (WIN32)
-        add_executable(RTICreator)
+        add_real_executable(RTICreator)
         target_include_directories(RTICreator PRIVATE tools)
         set_target_properties(RTICreator PROPERTIES
             CXX_STANDARD 23
             INTERPROCEDURAL_OPTIMIZATION TRUE
         )
         target_link_libraries(RTICreator PUBLIC RealEngine)
-        add_subdirectory(tools)
         set(RTICreator "RTICreator")
     else()
         set(RTICreator "")
     endif()
+
+    # RealShadersGenerator
+    add_real_executable(RealShadersGenerator)
+        target_include_directories(RealShadersGenerator PRIVATE tools)
+    set_target_properties(RealShadersGenerator PROPERTIES
+        CXX_STANDARD 23
+    )
+    target_link_libraries(RealShadersGenerator
+        PRIVATE
+            argparse
+            Vulkan::shaderc_combined
+            spirv-cross-core
+            spirv-cross-reflect
+    )
+    add_subdirectory(tools)
 
 # Installation
     install(TARGETS RealEngine vma glm-header-only nlohmann_json ImGui lodepng ${RTICreator}

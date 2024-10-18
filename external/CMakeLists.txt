@@ -3,6 +3,11 @@ set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
 set(CMAKE_CXX_CLANG_TIDY "")
 
+# argparse
+add_real_library(argparse INTERFACE)
+real_target_init_file_sets(argparse BASE_DIR ".")
+add_subdirectory(argparse)
+
 # Dear ImGui
 add_real_library(ImGui STATIC)
 real_target_init_file_sets(ImGui BASE_DIR ".")
