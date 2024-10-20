@@ -10,9 +10,11 @@ namespace rsg {
 CLIArguments parseArguments(int argc, char* argv[]) {
     argparse::ArgumentParser parser("RealShadersGenerator", "0.1.0");
 
-    parser.add_argument("-I").append().help("Include directory");
-    parser.add_argument("input file").help("Input filename");
-    parser.add_argument("-o").append().help("Output filename");
+    parser.add_argument("-I").append().metavar("dir").help("Include directory");
+    parser.add_argument("-o").metavar("outfile").required().help(
+        "Output C++ file"
+    );
+    parser.add_argument("infile").help("Input GLSL file");
 
     try {
         parser.parse_args(argc, argv);
@@ -23,7 +25,7 @@ CLIArguments parseArguments(int argc, char* argv[]) {
     }
 
     return CLIArguments{
-        .inputFile   = parser.get<>("input file"),
+        .inputFile   = parser.get<>("infile"),
         .outputFile  = parser.get<>("-o"),
         .includeDirs = parser.get<std::vector<std::string>>("-I")
     };

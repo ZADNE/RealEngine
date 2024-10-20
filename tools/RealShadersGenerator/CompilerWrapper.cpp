@@ -3,6 +3,7 @@
  */
 #include <filesystem>
 #include <format>
+#include <fstream>
 
 #include <RealShadersGenerator/CompilerWrapper.hpp>
 #include <RealShadersGenerator/Utility.hpp>
@@ -11,6 +12,16 @@
 namespace std {
 namespace fs = filesystem;
 }
+
+namespace {
+std::string readWholeFile(const std::fs::path& fullPath) {
+    size_t size = static_cast<size_t>(std::fs::file_size(fullPath));
+    std::string content(size, '\0');
+    std::ifstream file(fullPath, std::ios::binary);
+    file.read(content.data(), size);
+    return content;
+}
+} // namespace
 
 namespace rsg {
 
@@ -30,19 +41,19 @@ public:
         const char* requestedSource, shaderc_include_type type,
         const char* requestingSource, size_t includeDepth
     ) override {
-        // Seach in open files
+        std::string requested{requestedSource};
+        // Search in already read files
         for (auto& res : m_includeResults) {
-            if (res.relName == requestedSource) {
+            if (res.relName == requested) {
                 return &(res.res);
             }
         }
-        // File not open yet - find it in disk
+        // File not read yet - find it and read it
         for (const auto& dir : m_dirs) {
-            auto path = std::fs::path{dir} / requestedSource;
-            if (std::fs::is_regular_file(path)) {
-                std::string relName{requestedSource};
-                std::string name{path.string()};
-                std::string content{}; // TODO
+            auto fullPath = std::fs::path{dir} / requested;
+            if (std::fs::is_regular_file(fullPath)) {
+                std::string name{fullPath.string()};
+                std::string content = readWholeFile(fullPath);
                 m_includeResults.emplace_back(
                     shaderc_include_result{
                         .source_name        = name.c_str(),
@@ -50,12 +61,23 @@ public:
                         .content            = content.c_str(),
                         .content_length     = content.size()
                     },
-                    std::move(relName), std::move(name), std::move(content)
+                    std::move(requested), std::move(name), std::move(content)
                 );
                 return &m_includeResults.back().res;
             }
         }
         // File not found...
+        std::string errorMessage = std::format("File '{}' not found", requestedSource);
+        m_includeResults.emplace_back(
+            shaderc_include_result{
+                .source_name        = "",
+                .source_name_length = 0,
+                .content            = errorMessage.c_str(),
+                .content_length     = errorMessage.size()
+            },
+            std::string{}, std::string{}, std::move(errorMessage)
+        );
+        return &m_includeResults.back().res;
     }
 
     void ReleaseInclude([[maybe_unused]] shaderc_include_result* data) override {}
@@ -68,18 +90,25 @@ private:
 std::vector<uint32_t> compileToSpirV(
     const std::string& inputFile, const std::vector<std::string>& includeDirs
 ) {
-    shaderc::Compiler compiler{};
+    // Prepare compiler inputs
     shaderc::CompileOptions options{};
     options.SetIncluder(std::make_unique<IncludeResolver>(includeDirs));
-    std::string file = std::format("#include <{}>\nvoid main(){}", inputFile);
-    shaderc::SpvCompilationResult res = compiler.CompileGlslToSpv(
-        file, shaderc_vertex_shader, "$injected_main_file$", "main", options
+    options.SetTargetEnvironment(
+        shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_3
     );
+    options.SetGenerateDebugInfo();
+    options.SetOptimizationLevel(shaderc_optimization_level_zero);
+    options.SetForcedVersionProfile(460, shaderc_profile_core);
+    std::string content = readWholeFile(inputFile) + "\nvoid main(){}";
 
+    // Compile
+    shaderc::Compiler compiler{};
+    shaderc::SpvCompilationResult res = compiler.CompileGlslToSpv(
+        content, shaderc_vertex_shader, inputFile.c_str(), "main", options
+    );
     if (res.GetCompilationStatus() != shaderc_compilation_status_success) {
         fatalError("Compilation error: {}", res.GetErrorMessage());
     }
-
     return std::vector<uint32_t>{res.begin(), res.end()};
 }
 

@@ -100,7 +100,7 @@ endfunction()
 
     # RealShadersGenerator
     add_real_executable(RealShadersGenerator)
-        target_include_directories(RealShadersGenerator PRIVATE tools)
+    target_include_directories(RealShadersGenerator PRIVATE tools)
     set_target_properties(RealShadersGenerator PROPERTIES
         CXX_STANDARD 23
     )
