@@ -40,7 +40,7 @@ endfunction()
     add_real_library(RealEngine STATIC)
     set_target_properties(RealEngine PROPERTIES
         CXX_STANDARD 23
-        realproject_shader_cxx_namespace "re"
+        realproject_shader_cxx_namespace "re::glsl"
         INTERPROCEDURAL_OPTIMIZATION TRUE
     )
     target_link_libraries(RealEngine

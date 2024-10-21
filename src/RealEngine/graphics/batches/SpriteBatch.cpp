@@ -152,7 +152,10 @@ PipelineLayout SpriteBatch::createPipelineLayout(unsigned int maxTextures) {
                 vk::SpecializationInfo{1u, &specMapEntry, sizeof(totalTextures), &totalTextures}
         },
         PipelineGraphicsSources{
-            .vert = sprite_vert, .tesc = sprite_tesc, .tese = sprite_tese, .frag = sprite_frag
+            .vert = glsl::sprite_vert,
+            .tesc = glsl::sprite_tesc,
+            .tese = glsl::sprite_tese,
+            .frag = glsl::sprite_frag
         }
     };
 }
@@ -211,7 +214,10 @@ Pipeline SpriteBatch::createPipeline(
             .renderPassSubpass  = createInfo.renderPassSubpass,
         },
         PipelineGraphicsSources{
-            .vert = sprite_vert, .tesc = sprite_tesc, .tese = sprite_tese, .frag = sprite_frag
+            .vert = glsl::sprite_vert,
+            .tesc = glsl::sprite_tesc,
+            .tese = glsl::sprite_tese,
+            .frag = glsl::sprite_frag
         }
     };
 }

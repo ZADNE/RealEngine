@@ -26,6 +26,11 @@
  */
 
 /**
+ * @namespace re::glsl
+ * @brief Contains exposed GLSL shaders, functions and types
+ */
+
+/**
  * @namespace re::details
  * @brief Not to be used directly, used for internal implementation
  */
