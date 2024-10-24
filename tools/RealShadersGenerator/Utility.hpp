@@ -3,6 +3,8 @@
  */
 #pragma once
 #include <cstdio>
+#include <filesystem>
+#include <fstream>
 #include <print>
 #include <utility>
 
@@ -16,5 +18,7 @@ template<class... Args>
     );
     std::exit(1);
 }
+
+std::string readWholeFile(const std::filesystem::path& fullPath);
 
 } // namespace rsg

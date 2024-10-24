@@ -1,9 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <filesystem>
 #include <format>
-#include <fstream>
 
 #include <RealShadersGenerator/CompilerWrapper.hpp>
 #include <RealShadersGenerator/Utility.hpp>
@@ -12,16 +10,6 @@
 namespace std {
 namespace fs = filesystem;
 }
-
-namespace {
-std::string readWholeFile(const std::fs::path& fullPath) {
-    size_t size = static_cast<size_t>(std::fs::file_size(fullPath));
-    std::string content(size, '\0');
-    std::ifstream file(fullPath, std::ios::binary);
-    file.read(content.data(), size);
-    return content;
-}
-} // namespace
 
 namespace rsg {
 
