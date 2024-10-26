@@ -132,7 +132,6 @@ void generateCppFile(
 ) {
     std::string str = generateCppString(reflection, namespace_);
 
-    // TODO: crlf causing size mismatch
     if (!std::fs::exists(outFile) || readWholeFile(outFile) != str) {
         std::ofstream out{outFile};
         out.write(str.c_str(), str.size());

@@ -13,12 +13,14 @@ CLIArguments parseArguments(int argc, char* argv[]) {
     parser.add_argument("-I").append().metavar("dir").help("include directory");
     parser.add_argument("--namespace")
         .metavar("namespace")
-        .default_value("")
         .help("namespace to generate the reflection to");
     parser.add_argument("-o").metavar("outfile").required().help(
         "output C++ file"
     );
-    parser.add_argument("infile").help("input GLSL file");
+    parser.add_argument("infile").help(
+        "input GLSL file, "
+        "name of the interface block is the same as the filename"
+    );
 
     try {
         parser.parse_args(argc, argv);
@@ -32,7 +34,7 @@ CLIArguments parseArguments(int argc, char* argv[]) {
         .inputFile   = parser.get<>("infile"),
         .outputFile  = parser.get<>("-o"),
         .includeDirs = parser.get<std::vector<std::string>>("-I"),
-        .namespace_  = parser.get<>("--namespace")
+        .namespace_  = parser.present<>("--namespace").value_or("")
     };
 }
 
