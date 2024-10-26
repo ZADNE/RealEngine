@@ -1,7 +1,7 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealShadersGenerator/Utility.hpp>
+#include <RealShadersGenTool/Utility.hpp>
 
 namespace rsg {
 

@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <span>
 
-#include <RealShadersGenerator/InterfaceBlockReflection.hpp>
+#include <RealShadersGenTool/InterfaceBlockReflection.hpp>
 
 namespace rsg {
 

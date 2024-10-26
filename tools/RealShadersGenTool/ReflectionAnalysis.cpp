@@ -4,8 +4,8 @@
 #include <fstream>
 #include <spirv_glsl.hpp>
 
-#include <RealShadersGenerator/CppGenerator.hpp>
-#include <RealShadersGenerator/Utility.hpp>
+#include <RealShadersGenTool/CppGenerator.hpp>
+#include <RealShadersGenTool/Utility.hpp>
 
 namespace rsg {
 

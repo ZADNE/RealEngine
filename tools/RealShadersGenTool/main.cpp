@@ -1,10 +1,10 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealShadersGenerator/Arguments.hpp>
-#include <RealShadersGenerator/CompilerWrapper.hpp>
-#include <RealShadersGenerator/CppGenerator.hpp>
-#include <RealShadersGenerator/ReflectionAnalysis.hpp>
+#include <RealShadersGenTool/Arguments.hpp>
+#include <RealShadersGenTool/CompilerWrapper.hpp>
+#include <RealShadersGenTool/CppGenerator.hpp>
+#include <RealShadersGenTool/ReflectionAnalysis.hpp>
 
 int main(int argc, char* argv[]) {
     using namespace rsg;

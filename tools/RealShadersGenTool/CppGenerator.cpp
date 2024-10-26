@@ -6,8 +6,8 @@
 #include <print>
 #include <string_view>
 
-#include <RealShadersGenerator/CppGenerator.hpp>
-#include <RealShadersGenerator/Utility.hpp>
+#include <RealShadersGenTool/CppGenerator.hpp>
+#include <RealShadersGenTool/Utility.hpp>
 
 namespace std {
 namespace fs = filesystem;

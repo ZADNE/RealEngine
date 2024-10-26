@@ -1,2 +1,2 @@
-﻿add_subdirectory(RealShadersGenerator)
+﻿add_subdirectory(RealShadersGenTool)
 add_subdirectory(RTICreator)

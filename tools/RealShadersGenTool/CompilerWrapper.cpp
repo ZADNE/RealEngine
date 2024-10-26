@@ -3,8 +3,8 @@
  */
 #include <format>
 
-#include <RealShadersGenerator/CompilerWrapper.hpp>
-#include <RealShadersGenerator/Utility.hpp>
+#include <RealShadersGenTool/CompilerWrapper.hpp>
+#include <RealShadersGenTool/Utility.hpp>
 #include <shaderc/shaderc.hpp>
 
 namespace std {

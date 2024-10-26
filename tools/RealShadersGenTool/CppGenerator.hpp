@@ -4,7 +4,7 @@
 #pragma once
 #include <filesystem>
 
-#include <RealShadersGenerator/InterfaceBlockReflection.hpp>
+#include <RealShadersGenTool/InterfaceBlockReflection.hpp>
 
 namespace rsg {
 

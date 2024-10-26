@@ -98,13 +98,13 @@ endfunction()
         set(RTICreator "")
     endif()
 
-    # RealShadersGenerator
-    add_real_executable(RealShadersGenerator)
-    target_include_directories(RealShadersGenerator PRIVATE tools)
-    set_target_properties(RealShadersGenerator PROPERTIES
+    # RealShadersGenTool
+    add_real_executable(RealShadersGenTool)
+    target_include_directories(RealShadersGenTool PRIVATE tools)
+    set_target_properties(RealShadersGenTool PROPERTIES
         CXX_STANDARD 23
     )
-    target_link_libraries(RealShadersGenerator
+    target_link_libraries(RealShadersGenTool
         PRIVATE
             argparse
             Vulkan::shaderc_combined

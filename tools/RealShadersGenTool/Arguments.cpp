@@ -1,14 +1,14 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
-#include <RealShadersGenerator/Arguments.hpp>
-#include <RealShadersGenerator/Utility.hpp>
+#include <RealShadersGenTool/Arguments.hpp>
+#include <RealShadersGenTool/Utility.hpp>
 #include <argparse/argparse.hpp>
 
 namespace rsg {
 
 CLIArguments parseArguments(int argc, char* argv[]) {
-    argparse::ArgumentParser parser("RealShadersGenerator", "0.1.0");
+    argparse::ArgumentParser parser("RealShadersGenTool", "0.1.0");
 
     parser.add_argument("-I").append().metavar("dir").help("include directory");
     parser.add_argument("--namespace")
