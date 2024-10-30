@@ -30,6 +30,10 @@ struct Member {
     size_t columns{};
     std::string name;
     std::vector<size_t> arraySizes;
+    size_t offsetBytes{};
+    size_t sizeBytes{};
+    size_t matrixStrideBytes{}; ///< 0 for non-matrices
+    size_t arrStrideBytes{};    ///< 0 for non-arrays
 };
 
 struct Struct {

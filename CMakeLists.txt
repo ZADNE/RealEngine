@@ -110,6 +110,7 @@ endfunction()
             Vulkan::shaderc_combined
             spirv-cross-core
             spirv-cross-reflect
+            glm::glm-header-only
     )
     add_subdirectory(tools)
 

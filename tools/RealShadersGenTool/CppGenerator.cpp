@@ -6,6 +6,8 @@
 #include <print>
 #include <string_view>
 
+#include <glm/glm.hpp>
+
 #include <RealShadersGenTool/CppGenerator.hpp>
 #include <RealShadersGenTool/Utility.hpp>
 
@@ -22,31 +24,46 @@ using namespace std::string_literals;
  */
 using BaseTypeNames = std::array<std::string_view, 2>;
 
-/**
- * @brief Ordered the same as spirv_cross::SPIRType::BaseType
- */
 constexpr std::array<BaseTypeNames, std::to_underlying(BaseType::Count)> k_typeNames{
-    BaseTypeNames{"bool", "b"},          // Boolean
-    BaseTypeNames{"glm::int8", "i8"},    // SByte
-    BaseTypeNames{"glm::uint8", "u8"},   // UByte
-    BaseTypeNames{"glm::int16", "i16"},  // Short
-    BaseTypeNames{"glm::uint16", "u16"}, // UShort
-    BaseTypeNames{"glm::int32", "i32"},  // Int
-    BaseTypeNames{"glm::uint32", "u32"}, // UInt
-    BaseTypeNames{"glm::int64", "i64"},  // Int64
-    BaseTypeNames{"glm::uint64", "u64"}, // UInt64
-    BaseTypeNames{"glm::half", "h"},     // Half
-    BaseTypeNames{"float", ""},          // Float
-    BaseTypeNames{"double", "d"},        // Double
-    BaseTypeNames{}                      // Unknown
+    BaseTypeNames{"bool", "b"},       // Boolean
+    BaseTypeNames{"int8_t", "i8"},    // SByte
+    BaseTypeNames{"uint8_t", "u8"},   // UByte
+    BaseTypeNames{"int16_t", "i16"},  // Short
+    BaseTypeNames{"uint16_t", "u16"}, // UShort
+    BaseTypeNames{"int32_t", "i32"},  // Int
+    BaseTypeNames{"uint32_t", "u32"}, // UInt
+    BaseTypeNames{"int64_t", "i64"},  // Int64
+    BaseTypeNames{"uint64_t", "u64"}, // UInt64
+    BaseTypeNames{"uint16_t", "u16"}, // Half
+    BaseTypeNames{"float", ""},       // Float
+    BaseTypeNames{"double", "d"},     // Double
+    BaseTypeNames{}                   // Unknown
+};
+
+struct BaseTypeLayout {
+    int alignment{};
+    int size{};
+};
+
+constexpr std::array<BaseTypeLayout, std::to_underlying(BaseType::Count)> k_typeLayouts{
+    BaseTypeLayout{alignof(bool), sizeof(bool)},               // Boolean
+    BaseTypeLayout{alignof(glm::int8), sizeof(glm::int8)},     // SByte
+    BaseTypeLayout{alignof(glm::uint8), sizeof(glm::uint8)},   // UByte
+    BaseTypeLayout{alignof(glm::int16), sizeof(glm::int16)},   // Short
+    BaseTypeLayout{alignof(glm::uint16), sizeof(glm::uint16)}, // UShort
+    BaseTypeLayout{alignof(glm::int32), sizeof(glm::int32)},   // Int
+    BaseTypeLayout{alignof(glm::uint32), sizeof(glm::uint32)}, // UInt
+    BaseTypeLayout{alignof(glm::int64), sizeof(glm::int64)},   // Int64
+    BaseTypeLayout{alignof(glm::uint64), sizeof(glm::uint64)}, // UInt64
+    BaseTypeLayout{alignof(short), sizeof(short)},             // Half
+    BaseTypeLayout{alignof(float), sizeof(float)},             // Float
+    BaseTypeLayout{alignof(double), sizeof(double)},           // Double
+    BaseTypeLayout{}                                           // Unknown
 };
 
 constexpr std::array<std::string_view, 3> k_tensorInfixes{"", "vec", "mat"};
 
 std::string basicTypeToString(const Member& member) {
-    if (member.baseType >= BaseType::Count) {
-        return ""s;
-    }
     const auto& types = k_typeNames[std::to_underlying(member.baseType)];
     bool isVector     = member.vecSize >= 2;
     std::string rval{isVector ? "glm::"s : ""s};
@@ -67,25 +84,60 @@ constexpr std::string_view k_allowZeroSizedArrayBegin{
 constexpr std::string_view k_allowZeroSizedArrayEnd{"#pragma warning(pop)\n"};
 
 std::string generateStruct(const Struct& strct) {
+    size_t offset = 0;
     std::string membersStr;
     bool runtimeSized = false;
 
-    for (const Member& member : strct.members) {
-        membersStr += "    ";
-        std::string memberTypeStr = basicTypeToString(member);
-        if (memberTypeStr == "") {
+    for (Member member : strct.members) {
+        // Check if type is valid
+        if (member.baseType >= BaseType::Count) {
             fatalError("{}::{} has unsupported type", strct.name, member.name);
         }
-        membersStr += memberTypeStr + ' ' + member.name;
+
+        // Fix up sizes
+        BaseTypeLayout layout = k_typeLayouts[std::to_underlying(member.baseType)];
+        member.vecSize = member.vecSize == 3 ? 4 : member.vecSize;
+        size_t stride  = layout.size * member.vecSize * member.columns;
+        if (member.arrStrideBytes > 0) {
+            size_t columnCount = 1;
+            if (member.arraySizes.size() > 1) {
+                for (size_t i = 0; i < member.arraySizes.size() - 1; ++i) {
+                    columnCount *= member.arraySizes[i] ? member.arraySizes[i] : 1;
+                }
+            }
+            member.vecSize *= member.arrStrideBytes / (stride * columnCount);
+        }
+        stride = layout.size * member.vecSize * member.columns;
+
+        // Alignment
+        size_t forcedAlignment = layout.alignment;
+        while (roundToMultiple(offset, forcedAlignment) < member.offsetBytes) {
+            forcedAlignment *= 2;
+        }
+        offset = roundToMultiple(offset, forcedAlignment);
+        membersStr += "    ";
+        if (forcedAlignment > layout.alignment) {
+            membersStr += std::format("alignas({}) ", forcedAlignment);
+        }
+
+        // Type with std::arrays
+        std::string memberTypeStr = basicTypeToString(member);
+        size_t elemCount          = 1;
         for (const auto& arraySize : member.arraySizes) {
             if (arraySize != 0) {
-                membersStr += std::format("[{}]", arraySize);
+                elemCount *= arraySize;
+                memberTypeStr =
+                    std::format("std::array<{}, {}>", memberTypeStr, arraySize);
             } else {
-                membersStr += "[]";
                 runtimeSized = true;
             }
         }
-        membersStr += "{};\n";
+
+        // Whole member declaration
+        membersStr += std::format(
+            "{} {}{};\n", memberTypeStr, member.name, runtimeSized ? "[]" : "{}"
+        );
+        offset += stride * elemCount;
     }
 
     std::string assertSize = std::format(
