@@ -11,12 +11,16 @@ namespace rsg {
 using StreamIter = std::istreambuf_iterator<char>;
 
 std::string readWholeFile(const std::filesystem::path& fullPath) {
-    size_t binarySize = static_cast<size_t>(std::filesystem::file_size(fullPath));
-    std::string content;
-    content.reserve(binarySize); // Size may be smaller due to \r\n -> \n conversion
-    std::ifstream file(fullPath);
-    content.assign(StreamIter{file}, StreamIter{});
-    return content;
+    namespace fs = std::filesystem;
+    try {
+        size_t binarySize = static_cast<size_t>(fs::file_size(fullPath));
+        std::string content;
+        // Size may be smaller due to \r\n -> \n conversion
+        content.reserve(binarySize);
+        std::ifstream file(fullPath);
+        content.assign(StreamIter{file}, StreamIter{});
+        return content;
+    } catch (fs::filesystem_error& e) { fatalError("{}", e.what()); }
 }
 
 } // namespace rsg

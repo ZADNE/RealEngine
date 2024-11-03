@@ -59,21 +59,25 @@ InterfaceBlockReflection generateCppReflectionOfResource(
         reflMember.sizeBytes = compiler.get_declared_struct_member_size(resType, i);
         reflMember.vecSize = memberType.vecsize;
         reflMember.columns = memberType.columns;
-        if (memberType.columns > 1) {
-            reflMember.matrixStrideBytes =
-                compiler.type_struct_member_matrix_stride(resType, i);
-        }
         reflMember.arraySizes.reserve(memberType.array.size());
+        size_t elemCount = 1;
         for (size_t j = 0; j < memberType.array.size(); ++j) {
-            if (memberType.array_size_literal[j]) { // If size is literal
-                reflMember.arraySizes.push_back(memberType.array[j]);
+            size_t size = memberType.array[j];
+            if (memberType.array_size_literal[j] &&
+                size != 0) { // If size is literal
+                elemCount *= size;
+                reflMember.arraySizes.push_back(size);
             } else { // Size is defined by a spec constant or runtime
                 reflMember.arraySizes.push_back(0);
             }
         }
         if (memberType.array.size() > 0) {
-            reflMember.arrStrideBytes =
-                compiler.type_struct_member_array_stride(resType, i);
+            size_t stride = compiler.type_struct_member_array_stride(resType, i);
+            size_t lastSize            = reflMember.arraySizes.back();
+            reflMember.elemStrideBytes = (stride * (lastSize ? lastSize : 1)) /
+                                         elemCount;
+        } else {
+            reflMember.elemStrideBytes = reflMember.sizeBytes;
         }
     }
 

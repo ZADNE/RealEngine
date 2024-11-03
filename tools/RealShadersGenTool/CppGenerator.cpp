@@ -46,34 +46,48 @@ struct BaseTypeLayout {
 };
 
 constexpr std::array<BaseTypeLayout, std::to_underlying(BaseType::Count)> k_typeLayouts{
-    BaseTypeLayout{alignof(bool), sizeof(bool)},               // Boolean
-    BaseTypeLayout{alignof(glm::int8), sizeof(glm::int8)},     // SByte
-    BaseTypeLayout{alignof(glm::uint8), sizeof(glm::uint8)},   // UByte
-    BaseTypeLayout{alignof(glm::int16), sizeof(glm::int16)},   // Short
-    BaseTypeLayout{alignof(glm::uint16), sizeof(glm::uint16)}, // UShort
-    BaseTypeLayout{alignof(glm::int32), sizeof(glm::int32)},   // Int
-    BaseTypeLayout{alignof(glm::uint32), sizeof(glm::uint32)}, // UInt
-    BaseTypeLayout{alignof(glm::int64), sizeof(glm::int64)},   // Int64
-    BaseTypeLayout{alignof(glm::uint64), sizeof(glm::uint64)}, // UInt64
-    BaseTypeLayout{alignof(short), sizeof(short)},             // Half
-    BaseTypeLayout{alignof(float), sizeof(float)},             // Float
-    BaseTypeLayout{alignof(double), sizeof(double)},           // Double
-    BaseTypeLayout{}                                           // Unknown
+    BaseTypeLayout{alignof(bool), sizeof(bool)},                   // Boolean
+    BaseTypeLayout{alignof(std::int8_t), sizeof(std::int8_t)},     // SByte
+    BaseTypeLayout{alignof(std::uint8_t), sizeof(std::uint8_t)},   // UByte
+    BaseTypeLayout{alignof(std::int16_t), sizeof(std::int16_t)},   // Short
+    BaseTypeLayout{alignof(std::uint16_t), sizeof(std::uint16_t)}, // UShort
+    BaseTypeLayout{alignof(std::int32_t), sizeof(std::int32_t)},   // Int
+    BaseTypeLayout{alignof(std::uint32_t), sizeof(std::uint32_t)}, // UInt
+    BaseTypeLayout{alignof(std::int64_t), sizeof(std::int64_t)},   // Int64
+    BaseTypeLayout{alignof(std::uint64_t), sizeof(std::uint64_t)}, // UInt64
+    BaseTypeLayout{alignof(short), sizeof(short)},                 // Half
+    BaseTypeLayout{alignof(float), sizeof(float)},                 // Float
+    BaseTypeLayout{alignof(double), sizeof(double)},               // Double
+    BaseTypeLayout{}                                               // Unknown
 };
 
-constexpr std::array<std::string_view, 3> k_tensorInfixes{"", "vec", "mat"};
+struct RequiredHeaders {
+    bool cStdInt{};
+    bool stdArray{};
+    std::array<bool, 3> glmVec{};
+    std::array<std::array<bool, 3>, 3> glmMat{};
+    bool reAlignedTypes{};
+};
 
-std::string basicTypeToString(const Member& member) {
+std::string typeToString(
+    const Member& member, bool useStd140Vec, RequiredHeaders& reqHeaders
+) {
     const auto& types = k_typeNames[std::to_underlying(member.baseType)];
     bool isVector     = member.vecSize >= 2;
-    std::string rval{isVector ? "glm::"s : ""s};
-    rval += types[isVector];
-    bool isMatrix = member.columns >= 2;
-    rval += k_tensorInfixes[isVector + isMatrix];
-    rval += isVector ? std::to_string(isMatrix ? member.columns : member.vecSize)
-                     : ""s;
-    rval += isMatrix ? std::format("x{}", member.vecSize) : ""s;
-    return rval;
+    bool isMatrix     = member.columns >= 2;
+    if (useStd140Vec) {
+        reqHeaders.reAlignedTypes = true;
+        return std::format("re::rs::{}vec{}_140", types[1], member.vecSize);
+    } else if (isMatrix) {
+        reqHeaders.glmMat[member.columns - 2][member.vecSize - 2] = true;
+        return std::format("glm::{}mat{}x{}", types[1], member.columns, member.vecSize);
+    } else if (isVector) {
+        reqHeaders.glmVec[member.vecSize - 2] = true;
+        return std::format("glm::{}vec{}", types[1], member.vecSize);
+    } else {
+        reqHeaders.cStdInt = true;
+        return std::format("std::{}", types[0]);
+    }
 }
 
 constexpr std::string_view k_allowZeroSizedArrayBegin{
@@ -83,7 +97,7 @@ constexpr std::string_view k_allowZeroSizedArrayBegin{
 
 constexpr std::string_view k_allowZeroSizedArrayEnd{"#pragma warning(pop)\n"};
 
-std::string generateStruct(const Struct& strct) {
+std::string generateStruct(const Struct& strct, RequiredHeaders& reqHeaders) {
     size_t offset = 0;
     std::string membersStr;
     bool runtimeSized = false;
@@ -94,20 +108,27 @@ std::string generateStruct(const Struct& strct) {
             fatalError("{}::{} has unsupported type", strct.name, member.name);
         }
 
-        // Fix up sizes
+        // Stride adjustment
         BaseTypeLayout layout = k_typeLayouts[std::to_underlying(member.baseType)];
-        member.vecSize = member.vecSize == 3 ? 4 : member.vecSize;
-        size_t stride  = layout.size * member.vecSize * member.columns;
-        if (member.arrStrideBytes > 0) {
-            size_t columnCount = 1;
-            if (member.arraySizes.size() > 1) {
-                for (size_t i = 0; i < member.arraySizes.size() - 1; ++i) {
-                    columnCount *= member.arraySizes[i] ? member.arraySizes[i] : 1;
-                }
+        size_t elemSize   = layout.size * member.vecSize * member.columns;
+        bool useStd140Vec = false;
+        if (elemSize != member.elemStrideBytes) {
+            if (member.vecSize == 3 &&
+                (layout.size * 4 * member.columns) == member.elemStrideBytes) {
+                member.vecSize = 4;  // *vec3 to *vec4 or *mat*x3 to *mat*x4
+            } else if (member.elemStrideBytes == 16) {
+                useStd140Vec = true; // std140 array of scalars or vectors
+            } else if (member.elemStrideBytes / member.columns == 16 &&
+                (layout.size * 4 * member.columns) == member.elemStrideBytes) {
+                member.vecSize = 4;  // std140 array of mat*x2
+            } else {
+                fatalError(
+                    "{}::{} has unexpected stride {}", strct.name, member.name,
+                    member.elemStrideBytes
+                );
             }
-            member.vecSize *= member.arrStrideBytes / (stride * columnCount);
+            elemSize = member.elemStrideBytes;
         }
-        stride = layout.size * member.vecSize * member.columns;
 
         // Alignment
         size_t forcedAlignment = layout.alignment;
@@ -121,13 +142,14 @@ std::string generateStruct(const Struct& strct) {
         }
 
         // Type with std::arrays
-        std::string memberTypeStr = basicTypeToString(member);
-        size_t elemCount          = 1;
+        std::string memberTypeStr = typeToString(member, useStd140Vec, reqHeaders);
+        size_t elemCount = 1;
         for (const auto& arraySize : member.arraySizes) {
             if (arraySize != 0) {
                 elemCount *= arraySize;
                 memberTypeStr =
                     std::format("std::array<{}, {}>", memberTypeStr, arraySize);
+                reqHeaders.stdArray = true;
             } else {
                 runtimeSized = true;
             }
@@ -137,12 +159,17 @@ std::string generateStruct(const Struct& strct) {
         membersStr += std::format(
             "{} {}{};\n", memberTypeStr, member.name, runtimeSized ? "[]" : "{}"
         );
-        offset += stride * elemCount;
+        offset += elemSize * elemCount;
     }
 
-    std::string assertSize = std::format(
-        "static_assert(sizeof({}) == {});", strct.name, strct.declaredSize
-    );
+    std::string assertSize =
+        runtimeSized
+            ? std::format("static_assert(sizeof({}) == {});", strct.name, strct.declaredSize)
+            : std::format(
+                  "static_assert(offsetof({0}, {1}) + sizeof({0}::{1}) == "
+                  "{2});",
+                  strct.name, strct.members.back().name, strct.declaredSize
+              );
 
     return std::format(
         "{}struct {} {{\n"
@@ -157,24 +184,64 @@ std::string generateStruct(const Struct& strct) {
 std::string generateCppString(
     const InterfaceBlockReflection& reflection, const std::string& namespace_
 ) {
+    // Compose structs
+    RequiredHeaders reqHeaders;
     std::string body;
     for (const auto& strct : reflection.structs) {
-        body += generateStruct(strct);
+        body += generateStruct(strct, reqHeaders);
     }
 
-    std::string namespaceBegin =
-        namespace_.empty() ? "" : std::format("namespace {} {{\n", namespace_);
-    std::string namespaceEnd =
-        namespace_.empty() ? "" : std::format("\n}} // namespace {}", namespace_);
+    // Compose includes
+    std::string includeGroup = "#include <cstddef>\n";
+    std::string includes;
+    auto endIncludeGroup = [&]() {
+        if (!includeGroup.empty()) {
+            includes += includeGroup + '\n';
+            includeGroup.clear();
+        }
+    };
+    if (reqHeaders.cStdInt) {
+        includeGroup += "#include <cstdint>\n";
+    }
+    if (reqHeaders.stdArray) {
+        includeGroup += "#include <array>\n";
+    }
+    endIncludeGroup();
+    for (size_t i = 0; i < reqHeaders.glmVec.size(); i++) {
+        if (reqHeaders.glmVec[i]) {
+            includeGroup += std::format("#include <glm/vec{}.hpp>\n", i + 2);
+        }
+    }
+    for (size_t cols = 0; cols < reqHeaders.glmMat.size(); cols++) {
+        for (size_t rows = 0; rows < reqHeaders.glmMat[0].size(); rows++) {
+            if (reqHeaders.glmMat[cols][rows]) {
+                includeGroup += std::format(
+                    "#include <glm/mat{}x{}.hpp>\n", cols + 2, rows + 2
+                );
+            }
+        }
+    }
+    endIncludeGroup();
+    if (reqHeaders.reAlignedTypes) {
+        includeGroup += "#include <RealShaders/Std140AlignedTypes.hpp>\n";
+    }
+    endIncludeGroup();
 
+    // Compose namespace
+    std::string namespaceBegin =
+        namespace_.empty() ? ""s : std::format("namespace {} {{\n", namespace_);
+    std::string namespaceEnd =
+        namespace_.empty() ? ""s : std::format("\n}} // namespace {}", namespace_);
+
+    // Compose whole file
     return std::format(
         "// Automatically generated file by RealShadersGenTool\n"
         "#pragma once\n"
-        "\n"
+        "{}"
         "{}\n"
         "{}\n"
         "{}\n",
-        namespaceBegin, body, namespaceEnd
+        includes, namespaceBegin, body, namespaceEnd
     );
 }
 
