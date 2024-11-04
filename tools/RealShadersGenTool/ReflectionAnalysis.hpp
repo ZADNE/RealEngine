@@ -5,12 +5,14 @@
 #include <cstdint>
 #include <span>
 
+#include <RealShadersGenTool/Common.hpp>
 #include <RealShadersGenTool/InterfaceBlockReflection.hpp>
 
 namespace rsg {
 
 InterfaceBlockReflection reflectInterfaceBlock(
-    std::span<const uint32_t> spirv, std::string_view expectedTypename
+    std::span<const uint32_t> spirv, InterfaceBlockType blockType,
+    std::string_view blockName
 );
 
 } // namespace rsg

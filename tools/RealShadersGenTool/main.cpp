@@ -12,9 +12,8 @@ int main(int argc, char* argv[]) {
 
     std::vector<uint32_t> spirv = compileToSpirV(args.inputFile, args.includeDirs);
 
-    InterfaceBlockReflection reflection = reflectInterfaceBlock(
-        spirv, std::filesystem::path{args.inputFile}.stem().string()
-    );
+    InterfaceBlockReflection reflection =
+        reflectInterfaceBlock(spirv, args.blockType, args.blockName);
 
     generateCppFile(reflection, args.namespace_, std::filesystem::path{args.outputFile});
 }

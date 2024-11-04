@@ -4,7 +4,7 @@
 #include <fstream>
 #include <spirv_glsl.hpp>
 
-#include <RealShadersGenTool/CppGenerator.hpp>
+#include <RealShadersGenTool/ReflectionAnalysis.hpp>
 #include <RealShadersGenTool/Utility.hpp>
 
 namespace rsg {
@@ -84,43 +84,13 @@ InterfaceBlockReflection generateCppReflectionOfResource(
     return rval;
 }
 
-constexpr int k_interfaceBlockTypeCount = 3;
-enum class InterfaceBlockType {
-    Uniform      = 0,
-    Storage      = 1,
-    PushConstant = 2
-};
-
 constexpr std::array<const char*, k_interfaceBlockTypeCount>
     k_interfaceBlockTypeNames{"uniform", "storage", "push constant range"};
 
 InterfaceBlockReflection reflectInterfaceBlock(
-    std::span<const uint32_t> spirv, std::string_view expectedTypename
+    std::span<const uint32_t> spirv, InterfaceBlockType blockType,
+    std::string_view blockName
 ) {
-    // Determine what type to expect
-    InterfaceBlockType expectedType{};
-    if (expectedTypename.size() <= 2) {
-        fatalError(
-            "Name of the interface block is '{}' which means it has no name "
-            "beyond type suffix.",
-            expectedTypename
-        );
-    }
-    std::string_view suffix = expectedTypename.substr(expectedTypename.size() - 2);
-    if (suffix == "UB") {
-        expectedType = InterfaceBlockType::Uniform;
-    } else if (suffix == "SB") {
-        expectedType = InterfaceBlockType::Storage;
-    } else if (suffix == "PC") {
-        expectedType = InterfaceBlockType::PushConstant;
-    } else {
-        fatalError(
-            "Unexpected interface block suffix '{}' -  expected either 'UB', "
-            "'SB', or 'PC'.",
-            suffix
-        );
-    }
-
     // Check whether the expected interface block is the only one present
     spirv_cross::Compiler compiler{spirv.data(), spirv.size()};
     auto resources = compiler.get_shader_resources();
@@ -129,39 +99,39 @@ InterfaceBlockReflection reflectInterfaceBlock(
             &resources.uniform_buffers, &resources.storage_buffers,
             &resources.push_constant_buffers
         };
-    int expected = static_cast<int>(expectedType);
+    int expected = static_cast<int>(blockType);
     for (size_t i = 0; i < k_interfaceBlockTypeCount; ++i) {
         if (i != expected && reses[i]->size() > 0) {
             fatalError(
                 "Unexpected {} block '{}' - expecting only {}",
-                k_interfaceBlockTypeNames[i], (*reses[i])[0].name, expectedTypename
+                k_interfaceBlockTypeNames[i], (*reses[i])[0].name, blockName
             );
         }
     }
     if (reses[expected]->size() > 1) {
         std::string_view bad{};
         for (const auto& res : (*reses[expected])) {
-            if (res.name != expectedTypename) {
+            if (res.name != blockName) {
                 bad = res.name;
                 break;
             }
         }
         fatalError(
             "Unexpected {} block '{}' - expecting only {}",
-            k_interfaceBlockTypeNames[expected], bad, expectedTypename
+            k_interfaceBlockTypeNames[expected], bad, blockName
         );
     } else if (reses[expected]->size() == 0) {
         fatalError(
             "The expected {} block '{}' was not found",
-            k_interfaceBlockTypeNames[expected], expectedTypename
+            k_interfaceBlockTypeNames[expected], blockName
         );
     } else { // reses[expected]->size() == 1
         const auto& res = (*reses[expected])[0];
-        if (res.name != expectedTypename) {
+        if (res.name != blockName) {
             fatalError(
                 "Unexpected {} block '{}' - expecting only {}",
                 k_interfaceBlockTypeNames[expected], (*reses[expected])[0].name,
-                expectedTypename
+                blockName
             );
         }
     }
