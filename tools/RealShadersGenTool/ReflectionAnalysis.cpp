@@ -1,7 +1,10 @@
 ﻿/*!
  *  @author    Dubsky Tomas
  */
+#include <algorithm>
 #include <fstream>
+#include <queue>
+#include <set>
 #include <spirv_glsl.hpp>
 
 #include <RealShadersGenTool/ReflectionAnalysis.hpp>
@@ -9,7 +12,7 @@
 
 namespace rsg {
 
-constexpr int k_iBTypeCount{spirv_cross::SPIRType::BaseType::Struct};
+constexpr int k_iBTypeCount{spirv_cross::SPIRType::BaseType::Struct + 1};
 
 constexpr std::array<BaseType, k_iBTypeCount> k_typeConversionTable{
     BaseType::Unknown, // Unknown
@@ -26,7 +29,8 @@ constexpr std::array<BaseType, k_iBTypeCount> k_typeConversionTable{
     BaseType::Unknown, // AtomicCounter
     BaseType::Half,    // Half
     BaseType::Float,   // Float
-    BaseType::Double   // Double
+    BaseType::Double,  // Double
+    BaseType::Struct,  // Struct
 };
 
 BaseType toBasicType(spirv_cross::SPIRType::BaseType type) {
@@ -36,24 +40,35 @@ BaseType toBasicType(spirv_cross::SPIRType::BaseType type) {
     return k_typeConversionTable[std::to_underlying(type)];
 }
 
-InterfaceBlockReflection generateCppReflectionOfResource(
-    const spirv_cross::Compiler& compiler, const spirv_cross::Resource& res
+struct ReflectionResult {
+    Struct strct;
+    std::vector<spirv_cross::TypeID> requiredStructs;
+};
+
+ReflectionResult reflectStruct(
+    const spirv_cross::Compiler& compiler, const spirv_cross::TypeID& id
 ) {
-    InterfaceBlockReflection rval;
-    Struct& ib          = rval.structs.emplace_back();
-    const auto& resType = compiler.get_type(res.type_id);
-    ib.name             = res.name;
-    ib.declaredSize     = compiler.get_declared_struct_size(resType);
+    ReflectionResult res;
+    const auto& resType    = compiler.get_type(id);
+    auto baseTypeId        = compiler.get_type(id).self;
+    res.strct.name         = compiler.get_name(baseTypeId);
+    res.strct.declaredSize = compiler.get_declared_struct_size(resType);
 
     // Reflect all members
-    ib.members.resize(resType.member_types.size());
+    res.strct.members.resize(resType.member_types.size());
     for (size_t i = 0; i < resType.member_types.size(); ++i) {
-        auto& reflMember       = ib.members[i];
+        auto& reflMember       = res.strct.members[i];
         const auto& memberType = compiler.get_type(resType.member_types[i]);
-        reflMember.name        = compiler.get_member_name(res.base_type_id, i);
+        reflMember.name        = compiler.get_member_name(baseTypeId, i);
         reflMember.baseType    = toBasicType(memberType.basetype);
-        if (reflMember.baseType == BaseType::Unknown) {
-            fatalError("{}::{} has unsupported type", ib.name, reflMember.name);
+        switch (reflMember.baseType) {
+        case BaseType::Unknown:
+            fatalError("{}::{} has unsupported type", res.strct.name, reflMember.name);
+        case BaseType::Struct:
+            res.requiredStructs.emplace_back(memberType.self);
+            reflMember.structTypeName = compiler.get_name(memberType.self);
+            break;
+        default: break;
         }
         reflMember.offsetBytes = compiler.type_struct_member_offset(resType, i);
         reflMember.sizeBytes = compiler.get_declared_struct_member_size(resType, i);
@@ -81,7 +96,7 @@ InterfaceBlockReflection generateCppReflectionOfResource(
         }
     }
 
-    return rval;
+    return res;
 }
 
 constexpr std::array<const char*, k_interfaceBlockTypeCount>
@@ -137,7 +152,27 @@ InterfaceBlockReflection reflectInterfaceBlock(
     }
 
     // Reflect the expected interface block
-    return generateCppReflectionOfResource(compiler, (*reses[expected])[0]);
+    InterfaceBlockReflection rval;
+    std::set<spirv_cross::TypeID> reflectedStructs;
+    std::queue<spirv_cross::TypeID> structsToReflect;
+    auto enqueue = [&](spirv_cross::TypeID id) {
+        if (!reflectedStructs.contains(id)) {
+            structsToReflect.push(id);
+            reflectedStructs.insert(id);
+        }
+    };
+    enqueue((*reses[expected])[0].type_id);
+    while (!structsToReflect.empty()) {
+        ReflectionResult res = reflectStruct(compiler, structsToReflect.front());
+        rval.structs.emplace_back(std::move(res.strct));
+        structsToReflect.pop();
+        for (auto it = res.requiredStructs.rbegin();
+             it != res.requiredStructs.rend(); ++it) {
+            enqueue(*it);
+        }
+    }
+    std::reverse(rval.structs.begin(), rval.structs.end());
+    return rval;
 }
 
 } // namespace rsg

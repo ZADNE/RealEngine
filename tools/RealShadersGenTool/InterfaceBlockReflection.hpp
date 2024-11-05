@@ -20,6 +20,7 @@ enum class BaseType {
     Half,
     Float,
     Double,
+    Struct,
     Unknown,
     Count
 };
@@ -28,11 +29,12 @@ struct Member {
     BaseType baseType;
     size_t vecSize{};
     size_t columns{};
+    std::string structTypeName;
     std::string name;
     std::vector<size_t> arraySizes;
     size_t offsetBytes{};
     size_t sizeBytes{};
-    size_t elemStrideBytes{}; ///< Eaqual to sizeBytes for non-arrays
+    size_t elemStrideBytes{}; ///< Equal to sizeBytes for non-arrays
 };
 
 struct Struct {
