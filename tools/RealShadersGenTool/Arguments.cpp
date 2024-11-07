@@ -34,7 +34,9 @@ CLIArguments parseArguments(int argc, char* argv[]) {
         .metavar("block_name")
         .required()
         .help("name of the interface block to reflect");
-    parser.add_argument("-I").append().metavar("dir").help("include directory");
+    parser.add_argument("--inc").append().metavar("dir").help(
+        "include directory"
+    );
     parser.add_argument("--namespace")
         .metavar("namespace")
         .help("namespace to generate the reflection to");
@@ -59,7 +61,7 @@ CLIArguments parseArguments(int argc, char* argv[]) {
         .blockName   = parser.get<>("-n"),
         .inputFile   = parser.get<>("infile"),
         .outputFile  = parser.get<>("-o"),
-        .includeDirs = parser.get<std::vector<std::string>>("-I"),
+        .includeDirs = parser.get<std::vector<std::string>>("--inc"),
         .namespace_  = parser.present<>("--namespace").value_or("")
     };
 }
