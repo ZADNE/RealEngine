@@ -102,6 +102,13 @@ ReflectionResult reflectStruct(
 constexpr std::array<const char*, k_interfaceBlockTypeCount>
     k_interfaceBlockTypeNames{"uniform", "storage", "push constant range"};
 
+const std::string& fetchResBlockName(
+    const spirv_cross::Compiler& compiler, const spirv_cross::Resource& res
+) {
+    auto baseTypeId = compiler.get_type(res.base_type_id).self;
+    return compiler.get_name(baseTypeId);
+}
+
 InterfaceBlockReflection reflectInterfaceBlock(
     std::span<const uint32_t> spirv, InterfaceBlockType blockType,
     std::string_view blockName
@@ -119,15 +126,17 @@ InterfaceBlockReflection reflectInterfaceBlock(
         if (i != expected && reses[i]->size() > 0) {
             fatalError(
                 "Unexpected {} block '{}' - expecting only {}",
-                k_interfaceBlockTypeNames[i], (*reses[i])[0].name, blockName
+                k_interfaceBlockTypeNames[i],
+                fetchResBlockName(compiler, (*reses[i])[0]), blockName
             );
         }
     }
     if (reses[expected]->size() > 1) {
         std::string_view bad{};
         for (const auto& res : (*reses[expected])) {
-            if (res.name != blockName) {
-                bad = res.name;
+            const std::string& resBlockName = fetchResBlockName(compiler, res);
+            if (resBlockName != blockName) {
+                bad = resBlockName;
                 break;
             }
         }
@@ -141,12 +150,12 @@ InterfaceBlockReflection reflectInterfaceBlock(
             k_interfaceBlockTypeNames[expected], blockName
         );
     } else { // reses[expected]->size() == 1
-        const auto& res = (*reses[expected])[0];
-        if (res.name != blockName) {
+        const auto& res                 = (*reses[expected])[0];
+        const std::string& resBlockName = fetchResBlockName(compiler, res);
+        if (resBlockName != blockName) {
             fatalError(
                 "Unexpected {} block '{}' - expecting only {}",
-                k_interfaceBlockTypeNames[expected], (*reses[expected])[0].name,
-                blockName
+                k_interfaceBlockTypeNames[expected], resBlockName, blockName
             );
         }
     }
