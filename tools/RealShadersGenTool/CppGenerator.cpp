@@ -124,7 +124,7 @@ constexpr std::string_view k_allowZeroSizedArrayEnd{"#pragma warning(pop)\n"};
 
 std::string generateStruct(
     const Struct& strct, const InterfaceBlockReflection& reflection,
-    RequiredHeaders& reqHeaders
+    RequiredHeaders& reqHeaders, bool isTopLevel
 ) {
     size_t offset = 0;
     std::string membersStr;
@@ -198,15 +198,20 @@ std::string generateStruct(
                   "{2});",
                   strct.name, strct.members.back().name, strct.declaredSize
               );
+
     std::string alignedType =
-        std::format("struct alignas(16) {0}_140: public {0} {{}};", strct.name);
+        isTopLevel
+            ? ""s
+            : std::format(
+                  "struct alignas(16) {0}_140: public {0} {{}};\n", strct.name
+              );
 
     return std::format(
         "{}struct {} {{\n"
         "{}}};\n"
         "{}"
         "{}\n"
-        "{}\n\n",
+        "{}\n",
         runtimeSized ? k_allowZeroSizedArrayBegin : "", strct.name, membersStr,
         runtimeSized ? k_allowZeroSizedArrayEnd : "", assertSize, alignedType
     );
@@ -218,8 +223,12 @@ std::string generateCppString(
     // Compose structs
     RequiredHeaders reqHeaders;
     std::string body;
-    for (const auto& strct : reflection.structs) {
-        body += generateStruct(strct, reflection, reqHeaders);
+    {
+        auto it = reflection.structs.begin();
+        for (; (it + 1) != reflection.structs.end(); ++it) {
+            body += generateStruct(*it, reflection, reqHeaders, false);
+        }
+        body += generateStruct(*it, reflection, reqHeaders, true);
     }
 
     // Compose includes
