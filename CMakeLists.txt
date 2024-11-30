@@ -16,7 +16,7 @@ endfunction()
 
 # Find/fetch dependencies
     # Vulkan
-    find_package(Vulkan REQUIRED COMPONENTS glslc shaderc_combined)
+    find_package(Vulkan REQUIRED COMPONENTS glslc)
     # SDL2
     find_package(SDL2 CONFIG REQUIRED GLOBAL)
     find_package(SDL2_ttf CONFIG REQUIRED GLOBAL)
@@ -97,21 +97,6 @@ endfunction()
     else()
         set(RTICreator "")
     endif()
-
-    # RealShadersGenTool
-    add_real_executable(RealShadersGenTool)
-    target_include_directories(RealShadersGenTool PRIVATE tools)
-    set_target_properties(RealShadersGenTool PROPERTIES
-        CXX_STANDARD 23
-    )
-    target_link_libraries(RealShadersGenTool
-        PRIVATE
-            argparse
-            Vulkan::shaderc_combined
-            spirv-cross-core
-            spirv-cross-reflect
-            glm::glm-header-only
-    )
     add_subdirectory(tools)
 
 # Installation
