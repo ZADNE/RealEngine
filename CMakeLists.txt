@@ -93,11 +93,11 @@ endfunction()
             INTERPROCEDURAL_OPTIMIZATION TRUE
         )
         target_link_libraries(RTICreator PUBLIC RealEngine)
+        add_subdirectory(tools)
         set(RTICreator "RTICreator")
     else()
         set(RTICreator "")
     endif()
-    add_subdirectory(tools)
 
 # Installation
     install(TARGETS RealEngine vma glm-header-only nlohmann_json ImGui lodepng ${RTICreator}
