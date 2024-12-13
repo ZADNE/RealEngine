@@ -80,15 +80,13 @@ void PipelineLayout::reflectSource(
     auto constants       = compiler.get_specialization_constants();
     const char* specData = reinterpret_cast<const char*>(specInfo.pData);
     for (const auto& constant : constants) { // For each spec constant in the SPIRV
-        for (uint32_t i = 0; i < specInfo.mapEntryCount;
-             i++) {                          // Search its override entry
+        // Search its override entry
+        for (uint32_t i = 0; i < specInfo.mapEntryCount; i++) {
             const auto& map = specInfo.pMapEntries[i];
-            if (constant.constant_id ==
-                map.constantID) { // If it is the override entry
+            if (constant.constant_id == map.constantID) {
+                // Override the constant
                 auto& c = compiler.get_constant(constant.id);
-                std::memcpy(
-                    &c.m.c[0].r, &specData[map.offset], map.size
-                ); // Override the constant
+                std::memcpy(&c.m.c[0].r, &specData[map.offset], map.size);
                 break;
             }
         }

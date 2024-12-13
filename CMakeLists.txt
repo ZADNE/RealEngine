@@ -40,7 +40,7 @@ endfunction()
     add_real_library(RealEngine STATIC)
     set_target_properties(RealEngine PROPERTIES
         CXX_STANDARD 23
-        realproject_shader_cxx_namespace "re"
+        realproject_shader_cxx_namespace "re::glsl"
         INTERPROCEDURAL_OPTIMIZATION TRUE
     )
     target_link_libraries(RealEngine
@@ -86,7 +86,7 @@ endfunction()
 
     # RTICreator (Windows only)
     if (WIN32)
-        add_executable(RTICreator)
+        add_real_executable(RTICreator)
         target_include_directories(RTICreator PRIVATE tools)
         set_target_properties(RTICreator PROPERTIES
             CXX_STANDARD 23

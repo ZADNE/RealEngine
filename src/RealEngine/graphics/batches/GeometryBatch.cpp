@@ -49,7 +49,7 @@ GeometryBatch::GeometryBatch(const GeometryBatchCreateInfo& createInfo)
     , m_maxVertices(createInfo.maxVertices)
     , m_pipelineLayout(
           PipelineLayoutCreateInfo{},
-          PipelineGraphicsSources{.vert = geometry_vert, .frag = geometry_frag}
+          PipelineGraphicsSources{.vert = glsl::geometry_vert, .frag = glsl::geometry_frag}
       )
     , m_pipeline(
           PipelineGraphicsCreateInfo{
@@ -59,7 +59,7 @@ GeometryBatch::GeometryBatch(const GeometryBatchCreateInfo& createInfo)
               .pipelineLayout    = *m_pipelineLayout,
               .renderPassSubpass = createInfo.renderPassSubpass
           },
-          PipelineGraphicsSources{.vert = geometry_vert, .frag = geometry_frag}
+          PipelineGraphicsSources{.vert = glsl::geometry_vert, .frag = glsl::geometry_frag}
       ) {
 }
 

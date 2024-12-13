@@ -26,20 +26,21 @@ const char* skipMessageHeader(const char* msg) {
 
 const char* skipFunctionName(const char* msg) {
     while (*msg != '\0') {
-        bool colon = (*msg == ':');
+        bool openingBracket = (*msg == '[');
         msg++;
-        if (colon) {
+        if (openingBracket) {
             break;
         }
     }
-    int spacesSkipped = 0;
-    while (*msg != '\0' && spacesSkipped <= 1) {
-        if (*msg == ' ') {
-            msg++;
-            spacesSkipped++;
-        } else {
+    while (*msg != '\0') {
+        bool closingBracket = (*msg == ']');
+        msg++;
+        if (closingBracket) {
             break;
         }
+    }
+    if (*msg != '\0') {
+        msg++;
     }
     return msg;
 }
