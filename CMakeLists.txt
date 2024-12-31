@@ -33,8 +33,8 @@ endfunction()
     FetchContent_Declare(7zip
         URL https://github.com/ip7z/7zip/archive/refs/tags/24.09.zip
     )
-    set(BIT7Z_CUSTOM_7ZIP_PATH "${FETCHCONTENT_BASE_DIR}/7zip-src")
     # bit7z
+    set(BIT7Z_CUSTOM_7ZIP_PATH "${FETCHCONTENT_BASE_DIR}/7zip-src" CACHE STRING "")
     FetchContent_Declare(bit7z
         URL https://github.com/rikyoz/bit7z/archive/refs/tags/v4.0.9.zip
     )
