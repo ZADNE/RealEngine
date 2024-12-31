@@ -20,21 +20,13 @@ constexpr bool isSystemBigEndian() {
  * @tparam T Any type
  * @param val Value to be reversed
  * @return Value with reversed bytes
+ * @note Almost the same as std::byteswap but allows non-integral types too.
  */
 template<typename T>
 constexpr T reverseByteOrder(const T& val) {
-    union U {
-        U()
-            : raw() {}
-        T val;
-        std::array<std::byte, sizeof(T)> raw;
-    };
-    U source;
-    source.val = val;
-    U dest;
-
-    std::reverse_copy(source.raw.begin(), source.raw.end(), dest.raw.begin());
-    return dest.val;
+    auto bytes = std::bit_cast<std::array<std::byte, sizeof(T)>>(val);
+    std::ranges::reverse(bytes);
+    return std::bit_cast<T>(bytes);
 }
 
 /**

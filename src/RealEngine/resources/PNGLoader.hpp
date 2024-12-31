@@ -25,7 +25,6 @@ public:
 
     /**
      * @brief   Loads texels and parameters from PNG file
-     * @return  0 on success, other on failure
      * @throws  Throws when the file cannot be opened/decoded
      * @details Failing to load parameters is not considered a failure
      */

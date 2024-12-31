@@ -9,7 +9,7 @@ namespace re {
 /**
  * @brief Ensures that there is at most one copy of shared resources.
  *
- * Resources managed by resource manager: textures, shader programs.
+ * Resources managed by resource manager: textures (only so far).
  * Resources are released once there are no references to them.
  *
  * Also accessible through "RM" abbreviation.

@@ -21,16 +21,38 @@ endfunction()
     find_package(SDL2 CONFIG REQUIRED GLOBAL)
     find_package(SDL2_ttf CONFIG REQUIRED GLOBAL)
     # SPIRV-Cross
-    FetchContent_Declare(SPIRV-Cross URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.290.0.tar.gz)
+    FetchContent_Declare(SPIRV-Cross
+        URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.290.0.tar.gz
+    )
     # OpenGL Mathematics
     set(GLM_BUILD_INSTALL ON CACHE INTERNAL "")
-    FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/refs/tags/1.0.0.tar.gz)
+    FetchContent_Declare(glm
+        URL https://github.com/g-truc/glm/archive/refs/tags/1.0.0.tar.gz
+    )
+    # 7zip
+    FetchContent_Declare(7zip
+        URL https://github.com/ip7z/7zip/archive/refs/tags/24.09.zip
+    )
+    set(BIT7Z_CUSTOM_7ZIP_PATH "${FETCHCONTENT_BASE_DIR}/7zip-src")
+    # bit7z
+    FetchContent_Declare(bit7z
+        URL https://github.com/rikyoz/bit7z/archive/refs/tags/v4.0.9.zip
+    )
     # nlohmann json
     set(JSON_Install ON CACHE INTERNAL "")
-    FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+    FetchContent_Declare(json
+        URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+    )
 
     # Download remote libs
-    FetchContent_MakeAvailableWithoutLinting(SPIRV-Cross glm json)
+    FetchContent_MakeAvailableWithoutLinting(SPIRV-Cross glm 7zip bit7z json)
+
+    # Remove interface headers with absolute paths from bit7z
+    get_target_property(bit7zAliasedTarget bit7z ALIASED_TARGET)
+    set_target_properties(${bit7zAliasedTarget}
+        PROPERTIES
+            INTERFACE_SOURCES ""
+    )
 
     # Add embedded libs
     add_subdirectory(external)
@@ -52,6 +74,7 @@ endfunction()
             SDL2::SDL2
             SDL2_ttf::SDL2_ttf
             glm::glm-header-only
+            bit7z
             nlohmann_json::nlohmann_json
             ImGui
             lodepng
@@ -84,6 +107,24 @@ endfunction()
         )
     endif(DOXYGEN_FOUND)
 
+    # DataPackager
+    add_real_executable(DataPackager)
+    target_include_directories(DataPackager
+        PRIVATE
+            src
+            tools
+    )
+    set_target_properties(DataPackager PROPERTIES
+        CXX_STANDARD 23
+        INTERPROCEDURAL_OPTIMIZATION TRUE
+    )
+    target_link_libraries(DataPackager
+        PRIVATE
+            argparse
+            bit7z
+    )
+    include("cmake/DataPackaging.cmake")
+
     # RTICreator (Windows only)
     if (WIN32)
         add_real_executable(RTICreator)
@@ -92,15 +133,18 @@ endfunction()
             CXX_STANDARD 23
             INTERPROCEDURAL_OPTIMIZATION TRUE
         )
-        target_link_libraries(RTICreator PUBLIC RealEngine)
-        add_subdirectory(tools)
+        target_link_libraries(RTICreator PRIVATE RealEngine)
         set(RTICreator "RTICreator")
     else()
         set(RTICreator "")
     endif()
+    add_subdirectory(tools)
 
 # Installation
-    install(TARGETS RealEngine vma glm-header-only nlohmann_json ImGui lodepng ${RTICreator}
+    install(
+        TARGETS
+            RealEngine vma glm-header-only ${bit7zAliasedTarget}
+            nlohmann_json ImGui lodepng ${RTICreator}
         EXPORT RealEngineTargets
         RUNTIME
             DESTINATION ${CMAKE_INSTALL_BINDIR}
