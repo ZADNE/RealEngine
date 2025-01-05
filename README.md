@@ -39,5 +39,6 @@
 * [SDL2](https://www.libsdl.org/) (for user input and window creation)
 * [SDL2_ttf](https://wiki.libsdl.org/SDL2_ttf/FrontPage) (for font rasterization)
 * [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) (for GPU-accelerated rendering and compute)
+* [7-Zip](https://www.7-zip.org/) (for data compression and encryption)
 
 See documentation on ![how to set up a project using RealEngine](https://github.com/ZADNE/Real/blob/main/doc/HowToSetUpProject.md).

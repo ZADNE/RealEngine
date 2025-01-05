@@ -1,18 +1,25 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <format>
+
 #include <RealEngine/resources/PackageLoader.hpp>
+#include <RealEngine/utility/BuildType.hpp>
 
 namespace re {
 
-void PackageLoader::loadFile(const std::string& path) const {
-    bit7z::BitFileExtractor extractor{m_lib, bit7z::BitFormat::SevenZip};
-    extractor.setPassword(k_packageKey);
+std::vector<unsigned char> PackageLoader::unpack(ResourceID id) const {
+    // Prefer unpackaged data in debug build
+    if constexpr (/*k_buildType == BuildType::Debug*/ false) {
+        if (std::filesystem::exists(id.path())) {
+            return readBinaryFile(id.path());
+        }
+    }
 
-    std::vector<bit7z::byte_t> buffer;
-    extractor.extractMatching(k_packageName, path, buffer);
-
-    // TODO
+    // Extract from package
+    std::vector<unsigned char> rval;
+    m_inputArchive.extractTo(rval, id);
+    return rval;
 }
 
 } // namespace re

@@ -19,6 +19,10 @@ CLIArguments parseArguments(int argc, char* argv[]) {
         .metavar("output_dir")
         .required()
         .help("directory where packaged data will be placed");
+    parser.add_argument("--index")
+        .metavar("output_index_file")
+        .required()
+        .help("filepath where C++ index file will be placed");
 
     try {
         parser.parse_args(argc, argv);
@@ -29,8 +33,9 @@ CLIArguments parseArguments(int argc, char* argv[]) {
     }
 
     return CLIArguments{
-        .inputDirs = parser.get<std::vector<std::string>>("--in"),
-        .outputDir = parser.get<>("-o")
+        .inputDirs     = parser.get<std::vector<std::string>>("--in"),
+        .outputDir     = parser.get<>("-o"),
+        .indexFilepath = parser.get<>("--index")
     };
 }
 

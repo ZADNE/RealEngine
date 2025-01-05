@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <RealEngine/resources/PackageLoader.hpp>
 #include <RealEngine/resources/TextureCache.hpp>
 
 namespace re {
@@ -17,18 +18,20 @@ namespace re {
 class ResourceManager {
 public:
     /**
-     * @brief Gets texture as a shared resource
-     * @param seed seed.toFullPath() is used as filepath
-     */
-    static SharedTexture texture(const TextureSeed& seed);
-
-    /**
      * @copydoc TextureCache::texture
      */
-    static SharedTexture texture(const std::string& filePathPNG);
+    static SharedTexture texture(ResourceID id);
+
+    /**
+     * @brief Creates an unmanaged texture.
+     * @warning Calling this function multiple times creates
+     *          multiple copies of the texture
+     */
+    static TextureShaped textureUnmanaged(ResourceID id);
 
 private:
-    static inline TextureCache s_textureCache{};
+    static inline PackageLoader s_packageLoader{};
+    static inline TextureCache s_textureCache{s_packageLoader};
 };
 
 /**

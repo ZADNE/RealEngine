@@ -31,6 +31,12 @@ public:
     static PNGData load(const std::string& filePathPNG);
 
     /**
+     * @brief   Loads texels and parameters from encoded PNG in buffer
+     * @throws  Throws the buffer cannot be decoded
+     */
+    static PNGData load(const std::vector<unsigned char>& encoded);
+
+    /**
      * @brief   Saves texels and parameters to PNG file
      * @details Overwrites existing file without notice
      * @throws  Throws when the file cannot be saved/encoded

@@ -5,12 +5,13 @@
 
 namespace re {
 
-SharedTexture ResourceManager::texture(const TextureSeed& seed) {
-    return s_textureCache.texture(seed.toFullPath());
+SharedTexture ResourceManager::texture(ResourceID id) {
+    return s_textureCache.texture(id);
 }
 
-SharedTexture ResourceManager::texture(const std::string& filePathPNG) {
-    return s_textureCache.texture(filePathPNG);
+TextureShaped ResourceManager::textureUnmanaged(ResourceID id) {
+    auto encodedPNG = s_packageLoader.unpack(id);
+    return TextureShaped{PNGLoader::load(encodedPNG)};
 }
 
 } // namespace re

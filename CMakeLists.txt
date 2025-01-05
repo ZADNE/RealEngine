@@ -48,8 +48,8 @@ endfunction()
     FetchContent_MakeAvailableWithoutLinting(SPIRV-Cross glm 7zip bit7z json)
 
     # Remove interface headers with absolute paths from bit7z
-    get_target_property(bit7zAliasedTarget bit7z ALIASED_TARGET)
-    set_target_properties(${bit7zAliasedTarget}
+    get_target_property(bit7z_aliased_target bit7z ALIASED_TARGET)
+    set_target_properties(${bit7z_aliased_target}
         PROPERTIES
             INTERFACE_SOURCES ""
     )
@@ -143,7 +143,7 @@ endfunction()
 # Installation
     install(
         TARGETS
-            RealEngine vma glm-header-only ${bit7zAliasedTarget}
+            RealEngine vma glm-header-only ${bit7z_aliased_target}
             nlohmann_json ImGui lodepng ${RTICreator}
         EXPORT RealEngineTargets
         RUNTIME

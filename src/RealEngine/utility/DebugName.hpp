@@ -3,8 +3,6 @@
  *  @file
  */
 #pragma once
-#include <string_view>
-
 #include <RealEngine/utility/BuildType.hpp>
 
 namespace re {
@@ -24,13 +22,11 @@ public:
     constexpr DebugName() {}
     constexpr DebugName(const char* name)
         : m_name(name) {}
-    constexpr DebugName(std::string_view name)
-        : m_name(name) {}
 
-    constexpr operator const char*() const { return m_name.data(); }
+    constexpr operator const char*() const { return m_name; }
 
 private:
-    std::string_view m_name;
+    const char* m_name{};
 };
 
 /**
@@ -41,7 +37,6 @@ class DebugName<BuildType::Release> {
 public:
     constexpr DebugName() {}
     constexpr DebugName([[maybe_unused]] const char* name_) {}
-    constexpr DebugName([[maybe_unused]] std::string_view name_) {}
 
     constexpr operator const char*() const { return ""; }
 };

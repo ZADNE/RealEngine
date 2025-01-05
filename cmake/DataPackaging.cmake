@@ -13,11 +13,13 @@ function(real_target_package_data)
     cmake_parse_arguments(ARG "" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
     set(output_package "${ARG_OUTPUT_DIR}/package.dat")
+    get_target_property(realengine_binary_dir RealEngine BINARY_DIR)
 
     add_custom_command(
         OUTPUT ${output_package}
         COMMAND DataPackager "$<LIST:TRANSFORM,${ARG_INPUT_DIRS},PREPEND,--in=>"
                              -o ${ARG_OUTPUT_DIR}
+                             --index "${realengine_binary_dir}/src/RealEngine/resources/ResourceIndex.hpp"
         DEPENDS DataPackager
         COMMENT "Packaging data for ${ARG_TARGET}..."
         VERBATIM

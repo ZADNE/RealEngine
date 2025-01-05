@@ -7,8 +7,9 @@
 
 namespace re::dp {
 
-void composeTileItemTextures(
-    std::span<const std::string> inputDirs, const std::string& outputDir
+void composePackage(
+    std::span<const std::string> inputDirs, const std::string& outputDir,
+    const std::string& indexFilepath
 );
 
 } // namespace re::dp
