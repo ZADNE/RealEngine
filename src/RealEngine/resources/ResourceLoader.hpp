@@ -11,10 +11,28 @@
 #    undef MemoryBarrier
 #endif
 
+#include <RealEngine/graphics/textures/TextureShaped.hpp>
 #include <RealEngine/resources/FileIO.hpp>
+#include <RealEngine/resources/PackageConstants.hpp>
 #include <RealEngine/resources/ResourceID.hpp>
 
 namespace re {
+
+namespace details {
+template<typename T, typename... U>
+concept IsAnyOf = (std::same_as<T, U> || ...);
+}
+
+/**
+ * @brief Is an alias for vector of bytes...
+ */
+using DataResource = std::vector<unsigned char>;
+
+/**
+ * @brief Must be one of: re::DataResource, re::TextureShaped
+ */
+template<typename T>
+concept IsResource = details::IsAnyOf<T, DataResource, TextureShaped>;
 
 /**
  * @brief   Loads files from compressed 'encrypted' package.
@@ -26,12 +44,15 @@ namespace re {
  */
 class ResourceLoader {
 public:
-    constexpr static const char* k_packageKey  = "906def63237d";
-    constexpr static const char* k_packageName = "package.dat";
-
     ResourceLoader() = default;
 
-    std::vector<unsigned char> load(ResourceID id) const;
+    /**
+     * @brief Loads resource from package (Release) or directly from file (Debug)
+     * @tparam T Any resource type
+     */
+    template<typename T>
+        requires IsResource<T>
+    T load(ResourceID id) const;
 
 private:
     std::vector<unsigned char> m_compressedPackage = readBinaryFile(k_packageName);

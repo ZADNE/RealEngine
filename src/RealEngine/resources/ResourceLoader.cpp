@@ -1,14 +1,13 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <format>
-
 #include <RealEngine/resources/ResourceLoader.hpp>
 #include <RealEngine/utility/BuildType.hpp>
 
 namespace re {
 
-std::vector<unsigned char> ResourceLoader::load(ResourceID id) const {
+template<>
+DataResource ResourceLoader::load<DataResource>(ResourceID id) const {
     // Prefer unpackaged data in debug build
     if constexpr (k_buildType == BuildType::Debug) {
         if (std::filesystem::exists(id.path())) {
@@ -21,5 +20,13 @@ std::vector<unsigned char> ResourceLoader::load(ResourceID id) const {
     m_inputArchive.extractTo(rval, id);
     return rval;
 }
+
+template<>
+TextureShaped ResourceLoader::load<TextureShaped>(ResourceID id) const {
+    return TextureShaped{PNGLoader::load(load<DataResource>(id))};
+}
+
+template DataResource ResourceLoader::load<DataResource>(ResourceID id) const;
+template TextureShaped ResourceLoader::load<TextureShaped>(ResourceID id) const;
 
 } // namespace re

@@ -5,11 +5,11 @@
 #include <span>
 #include <string>
 
-namespace re::dp {
+namespace re::rp {
 
 void composePackage(
     std::span<const std::string> inputDirs, const std::string& outputDir,
     const std::string& indexFilepath
 );
 
-} // namespace re::dp
+} // namespace re::rp

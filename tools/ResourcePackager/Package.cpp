@@ -6,13 +6,13 @@
 
 #include <bit7z/bitfilecompressor.hpp>
 
-#include <RealEngine/resources/ResourceLoader.hpp>
+#include <RealEngine/resources/PackageConstants.hpp>
 
 #include <ResourcePackager/Package.hpp>
 
 namespace fs = std::filesystem;
 
-namespace re::dp {
+namespace re::rp {
 
 constexpr const char* k_indexFileFormatString =
     "/**\n"
@@ -61,7 +61,7 @@ void composePackage(
     // Prepare 7z
     bit7z::Bit7zLibrary lib{};
     bit7z::BitFileCompressor compressor{lib, bit7z::BitFormat::SevenZip};
-    compressor.setPassword(ResourceLoader::k_packageKey, true);
+    compressor.setPassword(k_packageKey, true);
     bit7z::BitOutputArchive outputArchive{compressor};
     std::vector<std::string> index;
 
@@ -70,8 +70,10 @@ void composePackage(
         fs::path parentDir = inputDir.parent_path();
         for (const auto& entry : fs::recursive_directory_iterator{inputDir}) {
             if (entry.is_regular_file()) {
-                // Replace path with index to obfuscate (path will not be used by runtime)
-                std::string archivePath = std::to_string(index.size());
+                // Replace path with index to obfuscate (path will not be used
+                // by runtime).
+                // It also ensures that the ordering within the zip stays the same.
+                std::string archivePath = std::format("{:0>6}", index.size());
                 // Add the file to archive
                 outputArchive.addFile(entry.path().string(), archivePath);
                 // Index path (with forward slashes as separator for consistency)
@@ -83,7 +85,7 @@ void composePackage(
     }
 
     // Delete previous package and create the new package
-    auto outputFilepath = fs::path{outputDir} / ResourceLoader::k_packageName;
+    auto outputFilepath = fs::path{outputDir} / k_packageName;
     fs::remove(outputFilepath);
     outputArchive.compressTo(outputFilepath.string());
 
@@ -99,4 +101,4 @@ void composePackage(
     indexFile.write(indexContents.data(), indexContents.size());
 }
 
-} // namespace re::dp
+} // namespace re::rp

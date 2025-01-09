@@ -2,8 +2,8 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <RealEngine/resources/ResourceCache.hpp>
 #include <RealEngine/resources/ResourceLoader.hpp>
-#include <RealEngine/resources/TextureCache.hpp>
 
 namespace re {
 
@@ -17,10 +17,11 @@ namespace re {
  */
 class ResourceManager {
 public:
+
     /**
-     * @copydoc TextureCache::texture
+     * @brief Loads a managed textures
      */
-    static SharedTexture texture(ResourceID id);
+    static SharedTextureShaped texture(ResourceID id);
 
     /**
      * @brief Creates an unmanaged texture.
@@ -30,15 +31,20 @@ public:
     static TextureShaped textureUnmanaged(ResourceID id);
 
     /**
+     * @brief Loads managed data resource.
+     */
+    static SharedDataResource data(ResourceID id);
+
+    /**
      * @brief Loads an unmanaged data.
      * @warning Calling this function multiple times creates
      *          multiple copies of the data.
      */
-    static std::vector<unsigned char> dataUnmanaged(ResourceID id);
+    static DataResource dataUnmanaged(ResourceID id);
 
 private:
     static inline ResourceLoader s_resourceLoader{};
-    static inline TextureCache s_textureCache{s_resourceLoader};
+    static inline ResourceCache s_resourceCache{s_resourceLoader};
 };
 
 /**

@@ -5,7 +5,7 @@
 
 #include <ResourcePackager/Arguments.hpp>
 
-namespace re::dp {
+namespace re::rp {
 
 CLIArguments parseArguments(int argc, char* argv[]) {
     argparse::ArgumentParser parser("ResourcePackager", "0.1.0");
@@ -39,4 +39,4 @@ CLIArguments parseArguments(int argc, char* argv[]) {
     };
 }
 
-} // namespace re::dp
+} // namespace re::rp

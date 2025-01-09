@@ -5,17 +5,20 @@
 
 namespace re {
 
-SharedTexture ResourceManager::texture(ResourceID id) {
-    return s_textureCache.texture(id);
+SharedTextureShaped ResourceManager::texture(ResourceID id) {
+    return s_resourceCache.resource<TextureShaped>(id);
 }
 
 TextureShaped ResourceManager::textureUnmanaged(ResourceID id) {
-    auto encodedPNG = s_resourceLoader.load(id);
-    return TextureShaped{PNGLoader::load(encodedPNG)};
+    return s_resourceLoader.load<TextureShaped>(id);
+}
+
+SharedDataResource ResourceManager::data(ResourceID id) {
+    return s_resourceCache.resource<DataResource>(id);
 }
 
 std::vector<unsigned char> ResourceManager::dataUnmanaged(ResourceID id) {
-    return s_resourceLoader.load(id);
+    return s_resourceLoader.load<std::vector<unsigned char>>(id);
 }
 
 } // namespace re

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace re::dp {
+namespace re::rp {
 
 struct CLIArguments {
     std::vector<std::string> inputDirs;
@@ -15,4 +15,4 @@ struct CLIArguments {
 
 CLIArguments parseArguments(int argc, char* argv[]);
 
-} // namespace re::dp
+} // namespace re::rp
