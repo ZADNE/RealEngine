@@ -13,7 +13,7 @@
 namespace re {
 
 struct RasterizedFontCreateInfo {
-    const char* filePath{};
+    std::span<const unsigned char> ttfBytes{};
     int pointSize{};
     int faceIndex{};
     std::span<const UnicodeRange> ranges = k_asciiPrintableUnicodeRanges;

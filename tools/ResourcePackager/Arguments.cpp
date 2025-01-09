@@ -1,14 +1,14 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #include <argparse/argparse.hpp>
 
-#include <DataPackager/Arguments.hpp>
+#include <ResourcePackager/Arguments.hpp>
 
 namespace re::dp {
 
 CLIArguments parseArguments(int argc, char* argv[]) {
-    argparse::ArgumentParser parser("DataPackager", "0.1.0");
+    argparse::ArgumentParser parser("ResourcePackager", "0.1.0");
 
     parser.add_argument("--in")
         .metavar("input_dir")

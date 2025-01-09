@@ -16,16 +16,17 @@
 
 namespace re {
 
+using TTF_RWopsRAII   = UniqueCPtr<SDL_RWops, SDL_FreeRW>;
 using TTF_FontRAII    = UniqueCPtr<TTF_Font, TTF_CloseFont>;
 using SDL_SurfaceRAII = UniqueCPtr<SDL_Surface, SDL_FreeSurface>;
 
 RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
-    TTF_FontRAII font{TTF_OpenFontIndex(
-        createInfo.filePath, createInfo.pointSize, createInfo.faceIndex
+    TTF_RWopsRAII rWops{SDL_RWFromConstMem(
+        createInfo.ttfBytes.data(), createInfo.ttfBytes.size_bytes()
     )};
-    if (font == nullptr) {
-        throw Exception{std::format("Could not load font {}", createInfo.filePath)};
-    }
+    TTF_FontRAII font{TTF_OpenFontIndexRW(
+        rWops.get(), false, createInfo.pointSize, createInfo.faceIndex
+    )};
 
     // Count the expected number of characters
     int glyphCount = std::accumulate(

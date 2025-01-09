@@ -1,4 +1,4 @@
-﻿real_target_sources(DataPackager
+﻿real_target_sources(ResourcePackager
     PRIVATE
         Arguments.hpp               Arguments.cpp
                                     main.cpp

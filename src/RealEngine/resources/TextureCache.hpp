@@ -6,8 +6,8 @@
 #include <unordered_map>
 
 #include <RealEngine/graphics/textures/TextureShaped.hpp>
-#include <RealEngine/resources/PackageLoader.hpp>
 #include <RealEngine/resources/ResourceID.hpp>
+#include <RealEngine/resources/ResourceLoader.hpp>
 
 namespace re {
 
@@ -18,7 +18,7 @@ using SharedTexture = std::shared_ptr<TextureShaped>;
 
 class TextureCache {
 public:
-    explicit TextureCache(const PackageLoader& packageLoader);
+    explicit TextureCache(const ResourceLoader& resourceLoader);
 
     /**
      * @brief Gets texture as a shared resource.
@@ -27,7 +27,7 @@ public:
     SharedTexture texture(ResourceID id);
 
 private:
-    const PackageLoader& m_packageLoader;
+    const ResourceLoader& m_resourceLoader;
     std::unordered_map<ResourceID::IDType, std::weak_ptr<TextureShaped>> m_textureMap;
 };
 

@@ -34,8 +34,6 @@ public:
 
     /**
      * @brief   Constructs texture from already loaded PNG
-     * @param   filePathPNG Path to the PNG
-     * @throws  Throws when the PNG cannot be loaded
      */
     TextureShaped(const PNGLoader::PNGData& pngData);
 

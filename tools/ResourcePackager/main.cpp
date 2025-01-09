@@ -1,10 +1,10 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #include <iostream>
 
-#include <DataPackager/Arguments.hpp>
-#include <DataPackager/Package.hpp>
+#include <ResourcePackager/Arguments.hpp>
+#include <ResourcePackager/Package.hpp>
 
 int main(int argc, char* argv[]) {
     using namespace re::dp;

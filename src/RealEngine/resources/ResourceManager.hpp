@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/resources/PackageLoader.hpp>
+#include <RealEngine/resources/ResourceLoader.hpp>
 #include <RealEngine/resources/TextureCache.hpp>
 
 namespace re {
@@ -25,13 +25,20 @@ public:
     /**
      * @brief Creates an unmanaged texture.
      * @warning Calling this function multiple times creates
-     *          multiple copies of the texture
+     *          multiple copies of the texture.
      */
     static TextureShaped textureUnmanaged(ResourceID id);
 
+    /**
+     * @brief Loads an unmanaged data.
+     * @warning Calling this function multiple times creates
+     *          multiple copies of the data.
+     */
+    static std::vector<unsigned char> dataUnmanaged(ResourceID id);
+
 private:
-    static inline PackageLoader s_packageLoader{};
-    static inline TextureCache s_textureCache{s_packageLoader};
+    static inline ResourceLoader s_resourceLoader{};
+    static inline TextureCache s_textureCache{s_resourceLoader};
 };
 
 /**

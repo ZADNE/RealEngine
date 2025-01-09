@@ -16,14 +16,22 @@
 
 namespace re {
 
-class PackageLoader {
+/**
+ * @brief   Loads files from compressed 'encrypted' package.
+ * @details Resource more less means a file in this context.
+ * @details In debug build only, prefers to read the original files instead (if
+ *          they exist) to allow quick iteration without needing to run rerun
+ *          packaging everytime.
+ * @see     ResourcePackager executable (CMake target)
+ */
+class ResourceLoader {
 public:
     constexpr static const char* k_packageKey  = "906def63237d";
     constexpr static const char* k_packageName = "package.dat";
 
-    PackageLoader() = default;
+    ResourceLoader() = default;
 
-    std::vector<unsigned char> unpack(ResourceID id) const;
+    std::vector<unsigned char> load(ResourceID id) const;
 
 private:
     std::vector<unsigned char> m_compressedPackage = readBinaryFile(k_packageName);

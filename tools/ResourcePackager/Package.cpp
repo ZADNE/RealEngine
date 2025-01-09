@@ -1,4 +1,4 @@
-﻿/*!
+﻿/**
  *  @author    Dubsky Tomas
  */
 #include <filesystem>
@@ -6,41 +6,46 @@
 
 #include <bit7z/bitfilecompressor.hpp>
 
-#include <RealEngine/resources/PackageLoader.hpp>
+#include <RealEngine/resources/ResourceLoader.hpp>
 
-#include <DataPackager/Package.hpp>
+#include <ResourcePackager/Package.hpp>
 
 namespace fs = std::filesystem;
 
 namespace re::dp {
 
-constexpr const char* k_indexFile =
-    "/*!\n"
-    " * Automatically generated file by RealEngine's DataPackager\n"
+constexpr const char* k_indexFileFormatString =
+    "/**\n"
+    " *  @file Automatically generated file by RealEngine's ResourcePackager\n"
     " */\n"
     "#pragma once\n"
-    "#include <vector>\n"
-    "\n"
-    "#include <RealEngine/resources/ResourceManager.hpp>\n"
+    "#include <RealEngine/resources/ResourceID.hpp>\n"
+    "#include <RealEngine/utility/CompTimeString.hpp>\n"
     "\n"
     "namespace re {{\n"
     "\n"
-    "consteval ResourceID resourceID(const char* path) {{\n"
-    "    std::vector<std::string> k_index{{{}}};\n"
-    "    for (uint32_t i = 0; i < k_index.size(); ++i) {{\n"
-    "        if (k_index[i] == path) {{\n"
-    "            return ResourceID{{i, \"\"}};\n"
-    "        }}\n"
+    "template<CompTimeString k_lit>\n"
+    "consteval ResourceID resourceID() {{\n"
+    "    if constexpr (k_buildType == BuildType::Debug) {{\n"
+    "        // Allow non-indexed data in debug builds.\n"
+    "        // The debug-only path will be used to load the data.\n"
+    "        return ResourceID{{0xffffffff, k_lit.data}};\n"
+    "    }} else {{\n"
+    "        // All data must be indexed in release builds.\n"
+    "        // This is because paths are not preserved at all.\n"
+    "        throw \"Trying to use a non-indexed resource.\";\n"
     "    }}\n"
-    "    return ResourceID{{0xffffffff, \"\"}};\n"
-    "}}\n"
+    "}};\n"
     "\n"
-    "consteval ResourceID textureID(const char* filenameStem) {{\n"
-    "    auto path = std::string{{\"textures/\"}} + filenameStem + \".png\";\n"
-    "    return resourceID(path.c_str());\n"
-    "}}\n"
-    "\n"
+    "{}"
     "}} // namespace re\n";
+
+constexpr const char* k_textureIDFormatString =
+    "template<>\n"
+    "consteval ResourceID resourceID<\"{0}\">() {{\n"
+    "    return ResourceID{{{1}, \"{0}\"}};\n"
+    "}};\n"
+    "\n";
 
 std::string toForwardSlash(const std::string& in) {
     std::string rval;
@@ -56,7 +61,7 @@ void composePackage(
     // Prepare 7z
     bit7z::Bit7zLibrary lib{};
     bit7z::BitFileCompressor compressor{lib, bit7z::BitFormat::SevenZip};
-    compressor.setPassword(PackageLoader::k_packageKey, true);
+    compressor.setPassword(ResourceLoader::k_packageKey, true);
     bit7z::BitOutputArchive outputArchive{compressor};
     std::vector<std::string> index;
 
@@ -68,7 +73,7 @@ void composePackage(
                 // Replace path with index to obfuscate (path will not be used by runtime)
                 std::string archivePath = std::to_string(index.size());
                 // Add the file to archive
-                outputArchive.addFile(entry.path().string(), entry.path().string());
+                outputArchive.addFile(entry.path().string(), archivePath);
                 // Index path (with forward slashes as separator for consistency)
                 index.push_back(
                     toForwardSlash(fs::relative(entry.path(), parentDir).string())
@@ -78,17 +83,16 @@ void composePackage(
     }
 
     // Delete previous package and create the new package
-    auto outputFilepath = fs::path{outputDir} / PackageLoader::k_packageName;
+    auto outputFilepath = fs::path{outputDir} / ResourceLoader::k_packageName;
     fs::remove(outputFilepath);
     outputArchive.compressTo(outputFilepath.string());
 
     // Compose C++ index
-    std::string initializer;
-    for (int i = 0; i < static_cast<int>(index.size()) - 1; ++i) {
-        initializer += std::format("\"{}\", ", index[i]);
+    std::string idsString;
+    for (uint32_t i = 0; i < static_cast<uint32_t>(index.size()); ++i) {
+        idsString += std::format(k_textureIDFormatString, index[i], i);
     }
-    initializer += std::format("\"{}\"", index[index.size() - 1]);
-    std::string indexContents = std::format(k_indexFile, initializer);
+    std::string indexContents = std::format(k_indexFileFormatString, idsString);
 
     // Write C++ index
     std::ofstream indexFile{indexFilepath};

@@ -107,23 +107,23 @@ endfunction()
         )
     endif(DOXYGEN_FOUND)
 
-    # DataPackager
-    add_real_executable(DataPackager)
-    target_include_directories(DataPackager
+    # ResourcePackager
+    add_real_executable(ResourcePackager)
+    target_include_directories(ResourcePackager
         PRIVATE
             src
             tools
     )
-    set_target_properties(DataPackager PROPERTIES
+    set_target_properties(ResourcePackager PROPERTIES
         CXX_STANDARD 23
         INTERPROCEDURAL_OPTIMIZATION TRUE
     )
-    target_link_libraries(DataPackager
+    target_link_libraries(ResourcePackager
         PRIVATE
             argparse
             bit7z
     )
-    include("cmake/DataPackaging.cmake")
+    include("cmake/ResourcePackaging.cmake")
 
     # RTICreator (Windows only)
     if (WIN32)
