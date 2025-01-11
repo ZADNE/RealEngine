@@ -8,6 +8,8 @@
 #        INPUT_DIRS <directory_name>...
 #     )
 # The target will be named <target>_PackageResources.
+# The packaging will be done in non-debug builds only as debug build of RealEngine
+# reads the unpackaged data.
 function(real_target_package_resources)
     set(one_value_args TARGET OUTPUT_DIR)
     set(multi_value_args INPUT_DIRS)
@@ -28,7 +30,7 @@ function(real_target_package_resources)
         COMMAND_EXPAND_LISTS
     )
     set(package_target "${ARG_TARGET}_PackageResources")
-    add_custom_target(${package_target} DEPENDS ${output_package})
+    add_custom_target(${package_target} DEPENDS $<$<NOT:$<CONFIG:Debug>>:${output_package}>)
     add_dependencies(${ARG_TARGET} ${package_target})
 endfunction()
 

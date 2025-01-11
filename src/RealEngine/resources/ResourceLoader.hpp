@@ -37,9 +37,8 @@ concept IsResource = details::IsAnyOf<T, DataResource, TextureShaped>;
 /**
  * @brief   Loads files from compressed 'encrypted' package.
  * @details Resource more less means a file in this context.
- * @details In debug build only, prefers to read the original files instead (if
- *          they exist) to allow quick iteration without needing to run rerun
- *          packaging everytime.
+ * @details In debug build, reads the original files instead to allow quick
+ *          iteration without needing to run rerun packaging everytime.
  * @see     ResourcePackager executable (CMake target)
  */
 class ResourceLoader {
@@ -55,6 +54,7 @@ public:
     T load(ResourceID id) const;
 
 private:
+#ifdef NDEBUG
     std::vector<unsigned char> m_compressedPackage = readBinaryFile(k_packageName);
     bit7z::Bit7zLibrary m_lib{};
     bit7z::BitMemExtractor m_extractor{m_lib, bit7z::BitFormat::SevenZip};
@@ -64,6 +64,7 @@ private:
         return Empty{};                        // that would set the password.
     }();
     bit7z::BitInputArchive m_inputArchive{m_extractor, m_compressedPackage};
+#endif
 };
 
 } // namespace re
