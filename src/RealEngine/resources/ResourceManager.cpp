@@ -5,7 +5,7 @@
 
 namespace re {
 
-SharedTextureShaped ResourceManager::texture(ResourceID id) {
+std::shared_ptr<TextureShaped> ResourceManager::texture(ResourceID id) {
     return s_resourceCache.resource<TextureShaped>(id);
 }
 
@@ -13,7 +13,7 @@ TextureShaped ResourceManager::textureUnmanaged(ResourceID id) {
     return s_resourceLoader.load<TextureShaped>(id);
 }
 
-SharedDataResource ResourceManager::data(ResourceID id) {
+std::shared_ptr<DataResource> ResourceManager::data(ResourceID id) {
     return s_resourceCache.resource<DataResource>(id);
 }
 

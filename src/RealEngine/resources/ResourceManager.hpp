@@ -21,7 +21,7 @@ public:
     /**
      * @brief Loads a managed textures
      */
-    static SharedTextureShaped texture(ResourceID id);
+    static std::shared_ptr<TextureShaped> texture(ResourceID id);
 
     /**
      * @brief Creates an unmanaged texture.
@@ -33,7 +33,7 @@ public:
     /**
      * @brief Loads managed data resource.
      */
-    static SharedDataResource data(ResourceID id);
+    static std::shared_ptr<DataResource> data(ResourceID id);
 
     /**
      * @brief Loads an unmanaged data.

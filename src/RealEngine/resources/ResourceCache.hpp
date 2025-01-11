@@ -11,16 +11,6 @@
 namespace re {
 
 /**
- * @brief Is a texture that can be shared across Rooms
- */
-using SharedTextureShaped = std::shared_ptr<TextureShaped>;
-
-/**
- * @brief Is a data resource that can be shared across Rooms
- */
-using SharedDataResource = std::shared_ptr<DataResource>;
-
-/**
  * @brief Caches resources to avoid duplication
  */
 class ResourceCache {
