@@ -1,4 +1,4 @@
-name: CMake build
+﻿name: CMake build
 
 on:
   workflow_dispatch:
@@ -98,6 +98,7 @@ jobs:
         cmake --install ${{ env.build-dir }}
         --prefix ${{ env.install-dir }}/${{ env.archive-name }}
         --config ${{ matrix.build_type }}
+        --component RealEngine_Development
         --strip
         ;
         7z a ${{ env.install-dir }}/${{ env.archive-name }}.7z

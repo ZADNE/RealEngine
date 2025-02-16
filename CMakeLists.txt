@@ -144,14 +144,14 @@ endfunction()
     install(
         TARGETS
             RealEngine vma glm-header-only ${bit7z_aliased_target}
-            nlohmann_json ImGui lodepng ${RTICreator}
+            nlohmann_json ImGui lodepng argparse ResourcePackager ${RTICreator}
         EXPORT RealEngineTargets
-        RUNTIME
+        RUNTIME # Tool executables are part of RealEngine development
             DESTINATION ${CMAKE_INSTALL_BINDIR}
-            COMPONENT           RealEngine_Runtime
+            COMPONENT           RealEngine_Development
         LIBRARY
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            COMPONENT           RealEngine_Runtime
+            COMPONENT           RealEngine_Development
             NAMELINK_COMPONENT  RealEngine_Development
         ARCHIVE
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -171,6 +171,7 @@ endfunction()
     install(EXPORT RealEngineTargets
         FILE RealEngineTargets.cmake
         DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
+        COMPONENT RealEngine_Development
     )
     configure_file(cmake/RealEngineConfig.cmake.in RealEngineConfig.cmake @ONLY)
     install(
@@ -178,4 +179,5 @@ endfunction()
             ${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake
             ${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake
         DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
+        COMPONENT RealEngine_Development
     )
