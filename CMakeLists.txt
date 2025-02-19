@@ -29,12 +29,7 @@ endfunction()
     FetchContent_Declare(glm
         URL https://github.com/g-truc/glm/archive/refs/tags/1.0.0.tar.gz
     )
-    # 7zip
-    FetchContent_Declare(7zip
-        URL https://github.com/ip7z/7zip/archive/refs/tags/24.09.zip
-    )
     # bit7z
-    set(BIT7Z_CUSTOM_7ZIP_PATH "${FETCHCONTENT_BASE_DIR}/7zip-src" CACHE STRING "")
     FetchContent_Declare(bit7z
         URL https://github.com/rikyoz/bit7z/archive/refs/tags/v4.0.9.zip
     )
@@ -44,10 +39,13 @@ endfunction()
         URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
     )
 
-    # Download remote libs
-    FetchContent_MakeAvailableWithoutLinting(SPIRV-Cross glm 7zip bit7z json)
+    # Make all imported libs implicitly install as a part of RealEngine_Development
+    set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME RealEngine_Development)
 
-    # Remove interface headers with absolute paths from bit7z
+    # Download remote libs
+    FetchContent_MakeAvailableWithoutLinting(SPIRV-Cross glm bit7z json)
+
+    # Remove interface headers with absolute paths from bit7z target
     get_target_property(bit7z_aliased_target bit7z ALIASED_TARGET)
     set_target_properties(${bit7z_aliased_target}
         PROPERTIES
@@ -141,43 +139,69 @@ endfunction()
     add_subdirectory(tools)
 
 # Installation
+    # The main install command
     install(
         TARGETS
             RealEngine vma glm-header-only ${bit7z_aliased_target}
-            nlohmann_json ImGui lodepng argparse ResourcePackager ${RTICreator}
-        EXPORT RealEngineTargets
+            nlohmann_json ImGui lodepng argparse
+            ResourcePackager ${RTICreator}
+        EXPORT                  RealEngineTargets
         RUNTIME # Tool executables are part of RealEngine development
-            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            DESTINATION         ${CMAKE_INSTALL_BINDIR}
             COMPONENT           RealEngine_Development
         LIBRARY
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            DESTINATION         ${CMAKE_INSTALL_LIBDIR}
             COMPONENT           RealEngine_Development
             NAMELINK_COMPONENT  RealEngine_Development
         ARCHIVE
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            DESTINATION         ${CMAKE_INSTALL_LIBDIR}
             COMPONENT           RealEngine_Development
         FILE_SET realproject_public_headers
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            DESTINATION         ${CMAKE_INSTALL_INCLUDEDIR}
             COMPONENT           RealEngine_Development
         FILE_SET HEADERS
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            DESTINATION         ${CMAKE_INSTALL_INCLUDEDIR}
             COMPONENT           RealEngine_Development
     )
+
+    # Manually install headers and necessary scripts for bit7z
+    # because as it does not have install rules
+    install(
+        DIRECTORY   "${FETCHCONTENT_BASE_DIR}/bit7z-src/include/bit7z"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT   RealEngine_Development
+    )
+    install(
+        FILES
+            "${FETCHCONTENT_BASE_DIR}/bit7z-src/cmake/FilesystemDetect.cmake"
+            "${FETCHCONTENT_BASE_DIR}/bit7z-src/cmake/BuildOptions.cmake"
+            "${FETCHCONTENT_BASE_DIR}/bit7z-src/cmake/Dependencies.cmake"
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/bit7z/cmake"
+        COMPONENT   RealEngine_Development
+    )
+
     write_basic_package_version_file(
-        RealEngineConfigVersion.cmake
+        "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake"
         VERSION ${realengine_version}
         COMPATIBILITY SameMajorVersion
     )
-    install(EXPORT RealEngineTargets
+    install(
+        EXPORT RealEngineTargets
         FILE RealEngineTargets.cmake
         DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
         COMPONENT RealEngine_Development
     )
-    configure_file(cmake/RealEngineConfig.cmake.in RealEngineConfig.cmake @ONLY)
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RealEngineConfig.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake"
+        @ONLY
+    )
     install(
         FILES
-            ${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake
-            ${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake
-        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake"
+            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ResourcePackaging.cmake"
+        DESTINATION
+            "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
         COMPONENT RealEngine_Development
     )
