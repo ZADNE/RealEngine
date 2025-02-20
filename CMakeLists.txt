@@ -30,6 +30,7 @@ endfunction()
         URL https://github.com/g-truc/glm/archive/refs/tags/1.0.0.tar.gz
     )
     # bit7z
+    set(BIT7Z_7ZIP_VERSION "23.01" CACHE INTERNAL "")
     FetchContent_Declare(bit7z
         URL https://github.com/rikyoz/bit7z/archive/refs/tags/v4.0.9.zip
     )
@@ -44,6 +45,15 @@ endfunction()
 
     # Download remote libs
     FetchContent_MakeAvailableWithoutLinting(SPIRV-Cross glm bit7z json)
+
+    # Create imported target for 7z.dll
+    if(WIN32)
+        add_library(7z SHARED IMPORTED GLOBAL)
+        set_target_properties(7z PROPERTIES
+            IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/external/bin/win_x64/7z.dll"
+        )
+        list(APPEND runtime_bundled_artifacts 7z)
+    endif()
 
     # Remove interface headers with absolute paths from bit7z target
     get_target_property(bit7z_aliased_target bit7z ALIASED_TARGET)
@@ -180,6 +190,21 @@ endfunction()
         COMPONENT   RealEngine_Development
     )
 
+    # Install bundled precompiled dlls of external projects
+    install(
+        IMPORTED_RUNTIME_ARTIFACTS ${runtime_bundled_artifacts} # SDLs are not bundled
+        RUNTIME
+            DESTINATION         ${CMAKE_INSTALL_BINDIR}
+            COMPONENT           RealEngine_Development
+    )
+
+    # Downstream projects should install these runtime artifacts from these targets
+    set(REALENGINE_RUNTIME_ARTIFACTS 
+        SDL2::SDL2 SDL2_ttf::SDL2_ttf ${runtime_bundled_artifacts}
+        CACHE INTERNAL ""
+    )
+
+    # Configure/generate and install CMake scripts
     write_basic_package_version_file(
         "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake"
         VERSION ${realengine_version}
