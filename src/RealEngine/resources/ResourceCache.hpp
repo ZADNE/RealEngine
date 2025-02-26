@@ -26,7 +26,7 @@ private:
 
     using WeakResource =
         std::variant<std::weak_ptr<DataResource>, std::weak_ptr<TextureShaped>>;
-    std::unordered_map<ResourceID::IDType, WeakResource> m_resourceMap;
+    std::unordered_map<ResourceID, WeakResource> m_resourceMap;
 };
 
 } // namespace re
