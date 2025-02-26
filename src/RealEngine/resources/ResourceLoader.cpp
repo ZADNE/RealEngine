@@ -8,15 +8,15 @@ namespace re {
 
 template<>
 DataResource ResourceLoader::load<DataResource>(ResourceID id) const {
-    if constexpr (k_buildType == BuildType::Debug) {
-        // Debug: Load the file directly
-        return readBinaryFile(id.path());
-    } else {
-        // Release: Extract from package
-        std::vector<unsigned char> rval;
-        m_inputArchive.extractTo(rval, id);
-        return rval;
-    }
+#ifndef NDEBUG
+    // Debug: Load the file directly
+    return readBinaryFile(id.path());
+#else
+    // Release: Extract from package
+    std::vector<unsigned char> rval;
+    m_inputArchive.extractTo(rval, id);
+    return rval;
+#endif
 }
 
 template<>

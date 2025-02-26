@@ -7,7 +7,7 @@
 
 namespace re::rp {
 
-CLIArguments parseArguments(int argc, char* argv[]) {
+CLIArguments parseArguments(int argc, char* argv[]) { // NOLINT(*-avoid-c-arrays)
     argparse::ArgumentParser parser("ResourcePackager", "0.1.0");
 
     parser.add_argument("--in")

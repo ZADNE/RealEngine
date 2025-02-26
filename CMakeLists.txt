@@ -57,6 +57,9 @@ endfunction()
 
     # Remove interface headers with absolute paths from bit7z target
     get_target_property(bit7z_aliased_target bit7z ALIASED_TARGET)
+    if(NOT TARGET ${bit7z_aliased_target})
+        set(bit7z_aliased_target bit7z)
+    endif()
     set_target_properties(${bit7z_aliased_target}
         PROPERTIES
             INTERFACE_SOURCES ""

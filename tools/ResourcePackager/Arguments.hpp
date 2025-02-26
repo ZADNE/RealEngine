@@ -13,6 +13,6 @@ struct CLIArguments {
     std::string indexFilepath;
 };
 
-CLIArguments parseArguments(int argc, char* argv[]);
+CLIArguments parseArguments(int argc, char* argv[]); // NOLINT(*-avoid-c-arrays)
 
 } // namespace re::rp
