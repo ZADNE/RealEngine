@@ -98,7 +98,9 @@ void composePackage(
 
     // Write C++ index
     std::ofstream indexFile{indexFilepath};
-    indexFile.write(indexContents.data(), indexContents.size());
+    indexFile.write(
+        indexContents.data(), static_cast<std::streamsize>(indexContents.size())
+    );
 }
 
 } // namespace re::rp

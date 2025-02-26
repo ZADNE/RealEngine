@@ -48,7 +48,7 @@ private:
 
 template<>
 struct std::hash<re::ResourceID> {
-    size_t operator()(const re::ResourceID& id) const { 
+    size_t operator()(const re::ResourceID& id) const {
         if constexpr (re::k_buildType == re::BuildType::Release) {
             return id.m_id;
         } else {

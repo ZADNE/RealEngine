@@ -6,7 +6,7 @@
 #include <ResourcePackager/Arguments.hpp>
 #include <ResourcePackager/Package.hpp>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) { // NOLINT(*-avoid-c-arrays)
     using namespace re::rp;
     try {
         CLIArguments args = parseArguments(argc, argv);

@@ -58,10 +58,9 @@ PNGLoader::PNGData PNGLoader::load(const std::string& filePathPNG) {
     lodepng::State state{};
     state.decoder.remember_unknown_chunks = 1;
     std::vector<unsigned char> encoded;
-    unsigned int code{};
 
     // Decode PNG
-    if (code = lodepng::load_file(encoded, filePathPNG)) {
+    if (unsigned int code = lodepng::load_file(encoded, filePathPNG)) {
         throw Exception{filePathPNG + ": " + lodepng_error_text(code)};
     }
 
@@ -72,11 +71,10 @@ PNGLoader::PNGData PNGLoader::load(const std::vector<unsigned char>& encoded) {
     // Prepare variables
     lodepng::State state{};
     state.decoder.remember_unknown_chunks = 1;
-    unsigned int code{};
     PNGData decoded{};
 
     // Decode PNG
-    if (code = lodepng::decode(
+    if (unsigned int code = lodepng::decode(
             decoded.texels, decoded.dims.x, decoded.dims.y, state, encoded
         )) {
         throw Exception{lodepng_error_text(code)};

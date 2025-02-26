@@ -22,7 +22,8 @@ using SDL_SurfaceRAII = UniqueCPtr<SDL_Surface, SDL_FreeSurface>;
 
 RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     TTF_RWopsRAII rWops{SDL_RWFromConstMem(
-        createInfo.ttfBytes.data(), createInfo.ttfBytes.size_bytes()
+        createInfo.ttfBytes.data(),
+        static_cast<int>(createInfo.ttfBytes.size_bytes())
     )};
     TTF_FontRAII font{TTF_OpenFontIndexRW(
         rWops.get(), false, createInfo.pointSize, createInfo.faceIndex

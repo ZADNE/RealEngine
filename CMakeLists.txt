@@ -175,7 +175,7 @@ endfunction()
     )
 
     # Manually install headers and necessary scripts for bit7z
-    # because as it does not have install rules
+    # because it does not have install rules
     install(
         DIRECTORY   "${FETCHCONTENT_BASE_DIR}/bit7z-src/include/bit7z"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}

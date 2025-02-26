@@ -8,23 +8,20 @@ namespace re {
 
 template<>
 DataResource ResourceLoader::load<DataResource>(ResourceID id) const {
-#ifndef NDEBUG
-    // Debug: Load the file directly
-    return readBinaryFile(id.path());
-#else
-    // Release: Extract from package
-    std::vector<unsigned char> rval;
-    m_inputArchive.extractTo(rval, id);
-    return rval;
-#endif
+    if constexpr (k_buildType == BuildType::Debug) {
+        // Debug: Load the file directly
+        return readBinaryFile(id.path());
+    } else {
+        // Release: Extract from package
+        std::vector<unsigned char> rval;
+        m_inputArchive.extractTo(rval, id);
+        return rval;
+    }
 }
 
 template<>
 TextureShaped ResourceLoader::load<TextureShaped>(ResourceID id) const {
     return TextureShaped{PNGLoader::load(load<DataResource>(id))};
 }
-
-template DataResource ResourceLoader::load<DataResource>(ResourceID id) const;
-template TextureShaped ResourceLoader::load<TextureShaped>(ResourceID id) const;
 
 } // namespace re
