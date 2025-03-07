@@ -29,7 +29,7 @@ constexpr const char* k_indexFileFormatString =
     "    if constexpr (k_buildType == BuildType::Debug) {{\n"
     "        // Allow non-indexed data in debug builds.\n"
     "        // The debug-only path will be used to load the data.\n"
-    "        return ResourceID{{0xffffffff, k_lit.data}};\n"
+    "        return ResourceID{{~0u, static_cast<const char*>(k_lit.data)}};\n"
     "    }} else {{\n"
     "        // All data must be indexed in release builds.\n"
     "        // This is because paths are not preserved at all.\n"
