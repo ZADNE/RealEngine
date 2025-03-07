@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  *  @file      ResourceIndex.hpp
  *  @brief     Is an empty placeholder that will be overriden by a real index.
@@ -27,7 +27,7 @@ consteval ResourceID resourceID() {
     if constexpr (k_buildType == BuildType::Debug) {
         // Allow non-indexed data in debug builds.
         // The debug-only path will be used to load the data.
-        return ResourceID{0xffffffff, k_lit.data};
+        return ResourceID{~0u, static_cast<const char*>(k_lit.data)};
     } else {
         // All data must be indexed in release builds.
         // This is because paths are not preserved at all.
