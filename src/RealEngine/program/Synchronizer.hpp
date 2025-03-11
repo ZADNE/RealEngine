@@ -115,7 +115,7 @@ public:
 private:
 
     /** @brief Sleeps this thread until next frame should begin. */
-    void delayTillEndOfFrame();
+    void delayTillEndOfFrame() const;
 
     void resetSynchronization();
 
