@@ -13,7 +13,7 @@ namespace re {
  * Resources managed by resource manager: textures (only so far).
  * Resources are released once there are no references to them.
  *
- * Also accessible through "RM" abbreviation.
+ * @note This class is also accessible through re::RM abbreviation.
  */
 class ResourceManager {
 public:

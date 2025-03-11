@@ -207,6 +207,16 @@ endfunction()
         CACHE INTERNAL ""
     )
 
+    # Install documentation
+    if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/doc/")
+        install(
+            DIRECTORY
+                "${CMAKE_CURRENT_BINARY_DIR}/doc/"
+            DESTINATION ${CMAKE_INSTALL_DOCDIR}
+            COMPONENT RealEngine_Development
+        )
+    endif()
+
     # Configure/generate and install CMake scripts
     write_basic_package_version_file(
         "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake"
