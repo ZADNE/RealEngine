@@ -59,7 +59,7 @@ void composePackage(
     const std::string& indexFilepath
 ) {
     // Prepare 7z
-    bit7z::Bit7zLibrary lib{};
+    bit7z::Bit7zLibrary lib{default7ZipSharedLibLocation()};
     bit7z::BitFileCompressor compressor{lib, bit7z::BitFormat::SevenZip};
     compressor.setPassword(k_packageKey, true);
     bit7z::BitOutputArchive outputArchive{compressor};
