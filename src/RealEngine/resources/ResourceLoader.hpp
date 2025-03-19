@@ -56,7 +56,9 @@ public:
 private:
 #ifdef NDEBUG
     std::vector<unsigned char> m_compressedPackage = readBinaryFile(k_packageName);
-    bit7z::Bit7zLibrary m_lib{};
+    bit7z::Bit7zLibrary m_lib{
+        k_buildOS == BuildOS::Windows ? "7z.dll" : "/usr/lib/7zip/7z.so"
+    };
     bit7z::BitMemExtractor m_extractor{m_lib, bit7z::BitFormat::SevenZip};
     [[no_unique_address]] struct Empty {       // A hack to set password before
     } _empty = [&]() {                         // m_inputArchive is constructed.
