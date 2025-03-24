@@ -13,20 +13,6 @@
 namespace re {
 
 /**
- * @brief Converts simple filename to full path to a texture
- */
-struct TextureSeed {
-
-    std::string toFullPath() const { return s_folder + file + s_fileExtension; }
-
-    const std::string& file; ///< Filepath without extension
-
-private:
-    static inline std::string s_folder        = "textures/";
-    static inline std::string s_fileExtension = ".png";
-};
-
-/**
  * @brief Is a 2D texture with associated shape, typically loaded from a PNG file
  */
 class TextureShaped: public Texture {
@@ -34,24 +20,22 @@ public:
     /**
      * @brief Constructs a null Texture with no memory or images
      */
-    explicit TextureShaped() {}
+    explicit TextureShaped() = default;
+
     /**
      * @brief   Constructs texture from PNG
      * @param   filePathPNG Path to the PNG
      * @throws  Throws when the PNG cannot be loaded
-     * @details Shape of the texture is also loaded from the chunk,
+     * @details Shape of the texture is also loaded from the texture,
      *          or if that cannot be done, default shape is used instead.
      */
     explicit TextureShaped(const std::string& filePathPNG)
         : TextureShaped(PNGLoader::load(filePathPNG)) {}
 
     /**
-     * @brief   Constructs texture from seed
-     * @details TextureSeed is converted to full path which is used to load the
-     * texture
+     * @brief   Constructs texture from already loaded PNG
      */
-    explicit TextureShaped(const TextureSeed& seed)
-        : TextureShaped(seed.toFullPath()) {}
+    TextureShaped(const PNGLoader::PNGData& pngData);
 
     TextureShaped(const TextureShaped&)            = delete;  ///< Noncopyable
     TextureShaped& operator=(const TextureShaped&) = delete;  ///< Noncopyable
@@ -77,7 +61,6 @@ public:
     }
 
 private:
-    TextureShaped(const PNGLoader::PNGData& pngData);
 
     TextureShape m_shape{};
 

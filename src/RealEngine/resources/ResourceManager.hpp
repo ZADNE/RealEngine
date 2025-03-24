@@ -2,33 +2,49 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/resources/TextureCache.hpp>
+#include <RealEngine/resources/ResourceCache.hpp>
+#include <RealEngine/resources/ResourceLoader.hpp>
 
 namespace re {
 
 /**
  * @brief Ensures that there is at most one copy of shared resources.
  *
- * Resources managed by resource manager: textures, shader programs.
+ * Resources managed by resource manager: textures (only so far).
  * Resources are released once there are no references to them.
  *
- * Also accessible through "RM" abbreviation.
+ * @note This class is also accessible through re::RM abbreviation.
  */
 class ResourceManager {
 public:
-    /**
-     * @brief Gets texture as a shared resource
-     * @param seed seed.toFullPath() is used as filepath
-     */
-    static SharedTexture texture(const TextureSeed& seed);
 
     /**
-     * @copydoc TextureCache::texture
+     * @brief Loads a managed textures
      */
-    static SharedTexture texture(const std::string& filePathPNG);
+    static std::shared_ptr<TextureShaped> texture(ResourceID id);
+
+    /**
+     * @brief Creates an unmanaged texture.
+     * @warning Calling this function multiple times creates
+     *          multiple copies of the texture.
+     */
+    static TextureShaped textureUnmanaged(ResourceID id);
+
+    /**
+     * @brief Loads managed data resource.
+     */
+    static std::shared_ptr<DataResource> data(ResourceID id);
+
+    /**
+     * @brief Loads an unmanaged data.
+     * @warning Calling this function multiple times creates
+     *          multiple copies of the data.
+     */
+    static DataResource dataUnmanaged(ResourceID id);
 
 private:
-    static inline TextureCache s_textureCache{};
+    static inline ResourceLoader s_resourceLoader{};
+    static inline ResourceCache s_resourceCache{s_resourceLoader};
 };
 
 /**

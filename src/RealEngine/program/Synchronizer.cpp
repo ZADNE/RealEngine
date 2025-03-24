@@ -98,13 +98,19 @@ bool Synchronizer::shouldStepHappen() {
     // If accumulated enough time for the next step to happen
     if (m_stepTimeAccumulator >= m_timePerStep) {
         m_stepTimeAccumulator -= m_timePerStep; // Reduce accumulated time
+
+        // If lacking behind extremely (may be because of stoppping on a breakpoint)
+        if (m_stepTimeAccumulator >= 4s) {
+            // Skip the steps to avoid waiting for the simulation to catch up
+            m_stepTimeAccumulator %= m_timePerStep;
+        }
         return true;
     } else {
         return false;
     }
 }
 
-void Synchronizer::delayTillEndOfFrame() {
+void Synchronizer::delayTillEndOfFrame() const {
     auto now              = std::chrono::steady_clock::now();
     auto expectedFrameEnd = m_startTime + m_currFrameIndex * m_timePerFrame;
     if (now < expectedFrameEnd) { // If there is time to sleep

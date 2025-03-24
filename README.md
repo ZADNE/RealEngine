@@ -1,4 +1,4 @@
-# RealEngine: A Vulkan-based engine-like library
+﻿# RealEngine: A Vulkan-based engine-like library
 
 [![CMake build](https://github.com/ZADNE/RealEngine/actions/workflows/build.yml/badge.svg)](https://github.com/ZADNE/RealEngine/actions/workflows/build.yml)
 [![C++ Core Guidelines](https://github.com/ZADNE/RealEngine/actions/workflows/cpp-core-guidelines.yml/badge.svg)](https://github.com/ZADNE/RealEngine/actions/workflows/cpp-core-guidelines.yml)
@@ -18,7 +18,7 @@
 * A lightweight library, not a full-fledged engine with all sorts of subsystems
 * As little runtime overhead as possible
 * A modern type-safe C++23 library following [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
-* Doxygen documented at least at class level
+* Doxygen-documented at least at class level
 
 ## The library was used to develop:
 

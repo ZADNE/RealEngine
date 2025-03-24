@@ -1,7 +1,8 @@
-include(CMakeFindDependencyMacro)
+﻿include(CMakeFindDependencyMacro)
 
 # Vulkan
 find_dependency(Vulkan REQUIRED COMPONENTS glslc)
+
 # SDL2
 find_dependency(SDL2 REQUIRED)
 find_dependency(SDL2_ttf REQUIRED)
@@ -9,6 +10,27 @@ find_dependency(SDL2_ttf REQUIRED)
 # Spriv-cross
 include("${CMAKE_CURRENT_LIST_DIR}/../../spirv_cross_core/cmake/spirv_cross_coreConfig.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/../../spirv_cross_reflect/cmake/spirv_cross_reflectConfig.cmake")
+
+# bit-7z dependencies / 7-zip
+include("${CMAKE_CURRENT_LIST_DIR}/../../bit7z/cmake/FilesystemDetect.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../bit7z/cmake/BuildOptions.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../bit7z/cmake/Dependencies.cmake")
+
+# CMake scripts for RealEngine's resource packaging
+include("${CMAKE_CURRENT_LIST_DIR}/ResourcePackaging.cmake")
+
+# Runtime artifacts needed by RealEngine
+if(WIN32)
+    add_library(7z SHARED IMPORTED GLOBAL)
+    set_target_properties(7z PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/../../../bin/7z.dll"
+    )
+    list(APPEND runtime_bundled_artifacts 7z)
+endif()
+set(REALENGINE_RUNTIME_ARTIFACTS # A bit hacky...
+    SDL2::SDL2 SDL2_ttf::SDL2_ttf ${runtime_bundled_artifacts}
+    CACHE INTERNAL ""
+)
 
 # RealEngine
 include("${CMAKE_CURRENT_LIST_DIR}/RealEngineTargets.cmake")

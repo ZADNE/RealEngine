@@ -58,15 +58,26 @@ PNGLoader::PNGData PNGLoader::load(const std::string& filePathPNG) {
     lodepng::State state{};
     state.decoder.remember_unknown_chunks = 1;
     std::vector<unsigned char> encoded;
-    unsigned int code{};
+
+    // Decode PNG
+    if (unsigned int code = lodepng::load_file(encoded, filePathPNG)) {
+        throw Exception{filePathPNG + ": " + lodepng_error_text(code)};
+    }
+
+    return load(encoded); // Could not load RTI but that is still ok
+}
+
+PNGLoader::PNGData PNGLoader::load(const std::vector<unsigned char>& encoded) {
+    // Prepare variables
+    lodepng::State state{};
+    state.decoder.remember_unknown_chunks = 1;
     PNGData decoded{};
 
     // Decode PNG
-    if ((code = lodepng::load_file(encoded, filePathPNG)) ||
-        (code = lodepng::decode(
-             decoded.texels, decoded.dims.x, decoded.dims.y, state, encoded
-         ))) {
-        throw Exception{lodepng_error_text(code)}; // Loading or decoding failed
+    if (unsigned int code = lodepng::decode(
+            decoded.texels, decoded.dims.x, decoded.dims.y, state, encoded
+        )) {
+        throw Exception{lodepng_error_text(code)};
     }
 
     // Load parameters
@@ -103,7 +114,8 @@ void PNGLoader::save(const std::string& filePathPNG, const PNGData& data) {
              &state.info_png.unknown_chunks_size[0],
              static_cast<unsigned int>(rti.size()), "reAl", rti.data()
          ))) {
-        throw Exception{lodepng_error_text(code)}; // Chunk creation failed
+        // Chunk creation failed
+        throw Exception{filePathPNG + ": " + lodepng_error_text(code)};
     }
 
     // Encode and save PNG
@@ -112,7 +124,8 @@ void PNGLoader::save(const std::string& filePathPNG, const PNGData& data) {
     std::vector<unsigned char> png;
     if ((code = lodepng::encode(png, data.texels, data.dims.x, data.dims.y, state)) ||
         (code = lodepng::save_file(png, filePathPNG))) {
-        throw Exception{lodepng_error_text(code)}; // Encoding or saving failed
+        // Encoding or saving failed
+        throw Exception{filePathPNG + ": " + lodepng_error_text(code)};
     }
 }
 

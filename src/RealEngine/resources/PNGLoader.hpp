@@ -25,11 +25,16 @@ public:
 
     /**
      * @brief   Loads texels and parameters from PNG file
-     * @return  0 on success, other on failure
      * @throws  Throws when the file cannot be opened/decoded
      * @details Failing to load parameters is not considered a failure
      */
     static PNGData load(const std::string& filePathPNG);
+
+    /**
+     * @brief   Loads texels and parameters from encoded PNG in buffer
+     * @throws  Throws the buffer cannot be decoded
+     */
+    static PNGData load(const std::vector<unsigned char>& encoded);
 
     /**
      * @brief   Saves texels and parameters to PNG file
