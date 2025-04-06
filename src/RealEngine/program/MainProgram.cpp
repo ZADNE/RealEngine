@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #include <filesystem>
@@ -205,7 +205,8 @@ void MainProgram::doRoomTransitionIfScheduled() {
         return;
 
     m_synchronizer.pauseSteps();
-    auto prev    = m_roomManager.currentRoom();
+    auto transitionTo = m_nextRoomName;
+    auto prev         = m_roomManager.currentRoom();
     auto current = m_roomManager.goToRoom(m_nextRoomName, m_roomTransitionArgs);
     if (prev != current) { // If successfully changed the room
         // Update main renderpass
@@ -219,7 +220,9 @@ void MainProgram::doRoomTransitionIfScheduled() {
         // Ensure at least one step before the first frame is rendered
         step();
     }
-    m_nextRoomName = k_noNextRoom;
+    if (m_nextRoomName == transitionTo) { // If new transition has not been scheduled
+        m_nextRoomName = k_noNextRoom;
+    }
 
     m_synchronizer.resumeSteps();
 }
