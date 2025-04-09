@@ -41,7 +41,7 @@ struct TextureCreateInfo {
     std::span<const unsigned char> texels; // Only for 1 layer color images
 
     // Debug
-    [[no_unique_address]] DebugName<> debugName;
+    [[no_unique_address]] DebugString<> debugName;
 };
 
 /**

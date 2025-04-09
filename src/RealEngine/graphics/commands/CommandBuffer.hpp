@@ -19,7 +19,7 @@ struct CommandBufferCreateInfo {
     vk::CommandBufferLevel level = vk::CommandBufferLevel::ePrimary;
 
     // Debug
-    [[no_unique_address]] DebugName<> debugName;
+    [[no_unique_address]] DebugString<> debugName;
 };
 
 /**

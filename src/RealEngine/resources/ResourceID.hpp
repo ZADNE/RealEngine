@@ -4,7 +4,7 @@
 #pragma once
 #include <cstdint>
 
-#include <RealEngine/utility/DebugName.hpp>
+#include <RealEngine/utility/DebugString.hpp>
 
 namespace re {
 
@@ -41,7 +41,7 @@ public:
 
 private:
     uint32_t m_id;
-    [[no_unique_address]] DebugName<> m_path;
+    [[no_unique_address]] DebugString<> m_path;
 };
 
 } // namespace re

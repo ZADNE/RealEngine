@@ -32,7 +32,7 @@ struct PipelineGraphicsCreateInfo {
     RenderPassSubpass renderPassSubpass{};
 
     // Debug
-    [[no_unique_address]] DebugName<> debugName;
+    [[no_unique_address]] DebugString<> debugName;
 };
 
 struct PipelineComputeCreateInfo {
@@ -42,7 +42,7 @@ struct PipelineComputeCreateInfo {
     vk::PipelineLayout pipelineLayout = nullptr;
 
     // Debug
-    [[no_unique_address]] DebugName<> debugName;
+    [[no_unique_address]] DebugString<> debugName;
 };
 
 /**

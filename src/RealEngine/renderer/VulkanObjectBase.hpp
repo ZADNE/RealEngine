@@ -8,7 +8,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
-#include <RealEngine/utility/DebugName.hpp>
+#include <RealEngine/utility/DebugString.hpp>
 
 namespace re {
 
@@ -55,7 +55,7 @@ protected:
      */
     template<typename T>
         requires vk::isVulkanHandleType<T>::value
-    static void setDebugUtilsObjectName(T object, DebugName<> debugName) {
+    static void setDebugUtilsObjectName(T object, DebugString<> debugName) {
         if constexpr (k_buildType == BuildType::Debug) {
             device().setDebugUtilsObjectNameEXT(
                 vk::DebugUtilsObjectNameInfoEXT{

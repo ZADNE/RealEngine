@@ -38,7 +38,7 @@ struct BufferCreateInfo {
     }; // Offset in bytes where initData will be placed
 
     // Debug
-    [[no_unique_address]] DebugName<> debugName;
+    [[no_unique_address]] DebugString<> debugName;
 };
 
 /**

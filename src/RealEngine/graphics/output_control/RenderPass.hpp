@@ -15,7 +15,7 @@ struct RenderPassCreateInfo {
     std::span<const vk::SubpassDependency2> dependencies;
 
     // Debug
-    [[no_unique_address]] DebugName<> debugName;
+    [[no_unique_address]] DebugString<> debugName;
 };
 
 /**
