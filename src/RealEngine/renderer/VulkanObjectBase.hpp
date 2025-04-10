@@ -8,6 +8,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
+#include <RealEngine/renderer/PipelineHotLoader.hpp>
 #include <RealEngine/utility/DebugString.hpp>
 
 namespace re {
@@ -49,6 +50,9 @@ protected:
         return *s_dispatchLoaderDynamic;
     }
     static DeletionQueue& deletionQueue() { return *s_deletionQueue; }
+    static PipelineHotLoader& pipelineHotLoader() {
+        return *s_pipelineHotLoader;
+    }
 
     /**
      * @brief Assign a debug name to a given object, does nothing in release build
@@ -79,7 +83,8 @@ private:
     static inline const CommandBuffer* s_oneTimeSubmitCmdBuf = nullptr;
     static inline const vk::DescriptorPool* s_descriptorPool = nullptr;
     static inline const vk::DispatchLoaderDynamic* s_dispatchLoaderDynamic = nullptr;
-    static inline DeletionQueue* s_deletionQueue = nullptr;
+    static inline DeletionQueue* s_deletionQueue         = nullptr;
+    static inline PipelineHotLoader* s_pipelineHotLoader = nullptr;
 };
 
 } // namespace re

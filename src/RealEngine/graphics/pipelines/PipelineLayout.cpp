@@ -63,9 +63,9 @@ PipelineLayout& PipelineLayout::operator=(PipelineLayout&& other) noexcept {
 }
 
 PipelineLayout::~PipelineLayout() {
-    device().destroyPipelineLayout(m_pipelineLayout);
+    deletionQueue().enqueueDeletion(m_pipelineLayout);
     for (int i = static_cast<int>(m_descriptorSetLayouts.size()) - 1; i >= 0; i--) {
-        device().destroyDescriptorSetLayout(m_descriptorSetLayouts[i]);
+        deletionQueue().enqueueDeletion(m_descriptorSetLayouts[i]);
     }
 }
 

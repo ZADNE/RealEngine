@@ -2,6 +2,7 @@
     PUBLIC
         Allocator.hpp               
         DeletionQueue.hpp           DeletionQueue.cpp
+        PipelineHotLoader.hpp       PipelineHotLoader.cpp
         VulkanFixture.hpp           VulkanFixture.cpp
         VulkanObjectBase.hpp        
     PRIVATE

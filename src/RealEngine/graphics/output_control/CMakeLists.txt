@@ -2,4 +2,5 @@
     PUBLIC
         Framebuffer.hpp             Framebuffer.cpp
         RenderPass.hpp              RenderPass.cpp
+        RenderPassSubpass.hpp       
 )

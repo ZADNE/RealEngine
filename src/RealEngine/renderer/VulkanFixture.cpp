@@ -645,6 +645,9 @@ void VulkanFixture::assignImplementationReferences() {
     VulkanObjectBase::s_oneTimeSubmitCmdBuf   = &m_oneTimeSubmitCmdBuf;
     VulkanObjectBase::s_dispatchLoaderDynamic = &(m_dispatchLoaderDynamic);
     VulkanObjectBase::s_deletionQueue         = &m_deletionQueue;
+#ifndef NDEBUG
+    VulkanObjectBase::s_pipelineHotLoader = &m_pipelineHotLoader;
+#endif // !NDEBUG
 }
 
 } // namespace re

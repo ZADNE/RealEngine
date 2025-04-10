@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
+#include <RealEngine/graphics/output_control/RenderPassSubpass.hpp>
 #include <RealEngine/renderer/VulkanObjectBase.hpp>
 
 namespace re {
@@ -16,15 +17,6 @@ struct RenderPassCreateInfo {
 
     // Debug
     [[no_unique_address]] DebugString<> debugName;
-};
-
-/**
- * @brief Identifies a subpass within a renderpass
- * @note This does not hold ownership of the renderpass!
- */
-struct RenderPassSubpass {
-    vk::RenderPass renderPass{};
-    uint32_t subpassIndex{};
 };
 
 /**

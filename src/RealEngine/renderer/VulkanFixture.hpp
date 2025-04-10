@@ -131,6 +131,9 @@ private:
     FrameDoubleBuffered<vk::raii::Fence> m_inFlightFences;
     bool m_recreteSwapchain = false;
     DeletionQueue m_deletionQueue{*m_device, m_allocator};
+#ifndef NDEBUG
+    PipelineHotLoader m_pipelineHotLoader{m_deletionQueue};
+#endif // !NDEBUG
 
     // Active room dependent
     const RenderPass* m_mainRenderPass{};
