@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #include <iostream>
@@ -158,8 +158,7 @@ const CommandBuffer& VulkanFixture::prepareFrame() {
     // Wait for the previous frame to finish
     checkSuccess(m_device.waitForFences(**m_inFlightFences, true, k_maxTimeout));
 
-    m_deletionQueue.deleteNextGroup();
-    m_deletionQueue.beginNewGroup();
+    m_deletionQueue.startNextIteration(DeletionQueue::Timeline::Render);
 
     // Recreate swapchain if required
     if (m_recreteSwapchain) {

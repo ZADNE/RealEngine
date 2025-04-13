@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -49,6 +49,8 @@ public:
     void operator=(Window&&) = delete;      ///< Nonmovable
 
     ~Window();
+
+    void startStep();
 
     void setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex);
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -91,6 +91,8 @@ public:
     std::vector<std::string> availableDevices() const;
 
     std::string usedDevice() const;
+
+    DeletionQueue& deletionQueue() { return m_deletionQueue; }
 
 private:
     // Vulkan objects

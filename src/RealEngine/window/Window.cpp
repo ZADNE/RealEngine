@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #include <iostream>
@@ -46,6 +46,15 @@ Window::~Window() {
     switch (m_usedRenderer) {
     case RendererID::Vulkan13: m_vk13.~VulkanFixture(); break;
     case RendererID::Any:      break;
+    }
+}
+
+void Window::startStep() {
+    switch (m_usedRenderer) {
+    case RendererID::Vulkan13:
+        m_vk13.deletionQueue().startNextIteration(DeletionQueue::Timeline::Step);
+        break;
+    case RendererID::Any: break;
     }
 }
 

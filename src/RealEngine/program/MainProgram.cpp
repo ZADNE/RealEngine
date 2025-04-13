@@ -145,6 +145,7 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
 
 void MainProgram::step() {
     StepDoubleBufferingState::setTotalIndex(++m_stepN);
+    m_window.startStep();
     m_roomManager.currentRoom()->step();
 }
 
