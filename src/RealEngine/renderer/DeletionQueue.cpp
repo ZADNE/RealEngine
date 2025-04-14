@@ -1,6 +1,7 @@
 /**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 #include <RealEngine/renderer/DeletionQueue.hpp>
 #include <RealEngine/utility/Error.hpp>
 
@@ -11,8 +12,9 @@ DeletionQueue::DeletionQueue(const vk::Device& device, const vma::Allocator& all
     , m_allocator(allocator) {
     // Insert initial separators to delay deletion
     for (auto& queue : m_queues) {
-        queue.emplace(QueueRecord::separator());
-        queue.emplace(QueueRecord::separator());
+        for (size_t i = 0; i < k_maxFramesInFlight; i++) {
+            queue.emplace(QueueRecord::separator());
+        }
     }
 }
 
