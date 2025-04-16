@@ -3,6 +3,7 @@
  */
 #pragma once
 #include <map>
+#include <memory>
 
 #include <RealEngine/graphics/pipelines/PipelineCreateInfos.hpp>
 #include <RealEngine/graphics/pipelines/PipelineSources.hpp>
@@ -11,13 +12,13 @@
 namespace re {
 
 /**
- * @brief Allows recompilation of Vulkan pipelines during runtime (debug builds only)
+ * @brief Allows recompilation of Vulkan pipelines during runtime (debug
+ * builds only)
  */
 class PipelineHotLoader {
 public:
 
-    explicit PipelineHotLoader(DeletionQueue& deletionQueue)
-        : m_deletionQueue{deletionQueue} {}
+    explicit PipelineHotLoader(DeletionQueue& deletionQueue);
 
     /**
      * @brief   Registers the pipeline so that it can be recompiled later
@@ -59,37 +60,53 @@ private:
     );
     using PipelineSources = std::array<ShaderSource, k_maxStagesPerPipeline>;
 
-    struct PipelineReloadInfo {
+    class PipelineReloadInfo {
+    public:
         PipelineReloadInfo(
             const PipelineGraphicsCreateInfo& createInfo,
             const PipelineGraphicsSources& srcs
         )
-            : type{PipelineType::Graphics}
-            , graphics{createInfo}
-            , sources{srcs[0], srcs[1], srcs[2], srcs[3], srcs[4]} {}
+            : m_type{PipelineType::Graphics}
+            , m_graphics{createInfo}
+            , m_sources{srcs[0], srcs[1], srcs[2], srcs[3], srcs[4]} {}
         PipelineReloadInfo(
             const PipelineComputeCreateInfo& createInfo,
             const PipelineComputeSources& srcs
         )
-            : type{PipelineType::Compute}
-            , compute{createInfo}
-            , sources{srcs[0], {}, {}, {}, {}} {}
+            : m_type{PipelineType::Compute}
+            , m_compute{createInfo}
+            , m_sources{srcs[0], {}, {}, {}, {}} {}
 
-        vk::Pipeline recreateFromSources() const;
+        void reloadSPIRV(vk::ShaderStageFlagBits stages) {
+            switch (m_type) {
+            case PipelineType::Graphics:
+                reloadSPIRV<PipelineGraphicsSources>(stages);
+                break;
+            case PipelineType::Compute:
+                reloadSPIRV<PipelineComputeSources>(stages);
+                break;
+            default: std::unreachable();
+            }
+        }
 
-        PipelineType type{};
+        template<typename T>
+        void reloadSPIRV(vk::ShaderStageFlagBits stages);
+
+        vk::Pipeline recreatePipelineFromSPIRV() const;
+
+    private:
+        PipelineType m_type{};
         union {
             // It is dangerous to store the create infos as the pointers in them
             // may become dangling! It is accepted as this whole class is not
             // used in Release builds.
-            PipelineGraphicsCreateInfo graphics;
-            PipelineComputeCreateInfo compute;
+            PipelineGraphicsCreateInfo m_graphics;
+            PipelineComputeCreateInfo m_compute;
         };
-        PipelineSources sources{};
+        PipelineSources m_sources{};
     };
 
     DeletionQueue& m_deletionQueue;
     std::map<vk::Pipeline, PipelineReloadInfo> m_pipeToReloadInfo;
 };
-
 } // namespace re

@@ -3,8 +3,13 @@
  */
 #include <RealEngine/graphics/pipelines/Pipeline.hpp>
 #include <RealEngine/renderer/PipelineHotLoader.hpp>
+#include <RealEngine/resources/FileIO.hpp>
 
 namespace re {
+
+PipelineHotLoader::PipelineHotLoader(DeletionQueue& deletionQueue)
+    : m_deletionQueue{deletionQueue} {
+}
 
 void PipelineHotLoader::registerForReloading(
     vk::Pipeline initial, const PipelineGraphicsCreateInfo& createInfo,
@@ -25,12 +30,13 @@ vk::Pipeline PipelineHotLoader::hotReload(
 ) {
     if (auto it = m_pipeToReloadInfo.find(current);
         it != m_pipeToReloadInfo.end()) {
-        // Recompile GLSL sources to SPIR-V
+        // Reload SPIR-V from filesystem
         auto nodeHandle                = m_pipeToReloadInfo.extract(it);
         PipelineReloadInfo& reloadInfo = nodeHandle.mapped();
+        reloadInfo.reloadSPIRV(stages);
 
         // Recompile SPIR-V
-        vk::Pipeline newPipeline = reloadInfo.recreateFromSources();
+        vk::Pipeline newPipeline = reloadInfo.recreatePipelineFromSPIRV();
 
         // Delete old pipeline and return the new one
         m_deletionQueue.enqueueDeletion(nodeHandle.key());
@@ -45,22 +51,41 @@ void PipelineHotLoader::unregisterForReloading(vk::Pipeline current) {
     m_pipeToReloadInfo.erase(current);
 }
 
-vk::Pipeline PipelineHotLoader::PipelineReloadInfo::recreateFromSources() const {
-    switch (type) {
+template<typename T>
+void PipelineHotLoader::PipelineReloadInfo::reloadSPIRV(vk::ShaderStageFlagBits stages
+) {
+    std::vector<unsigned char> temp;
+    for (size_t i = 0; i < T::k_numStages; ++i) {
+        vk::ShaderStageFlagBits thisStage = T::stageFlags(i);
+        if ((thisStage & stages) && m_sources[i].sourcePath) {
+            readBinaryFile(static_cast<const char*>(m_sources[i].sourcePath), temp);
+            assert((temp.size() % sizeof(uint32_t)) == 0);
+            m_sources[i].vk13.assign(
+                reinterpret_cast<const uint32_t*>(temp.data()), temp.size() / 4
+            );
+            int stop = 5;
+        }
+    }
+}
+
+vk::Pipeline PipelineHotLoader::PipelineReloadInfo::recreatePipelineFromSPIRV() const {
+    switch (m_type) {
     case PipelineType::Graphics:
         return Pipeline::create(
-            graphics,
+            m_graphics,
             PipelineGraphicsSources{
-                .vert = sources[0],
-                .tesc = sources[1],
-                .tese = sources[2],
-                .geom = sources[3],
-                .frag = sources[4]
+                .vert = m_sources[0],
+                .tesc = m_sources[1],
+                .tese = m_sources[2],
+                .geom = m_sources[3],
+                .frag = m_sources[4]
             }
         );
     case PipelineType::Compute:
-        return Pipeline::create(compute, PipelineComputeSources{.comp = sources[0]});
-    default: return nullptr;
+        return Pipeline::create(
+            m_compute, PipelineComputeSources{.comp = m_sources[0]}
+        );
+    default: std::unreachable();
     }
 }
 

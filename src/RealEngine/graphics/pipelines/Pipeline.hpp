@@ -51,7 +51,9 @@ public:
      * @brief Recompiles shaders of the pipeline from file system
      * @note  Only supported in Debug builds, does nothing in other builds
      */
-    void hotReloadShaders(vk::ShaderStageFlagBits stages);
+    void hotReloadShaders(
+        vk::ShaderStageFlagBits stages = vk::ShaderStageFlagBits::eAll
+    );
 
 private:
     static vk::Pipeline create(

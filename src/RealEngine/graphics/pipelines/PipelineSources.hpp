@@ -30,7 +30,9 @@ struct ShaderSourceRef {
  */
 struct ShaderSource {
     constexpr ShaderSource() {}
-    constexpr ShaderSource(std::initializer_list<uint32_t> vk13_, const char* sourcePath_)
+    constexpr ShaderSource(
+        std::initializer_list<uint32_t> vk13_, [[maybe_unused]] const char* sourcePath_
+    )
         : vk13{vk13_}
         , sourcePath{sourcePath_} {}
     constexpr ShaderSource(const ShaderSourceRef& sourceRef)

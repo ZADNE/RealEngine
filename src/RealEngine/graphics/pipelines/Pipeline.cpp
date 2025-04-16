@@ -57,7 +57,9 @@ Pipeline::~Pipeline() {
     deletionQueue().enqueueDeletion(m_pipeline);
 }
 
-void Pipeline::hotReloadShaders(vk::ShaderStageFlagBits stages) {
+void Pipeline::hotReloadShaders(
+    vk::ShaderStageFlagBits stages /*= vk::ShaderStageFlagBits::eAll*/
+) {
     if constexpr (k_buildType == BuildType::Debug) {
         m_pipeline = pipelineHotLoader().hotReload(m_pipeline, stages);
     }

@@ -22,8 +22,10 @@ void MainProgram::initialize(const VulkanInitInfo& initInfo) {
 int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
     try {
         return instance({}).doRun(roomName, args);
+    } catch (const Exception& e) {
+        fatalError(std::string("re::Exception: ") + e.what());
     } catch (const std::exception& e) {
-        fatalError(std::string("Exception: ") + e.what());
+        fatalError(std::string("std::exception: ") + e.what());
     } catch (const char* str) {
         fatalError(std::string("C-string exception: ") + str);
     } catch (int i) {
