@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  *  @file
  */
@@ -9,6 +9,7 @@
 #include <glm/vec2.hpp>
 
 #include <RealEngine/program/Synchronizer.hpp>
+#include <RealEngine/renderer/HotReloadInitInfo.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/rooms/RoomManager.hpp>
 #include <RealEngine/rooms/RoomToEngineAccess.hpp>
@@ -31,6 +32,11 @@ struct DisplayInfo {
     int refreshRate{};         ///< Refresh rate
     uint32_t pixelFormat{};    ///< Pixel format @see SDL2's SDL_PixelFormatEnum
     void* driverSpecific{};
+};
+
+struct MainProgramInitInfo {
+    VulkanInitInfo vulkan{}; ///< Default-constructed is used if not provided
+    HotReloadInitInfo hotReload{};
 };
 
 /**
@@ -61,7 +67,7 @@ public:
      * @brief Must be called before any Room is added
      * @warning Never call this more than once!
      */
-    static void initialize(const VulkanInitInfo& initInfo);
+    static void initialize(const MainProgramInitInfo& initInfo);
 
     /**
      * @brief Adds a Room to the management
@@ -131,12 +137,12 @@ private:
     /**
      * @brief Constructs the main program.
      */
-    explicit MainProgram(const VulkanInitInfo& initInfo);
+    explicit MainProgram(const MainProgramInitInfo& initInfo);
 
     /**
      * @brief Gets the singleton instance
      */
-    static MainProgram& instance(const VulkanInitInfo& initInfo);
+    static MainProgram& instance(const MainProgramInitInfo& initInfo);
 
     /**
      * @brief Does the actual game loop on the singleton instance

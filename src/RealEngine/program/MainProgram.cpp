@@ -14,7 +14,7 @@
 
 namespace re {
 
-void MainProgram::initialize(const VulkanInitInfo& initInfo) {
+void MainProgram::initialize(const MainProgramInitInfo& initInfo) {
     // Force initialization of the singleton instance
     instance(initInfo);
 }
@@ -39,7 +39,7 @@ void MainProgram::scheduleExit(int exitcode /* = EXIT_SUCCESS*/) {
 }
 
 void MainProgram::pollEventsInMainThread(bool poll) {
-    auto& mainProgram                    = instance(VulkanInitInfo{});
+    auto& mainProgram                    = instance({});
     mainProgram.m_pollEventsInMainThread = poll;
     mainProgram.m_inputManager.step();
 }
@@ -252,15 +252,17 @@ void MainProgram::pollEvents() {
     }
 }
 
-MainProgram::MainProgram(const VulkanInitInfo& initInfo)
-    : m_window{WindowSettings{}, WindowSubsystems::RealEngineVersionString(), initInfo}
+MainProgram::MainProgram(const MainProgramInitInfo& initInfo)
+    : m_window{
+        WindowSettings{}, WindowSubsystems::RealEngineVersionString(),
+        initInfo.vulkan, initInfo.hotReload}
     , s_roomToEngineAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
 
     Room::setRoomToEngineAccess(&s_roomToEngineAccess);
     Room::setStaticReferences(this, &m_roomManager);
 }
 
-MainProgram& MainProgram::instance(const VulkanInitInfo& initInfo) {
+MainProgram& MainProgram::instance(const MainProgramInitInfo& initInfo) {
     static MainProgram mainProgram{initInfo};
     return mainProgram;
 }

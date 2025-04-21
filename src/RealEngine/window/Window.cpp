@@ -13,7 +13,7 @@ namespace re {
 
 Window::Window(
     const WindowSettings& settings, const std::string& title,
-    const VulkanInitInfo& initInfo
+    const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
 )
     : WindowSettings(settings)
     , m_subsystems()
@@ -23,13 +23,13 @@ Window::Window(
     m_subsystems.printRealEngineVersion();
     m_subsystems.printSubsystemsVersions();
 
-    initForRenderer(settings.preferredRenderer(), initInfo);
+    initForRenderer(settings.preferredRenderer(), vulkan, hotReload);
 
     // If the preferred renderer could not be initialized
     if (m_usedRenderer == RendererID::Any) {
         for (size_t i = 0; i < static_cast<size_t>(RendererID::Any);
              i++) { // Try to init any other
-            initForRenderer(static_cast<RendererID>(i), initInfo);
+            initForRenderer(static_cast<RendererID>(i), vulkan, hotReload);
             if (m_usedRenderer != RendererID::Any)
                 break;
         }
@@ -168,14 +168,18 @@ void Window::setDims(glm::ivec2 newDims, bool save) {
         this->save();
 }
 
-void Window::initForRenderer(RendererID renderer, const VulkanInitInfo& initInfo) {
+void Window::initForRenderer(
+    RendererID renderer, const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
+) {
     switch (renderer) {
-    case RendererID::Vulkan13: initForVulkan13(initInfo); break;
+    case RendererID::Vulkan13: initForVulkan13(vulkan, hotReload); break;
     default:                   break;
     }
 }
 
-void Window::initForVulkan13(const VulkanInitInfo& initInfo) {
+void Window::initForVulkan13(
+    const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
+) {
     // Create SDL window
     SDL_WindowRAII window = createSDLWindow(RendererID::Vulkan13);
     if (!window) {
@@ -185,7 +189,7 @@ void Window::initForVulkan13(const VulkanInitInfo& initInfo) {
     // Set up Vulkan 1.3 fixture
     try {
         new (&m_vk13) VulkanFixture{
-            window.get(), (bool)m_flags.vSync, m_preferredDevice, initInfo
+            window.get(), (bool)m_flags.vSync, m_preferredDevice, vulkan, hotReload
         };
     } catch (std::exception& e) {
         std::cerr << e.what() << '\n';

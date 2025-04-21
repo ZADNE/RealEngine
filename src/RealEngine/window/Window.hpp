@@ -8,6 +8,7 @@
 #include <SDL_video.h>
 #include <glm/vec2.hpp>
 
+#include <RealEngine/renderer/HotReloadInitInfo.hpp>
 #include <RealEngine/renderer/VulkanFixture.hpp>
 #include <RealEngine/utility/UniqueCPtr.hpp>
 #include <RealEngine/window/WindowSettings.hpp>
@@ -35,11 +36,10 @@ public:
      *
      * @param settings Settings to initialize the window with.
      * @param title Title for the window
-     * @param initInfo
      */
     Window(
         const WindowSettings& settings, const std::string& title,
-        const VulkanInitInfo& initInfo
+        const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
     );
 
     Window(const Window&)         = delete; ///< Noncopyable
@@ -166,8 +166,11 @@ public:
     RendererID usedRenderer() const { return m_usedRenderer; }
 
 private:
-    void initForRenderer(RendererID renderer, const VulkanInitInfo& initInfo);
-    void initForVulkan13(const VulkanInitInfo& initInfo);
+    void initForRenderer(
+        RendererID renderer, const VulkanInitInfo& vulkan,
+        const HotReloadInitInfo& hotReload
+    );
+    void initForVulkan13(const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload);
 
     using SDL_WindowRAII = UniqueCPtr<SDL_Window, SDL_DestroyWindow>;
     SDL_WindowRAII createSDLWindow(RendererID renderer);

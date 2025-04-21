@@ -58,7 +58,7 @@ const void* defaultDeviceCreateInfoChain() {
 
 VulkanFixture::VulkanFixture(
     SDL_Window* sdlWindow, bool vSync, std::string_view preferredDevice,
-    const VulkanInitInfo& initInfo
+    const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
 )
     : m_sdlWindow(sdlWindow)
     , m_instance(createInstance())
@@ -66,18 +66,17 @@ VulkanFixture::VulkanFixture(
     , m_debugUtilsMessenger(createDebugUtilsMessenger())
 #endif // !NDEBUG
     , m_surface(createSurface())
-    , m_physicalDevice(
-          createPhysicalDevice(preferredDevice, initInfo.deviceCreateInfoChain)
+    , m_physicalDevice(createPhysicalDevice(preferredDevice, vulkan.deviceCreateInfoChain)
       )
     , m_presentMode(selectClosestPresentMode(vSync))
-    , m_device(createDevice(initInfo.deviceCreateInfoChain))
+    , m_device(createDevice(vulkan.deviceCreateInfoChain))
     , m_allocator(createAllocator())
     , m_graphicsCompQueue(getQueue(m_graphicsCompQueueFamIndex))
     , m_presentationQueue(getQueue(m_presentationQueueFamIndex))
     , m_swapchain(createSwapchain())
     , m_swapchainImageViews(createSwapchainImageViews())
     , m_additionalBufferDescrs(
-          {initInfo.additionalBuffers.begin(), initInfo.additionalBuffers.end()}
+          {vulkan.additionalBuffers.begin(), vulkan.additionalBuffers.end()}
       )
     , m_additionalBuffers(createAdditionalBuffers())
     , m_commandPool(createCommandPool())
@@ -94,7 +93,11 @@ VulkanFixture::VulkanFixture(
     , m_descriptorPool(createDescriptorPool())
     , m_imageAvailableSems(createSemaphores())
     , m_renderingFinishedSems(createSemaphores())
-    , m_inFlightFences(createFences()) {
+    , m_inFlightFences(createFences())
+#ifndef NDEBUG
+    , m_pipelineHotLoader{m_deletionQueue, hotReload}
+#endif // !NDEBUG
+{
     // Implementations
     assignImplementationReferences();
     FrameDoubleBufferingState::setTotalIndex(m_frame++);

@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/graphics/pipelines/Pipeline.hpp>
@@ -7,8 +7,14 @@
 
 namespace re {
 
-PipelineHotLoader::PipelineHotLoader(DeletionQueue& deletionQueue)
-    : m_deletionQueue{deletionQueue} {
+PipelineHotLoader::PipelineHotLoader(
+    DeletionQueue& deletionQueue, const HotReloadInitInfo& hotReload
+)
+    : m_deletionQueue{deletionQueue}
+    , m_recompileShadersCommand{std::format(
+          "{} --build {} -t {}", hotReload.cmakePath, hotReload.targetBinaryDir,
+          hotReload.targetName
+      )} {
 }
 
 void PipelineHotLoader::registerForReloading(

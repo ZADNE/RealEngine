@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -8,17 +8,18 @@
 #include <RealEngine/graphics/pipelines/PipelineCreateInfos.hpp>
 #include <RealEngine/graphics/pipelines/PipelineSources.hpp>
 #include <RealEngine/renderer/DeletionQueue.hpp>
+#include <RealEngine/renderer/HotReloadInitInfo.hpp>
 
 namespace re {
 
 /**
- * @brief Allows recompilation of Vulkan pipelines during runtime (debug
- * builds only)
+ * @brief   Allows recompilation of Vulkan pipelines during runtime (debug
+ *          builds only)
  */
 class PipelineHotLoader {
 public:
 
-    explicit PipelineHotLoader(DeletionQueue& deletionQueue);
+    PipelineHotLoader(DeletionQueue& deletionQueue, const HotReloadInitInfo& hotReload);
 
     /**
      * @brief   Registers the pipeline so that it can be recompiled later
@@ -108,5 +109,6 @@ private:
 
     DeletionQueue& m_deletionQueue;
     std::map<vk::Pipeline, PipelineReloadInfo> m_pipeToReloadInfo;
+    std::string m_recompileShadersCommand{};
 };
 } // namespace re

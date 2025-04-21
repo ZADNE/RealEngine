@@ -62,7 +62,7 @@ public:
      */
     VulkanFixture(
         SDL_Window* sdlWindow, bool vSync, std::string_view preferredDevice,
-        const VulkanInitInfo& initInfo
+        const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
     );
 
     VulkanFixture(const VulkanFixture&)            = delete; ///< Noncopyable
@@ -134,7 +134,7 @@ private:
     bool m_recreteSwapchain = false;
     DeletionQueue m_deletionQueue{*m_device, m_allocator};
 #ifndef NDEBUG
-    PipelineHotLoader m_pipelineHotLoader{m_deletionQueue};
+    PipelineHotLoader m_pipelineHotLoader;
 #endif // !NDEBUG
 
     // Active room dependent
