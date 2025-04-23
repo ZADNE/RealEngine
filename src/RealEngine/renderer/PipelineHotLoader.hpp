@@ -78,20 +78,20 @@ private:
             , m_compute{createInfo}
             , m_sources{srcs[0], {}, {}, {}, {}} {}
 
-        void reloadSPIRV(vk::ShaderStageFlagBits stages) {
+        void reloadSPIRV(const std::string& binaryDir, vk::ShaderStageFlagBits stages) {
             switch (m_type) {
             case PipelineType::Graphics:
-                reloadSPIRV<PipelineGraphicsSources>(stages);
+                reloadSPIRV<PipelineGraphicsSources>(binaryDir, stages);
                 break;
             case PipelineType::Compute:
-                reloadSPIRV<PipelineComputeSources>(stages);
+                reloadSPIRV<PipelineComputeSources>(binaryDir, stages);
                 break;
             default: std::unreachable();
             }
         }
 
         template<typename T>
-        void reloadSPIRV(vk::ShaderStageFlagBits stages);
+        void reloadSPIRV(const std::string& binaryDir, vk::ShaderStageFlagBits stages);
 
         vk::Pipeline recreatePipelineFromSPIRV() const;
 
@@ -109,6 +109,7 @@ private:
 
     DeletionQueue& m_deletionQueue;
     std::map<vk::Pipeline, PipelineReloadInfo> m_pipeToReloadInfo;
-    std::string m_recompileShadersCommand{};
+    std::string m_recompileShadersCommand;
+    std::string m_binaryDir;
 };
 } // namespace re

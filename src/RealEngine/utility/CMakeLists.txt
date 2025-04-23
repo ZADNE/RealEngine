@@ -1,3 +1,5 @@
+add_subdirectory(details)
+
 real_target_sources(RealEngine
     PUBLIC
         BuildType.hpp               

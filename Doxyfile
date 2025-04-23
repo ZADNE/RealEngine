@@ -191,7 +191,6 @@ FULL_PATH_NAMES        = YES
 # This tag requires that the tag FULL_PATH_NAMES is set to YES.
 
 STRIP_FROM_PATH        = @CMAKE_CURRENT_SOURCE_DIR@/src
-STRIP_FROM_PATH       += @CMAKE_CURRENT_SOURCE_DIR@/../doc
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of the
 # path mentioned in the documentation of a class, which tells the reader which
@@ -967,7 +966,6 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/src/RealEngine
-INPUT                 += @CMAKE_CURRENT_SOURCE_DIR@/../doc
 INPUT                 += @CMAKE_CURRENT_SOURCE_DIR@/doc
 
 # This tag can be used to specify the character encoding of the source files

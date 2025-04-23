@@ -35,7 +35,7 @@ struct DisplayInfo {
 };
 
 struct MainProgramInitInfo {
-    VulkanInitInfo vulkan{}; ///< Default-constructed is used if not provided
+    VulkanInitInfo vulkan{};
     HotReloadInitInfo hotReload{};
 };
 

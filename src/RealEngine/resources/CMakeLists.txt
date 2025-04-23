@@ -6,6 +6,5 @@
         PNGLoader.hpp               PNGLoader.cpp
         ResourceCache.hpp           ResourceCache.cpp
         ResourceID.hpp              
-        ResourceIndex.hpp           
         ResourceManager.hpp         ResourceManager.cpp
 )

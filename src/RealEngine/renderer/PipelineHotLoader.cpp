@@ -4,6 +4,7 @@
 #include <RealEngine/graphics/pipelines/Pipeline.hpp>
 #include <RealEngine/renderer/PipelineHotLoader.hpp>
 #include <RealEngine/resources/FileIO.hpp>
+#include <RealEngine/utility/details/CMakeConstants.hpp>
 
 namespace re {
 
@@ -12,9 +13,10 @@ PipelineHotLoader::PipelineHotLoader(
 )
     : m_deletionQueue{deletionQueue}
     , m_recompileShadersCommand{std::format(
-          "{} --build {} -t {}", hotReload.cmakePath, hotReload.targetBinaryDir,
-          hotReload.targetName
-      )} {
+          "{} --build {} -t {}{}", hotReload.cmakePath, hotReload.targetBinaryDir,
+          hotReload.targetName, details::k_shaderTargetSuffix
+      )}
+    , m_binaryDir{hotReload.targetBinaryDir} {
 }
 
 void PipelineHotLoader::registerForReloading(
@@ -39,7 +41,7 @@ vk::Pipeline PipelineHotLoader::hotReload(
         // Reload SPIR-V from filesystem
         auto nodeHandle                = m_pipeToReloadInfo.extract(it);
         PipelineReloadInfo& reloadInfo = nodeHandle.mapped();
-        reloadInfo.reloadSPIRV(stages);
+        reloadInfo.reloadSPIRV(m_binaryDir, stages);
 
         // Recompile SPIR-V
         vk::Pipeline newPipeline = reloadInfo.recreatePipelineFromSPIRV();
@@ -58,13 +60,21 @@ void PipelineHotLoader::unregisterForReloading(vk::Pipeline current) {
 }
 
 template<typename T>
-void PipelineHotLoader::PipelineReloadInfo::reloadSPIRV(vk::ShaderStageFlagBits stages
+void PipelineHotLoader::PipelineReloadInfo::reloadSPIRV(
+    const std::string& binaryDir, vk::ShaderStageFlagBits stages
 ) {
     std::vector<unsigned char> temp;
     for (size_t i = 0; i < T::k_numStages; ++i) {
         vk::ShaderStageFlagBits thisStage = T::stageFlags(i);
-        if ((thisStage & stages) && m_sources[i].sourcePath) {
-            readBinaryFile(static_cast<const char*>(m_sources[i].sourcePath), temp);
+        if ((thisStage & stages) && m_sources[i].relPath) {
+            readBinaryFile(
+                std::format(
+                    "{}/{}.{}", binaryDir,
+                    static_cast<const char*>(m_sources[i].relPath),
+                    details::k_shaderSPIRVBinFileExt
+                ),
+                temp
+            );
             assert((temp.size() % sizeof(uint32_t)) == 0);
             m_sources[i].vk13.assign(
                 reinterpret_cast<const uint32_t*>(temp.data()), temp.size() / 4

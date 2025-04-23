@@ -22,7 +22,7 @@ struct ShaderSourceRef {
     constexpr ShaderSourceRef(const ShaderSource& source);
 
     std::basic_string_view<uint32_t> vk13{};
-    [[no_unique_address]] DebugString<> sourcePath{};
+    [[no_unique_address]] DebugString<> relPath{};
 };
 
 /**
@@ -31,13 +31,13 @@ struct ShaderSourceRef {
 struct ShaderSource {
     constexpr ShaderSource() {}
     constexpr ShaderSource(
-        std::initializer_list<uint32_t> vk13_, [[maybe_unused]] const char* sourcePath_
+        std::initializer_list<uint32_t> vk13_, [[maybe_unused]] const char* relPath_
     )
         : vk13{vk13_}
-        , sourcePath{sourcePath_} {}
+        , relPath{relPath_} {}
     constexpr ShaderSource(const ShaderSourceRef& sourceRef)
         : vk13{sourceRef.vk13}
-        , sourcePath{sourceRef.sourcePath} {}
+        , relPath{sourceRef.relPath} {}
 
     /**
      * @brief SPIR-V compiled for Vulkan 1.3 environment
@@ -47,12 +47,12 @@ struct ShaderSource {
     /**
      * @brief Full path to the GLSL source file of the shader (debug only)
      */
-    [[no_unique_address]] DebugString<> sourcePath{};
+    [[no_unique_address]] DebugString<> relPath{};
 };
 
 constexpr ShaderSourceRef::ShaderSourceRef(const ShaderSource& source)
     : vk13{source.vk13}
-    , sourcePath{source.sourcePath} {
+    , relPath{source.relPath} {
 }
 
 /**

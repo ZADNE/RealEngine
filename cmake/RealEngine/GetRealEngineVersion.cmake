@@ -1,7 +1,10 @@
 # author     Dubsky Tomas
 
 function(get_realengine_version)
-    file(READ "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src/RealEngine/utility/Version.hpp" version_file)
+    file(READ
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../src/RealEngine/utility/Version.hpp"
+        version_file
+    )
     string(REGEX MATCH "constexpr int k_versionMajor = ([0-9]+)" _ ${version_file})
     set(version_major "${CMAKE_MATCH_1}")
     string(REGEX MATCH "constexpr int k_versionMinor = ([0-9]+)" _ ${version_file})

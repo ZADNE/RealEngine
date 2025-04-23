@@ -36,6 +36,8 @@ public:
      *
      * @param settings Settings to initialize the window with.
      * @param title Title for the window
+     * @param vulkan
+     * @param hotReload
      */
     Window(
         const WindowSettings& settings, const std::string& title,

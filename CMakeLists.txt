@@ -5,7 +5,8 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(FetchContent)
 
-include("cmake/GetRealEngineVersion.cmake")
+include("cmake/RealProject/RealProject.cmake")
+include("cmake/RealEngine/GetRealEngineVersion.cmake")
 
 function(FetchContent_MakeAvailableWithoutLinting)
     set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
@@ -134,7 +135,7 @@ endfunction()
             argparse
             bit7z
     )
-    include("cmake/ResourcePackaging.cmake")
+    include("cmake/RealEngine/ResourcePackaging.cmake")
 
     # RTICreator (Windows only)
     if (WIN32)
@@ -230,7 +231,7 @@ endfunction()
         COMPONENT RealEngine_Development
     )
     configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RealEngineConfig.cmake.in"
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RealEngine/RealEngineConfig.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake"
         @ONLY
     )
@@ -238,7 +239,7 @@ endfunction()
         FILES
             "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake"
-            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ResourcePackaging.cmake"
+            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RealEngine/ResourcePackaging.cmake"
         DESTINATION
             "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
         COMPONENT RealEngine_Development
