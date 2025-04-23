@@ -29,7 +29,7 @@ See `cmake/RealProject/RealProject.cmake` for full list and documentation of pub
 
 ### Incorporation of GLSL shaders
 
-Adding files via `real_target_sources` ensures that for a shader stage, C++ wrappers holding SPIR-V of the shader is generated. For example, given shader file `drawTiles.frag`, C++ header named `drawTiles_frag.hpp` is generated. This header holds the SPIR-V as a C++ constant named `drawTiles_frag`. The wrapper can be included as if it was placed in the same folder where the original shader was. The system also ensures that the SPIR-V is regenerated whenever the shader is changed.
+Adding files via `real_target_sources` ensures that for a shader stage, C++ wrappers holding SPIR-V of the shader is generated. For example, given shader file `drawTiles.frag`, C++ header named `drawTiles.frag.gen.hpp` is generated. This header holds the SPIR-V as a C++ constant named `drawTiles_frag`. The wrapper can be included as if it was placed in the same folder where the original shader was. The system also ensures that the SPIR-V is regenerated whenever the shader is changed.
 
 But there are cases when more than the SPIR-V is needed from shaders:
 

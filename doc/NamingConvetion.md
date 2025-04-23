@@ -10,6 +10,7 @@ Real naming convention follows [C++ Canonical Project Structure](https://www.ope
 * `.cpp` for C++ source files (e.g. `TileDrawer.cpp`)
 * `.glsl` for GLSL headers (e.g. `WorldDrawingPC.glsl`)
 * `.vert`, `.tesc`, `.tese`, `.geom`, `.frag`, `.comp` for GLSL vertex, tessellation control, tessellation evaluation, geometry, fragment and compute shaders respectively (e.g. `drawFullscreen.vert`, `drawTiles.frag`)
+* All generated files have `.gen` infixed before the final extension (e.g. `WorldDrawingPC.glsl.gen.hpp` for C++ header generated from above GLSL header).
 
 Related C++ and GLSL source codes may be mixed inside a folder or the shaders may be placed inside a directly nested folder.
 

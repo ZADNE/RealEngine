@@ -6,7 +6,7 @@
 #include <glm/common.hpp>
 
 #include <RealEngine/graphics/batches/SpriteBatch.hpp>
-#include <RealEngine/graphics/batches/shaders/AllShaders.hpp>
+#include <RealEngine/graphics/batches/shaders/AllShaders.gen.hpp>
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 
 using enum vk::DescriptorBindingFlagBits;

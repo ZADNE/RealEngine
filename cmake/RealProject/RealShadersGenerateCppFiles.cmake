@@ -6,13 +6,13 @@ function(_generate_cpp_wrapper_for_stage target shader_rel)
     # Compose paths
     get_filename_component(shader ${shader_rel} NAME)
     get_filename_component(shader_rel_dir ${shader_rel} DIRECTORY)
-    string(REPLACE "." "_" shader_ ${shader})
-    set(hpp_rel "${shader_rel_dir}/${shader_}.hpp")
-    set(cpp_rel "${shader_rel_dir}/${shader_}.cpp")
+    set(hpp_rel "${shader_rel_dir}/${shader}.gen.hpp")
+    set(cpp_rel "${shader_rel_dir}/${shader}.gen.cpp")
     set(hpp_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${hpp_rel}")
     set(cpp_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${cpp_rel}")
     set(debug_shader_rel
         "$<$<CONFIG:Debug>:${base_dir}/${shader_rel}>")
+    string(REPLACE "." "_" shader_ ${shader})
 
     # Generate files
     _generate_configured_file("${template_dir}/ShaderWrapper.hpp.in" ${hpp_abs})
@@ -26,8 +26,7 @@ function(_generate_cpp_wrapper_to_expose_header target header_rel)
     # Compose paths
     get_filename_component(header ${header_rel} NAME)
     get_filename_component(header_rel_dir ${header_rel} DIRECTORY)
-    string(REPLACE "." "_" header_ ${header})
-    set(hpp_rel "${header_rel_dir}/${header_}.hpp")
+    set(hpp_rel "${header_rel_dir}/${header}.gen.hpp")
     set(hpp_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${hpp_rel}")
 
     # Generate the file
@@ -87,7 +86,7 @@ function(_generate_cpp_wrappers_for_shaders target)
 
         # Generate the file
         list(JOIN shader_declarations "\n" shader_declarations)
-        set(hpp_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${dir}/AllShaders.hpp")
+        set(hpp_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${dir}/AllShaders.gen.hpp")
         configure_file("${template_dir}/AllShaders.hpp.in" ${hpp_abs} @ONLY)
         target_sources(${target} PRIVATE ${hpp_abs})
     endforeach()
