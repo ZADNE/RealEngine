@@ -21,6 +21,11 @@ public:
 
     PipelineHotLoader(DeletionQueue& deletionQueue, const HotReloadInitInfo& hotReload);
 
+    PipelineHotLoader(const PipelineHotLoader&)            = default;
+    PipelineHotLoader& operator=(const PipelineHotLoader&) = default;
+
+    ~PipelineHotLoader(); ///< Defined in source file to enable PImpl idiom
+
     /**
      * @brief   Registers the pipeline so that it can be recompiled later
      */
@@ -107,9 +112,7 @@ private:
         PipelineSources m_sources{};
     };
 
-    DeletionQueue& m_deletionQueue;
-    std::map<vk::Pipeline, PipelineReloadInfo> m_pipeToReloadInfo;
-    std::string m_recompileShadersCommand;
-    std::string m_binaryDir;
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 };
 } // namespace re

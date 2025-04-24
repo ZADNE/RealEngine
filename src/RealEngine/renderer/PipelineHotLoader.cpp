@@ -1,6 +1,8 @@
 /**
  *  @author    Dubsky Tomas
  */
+#include <filewatch/FileWatch.hpp>
+
 #include <RealEngine/graphics/pipelines/Pipeline.hpp>
 #include <RealEngine/renderer/PipelineHotLoader.hpp>
 #include <RealEngine/resources/FileIO.hpp>
@@ -8,55 +10,114 @@
 
 namespace re {
 
+const char* nulFile() {
+    if constexpr (k_buildOS == BuildOS::Windows) {
+        return "nul";
+    } else if constexpr (k_buildOS == BuildOS::Linux) {
+        return "/dev/null";
+    } else {
+        std::unreachable();
+    }
+}
+
+using namespace std::chrono_literals;
+
+struct PipelineHotLoader::Impl {
+    Impl(DeletionQueue& deletionQueue, const HotReloadInitInfo& hotReload)
+        : deletionQueue{deletionQueue}
+        , recompileShadersCommand{std::format(
+              "\"\"{}\" --build \"{}\" -t \"{}{}\" > {}\"", hotReload.cmakePath,
+              hotReload.binaryDir, hotReload.targetName,
+              details::k_shaderTargetSuffix, nulFile()
+          )}
+        , binaryDir{hotReload.binaryDir}
+        , sourceDirWatch(
+              hotReload.targetSourceDir, std::regex{".*\\.glsl"},
+              [this](const std::string& path, const filewatch::Event changeType) {
+                  lastSourceChange = std::chrono::steady_clock::now();
+              }
+          )
+        , binaryDirWatch{
+              hotReload.binaryDir, std::regex{".*\\.spv\\.bin"},
+              [](const std::string& path, const filewatch::Event changeType) {
+                  std::cout << "BINARY: " << path << "\n";
+              }
+          } {}
+
+    DeletionQueue& deletionQueue;
+    std::map<vk::Pipeline, PipelineReloadInfo> pipeToReloadInfo;
+    std::string recompileShadersCommand;
+    std::string binaryDir;
+    filewatch::FileWatch<std::string> sourceDirWatch;
+    filewatch::FileWatch<std::string> binaryDirWatch;
+    std::jthread cmakeThread{[this](std::stop_token stopToken) {
+        TimePoint lastCMakeExecution = std::chrono::steady_clock::now();
+        TimePoint lastIteration      = lastCMakeExecution;
+        while (!stopToken.stop_requested()) {
+            if (lastSourceChange.load() > lastCMakeExecution) {
+                lastCMakeExecution = std::chrono::steady_clock::now();
+                std::system(recompileShadersCommand.c_str());
+            }
+
+            if (std::chrono::steady_clock::now() > lastIteration + 1s) {
+                std::this_thread::sleep_until(lastIteration + 1s);
+                lastIteration = std::chrono::steady_clock::now();
+            }
+        }
+    }};
+
+    using TimePoint = std::chrono::steady_clock::time_point;
+    using Duration  = std::chrono::steady_clock::duration;
+    std::atomic<TimePoint> lastSourceChange;
+    std::atomic<TimePoint> lastCMakeRun;
+};
+
 PipelineHotLoader::PipelineHotLoader(
     DeletionQueue& deletionQueue, const HotReloadInitInfo& hotReload
 )
-    : m_deletionQueue{deletionQueue}
-    , m_recompileShadersCommand{std::format(
-          "{} --build {} -t {}{}", hotReload.cmakePath, hotReload.targetBinaryDir,
-          hotReload.targetName, details::k_shaderTargetSuffix
-      )}
-    , m_binaryDir{hotReload.targetBinaryDir} {
+    : m_impl{std::make_unique<Impl>(deletionQueue, hotReload)} {
 }
+
+PipelineHotLoader::~PipelineHotLoader() = default;
 
 void PipelineHotLoader::registerForReloading(
     vk::Pipeline initial, const PipelineGraphicsCreateInfo& createInfo,
     const PipelineGraphicsSources& srcs
 ) {
-    m_pipeToReloadInfo.try_emplace(initial, createInfo, srcs);
+    m_impl->pipeToReloadInfo.try_emplace(initial, createInfo, srcs);
 }
 
 void PipelineHotLoader::registerForReloading(
     vk::Pipeline initial, const PipelineComputeCreateInfo& createInfo,
     const PipelineComputeSources& srcs
 ) {
-    m_pipeToReloadInfo.try_emplace(initial, createInfo, srcs);
+    m_impl->pipeToReloadInfo.try_emplace(initial, createInfo, srcs);
 }
 
 vk::Pipeline PipelineHotLoader::hotReload(
     vk::Pipeline current, vk::ShaderStageFlagBits stages
 ) {
-    if (auto it = m_pipeToReloadInfo.find(current);
-        it != m_pipeToReloadInfo.end()) {
+    if (auto it = m_impl->pipeToReloadInfo.find(current);
+        it != m_impl->pipeToReloadInfo.end()) {
         // Reload SPIR-V from filesystem
-        auto nodeHandle                = m_pipeToReloadInfo.extract(it);
+        auto nodeHandle                = m_impl->pipeToReloadInfo.extract(it);
         PipelineReloadInfo& reloadInfo = nodeHandle.mapped();
-        reloadInfo.reloadSPIRV(m_binaryDir, stages);
+        reloadInfo.reloadSPIRV(m_impl->binaryDir, stages);
 
         // Recompile SPIR-V
         vk::Pipeline newPipeline = reloadInfo.recreatePipelineFromSPIRV();
 
         // Delete old pipeline and return the new one
-        m_deletionQueue.enqueueDeletion(nodeHandle.key());
+        m_impl->deletionQueue.enqueueDeletion(nodeHandle.key());
         nodeHandle.key() = newPipeline;
-        m_pipeToReloadInfo.insert(std::move(nodeHandle));
+        m_impl->pipeToReloadInfo.insert(std::move(nodeHandle));
         return newPipeline;
     }
     return current;
 }
 
 void PipelineHotLoader::unregisterForReloading(vk::Pipeline current) {
-    m_pipeToReloadInfo.erase(current);
+    m_impl->pipeToReloadInfo.erase(current);
 }
 
 template<typename T>
@@ -79,7 +140,6 @@ void PipelineHotLoader::PipelineReloadInfo::reloadSPIRV(
             m_sources[i].vk13.assign(
                 reinterpret_cast<const uint32_t*>(temp.data()), temp.size() / 4
             );
-            int stop = 5;
         }
     }
 }

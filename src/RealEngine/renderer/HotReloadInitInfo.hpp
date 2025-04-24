@@ -13,7 +13,7 @@ struct HotReloadInitInfo {
     const char* cmakePath{};       ///< Path to CMake executable
     const char* targetName{};      ///< Name of CMake target
     const char* targetSourceDir{}; ///< Path to root of target's source directory
-    const char* targetBinaryDir{}; ///< Path to root of target's binary directory
+    const char* binaryDir{};       ///< Path to project's binary directory
 };
 
 } // namespace re

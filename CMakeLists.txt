@@ -93,28 +93,27 @@ endfunction()
         PRIVATE
             spirv-cross-core
             spirv-cross-reflect
+            filewatch
     )
     target_include_directories(RealEngine
         PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-            $<INSTALL_INTERFACE:.>
-        PRIVATE
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external>
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
+            "$<INSTALL_INTERFACE:.>"
     )
-    real_target_init_file_sets(RealEngine BASE_DIR src)
+    real_target_init_file_sets(RealEngine BASE_DIR "src")
     get_realengine_version()
-    add_subdirectory(src)
+    add_subdirectory("src")
 
     # Doxygen documentation
     find_package(Doxygen)
     if (DOXYGEN_FOUND)
-        set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
-        set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-        configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+        set(DOXYGEN_IN "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile")
+        set(DOXYGEN_OUT "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
+        configure_file("${DOXYGEN_IN}" "${DOXYGEN_OUT}" @ONLY)
 
         add_custom_target(RealEngine_Documentation
-            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMAND "${DOXYGEN_EXECUTABLE}" "${DOXYGEN_OUT}"
+            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
             VERBATIM
         )
     endif(DOXYGEN_FOUND)
@@ -123,8 +122,8 @@ endfunction()
     add_real_executable(ResourcePackager)
     target_include_directories(ResourcePackager
         PRIVATE
-            src
-            tools
+            "src"
+            "tools"
     )
     set_target_properties(ResourcePackager PROPERTIES
         CXX_STANDARD 23
@@ -140,7 +139,7 @@ endfunction()
     # RTICreator (Windows only)
     if (WIN32)
         add_real_executable(RTICreator)
-        target_include_directories(RTICreator PRIVATE tools)
+        target_include_directories(RTICreator PRIVATE "tools")
         set_target_properties(RTICreator PROPERTIES
             CXX_STANDARD 23
             INTERPROCEDURAL_OPTIMIZATION TRUE
@@ -150,31 +149,31 @@ endfunction()
     else()
         set(RTICreator "")
     endif()
-    add_subdirectory(tools)
+    add_subdirectory("tools")
 
 # Installation
     # The main install command
     install(
         TARGETS
             RealEngine vma glm-header-only ${bit7z_aliased_target}
-            nlohmann_json ImGui lodepng argparse
+            nlohmann_json ImGui lodepng argparse filewatch
             ResourcePackager ${RTICreator}
         EXPORT                  RealEngineTargets
         RUNTIME # Tool executables are part of RealEngine development
-            DESTINATION         ${CMAKE_INSTALL_BINDIR}
+            DESTINATION         "${CMAKE_INSTALL_BINDIR}"
             COMPONENT           RealEngine_Development
         LIBRARY
-            DESTINATION         ${CMAKE_INSTALL_LIBDIR}
+            DESTINATION         "${CMAKE_INSTALL_LIBDIR}"
             COMPONENT           RealEngine_Development
             NAMELINK_COMPONENT  RealEngine_Development
         ARCHIVE
-            DESTINATION         ${CMAKE_INSTALL_LIBDIR}
+            DESTINATION         "${CMAKE_INSTALL_LIBDIR}"
             COMPONENT           RealEngine_Development
         FILE_SET realproject_public_headers
-            DESTINATION         ${CMAKE_INSTALL_INCLUDEDIR}
+            DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
         FILE_SET HEADERS
-            DESTINATION         ${CMAKE_INSTALL_INCLUDEDIR}
+            DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
     )
 
@@ -182,7 +181,7 @@ endfunction()
     # because it does not have install rules
     install(
         DIRECTORY   "${FETCHCONTENT_BASE_DIR}/bit7z-src/include/bit7z"
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         COMPONENT   RealEngine_Development
     )
     install(
@@ -198,7 +197,7 @@ endfunction()
     install(
         IMPORTED_RUNTIME_ARTIFACTS ${runtime_bundled_artifacts} # SDLs are not bundled
         RUNTIME
-            DESTINATION         ${CMAKE_INSTALL_BINDIR}
+            DESTINATION         "${CMAKE_INSTALL_BINDIR}"
             COMPONENT           RealEngine_Development
     )
 
@@ -211,10 +210,9 @@ endfunction()
     # Install documentation
     if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/doc/")
         install(
-            DIRECTORY
-                "${CMAKE_CURRENT_BINARY_DIR}/doc/"
-            DESTINATION ${CMAKE_INSTALL_DOCDIR}
-            COMPONENT RealEngine_Development
+            DIRECTORY   "${CMAKE_CURRENT_BINARY_DIR}/doc/"
+            DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+            COMPONENT   RealEngine_Development
         )
     endif()
 
@@ -226,7 +224,7 @@ endfunction()
     )
     install(
         EXPORT RealEngineTargets
-        FILE RealEngineTargets.cmake
+        FILE "RealEngineTargets.cmake"
         DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
         COMPONENT RealEngine_Development
     )

@@ -9,7 +9,7 @@ function(_generate_cpp_setup_file target)
     set(template_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/templates")
     set(cmake_command ${CMAKE_COMMAND})
     set(target_source_dir ${CMAKE_CURRENT_SOURCE_DIR})
-    set(target_binary_dir ${CMAKE_CURRENT_BINARY_DIR})
+    set(binary_dir ${CMAKE_BINARY_DIR})
 
     # Generate the file
     _generate_configured_file(

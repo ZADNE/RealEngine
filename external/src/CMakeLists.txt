@@ -3,6 +3,11 @@ set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
 set(CMAKE_CXX_CLANG_TIDY "")
 
+# Filewatch
+add_real_library(filewatch INTERFACE)
+real_target_init_file_sets(filewatch BASE_DIR ".")
+add_subdirectory(filewatch)
+
 # argparse
 add_real_library(argparse INTERFACE)
 real_target_init_file_sets(argparse BASE_DIR ".")
