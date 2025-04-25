@@ -1,17 +1,17 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <RealEngine/graphics/pipelines/PipelineCreateInfos.hpp>
 #include <RealEngine/graphics/pipelines/PipelineSources.hpp>
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
+#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 
 namespace re {
 
 /**
  * @brief Controls how vertices are transformed and shaded or describes compute work
  */
-class Pipeline: public VulkanObjectBase {
+class Pipeline: public ObjectUsingVulkan {
     friend class PipelineHotLoader;
 public:
     /**

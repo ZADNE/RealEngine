@@ -1,18 +1,18 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <limits>
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
+#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 
 namespace re {
 
 /**
  * @brief Allows synchronization CPU<->GPU and also GPU<->GPU
  */
-class Semaphore: public VulkanObjectBase {
+class Semaphore: public ObjectUsingVulkan {
 public:
     /**
      * @brief Creates binary unsignaled semaphore

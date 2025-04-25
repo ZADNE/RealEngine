@@ -13,7 +13,7 @@
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/renderer/Allocator.hpp>
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
+#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 
 struct SDL_Window;

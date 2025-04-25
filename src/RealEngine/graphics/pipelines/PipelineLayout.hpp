@@ -1,9 +1,9 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <RealEngine/graphics/pipelines/PipelineSources.hpp>
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
+#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 
 namespace re {
 
@@ -23,7 +23,7 @@ struct PipelineLayoutDescription {
  * buffers, etc)
  * @details DescriptorSet 'implements' a part of this interface.
  */
-class PipelineLayout: public VulkanObjectBase {
+class PipelineLayout: public ObjectUsingVulkan {
 public:
     /**
      * @brief Constructs a null PipelineLayout that cannot be used

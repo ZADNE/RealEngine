@@ -102,7 +102,7 @@ VulkanFixture::VulkanFixture(
     assignImplementationReferences();
     FrameDoubleBufferingState::setTotalIndex(m_frame++);
 
-    VulkanObjectBase::setDebugUtilsObjectName(
+    ObjectUsingVulkan::setDebugUtilsObjectName(
         *m_graphicsCompQueue, "re::VulkanFixture::graphicsCompQueue"
     );
 
@@ -525,8 +525,8 @@ std::vector<vk::raii::ImageView> VulkanFixture::createSwapchainImageViews() {
 
 std::vector<Texture> VulkanFixture::createAdditionalBuffers() {
     // Ugly hack to be able to use re::Texture already
-    VulkanObjectBase::s_allocator = &m_allocator;
-    VulkanObjectBase::s_device    = &(*m_device);
+    ObjectUsingVulkan::s_allocator = &m_allocator;
+    ObjectUsingVulkan::s_device    = &(*m_device);
     std::vector<Texture> buffers;
     buffers.reserve(m_additionalBufferDescrs.size());
     for (const auto& descr : m_additionalBufferDescrs) {
@@ -637,18 +637,18 @@ void VulkanFixture::recreateSwapchain() {
 }
 
 void VulkanFixture::assignImplementationReferences() {
-    VulkanObjectBase::s_physicalDevice        = &(*m_physicalDevice);
-    VulkanObjectBase::s_device                = &(*m_device);
-    VulkanObjectBase::s_allocator             = &m_allocator;
-    VulkanObjectBase::s_graphicsCompQueue     = &(*m_graphicsCompQueue);
-    VulkanObjectBase::s_commandPool           = &(*m_commandPool);
-    VulkanObjectBase::s_descriptorPool        = &(*m_descriptorPool);
-    VulkanObjectBase::s_pipelineCache         = &(*m_pipelineCache);
-    VulkanObjectBase::s_oneTimeSubmitCmdBuf   = &m_oneTimeSubmitCmdBuf;
-    VulkanObjectBase::s_dispatchLoaderDynamic = &(m_dispatchLoaderDynamic);
-    VulkanObjectBase::s_deletionQueue         = &m_deletionQueue;
+    ObjectUsingVulkan::s_physicalDevice        = &(*m_physicalDevice);
+    ObjectUsingVulkan::s_device                = &(*m_device);
+    ObjectUsingVulkan::s_allocator             = &m_allocator;
+    ObjectUsingVulkan::s_graphicsCompQueue     = &(*m_graphicsCompQueue);
+    ObjectUsingVulkan::s_commandPool           = &(*m_commandPool);
+    ObjectUsingVulkan::s_descriptorPool        = &(*m_descriptorPool);
+    ObjectUsingVulkan::s_pipelineCache         = &(*m_pipelineCache);
+    ObjectUsingVulkan::s_oneTimeSubmitCmdBuf   = &m_oneTimeSubmitCmdBuf;
+    ObjectUsingVulkan::s_dispatchLoaderDynamic = &(m_dispatchLoaderDynamic);
+    ObjectUsingVulkan::s_deletionQueue         = &m_deletionQueue;
 #ifndef NDEBUG
-    VulkanObjectBase::s_pipelineHotLoader = &m_pipelineHotLoader;
+    ObjectUsingVulkan::s_pipelineHotLoader = &m_pipelineHotLoader;
 #endif // !NDEBUG
 }
 

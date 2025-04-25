@@ -1,17 +1,17 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <glm/vec3.hpp>
 
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
+#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 
 namespace re {
 
 /**
  * @brief Represents a view to an image
  */
-class ImageView: public VulkanObjectBase {
+class ImageView: public ObjectUsingVulkan {
 public:
     /**
      * @brief Constructs a null ImageView that does not view any image

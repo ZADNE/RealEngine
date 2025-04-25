@@ -1,18 +1,18 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <limits>
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
+#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 
 namespace re {
 
 /**
  * @brief Allows synchronization between GPU and CPU
  */
-class Fence: public VulkanObjectBase {
+class Fence: public ObjectUsingVulkan {
 public:
     /**
      * @brief Constructs a null fence that cannot be used for synchronization

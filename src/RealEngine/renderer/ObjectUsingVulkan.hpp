@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -16,20 +16,19 @@ namespace re {
 class CommandBuffer;
 
 /**
- * @brief   Provides children Vulkan objects access to global Vulkan objects
- *          (such as device)
+ * @brief   Provides children objects access to global Vulkan objects (such as device)
  * @details Children Vulkan objects (e.g. buffers, textures, pipelines) derive
  *          from this.
  */
-class VulkanObjectBase {
+class ObjectUsingVulkan {
     friend class VulkanFixture;
 
 protected:
     /**
-     * @brief This constructor is deliberately protected as the VulkanObjectBase
-     * does not do anything on its own
+     * @brief This constructor is deliberately protected as an instance of this
+     *        class does not do anything on its own
      */
-    VulkanObjectBase() {}
+    ObjectUsingVulkan() = default;
 
     static const vk::PhysicalDevice& physicalDevice() {
         return *s_physicalDevice;
