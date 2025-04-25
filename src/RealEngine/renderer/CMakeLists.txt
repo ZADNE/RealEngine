@@ -5,7 +5,7 @@ real_target_sources(RealEngine
         HotReloadInitInfo.hpp       
         ObjectUsingVulkan.hpp       
         PipelineHotLoader.hpp       PipelineHotLoader.cpp
-        VulkanFixture.hpp           VulkanFixture.cpp
+        VulkanRenderer.hpp          VulkanRenderer.cpp
     PRIVATE
         DebugMessageHandler.hpp     DebugMessageHandler.cpp
         PhysDeviceSuitability.hpp   PhysDeviceSuitability.cpp

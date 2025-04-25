@@ -9,7 +9,7 @@
 #include <glm/vec2.hpp>
 
 #include <RealEngine/renderer/HotReloadInitInfo.hpp>
-#include <RealEngine/renderer/VulkanFixture.hpp>
+#include <RealEngine/renderer/VulkanRenderer.hpp>
 #include <RealEngine/utility/UniqueCPtr.hpp>
 #include <RealEngine/window/WindowSettings.hpp>
 #include <RealEngine/window/WindowSubsystems.hpp>
@@ -183,7 +183,7 @@ private:
     SDL_Window* sdlWindow() { return m_SDLwindow.get(); }
 
     union {
-        VulkanFixture m_vk13;
+        VulkanRenderer m_vk13;
     };
     RendererID m_usedRenderer{}; ///< May be different from the preferred one
     std::string m_windowTitle;

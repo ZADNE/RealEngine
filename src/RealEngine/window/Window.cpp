@@ -44,7 +44,7 @@ Window::Window(
 
 Window::~Window() {
     switch (m_usedRenderer) {
-    case RendererID::Vulkan13: m_vk13.~VulkanFixture(); break;
+    case RendererID::Vulkan13: m_vk13.~VulkanRenderer(); break;
     case RendererID::Any:      break;
     }
 }
@@ -186,9 +186,9 @@ void Window::initForVulkan13(
         return;
     }
 
-    // Set up Vulkan 1.3 fixture
+    // Set up Vulkan 1.3 renderer
     try {
-        new (&m_vk13) VulkanFixture{
+        new (&m_vk13) VulkanRenderer{
             window.get(), (bool)m_flags.vSync, m_preferredDevice, vulkan, hotReload
         };
     } catch (std::exception& e) {

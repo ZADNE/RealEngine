@@ -75,6 +75,7 @@ private:
             : m_type{PipelineType::Graphics}
             , m_graphics{createInfo}
             , m_sources{srcs[0], srcs[1], srcs[2], srcs[3], srcs[4]} {}
+
         PipelineReloadInfo(
             const PipelineComputeCreateInfo& createInfo,
             const PipelineComputeSources& srcs

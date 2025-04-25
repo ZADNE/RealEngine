@@ -13,7 +13,6 @@
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/renderer/Allocator.hpp>
-#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 
 struct SDL_Window;
@@ -50,28 +49,28 @@ struct VulkanInitInfo {
 };
 
 /**
- * @brief Enforces use of Vulkan graphics backend.
+ * @brief   Creates all objects necessary for Vulkan rendering.
  * @details This is used internally when the RealEngine starts.
  * @warning Never use this class directly!
  */
-class VulkanFixture {
+class VulkanRenderer {
 public:
     /**
      * @brief Sets up for Vulkan rendering
      * @throws If anything fails
      */
-    VulkanFixture(
+    VulkanRenderer(
         SDL_Window* sdlWindow, bool vSync, std::string_view preferredDevice,
         const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
     );
 
-    VulkanFixture(const VulkanFixture&)            = delete; ///< Noncopyable
-    VulkanFixture& operator=(const VulkanFixture&) = delete; ///< Noncopyable
+    VulkanRenderer(const VulkanRenderer&)            = delete; ///< Noncopyable
+    VulkanRenderer& operator=(const VulkanRenderer&) = delete; ///< Noncopyable
 
-    VulkanFixture(VulkanFixture&&)            = delete;      ///< Nonmovable
-    VulkanFixture& operator=(VulkanFixture&&) = delete;      ///< Nonmovable
+    VulkanRenderer(VulkanRenderer&&)            = delete;      ///< Nonmovable
+    VulkanRenderer& operator=(VulkanRenderer&&) = delete;      ///< Nonmovable
 
-    ~VulkanFixture();
+    ~VulkanRenderer();
 
     void setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex);
 

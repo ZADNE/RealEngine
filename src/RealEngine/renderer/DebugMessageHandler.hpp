@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -7,7 +7,7 @@
 namespace re {
 
 /**
- * @brief Is used by VulkanFixture to process Vulkan messages
+ * @brief Is used by VulkanRenderer to process Vulkan messages
  */
 VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallbackHandler(
     VkDebugUtilsMessageSeverityFlagBitsEXT sev,
