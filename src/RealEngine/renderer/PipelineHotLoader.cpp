@@ -22,15 +22,25 @@ const char* nulFile() {
     }
 }
 
-std::string cmakeListOfExtensionsToRegex(std::string str) {
-    std::replace(str.begin(), str.end(), ';', '|');
+constexpr void escapeDots(std::string& str){
     for (size_t i = 0; i < str.size(); ++i) { // Escape dots
         if (str[i] == '.') {
             str.insert(str.begin() + i, '\\');
             ++i;
         }
     }
-    return ".*(" + str + ")";
+}
+
+std::string cmakeListOfExtensionsToRegex(std::string str) {
+    std::replace(str.begin(), str.end(), ';', '|');
+    escapeDots(str);
+    return ".*(" + str + ")$";
+}
+
+constexpr std::string spirvBinFileRegex(){
+    auto str = std::string{"."} + details::k_shaderSPIRVBinFileExt;
+    escapeDots(str);
+    return ".*" + str + '$';
 }
 
 } // namespace
@@ -54,7 +64,7 @@ struct PipelineHotLoader::Impl {
               }
           )
         , binaryDirWatch{
-              hotReload.binaryDir, std::regex{".*\\.spv\\.bin"},
+              hotReload.binaryDir, std::regex{spirvBinFileRegex()},
               [](const std::string& path, const filewatch::Event changeType) {
                   std::cout << "BINARY: " << path << "\n";
               }
