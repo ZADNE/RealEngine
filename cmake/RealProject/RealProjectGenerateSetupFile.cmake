@@ -10,6 +10,7 @@ function(_generate_cpp_setup_file target)
     set(cmake_command ${CMAKE_COMMAND})
     set(target_source_dir ${CMAKE_CURRENT_SOURCE_DIR})
     set(binary_dir ${CMAKE_BINARY_DIR})
+    set(shader_file_extensions "${REALPROJECT_GLSL_HEADER_EXTENSIONS};${REALPROJECT_GLSL_STAGE_EXTENSIONS}")
 
     # Generate the file
     _generate_configured_file(

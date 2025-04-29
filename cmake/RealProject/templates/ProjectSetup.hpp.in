@@ -7,10 +7,11 @@
 namespace re::setup {
 
 constexpr HotReloadInitInfo k_hotReloadInitInfo{
-    .cmakePath       = "@cmake_command@",
-    .targetName      = "@target@",
-    .targetSourceDir = "@target_source_dir@",
-    .binaryDir       = "@binary_dir@"
+    .cmakePath              = "@cmake_command@",
+    .targetName             = "@target@",
+    .targetSourceDir        = "@target_source_dir@",
+    .binaryDir              = "@binary_dir@",
+    .shaderFileExtensions   = "@shader_file_extensions@"
 };
 
 } // namespace re::setup

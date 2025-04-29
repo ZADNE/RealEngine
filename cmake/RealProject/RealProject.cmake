@@ -1,6 +1,6 @@
 # author     Dubsky Tomas
 
-include("cmake/RealProject/RealProjectGenerateCppFiles.cmake")
+include("cmake/RealProject/RealProjectGenerateSetupFile.cmake")
 include("cmake/RealProject/RealShadersAddCompilationTarget.cmake")
 include("cmake/RealProject/RealShadersGenerateCppFiles.cmake")
 

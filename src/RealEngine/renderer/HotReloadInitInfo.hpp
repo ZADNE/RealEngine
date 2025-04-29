@@ -14,6 +14,7 @@ struct HotReloadInitInfo {
     const char* targetName{};      ///< Name of CMake target
     const char* targetSourceDir{}; ///< Path to root of target's source directory
     const char* binaryDir{};       ///< Path to project's binary directory
+    const char* shaderFileExtensions{}; ///< CMake-style semicolon-separated list
 };
 
 } // namespace re

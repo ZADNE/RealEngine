@@ -10,6 +10,8 @@
 
 namespace re {
 
+namespace {
+
 const char* nulFile() {
     if constexpr (k_buildOS == BuildOS::Windows) {
         return "nul";
@@ -19,6 +21,19 @@ const char* nulFile() {
         std::unreachable();
     }
 }
+
+std::string cmakeListOfExtensionsToRegex(std::string str) {
+    std::replace(str.begin(), str.end(), ';', '|');
+    for (size_t i = 0; i < str.size(); ++i) { // Escape dots
+        if (str[i] == '.') {
+            str.insert(str.begin() + i, '\\');
+            ++i;
+        }
+    }
+    return ".*(" + str + ")";
+}
+
+} // namespace
 
 using namespace std::chrono_literals;
 
@@ -32,7 +47,8 @@ struct PipelineHotLoader::Impl {
           )}
         , binaryDir{hotReload.binaryDir}
         , sourceDirWatch(
-              hotReload.targetSourceDir, std::regex{".*\\.glsl"},
+              hotReload.targetSourceDir,
+              std::regex{cmakeListOfExtensionsToRegex(hotReload.shaderFileExtensions)},
               [this](const std::string& path, const filewatch::Event changeType) {
                   lastSourceChange = std::chrono::steady_clock::now();
               }
