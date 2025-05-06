@@ -43,10 +43,17 @@ Pipeline::Pipeline(
 
 Pipeline::Pipeline(Pipeline&& other) noexcept
     : m_pipeline{std::exchange(other.m_pipeline, nullptr)} {
+    if constexpr (k_buildType == BuildType::Debug) {
+        pipelineHotLoader().moveRegisteredPipeline(other.m_pipeline, m_pipeline);
+    }
 }
 
 Pipeline& Pipeline::operator=(Pipeline&& other) noexcept {
     std::swap(m_pipeline, other.m_pipeline);
+    if constexpr (k_buildType == BuildType::Debug) {
+        pipelineHotLoader().moveRegisteredPipeline(other.m_pipeline, m_pipeline);
+        pipelineHotLoader().moveRegisteredPipeline(m_pipeline, other.m_pipeline);
+    }
     return *this;
 }
 

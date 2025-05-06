@@ -1,9 +1,12 @@
 /**
  *  @author    Dubsky Tomas
  */
+#include <set>
+
 #include <filewatch/FileWatch.hpp>
 
 #include <RealEngine/graphics/pipelines/Pipeline.hpp>
+#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 #include <RealEngine/renderer/PipelineHotLoader.hpp>
 #include <RealEngine/resources/FileIO.hpp>
 #include <RealEngine/utility/details/CMakeConstants.hpp>
@@ -22,7 +25,7 @@ const char* nulFile() {
     }
 }
 
-constexpr void escapeDots(std::string& str){
+constexpr void escapeDots(std::string& str) {
     for (size_t i = 0; i < str.size(); ++i) { // Escape dots
         if (str[i] == '.') {
             str.insert(str.begin() + i, '\\');
@@ -37,7 +40,7 @@ std::string cmakeListOfExtensionsToRegex(std::string str) {
     return ".*(" + str + ")$";
 }
 
-constexpr std::string spirvBinFileRegex(){
+constexpr std::string spirvBinFileRegex() {
     auto str = std::string{"."} + details::k_shaderSPIRVBinFileExt;
     escapeDots(str);
     return ".*" + str + '$';
@@ -65,13 +68,14 @@ struct PipelineHotLoader::Impl {
           )
         , binaryDirWatch{
               hotReload.binaryDir, std::regex{spirvBinFileRegex()},
-              [](const std::string& path, const filewatch::Event changeType) {
-                  std::cout << "BINARY: " << path << "\n";
+              [this](const std::string& path, const filewatch::Event changeType) {
+                  pathsToReload.write().emplace(path);
               }
           } {}
 
     DeletionQueue& deletionQueue;
-    std::map<vk::Pipeline, PipelineReloadInfo> pipeToReloadInfo;
+    std::vector<PipelineReloadInfo> pipelineRegister;
+    FrameDoubleBuffered<std::set<std::string>> pathsToReload;
     std::string recompileShadersCommand;
     std::string binaryDir;
     filewatch::FileWatch<std::string> sourceDirWatch;
@@ -96,6 +100,15 @@ struct PipelineHotLoader::Impl {
     using Duration  = std::chrono::steady_clock::duration;
     std::atomic<TimePoint> lastSourceChange;
     std::atomic<TimePoint> lastCMakeRun;
+
+    auto findInRegister(vk::Pipeline& pipeline) {
+        return std::find_if(
+            pipelineRegister.begin(), pipelineRegister.end(),
+            [&](const PipelineReloadInfo& info) -> bool {
+                return info.targetsPipeline(pipeline);
+            }
+        );
+    }
 };
 
 PipelineHotLoader::PipelineHotLoader(
@@ -107,73 +120,77 @@ PipelineHotLoader::PipelineHotLoader(
 PipelineHotLoader::~PipelineHotLoader() = default;
 
 void PipelineHotLoader::registerForReloading(
-    vk::Pipeline initial, const PipelineGraphicsCreateInfo& createInfo,
+    vk::Pipeline& initial, const PipelineGraphicsCreateInfo& createInfo,
     const PipelineGraphicsSources& srcs
 ) {
-    m_impl->pipeToReloadInfo.try_emplace(initial, createInfo, srcs);
+    m_impl->pipelineRegister.emplace_back(initial, createInfo, srcs);
 }
 
 void PipelineHotLoader::registerForReloading(
-    vk::Pipeline initial, const PipelineComputeCreateInfo& createInfo,
+    vk::Pipeline& initial, const PipelineComputeCreateInfo& createInfo,
     const PipelineComputeSources& srcs
 ) {
-    m_impl->pipeToReloadInfo.try_emplace(initial, createInfo, srcs);
+    m_impl->pipelineRegister.emplace_back(initial, createInfo, srcs);
 }
 
-vk::Pipeline PipelineHotLoader::hotReload(
-    vk::Pipeline current, vk::ShaderStageFlagBits stages
+void PipelineHotLoader::moveRegisteredPipeline(
+    vk::Pipeline& original, vk::Pipeline& moved
 ) {
-    if (auto it = m_impl->pipeToReloadInfo.find(current);
-        it != m_impl->pipeToReloadInfo.end()) {
-        // Reload SPIR-V from filesystem
-        auto nodeHandle                = m_impl->pipeToReloadInfo.extract(it);
-        PipelineReloadInfo& reloadInfo = nodeHandle.mapped();
-        reloadInfo.reloadSPIRV(m_impl->binaryDir, stages);
-
-        // Recompile SPIR-V
-        vk::Pipeline newPipeline = reloadInfo.recreatePipelineFromSPIRV();
-
-        // Delete old pipeline and return the new one
-        m_impl->deletionQueue.enqueueDeletion(nodeHandle.key());
-        nodeHandle.key() = newPipeline;
-        m_impl->pipeToReloadInfo.insert(std::move(nodeHandle));
-        return newPipeline;
+    auto it = m_impl->findInRegister(original);
+    if (it != m_impl->pipelineRegister.end()) {
+        it->updateTargetPipeline(moved);
     }
-    return current;
 }
 
-void PipelineHotLoader::unregisterForReloading(vk::Pipeline current) {
-    m_impl->pipeToReloadInfo.erase(current);
-}
+void PipelineHotLoader::reloadChangedPipelines() {
+    auto& paths = m_impl->pathsToReload.read();
+    std::set<PipelineReloadInfo*> pipelinesToRecompile;
+    std::vector<unsigned char> loadedFile;
+    for (const auto& path : paths) { // For each modified source
+        // Load the SPIRV
+        loadedFile = readBinaryFile(m_impl->binaryDir + '/' + path);
+        assert((loadedFile.size() % sizeof(uint32_t)) == 0);
 
-template<typename T>
-void PipelineHotLoader::PipelineReloadInfo::reloadSPIRV(
-    const std::string& binaryDir, vk::ShaderStageFlagBits stages
-) {
-    std::vector<unsigned char> temp;
-    for (size_t i = 0; i < T::k_numStages; ++i) {
-        vk::ShaderStageFlagBits thisStage = T::stageFlags(i);
-        if ((thisStage & stages) && m_sources[i].relPath) {
-            readBinaryFile(
-                std::format(
-                    "{}/{}.{}", binaryDir,
-                    static_cast<const char*>(m_sources[i].relPath),
-                    details::k_shaderSPIRVBinFileExt
-                ),
-                temp
-            );
-            assert((temp.size() % sizeof(uint32_t)) == 0);
-            m_sources[i].vk13.assign(
-                reinterpret_cast<const uint32_t*>(temp.data()), temp.size() / 4
-            );
+        // Search all pipelines that use the source file
+        for (PipelineReloadInfo& info : m_impl->pipelineRegister) {
+            // Search all stages of the pipeline
+            for (ShaderSource& source : info.sources()) {
+                const char* sourcePath = source.relPath;
+                if (sourcePath && sourcePath == path) { // TODO: file extension
+                    // Matching path - replace SPIRV
+                    source.vk13.assign(
+                        reinterpret_cast<const uint32_t*>(loadedFile.data()),
+                        loadedFile.size() / 4
+                    );
+                    pipelinesToRecompile.emplace(&info);
+                    // The same source cannot be used in multiple stages of pipeline
+                    break;
+                }
+            }
         }
     }
+    paths.clear();
+
+    // Recreate all affected pipelines
+    for (const auto& info : pipelinesToRecompile) {
+        info->recreatePipelineFromSources(m_impl->deletionQueue);
+    }
 }
 
-vk::Pipeline PipelineHotLoader::PipelineReloadInfo::recreatePipelineFromSPIRV() const {
+void PipelineHotLoader::unregisterForReloading(vk::Pipeline& current) {
+    auto it = m_impl->findInRegister(current);
+    if (it != m_impl->pipelineRegister.end()) {
+        m_impl->pipelineRegister.erase(it); // O(n) shift
+    }
+}
+
+void PipelineHotLoader::PipelineReloadInfo::recreatePipelineFromSources(
+    DeletionQueue& deletionQueue
+) const {
+    deletionQueue.enqueueDeletion(*m_pipeline);
     switch (m_type) {
     case PipelineType::Graphics:
-        return Pipeline::create(
+        *m_pipeline = Pipeline::create(
             m_graphics,
             PipelineGraphicsSources{
                 .vert = m_sources[0],
@@ -183,11 +200,13 @@ vk::Pipeline PipelineHotLoader::PipelineReloadInfo::recreatePipelineFromSPIRV() 
                 .frag = m_sources[4]
             }
         );
+        break;
     case PipelineType::Compute:
-        return Pipeline::create(
+        *m_pipeline = Pipeline::create(
             m_compute, PipelineComputeSources{.comp = m_sources[0]}
         );
-    default: std::unreachable();
+        break;
+    default: break;
     }
 }
 

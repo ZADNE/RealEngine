@@ -2,7 +2,6 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <map>
 #include <memory>
 
 #include <RealEngine/graphics/pipelines/PipelineCreateInfos.hpp>
@@ -28,33 +27,32 @@ public:
 
     /**
      * @brief   Registers the pipeline so that it can be recompiled later
+     * @note    Use moveRegisteredPipeline(...) if the pipeline should be
+     *          relocated in memory.
      */
     void registerForReloading(
-        vk::Pipeline initial, const PipelineGraphicsCreateInfo& createInfo,
+        vk::Pipeline& initial, const PipelineGraphicsCreateInfo& createInfo,
         const PipelineGraphicsSources& srcs
     );
     void registerForReloading(
-        vk::Pipeline initial, const PipelineComputeCreateInfo& createInfo,
+        vk::Pipeline& initial, const PipelineComputeCreateInfo& createInfo,
         const PipelineComputeSources& srcs
     );
 
-    /**
-     * @brief   Recompiles stages of the pipeline from GLSL source in filesystem
-     * @details The pipeline must have been register previously with
-     *          registerForReloading() or it must have been already reloaded
-     *          (that is returned by this function).
-     *          If realoded, the previous pipeline has been scheduled for deletion.
-     * @return  The recompiled pipeline or the current one if it has not been
-     *          registered before.
-     */
-    vk::Pipeline hotReload(vk::Pipeline current, vk::ShaderStageFlagBits stages);
+    void moveRegisteredPipeline(vk::Pipeline& original, vk::Pipeline& moved);
 
     /**
      * @brief   Unregisters the pipeline
      * @details This does not destroy the pipeline. Does nothing if the pipeline
      *          has not been registered.
      */
-    void unregisterForReloading(vk::Pipeline current);
+    void unregisterForReloading(vk::Pipeline& current);
+
+    /**
+     * @brief   Recreates all registered pipelines that had their sources changed
+     * @details Must be called every frame.
+     */
+    void reloadChangedPipelines();
 
 private:
     enum class PipelineType {
@@ -69,39 +67,37 @@ private:
     class PipelineReloadInfo {
     public:
         PipelineReloadInfo(
-            const PipelineGraphicsCreateInfo& createInfo,
+            vk::Pipeline& pipeline, const PipelineGraphicsCreateInfo& createInfo,
             const PipelineGraphicsSources& srcs
         )
-            : m_type{PipelineType::Graphics}
+            : m_pipeline{&pipeline}
+            , m_type{PipelineType::Graphics}
             , m_graphics{createInfo}
             , m_sources{srcs[0], srcs[1], srcs[2], srcs[3], srcs[4]} {}
 
         PipelineReloadInfo(
-            const PipelineComputeCreateInfo& createInfo,
+            vk::Pipeline& pipeline, const PipelineComputeCreateInfo& createInfo,
             const PipelineComputeSources& srcs
         )
-            : m_type{PipelineType::Compute}
+            : m_pipeline{&pipeline}
+            , m_type{PipelineType::Compute}
             , m_compute{createInfo}
             , m_sources{srcs[0], {}, {}, {}, {}} {}
 
-        void reloadSPIRV(const std::string& binaryDir, vk::ShaderStageFlagBits stages) {
-            switch (m_type) {
-            case PipelineType::Graphics:
-                reloadSPIRV<PipelineGraphicsSources>(binaryDir, stages);
-                break;
-            case PipelineType::Compute:
-                reloadSPIRV<PipelineComputeSources>(binaryDir, stages);
-                break;
-            default: std::unreachable();
-            }
+        void updateTargetPipeline(vk::Pipeline& pipeline) {
+            m_pipeline = &pipeline;
         }
 
-        template<typename T>
-        void reloadSPIRV(const std::string& binaryDir, vk::ShaderStageFlagBits stages);
+        bool targetsPipeline(vk::Pipeline& pipeline) const {
+            return m_pipeline == &pipeline;
+        }
 
-        vk::Pipeline recreatePipelineFromSPIRV() const;
+        void recreatePipelineFromSources(DeletionQueue& deletionQueue) const;
+
+        PipelineSources& sources() { return m_sources; }
 
     private:
+        vk::Pipeline* m_pipeline{};
         PipelineType m_type{};
         union {
             // It is dangerous to store the create infos as the pointers in them
