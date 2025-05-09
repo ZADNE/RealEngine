@@ -8,7 +8,7 @@
 #include <SDL_video.h>
 #include <glm/vec2.hpp>
 
-#include <RealEngine/renderer/HotReloadInitInfo.hpp>
+#include <RealEngine/program/HotReloadInitInfo.hpp>
 #include <RealEngine/renderer/VulkanRenderer.hpp>
 #include <RealEngine/utility/UniqueCPtr.hpp>
 #include <RealEngine/window/WindowSettings.hpp>

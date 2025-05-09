@@ -60,7 +60,7 @@ struct PipelineHotLoader::Impl {
           )}
         , binaryDir{hotReload.binaryDir}
         , sourceDirWatch(
-              hotReload.targetSourceDir,
+              hotReload.sourceDir,
               std::regex{cmakeListOfExtensionsToRegex(hotReload.shaderFileExtensions)},
               [this](const std::string& path, const filewatch::Event changeType) {
                   lastSourceChange = std::chrono::steady_clock::now();
@@ -143,33 +143,40 @@ void PipelineHotLoader::moveRegisteredPipeline(
 }
 
 void PipelineHotLoader::reloadChangedPipelines() {
-    auto& paths = m_impl->pathsToReload.read();
+    auto& binPaths = m_impl->pathsToReload.read();
     std::set<PipelineReloadInfo*> pipelinesToRecompile;
     std::vector<unsigned char> loadedFile;
-    for (const auto& path : paths) { // For each modified source
-        // Load the SPIRV
-        loadedFile = readBinaryFile(m_impl->binaryDir + '/' + path);
-        assert((loadedFile.size() % sizeof(uint32_t)) == 0);
+    for (const auto& binPath : binPaths) { // For each modified source
+        try {
+            // Load the SPIRV
+            loadedFile = readBinaryFile(m_impl->binaryDir + '/' + binPath);
+            assert((loadedFile.size() % sizeof(uint32_t)) == 0);
 
-        // Search all pipelines that use the source file
-        for (PipelineReloadInfo& info : m_impl->pipelineRegister) {
-            // Search all stages of the pipeline
-            for (ShaderSource& source : info.sources()) {
-                const char* sourcePath = source.relPath;
-                if (sourcePath && sourcePath == path) { // TODO: file extension
-                    // Matching path - replace SPIRV
-                    source.vk13.assign(
-                        reinterpret_cast<const uint32_t*>(loadedFile.data()),
-                        loadedFile.size() / 4
-                    );
-                    pipelinesToRecompile.emplace(&info);
-                    // The same source cannot be used in multiple stages of pipeline
-                    break;
+            // Search all pipelines that use the source file
+            std::string path{
+                binPath.begin(),
+                binPath.end() - std::strlen(details::k_shaderSPIRVBinFileExt) - 1
+            };
+            for (PipelineReloadInfo& info : m_impl->pipelineRegister) {
+                // Search all stages of the pipeline
+                auto sources = info.sources();
+                for (ShaderSource& source : sources) {
+                    const char* sourcePath = source.relPath;
+                    if (sourcePath && sourcePath == path) {
+                        // Matching path - replace SPIRV
+                        source.vk13.assign(
+                            reinterpret_cast<const uint32_t*>(loadedFile.data()),
+                            loadedFile.size() / 4
+                        );
+                        pipelinesToRecompile.emplace(&info);
+                        // The same source cannot be used in multiple stages of pipeline
+                        break;
+                    }
                 }
             }
-        }
+        } catch (...) {}
     }
-    paths.clear();
+    binPaths.clear();
 
     // Recreate all affected pipelines
     for (const auto& info : pipelinesToRecompile) {
@@ -184,30 +191,49 @@ void PipelineHotLoader::unregisterForReloading(vk::Pipeline& current) {
     }
 }
 
-void PipelineHotLoader::PipelineReloadInfo::recreatePipelineFromSources(
+bool PipelineHotLoader::PipelineReloadInfo::recreatePipelineFromSources(
     DeletionQueue& deletionQueue
 ) const {
-    deletionQueue.enqueueDeletion(*m_pipeline);
+    try {
+        vk::Pipeline original = *m_pipeline;
+        switch (m_type) {
+        case PipelineType::Graphics:
+            *m_pipeline = Pipeline::create(
+                m_graphicsCreateInfo,
+                PipelineGraphicsSources{
+                    .vert = m_sources[0],
+                    .tesc = m_sources[1],
+                    .tese = m_sources[2],
+                    .geom = m_sources[3],
+                    .frag = m_sources[4]
+                }
+            );
+            break;
+        case PipelineType::Compute:
+            *m_pipeline = Pipeline::create(
+                m_computeCreateInfo, PipelineComputeSources{.comp = m_sources[0]}
+            );
+            break;
+        default: break;
+        }
+        deletionQueue.enqueueDeletion(original);
+        return true;
+    } catch (...) {}
+    return false;
+}
+
+std::span<ShaderSource> PipelineHotLoader::PipelineReloadInfo::sources() {
+    size_t count = 0;
     switch (m_type) {
     case PipelineType::Graphics:
-        *m_pipeline = Pipeline::create(
-            m_graphics,
-            PipelineGraphicsSources{
-                .vert = m_sources[0],
-                .tesc = m_sources[1],
-                .tese = m_sources[2],
-                .geom = m_sources[3],
-                .frag = m_sources[4]
-            }
-        );
+        count = PipelineGraphicsSources::k_numStages;
         break;
     case PipelineType::Compute:
-        *m_pipeline = Pipeline::create(
-            m_compute, PipelineComputeSources{.comp = m_sources[0]}
-        );
+        count = PipelineComputeSources::k_numStages;
         break;
     default: break;
     }
+    return {m_sources.begin(), m_sources.begin() + count};
 }
 
 } // namespace re

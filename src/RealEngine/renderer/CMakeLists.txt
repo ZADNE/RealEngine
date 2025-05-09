@@ -2,7 +2,6 @@ real_target_sources(RealEngine
     PUBLIC
         Allocator.hpp               
         DeletionQueue.hpp           DeletionQueue.cpp
-        HotReloadInitInfo.hpp       
         ObjectUsingVulkan.hpp       
         PipelineHotLoader.hpp       PipelineHotLoader.cpp
         VulkanRenderer.hpp          VulkanRenderer.cpp

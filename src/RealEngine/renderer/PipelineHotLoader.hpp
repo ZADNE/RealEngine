@@ -6,8 +6,8 @@
 
 #include <RealEngine/graphics/pipelines/PipelineCreateInfos.hpp>
 #include <RealEngine/graphics/pipelines/PipelineSources.hpp>
+#include <RealEngine/program/HotReloadInitInfo.hpp>
 #include <RealEngine/renderer/DeletionQueue.hpp>
-#include <RealEngine/renderer/HotReloadInitInfo.hpp>
 
 namespace re {
 
@@ -72,7 +72,7 @@ private:
         )
             : m_pipeline{&pipeline}
             , m_type{PipelineType::Graphics}
-            , m_graphics{createInfo}
+            , m_graphicsCreateInfo{createInfo}
             , m_sources{srcs[0], srcs[1], srcs[2], srcs[3], srcs[4]} {}
 
         PipelineReloadInfo(
@@ -81,7 +81,7 @@ private:
         )
             : m_pipeline{&pipeline}
             , m_type{PipelineType::Compute}
-            , m_compute{createInfo}
+            , m_computeCreateInfo{createInfo}
             , m_sources{srcs[0], {}, {}, {}, {}} {}
 
         void updateTargetPipeline(vk::Pipeline& pipeline) {
@@ -92,9 +92,9 @@ private:
             return m_pipeline == &pipeline;
         }
 
-        void recreatePipelineFromSources(DeletionQueue& deletionQueue) const;
+        bool recreatePipelineFromSources(DeletionQueue& deletionQueue) const;
 
-        PipelineSources& sources() { return m_sources; }
+        std::span<ShaderSource> sources();
 
     private:
         vk::Pipeline* m_pipeline{};
@@ -103,8 +103,8 @@ private:
             // It is dangerous to store the create infos as the pointers in them
             // may become dangling! It is accepted as this whole class is not
             // used in Release builds.
-            PipelineGraphicsCreateInfo m_graphics;
-            PipelineComputeCreateInfo m_compute;
+            PipelineGraphicsCreateInfo m_graphicsCreateInfo;
+            PipelineComputeCreateInfo m_computeCreateInfo;
         };
         PipelineSources m_sources{};
     };

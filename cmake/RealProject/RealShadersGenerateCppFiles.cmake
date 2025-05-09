@@ -10,8 +10,11 @@ function(_generate_cpp_wrapper_for_stage target shader_rel)
     set(cpp_rel "${shader_rel_dir}/${shader}.gen.cpp")
     set(hpp_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${hpp_rel}")
     set(cpp_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${cpp_rel}")
+    file(RELATIVE_PATH target_base_dir_rel ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/${base_dir}")
+    file(TO_NATIVE_PATH "${target_base_dir_rel}/${shader_rel}" debug_shader_rel)
+    string(REPLACE "\\" "\\\\" debug_shader_rel "${debug_shader_rel}")
     set(debug_shader_rel
-        "$<$<CONFIG:Debug>:${base_dir}/${shader_rel}>")
+        "$<$<CONFIG:Debug>:${debug_shader_rel}>")
     string(REPLACE "." "_" shader_ ${shader})
 
     # Generate files

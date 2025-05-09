@@ -8,9 +8,10 @@ function(_generate_cpp_setup_file target)
     get_target_property(setup_rel ${target} realproject_setup_filepath_rel)
     set(template_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/templates")
     set(cmake_command ${CMAKE_COMMAND})
-    set(target_source_dir ${CMAKE_CURRENT_SOURCE_DIR})
+    set(source_dir ${CMAKE_SOURCE_DIR})
     set(binary_dir ${CMAKE_BINARY_DIR})
     set(shader_file_extensions "${REALPROJECT_GLSL_HEADER_EXTENSIONS};${REALPROJECT_GLSL_STAGE_EXTENSIONS}")
+    file(RELATIVE_PATH target_base_dir_rel ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/${base_dir}")
 
     # Generate the file
     _generate_configured_file(

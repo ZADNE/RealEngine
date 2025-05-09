@@ -2,16 +2,17 @@
  *  @author    Automatically generated file by RealProject
  */
 #pragma once
-#include <RealEngine/renderer/HotReloadInitInfo.hpp>
+#include <RealEngine/program/HotReloadInitInfo.hpp>
 
 namespace re::setup {
 
 constexpr HotReloadInitInfo k_hotReloadInitInfo{
     .cmakePath              = "@cmake_command@",
-    .targetName             = "@target@",
-    .targetSourceDir        = "@target_source_dir@",
+    .sourceDir              = "@source_dir@",
     .binaryDir              = "@binary_dir@",
-    .shaderFileExtensions   = "@shader_file_extensions@"
+    .shaderFileExtensions   = "@shader_file_extensions@",
+    .targetName             = "@target@",
+    .targetBaseDirRel       = "@target_base_dir_rel@"
 };
 
 } // namespace re::setup
