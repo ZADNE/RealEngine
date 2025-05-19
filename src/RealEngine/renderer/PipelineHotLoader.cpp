@@ -101,7 +101,7 @@ struct PipelineHotLoader::Impl {
     std::atomic<TimePoint> lastSourceChange;
     std::atomic<TimePoint> lastCMakeRun;
 
-    auto findInRegister(vk::Pipeline& pipeline) {
+    auto findInRegister(Pipeline& pipeline) {
         return std::find_if(
             pipelineRegister.begin(), pipelineRegister.end(),
             [&](const PipelineReloadInfo& info) -> bool {
@@ -120,22 +120,20 @@ PipelineHotLoader::PipelineHotLoader(
 PipelineHotLoader::~PipelineHotLoader() = default;
 
 void PipelineHotLoader::registerForReloading(
-    vk::Pipeline& initial, const PipelineGraphicsCreateInfo& createInfo,
+    Pipeline& initial, const PipelineGraphicsCreateInfo& createInfo,
     const PipelineGraphicsSources& srcs
 ) {
     m_impl->pipelineRegister.emplace_back(initial, createInfo, srcs);
 }
 
 void PipelineHotLoader::registerForReloading(
-    vk::Pipeline& initial, const PipelineComputeCreateInfo& createInfo,
+    Pipeline& initial, const PipelineComputeCreateInfo& createInfo,
     const PipelineComputeSources& srcs
 ) {
     m_impl->pipelineRegister.emplace_back(initial, createInfo, srcs);
 }
 
-void PipelineHotLoader::moveRegisteredPipeline(
-    vk::Pipeline& original, vk::Pipeline& moved
-) {
+void PipelineHotLoader::moveRegisteredPipeline(Pipeline& original, Pipeline& moved) {
     auto it = m_impl->findInRegister(original);
     if (it != m_impl->pipelineRegister.end()) {
         it->updateTargetPipeline(moved);
@@ -184,7 +182,7 @@ void PipelineHotLoader::reloadChangedPipelines() {
     }
 }
 
-void PipelineHotLoader::unregisterForReloading(vk::Pipeline& current) {
+void PipelineHotLoader::unregisterForReloading(Pipeline& current) {
     auto it = m_impl->findInRegister(current);
     if (it != m_impl->pipelineRegister.end()) {
         m_impl->pipelineRegister.erase(it); // O(n) shift
@@ -195,10 +193,10 @@ bool PipelineHotLoader::PipelineReloadInfo::recreatePipelineFromSources(
     DeletionQueue& deletionQueue
 ) const {
     try {
-        vk::Pipeline original = *m_pipeline;
+        vk::Pipeline original = **m_pipeline;
         switch (m_type) {
         case PipelineType::Graphics:
-            *m_pipeline = Pipeline::create(
+            m_pipeline->m_pipeline = Pipeline::create(
                 m_graphicsCreateInfo,
                 PipelineGraphicsSources{
                     .vert = m_sources[0],
@@ -210,7 +208,7 @@ bool PipelineHotLoader::PipelineReloadInfo::recreatePipelineFromSources(
             );
             break;
         case PipelineType::Compute:
-            *m_pipeline = Pipeline::create(
+            m_pipeline->m_pipeline = Pipeline::create(
                 m_computeCreateInfo, PipelineComputeSources{.comp = m_sources[0]}
             );
             break;

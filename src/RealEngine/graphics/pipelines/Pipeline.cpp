@@ -28,7 +28,7 @@ Pipeline::Pipeline(
 )
     : m_pipeline{create(createInfo, srcs)} {
     if constexpr (k_buildType == BuildType::Debug) {
-        pipelineHotLoader().registerForReloading(m_pipeline, createInfo, srcs);
+        pipelineHotLoader().registerForReloading(*this, createInfo, srcs);
     }
 }
 
@@ -37,29 +37,29 @@ Pipeline::Pipeline(
 )
     : m_pipeline{create(createInfo, srcs)} {
     if constexpr (k_buildType == BuildType::Debug) {
-        pipelineHotLoader().registerForReloading(m_pipeline, createInfo, srcs);
+        pipelineHotLoader().registerForReloading(*this, createInfo, srcs);
     }
 }
 
 Pipeline::Pipeline(Pipeline&& other) noexcept
     : m_pipeline{std::exchange(other.m_pipeline, nullptr)} {
     if constexpr (k_buildType == BuildType::Debug) {
-        pipelineHotLoader().moveRegisteredPipeline(other.m_pipeline, m_pipeline);
+        pipelineHotLoader().moveRegisteredPipeline(other, *this);
     }
 }
 
 Pipeline& Pipeline::operator=(Pipeline&& other) noexcept {
     std::swap(m_pipeline, other.m_pipeline);
     if constexpr (k_buildType == BuildType::Debug) {
-        pipelineHotLoader().moveRegisteredPipeline(other.m_pipeline, m_pipeline);
-        pipelineHotLoader().moveRegisteredPipeline(m_pipeline, other.m_pipeline);
+        pipelineHotLoader().moveRegisteredPipeline(other, *this);
+        pipelineHotLoader().moveRegisteredPipeline(*this, other);
     }
     return *this;
 }
 
 Pipeline::~Pipeline() {
     if constexpr (k_buildType == BuildType::Debug) {
-        pipelineHotLoader().unregisterForReloading(m_pipeline);
+        pipelineHotLoader().unregisterForReloading(*this);
     }
     deletionQueue().enqueueDeletion(m_pipeline);
 }
