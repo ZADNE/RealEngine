@@ -16,10 +16,16 @@ enum class BuildType {
  */
 #if defined(__DOXYGEN__)
 constexpr BuildType k_buildType = <build configuration dependent>;
+#define RE_BUILDING_FOR_DEBUG 1
+#define RE_BUILDING_FOR_RELEASE 1
 #elif !defined(NDEBUG)
 constexpr BuildType k_buildType = BuildType::Debug;
+#define RE_BUILDING_FOR_DEBUG 1
+#define RE_BUILDING_FOR_RELEASE 0
 #else
 constexpr BuildType k_buildType = BuildType::Release;
+#define RE_BUILDING_FOR_DEBUG 0
+#define RE_BUILDING_FOR_RELEASE 1
 #endif
 
 /**

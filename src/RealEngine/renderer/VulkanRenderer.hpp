@@ -100,9 +100,9 @@ private:
     SDL_Window* m_sdlWindow = nullptr;
     vk::raii::Context m_context{};
     vk::raii::Instance m_instance;
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
     vk::raii::DebugUtilsMessengerEXT m_debugUtilsMessenger;
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
     vk::raii::SurfaceKHR m_surface;
     uint32_t m_graphicsCompQueueFamIndex{};
     uint32_t m_presentationQueueFamIndex{};
@@ -132,9 +132,9 @@ private:
     FrameDoubleBuffered<vk::raii::Fence> m_inFlightFences;
     bool m_recreteSwapchain = false;
     DeletionQueue m_deletionQueue{*m_device, m_allocator};
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
     PipelineHotLoader m_pipelineHotLoader;
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
 
     // Active room dependent
     const RenderPass* m_mainRenderPass{};

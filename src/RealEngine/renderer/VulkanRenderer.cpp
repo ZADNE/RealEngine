@@ -62,9 +62,9 @@ VulkanRenderer::VulkanRenderer(
 )
     : m_sdlWindow(sdlWindow)
     , m_instance(createInstance())
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
     , m_debugUtilsMessenger(createDebugUtilsMessenger())
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
     , m_surface(createSurface())
     , m_physicalDevice(createPhysicalDevice(preferredDevice, vulkan.deviceCreateInfoChain)
       )
@@ -94,9 +94,9 @@ VulkanRenderer::VulkanRenderer(
     , m_imageAvailableSems(createSemaphores())
     , m_renderingFinishedSems(createSemaphores())
     , m_inFlightFences(createFences())
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
     , m_pipelineHotLoader{m_deletionQueue, hotReload}
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
 {
     // Implementations
     assignImplementationReferences();
@@ -273,9 +273,9 @@ void VulkanRenderer::finishFrame() {
         checkSuccess(m_presentationQueue.presentKHR(presentInfo));
     } catch (vk::OutOfDateKHRError&) { recreateSwapchain(); }
 
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
     m_pipelineHotLoader.reloadChangedPipelines();
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
     FrameDoubleBufferingState::setTotalIndex(m_frame++);
 }
 
@@ -306,14 +306,14 @@ std::string VulkanRenderer::usedDevice() const {
 vk::raii::Instance VulkanRenderer::createInstance() {
     // Prepare default layers and extensions
     std::vector<const char*> extensions = {
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
         VK_EXT_DEBUG_UTILS_EXTENSION_NAME
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
     };
     std::vector<const char*> validationLayers = {
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
         "VK_LAYER_KHRONOS_validation"
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
     };
 
     // Add extensions required by SDL2
@@ -650,9 +650,9 @@ void VulkanRenderer::assignImplementationReferences() {
     ObjectUsingVulkan::s_oneTimeSubmitCmdBuf   = &m_oneTimeSubmitCmdBuf;
     ObjectUsingVulkan::s_dispatchLoaderDynamic = &(m_dispatchLoaderDynamic);
     ObjectUsingVulkan::s_deletionQueue         = &m_deletionQueue;
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
     ObjectUsingVulkan::s_pipelineHotLoader = &m_pipelineHotLoader;
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
 }
 
 } // namespace re

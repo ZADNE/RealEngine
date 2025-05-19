@@ -54,7 +54,7 @@ public:
     T load(ResourceID id) const;
 
 private:
-#ifdef NDEBUG
+#if RE_BUILDING_FOR_RELEASE
     std::vector<unsigned char> m_compressedPackage = readBinaryFile(k_packageName);
     bit7z::Bit7zLibrary m_lib{default7ZipSharedLibLocation()};
     bit7z::BitMemExtractor m_extractor{m_lib, bit7z::BitFormat::SevenZip};
@@ -64,7 +64,7 @@ private:
         return Empty{};                        // that would set the password.
     }();
     bit7z::BitInputArchive m_inputArchive{m_extractor, m_compressedPackage};
-#endif
+#endif // RE_BUILDING_FOR_RELEASE
 };
 
 } // namespace re

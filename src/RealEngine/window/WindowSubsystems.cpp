@@ -8,6 +8,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
+#include <RealEngine/utility/BuildType.hpp>
 #include <RealEngine/utility/Error.hpp>
 #include <RealEngine/window/WindowSubsystems.hpp>
 
@@ -54,13 +55,13 @@ void WindowSubsystems::printRealEngineVersion() {
 
 void WindowSubsystems::printSubsystemsVersions() const {
     { // SDL2
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
         SDL_version compiled;
         SDL_VERSION(&compiled);
         std::println(
             "SDL compiled: {}.{}.{}", compiled.major, compiled.minor, compiled.patch
         );
-#endif // DEBUG
+#endif // RE_BUILDING_FOR_DEBUG
         SDL_version linked;
         SDL_GetVersion(&linked);
         std::println(
@@ -69,13 +70,13 @@ void WindowSubsystems::printSubsystemsVersions() const {
     }
 
     { // SDL2_ttf
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
         SDL_version compiled;
         SDL_TTF_VERSION(&compiled);
         std::println(
             "TTF compiled: {}.{}.{}", compiled.major, compiled.minor, compiled.patch
         );
-#endif // DEBUG
+#endif // RE_BUILDING_FOR_DEBUG
         const SDL_version* linked = TTF_Linked_Version();
         std::println(
             "TTF linked:   {}.{}.{}", linked->major, linked->minor, linked->patch
@@ -83,9 +84,9 @@ void WindowSubsystems::printSubsystemsVersions() const {
     }
 
     // ImGui
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
     std::println("ImGui:        {}", ImGui::GetVersion());
-#endif // DEBUG
+#endif // RE_BUILDING_FOR_DEBUG
 }
 
 } // namespace re
