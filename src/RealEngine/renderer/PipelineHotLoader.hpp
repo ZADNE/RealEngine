@@ -31,22 +31,22 @@ public:
      *          relocated in memory.
      */
     void registerForReloading(
-        Pipeline& initial, const PipelineGraphicsCreateInfo& createInfo,
+        vk::Pipeline& initial, const PipelineGraphicsCreateInfo& createInfo,
         const PipelineGraphicsSources& srcs
     );
     void registerForReloading(
-        Pipeline& initial, const PipelineComputeCreateInfo& createInfo,
+        vk::Pipeline& initial, const PipelineComputeCreateInfo& createInfo,
         const PipelineComputeSources& srcs
     );
 
-    void moveRegisteredPipeline(Pipeline& original, Pipeline& moved);
+    void moveRegisteredPipeline(vk::Pipeline& original, vk::Pipeline& moved);
 
     /**
      * @brief   Unregisters the pipeline
      * @details This does not destroy the pipeline. Does nothing if the pipeline
      *          has not been registered.
      */
-    void unregisterForReloading(Pipeline& current);
+    void unregisterForReloading(vk::Pipeline& current);
 
     /**
      * @brief   Recreates all registered pipelines that had their sources changed
@@ -67,7 +67,7 @@ private:
     class PipelineReloadInfo {
     public:
         PipelineReloadInfo(
-            Pipeline& pipeline, const PipelineGraphicsCreateInfo& createInfo,
+            vk::Pipeline& pipeline, const PipelineGraphicsCreateInfo& createInfo,
             const PipelineGraphicsSources& srcs
         )
             : m_pipeline{&pipeline}
@@ -76,7 +76,7 @@ private:
             , m_sources{srcs[0], srcs[1], srcs[2], srcs[3], srcs[4]} {}
 
         PipelineReloadInfo(
-            Pipeline& pipeline, const PipelineComputeCreateInfo& createInfo,
+            vk::Pipeline& pipeline, const PipelineComputeCreateInfo& createInfo,
             const PipelineComputeSources& srcs
         )
             : m_pipeline{&pipeline}
@@ -84,11 +84,11 @@ private:
             , m_computeCreateInfo{createInfo}
             , m_sources{srcs[0], {}, {}, {}, {}} {}
 
-        void updateTargetPipeline(Pipeline& pipeline) {
+        void updateTargetPipeline(vk::Pipeline& pipeline) {
             m_pipeline = &pipeline;
         }
 
-        bool targetsPipeline(Pipeline& pipeline) const {
+        bool targetsPipeline(vk::Pipeline& pipeline) const {
             return m_pipeline == &pipeline;
         }
 
@@ -97,7 +97,7 @@ private:
         std::span<ShaderSource> sources();
 
     private:
-        Pipeline* m_pipeline{};
+        vk::Pipeline* m_pipeline{};
         PipelineType m_type{};
         union {
             // It is dangerous to store the create infos as the pointers in them
