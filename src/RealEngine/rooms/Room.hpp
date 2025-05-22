@@ -80,19 +80,19 @@ public:
     virtual void render(const CommandBuffer& cb, double interpolationFactor) = 0;
 
     /**
-     * @brief Callback used to notify that the window's size has changed
+     * @brief Used to notify that the window's size has changed
      */
     virtual void windowResizedCallback(glm::ivec2 oldSize, glm::ivec2 newSize) {}
 
     /**
-     * @brief Callback used to notify that the window's title has changed
+     * @brief Used to notify that the window's title has changed
      */
     virtual void windowTitleChangedCallback(
         const std::string& oldTitle, const std::string& newTitle
     ) {}
 
     /**
-     * @brief Callback used to notify that the window's flags have changed
+     * @brief Used to notify that the window's flags have changed
      */
     virtual void windowFlagsChangedCallback(
         const WindowFlags& oldFlags, const WindowFlags& newFlags
@@ -129,6 +129,13 @@ public:
     static void setStaticReferences(MainProgram* mainProgram, RoomManager* roomManager);
 
     const RenderPass& mainRenderPass() const { return m_mainRenderPass; }
+
+    /**
+     * @brief   Used to notify that a pipeline has been reloaded
+     * @details Hot reloading works only in debug builds!
+     */
+    virtual void pipelineReloadedCallback(vk::Pipeline pipeline, int identifier) {
+    }
 
 protected:
     /**

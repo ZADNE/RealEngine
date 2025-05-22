@@ -273,9 +273,6 @@ void VulkanRenderer::finishFrame() {
         checkSuccess(m_presentationQueue.presentKHR(presentInfo));
     } catch (vk::OutOfDateKHRError&) { recreateSwapchain(); }
 
-#if RE_BUILDING_FOR_DEBUG
-    m_pipelineHotLoader.reloadChangedPipelines();
-#endif // RE_BUILDING_FOR_DEBUG
     FrameDoubleBufferingState::setTotalIndex(m_frame++);
 }
 

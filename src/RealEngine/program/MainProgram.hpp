@@ -155,6 +155,8 @@ private:
     void pollEvents();
     void processEvent(SDL_Event* evnt);
 
+    void performHotReload();
+
     Window m_window; ///< Window also creates and initializes renderer backends
     RoomManager m_roomManager;
     InputManager m_inputManager;

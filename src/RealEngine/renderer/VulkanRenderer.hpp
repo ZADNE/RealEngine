@@ -93,6 +93,10 @@ public:
 
     DeletionQueue& deletionQueue() { return m_deletionQueue; }
 
+#if RE_BUILDING_FOR_DEBUG
+    PipelineHotLoader& pipelineHotLoader() { return m_pipelineHotLoader; }
+#endif // RE_BUILDING_FOR_DEBUG
+
 private:
     // Vulkan objects
     uint32_t m_imageIndex   = 0u;

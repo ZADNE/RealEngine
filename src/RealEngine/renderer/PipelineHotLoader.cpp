@@ -7,6 +7,7 @@
 
 #include <RealEngine/graphics/pipelines/Pipeline.hpp>
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
+#include <RealEngine/program/MainProgram.hpp>
 #include <RealEngine/renderer/PipelineHotLoader.hpp>
 #include <RealEngine/resources/FileIO.hpp>
 #include <RealEngine/utility/details/CMakeConstants.hpp>
@@ -101,7 +102,7 @@ struct PipelineHotLoader::Impl {
     std::atomic<TimePoint> lastSourceChange;
     std::atomic<TimePoint> lastCMakeRun;
 
-    auto findInRegister(vk::Pipeline& pipeline) {
+    auto findInRegister(vk::Pipeline pipeline) {
         return std::find_if(
             pipelineRegister.begin(), pipelineRegister.end(),
             [&](const PipelineReloadInfo& info) -> bool {
@@ -119,14 +120,14 @@ PipelineHotLoader::PipelineHotLoader(
 
 PipelineHotLoader::~PipelineHotLoader() = default;
 
-void PipelineHotLoader::registerForReloading(
+void PipelineHotLoader::registerPipelineForReloading(
     vk::Pipeline& initial, const PipelineGraphicsCreateInfo& createInfo,
     const PipelineGraphicsSources& srcs
 ) {
     m_impl->pipelineRegister.emplace_back(initial, createInfo, srcs);
 }
 
-void PipelineHotLoader::registerForReloading(
+void PipelineHotLoader::registerPipelineForReloading(
     vk::Pipeline& initial, const PipelineComputeCreateInfo& createInfo,
     const PipelineComputeSources& srcs
 ) {
@@ -142,7 +143,16 @@ void PipelineHotLoader::moveRegisteredPipeline(
     }
 }
 
-void PipelineHotLoader::reloadChangedPipelines() {
+void PipelineHotLoader::setPipelineIdentifier(vk::Pipeline pipeline, int identifier) {
+    auto it = m_impl->findInRegister(pipeline);
+    if (it != m_impl->pipelineRegister.end()) {
+        it->setIdentifier(identifier);
+    }
+}
+
+void PipelineHotLoader::reloadChangedPipelines(
+    const std::function<void(vk::Pipeline, int)>& reloadedCallback
+) {
     auto& binPaths = m_impl->pathsToReload.read();
     std::set<PipelineReloadInfo*> pipelinesToRecompile;
     std::vector<unsigned char> loadedFile;
@@ -181,11 +191,12 @@ void PipelineHotLoader::reloadChangedPipelines() {
     // Recreate all affected pipelines
     for (const auto& info : pipelinesToRecompile) {
         info->recreatePipelineFromSources(m_impl->deletionQueue);
+        reloadedCallback(info->targetPipeline(), info->indentifier());
     }
 }
 
-void PipelineHotLoader::unregisterForReloading(vk::Pipeline& current) {
-    auto it = m_impl->findInRegister(current);
+void PipelineHotLoader::unregisterPipelineForReloading(vk::Pipeline& pipeline) {
+    auto it = m_impl->findInRegister(pipeline);
     if (it != m_impl->pipelineRegister.end()) {
         m_impl->pipelineRegister.erase(it); // O(n) shift
     }

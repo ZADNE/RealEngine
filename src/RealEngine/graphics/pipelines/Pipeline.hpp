@@ -47,6 +47,14 @@ public:
 
     const vk::Pipeline& pipeline() const { return m_pipeline; }
 
+#if RE_BUILDING_FOR_DEBUG
+    /**
+     * @brief   Updates hot realod identifier
+     * @details 0 is the default value if not changed
+     */
+    void setHotReloadIdentifier(int identifier);
+#endif // RE_BUILDING_FOR_DEBUG
+
 private:
     static vk::Pipeline create(
         const PipelineGraphicsCreateInfo& createInfo,

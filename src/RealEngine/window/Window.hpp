@@ -167,6 +167,12 @@ public:
      */
     RendererID usedRenderer() const { return m_usedRenderer; }
 
+#if RE_BUILDING_FOR_DEBUG
+    PipelineHotLoader& pipelineHotLoader() {
+        return m_vk13.pipelineHotLoader();
+    }
+#endif // RE_BUILDING_FOR_DEBUG
+
 private:
     void initForRenderer(
         RendererID renderer, const VulkanInitInfo& vulkan,

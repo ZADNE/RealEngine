@@ -135,7 +135,7 @@ const std::string& RoomToEngineAccess::windowTitle() const {
 }
 
 void RoomToEngineAccess::setWindowDims(glm::ivec2 newDims, bool save) {
-    const auto& oldDims = m_window.dims();
+    glm::ivec2 oldDims = m_window.dims();
     m_window.setDims(newDims, save);
     m_roomManager.notifyRooms<&Room::windowResizedCallback>(oldDims, newDims);
 }

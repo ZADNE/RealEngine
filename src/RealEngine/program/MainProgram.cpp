@@ -132,6 +132,8 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
         // Finish the drawing
         m_window.finishNewFrame();
 
+        performHotReload();
+
         doRoomTransitionIfScheduled();
 
         m_synchronizer.endFrame();
@@ -201,6 +203,15 @@ void MainProgram::processEvent(SDL_Event* evnt) {
         break;
     case SDL_QUIT: scheduleExit(); break;
     }
+}
+
+void MainProgram::performHotReload() {
+#if RE_BUILDING_FOR_DEBUG
+    auto callback = [this](vk::Pipeline pipeline, int identifier) {
+        m_roomManager.notifyRooms<&Room::pipelineReloadedCallback>(pipeline, identifier);
+    };
+    m_window.pipelineHotLoader().reloadChangedPipelines(callback);
+#endif // RE_BUILDING_FOR_DEBUG
 }
 
 void MainProgram::doRoomTransitionIfScheduled() {
