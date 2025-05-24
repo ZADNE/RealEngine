@@ -21,6 +21,7 @@ class CommandBuffer;
  */
 class ObjectUsingVulkan {
     friend class VulkanRenderer;
+    friend class MainProgram;
 
 protected:
     /**
@@ -58,16 +59,16 @@ protected:
     template<typename T>
         requires vk::isVulkanHandleType<T>::value
     static void setDebugUtilsObjectName(T object, DebugString<> debugName) {
-        if constexpr (k_buildType == BuildType::Debug) {
-            device().setDebugUtilsObjectNameEXT(
-                vk::DebugUtilsObjectNameInfoEXT{
-                    T::objectType,
-                    reinterpret_cast<uint64_t>(static_cast<T::NativeType>(object)),
-                    static_cast<const char*>(debugName)
-                },
-                dispatchLoaderDynamic()
-            );
-        }
+#if RE_BUILDING_FOR_DEBUG
+        device().setDebugUtilsObjectNameEXT(
+            vk::DebugUtilsObjectNameInfoEXT{
+                T::objectType,
+                reinterpret_cast<uint64_t>(static_cast<T::NativeType>(object)),
+                static_cast<const char*>(debugName)
+            },
+            dispatchLoaderDynamic()
+        );
+#endif // RE_BUILDING_FOR_DEBUG
     }
 
 private:

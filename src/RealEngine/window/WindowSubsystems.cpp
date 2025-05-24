@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #include <print>
@@ -13,14 +13,6 @@
 #include <RealEngine/window/WindowSubsystems.hpp>
 
 namespace re {
-
-std::string to_string(RendererID r) {
-    switch (r) {
-    case RendererID::Vulkan13: return "Vulkan13";
-    case RendererID::Any:      return "Any";
-    default:                   return "Unknown renderer";
-    }
-}
 
 WindowSubsystems::WindowSubsystems() {
     // SDL2

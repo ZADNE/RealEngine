@@ -90,12 +90,12 @@ public:
      * @note  Does nothing in release build
      */
     void beginDebugRegion(const char* label, glm::vec4 color = {}) const {
-        if constexpr (k_buildType == BuildType::Debug) {
-            m_cb.beginDebugUtilsLabelEXT(
-                vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
-                dispatchLoaderDynamic()
-            );
-        }
+#if RE_BUILDING_FOR_DEBUG
+        m_cb.beginDebugUtilsLabelEXT(
+            vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
+            dispatchLoaderDynamic()
+        );
+#endif // RE_BUILDING_FOR_DEBUG
     }
 
     /**
@@ -103,9 +103,9 @@ public:
      * @note  Does nothing in release build
      */
     void endDebugRegion() const {
-        if constexpr (k_buildType == BuildType::Debug) {
-            m_cb.endDebugUtilsLabelEXT(dispatchLoaderDynamic());
-        }
+#if RE_BUILDING_FOR_DEBUG
+        m_cb.endDebugUtilsLabelEXT(dispatchLoaderDynamic());
+#endif // RE_BUILDING_FOR_DEBUG
     }
 
     /**
@@ -113,12 +113,12 @@ public:
      * @note  Does nothing in release build
      */
     void insertDebugLabel(const char* label, glm::vec4 color = {}) const {
-        if constexpr (k_buildType == BuildType::Debug) {
-            m_cb.insertDebugUtilsLabelEXT(
-                vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
-                dispatchLoaderDynamic()
-            );
-        }
+#if RE_BUILDING_FOR_DEBUG
+        m_cb.insertDebugUtilsLabelEXT(
+            vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
+            dispatchLoaderDynamic()
+        );
+#endif // RE_BUILDING_FOR_DEBUG
     }
 
     /**

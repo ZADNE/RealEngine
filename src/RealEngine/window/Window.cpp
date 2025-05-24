@@ -11,83 +11,14 @@
 
 namespace re {
 
-Window::Window(
-    const WindowSettings& settings, const std::string& title,
-    const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
-)
-    : WindowSettings(settings)
-    , m_subsystems()
-    , m_windowTitle(title)
-    , m_usedRenderer(RendererID::Any) {
+Window::Window(const WindowSettings& settings, const std::string& title)
+    : WindowSettings{settings}
+    , m_subsystems{}
+    , m_SDLwindow{createSDLWindow()}
+    , m_windowTitle{title} {
 
     m_subsystems.printRealEngineVersion();
     m_subsystems.printSubsystemsVersions();
-
-    initForRenderer(settings.preferredRenderer(), vulkan, hotReload);
-
-    // If the preferred renderer could not be initialized
-    if (m_usedRenderer == RendererID::Any) {
-        for (size_t i = 0; i < static_cast<size_t>(RendererID::Any);
-             i++) { // Try to init any other
-            initForRenderer(static_cast<RendererID>(i), vulkan, hotReload);
-            if (m_usedRenderer != RendererID::Any)
-                break;
-        }
-
-        // If no renderer could be initialized
-        if (m_usedRenderer == RendererID::Any) {
-            // There is nothing more we can do
-            fatalError("No renderer could be initialized!");
-        }
-    }
-}
-
-Window::~Window() {
-    switch (m_usedRenderer) {
-    case RendererID::Vulkan13: m_vk13.~VulkanRenderer(); break;
-    case RendererID::Any:      break;
-    }
-}
-
-void Window::startStep() {
-    switch (m_usedRenderer) {
-    case RendererID::Vulkan13:
-        m_vk13.deletionQueue().startNextIteration(DeletionQueue::Timeline::Step);
-        break;
-    case RendererID::Any: break;
-    }
-}
-
-void Window::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex) {
-    m_vk13.setMainRenderPass(rp, imGuiSubpassIndex);
-}
-
-const CommandBuffer& Window::prepareNewFrame() {
-    return m_vk13.prepareFrame();
-}
-
-void Window::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues) {
-    m_vk13.mainRenderPassBegin(clearValues);
-}
-
-void Window::mainRenderPassNextSubpass() {
-    m_vk13.mainRenderPassNextSubpass();
-}
-
-void Window::mainRenderPassDrawImGui() {
-    m_vk13.mainRenderPassDrawImGui();
-}
-
-void Window::mainRenderPassEnd() {
-    m_vk13.mainRenderPassEnd();
-}
-
-void Window::finishNewFrame() {
-    m_vk13.finishFrame();
-}
-
-void Window::prepareForDestructionOfRendererObjects() {
-    m_vk13.prepareForDestructionOfRendererObjects();
 }
 
 bool Window::passSDLEvent(const SDL_Event& evnt) {
@@ -121,18 +52,8 @@ void Window::setBorderless(bool borderless, bool save) {
 
 void Window::setVSync(bool vSync, bool save) {
     m_flags.vSync = vSync;
-    if (m_usedRenderer == RendererID::Vulkan13) {
-        m_vk13.changePresentation(m_flags.vSync);
-    }
     if (save)
         this->save();
-}
-
-std::vector<std::string> Window::availableDevices() const {
-    if (m_usedRenderer == RendererID::Vulkan13) {
-        return m_vk13.availableDevices();
-    }
-    return {};
 }
 
 void Window::setPreferredDevice(std::string_view preferredDevice, bool save) {
@@ -142,22 +63,9 @@ void Window::setPreferredDevice(std::string_view preferredDevice, bool save) {
         this->save();
 }
 
-std::string Window::usedDevice() const {
-    if (m_usedRenderer == RendererID::Vulkan13) {
-        return m_vk13.usedDevice();
-    }
-    return {};
-}
-
 void Window::setTitle(const std::string& title) {
     m_windowTitle = title;
     SDL_SetWindowTitle(sdlWindow(), title.c_str());
-}
-
-void Window::setPreferredRenderer(RendererID renderer, bool save) {
-    m_preferredRenderer = renderer;
-    if (save)
-        this->save();
 }
 
 void Window::setDims(glm::ivec2 newDims, bool save) {
@@ -168,46 +76,9 @@ void Window::setDims(glm::ivec2 newDims, bool save) {
         this->save();
 }
 
-void Window::initForRenderer(
-    RendererID renderer, const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
-) {
-    switch (renderer) {
-    case RendererID::Vulkan13: initForVulkan13(vulkan, hotReload); break;
-    default:                   break;
-    }
-}
-
-void Window::initForVulkan13(
-    const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
-) {
-    // Create SDL window
-    SDL_WindowRAII window = createSDLWindow(RendererID::Vulkan13);
-    if (!window) {
-        return;
-    }
-
-    // Set up Vulkan 1.3 renderer
-    try {
-        new (&m_vk13) VulkanRenderer{
-            window.get(), (bool)m_flags.vSync, m_preferredDevice, vulkan, hotReload
-        };
-    } catch (std::exception& e) {
-        std::cerr << e.what() << '\n';
-        return;
-    }
-
-    // Success
-    m_SDLwindow    = std::move(window);
-    m_usedRenderer = RendererID::Vulkan13;
-}
-
-Window::SDL_WindowRAII Window::createSDLWindow(RendererID renderer) {
+Window::SDL_WindowRAII Window::createSDLWindow() {
     // Prepare window flags
-    Uint32 SDL_flags = 0;
-    switch (renderer) {
-    case RendererID::Vulkan13: SDL_flags |= SDL_WINDOW_VULKAN; break;
-    case RendererID::Any:      break;
-    }
+    Uint32 SDL_flags = SDL_WINDOW_VULKAN;
     if (m_flags.invisible)
         SDL_flags |= SDL_WINDOW_HIDDEN;
     if (m_flags.fullscreen)

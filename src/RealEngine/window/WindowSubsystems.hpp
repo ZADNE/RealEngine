@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -36,19 +36,6 @@
  */
 
 namespace re {
-
-/**
- * @brief Lists all renderers known to RealEngine
- *
- * The order also represents precedence when no specific renderer is
- * preffered (or if it fails during initialization).
- */
-enum class RendererID {
-    Vulkan13, ///< Vulkan 1.3 renderer
-    Any
-};
-
-std::string to_string(RendererID r);
 
 /**
  * @brief Represents RealEngine's subsystems

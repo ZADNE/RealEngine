@@ -17,13 +17,13 @@ namespace re {
 namespace {
 
 const char* nulFile() {
-    if constexpr (k_buildOS == BuildOS::Windows) {
-        return "nul";
-    } else if constexpr (k_buildOS == BuildOS::Linux) {
-        return "/dev/null";
-    } else {
-        std::unreachable();
-    }
+#if RE_BUILDING_FOR_WINDOWS
+    return "nul";
+#elif RE_BUILDING_FOR_LINUX // ^^^ RE_BUILDING_FOR_WINDOWS
+    return "/dev/null";
+#else
+#    error "Unhandled OS"
+#endif
 }
 
 constexpr void escapeDots(std::string& str) {

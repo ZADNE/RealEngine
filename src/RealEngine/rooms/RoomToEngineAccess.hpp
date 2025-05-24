@@ -1,8 +1,9 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <RealEngine/program/Synchronizer.hpp>
+#include <RealEngine/renderer/VulkanRenderer.hpp>
 #include <RealEngine/rooms/RoomManager.hpp>
 #include <RealEngine/user_input/InputManager.hpp>
 #include <RealEngine/window/Window.hpp>
@@ -25,13 +26,15 @@ public:
      */
     RoomToEngineAccess(
         MainProgram& mainProgram, InputManager& inputManager,
-        Synchronizer& synchronizer, Window& window, RoomManager& roomManager
+        Synchronizer& synchronizer, Window& window, VulkanRenderer& renderer,
+        RoomManager& roomManager
     )
-        : m_mainProgram(mainProgram)
-        , m_inputManager(inputManager)
-        , m_synchronizer(synchronizer)
-        , m_window(window)
-        , m_roomManager(roomManager) {}
+        : m_mainProgram{mainProgram}
+        , m_inputManager{inputManager}
+        , m_synchronizer{synchronizer}
+        , m_window{window}
+        , m_renderer{renderer}
+        , m_roomManager{roomManager} {}
 
 #pragma region MainProgram
 
@@ -183,21 +186,6 @@ public:
     glm::ivec2 windowDims() const;
 
     /**
-     * @copydoc Window::setPreferredRenderer
-     */
-    void setPreferredRenderer(RendererID renderer, bool save);
-
-    /**
-     * @copydoc Window::preferredRenderer
-     */
-    RendererID preferredRenderer() const;
-
-    /**
-     * @copydoc Window::usedRenderer
-     */
-    RendererID usedRenderer() const;
-
-    /**
      * @copydoc WindowSettings::save
      */
     void saveWindowSettings();
@@ -238,6 +226,7 @@ private:
     InputManager& m_inputManager;
     Synchronizer& m_synchronizer;
     Window& m_window;
+    VulkanRenderer& m_renderer;
     RoomManager& m_roomManager;
 };
 

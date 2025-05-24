@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #include <filesystem>
@@ -28,21 +28,6 @@ WindowSettings::WindowSettings() {
         m_flags.borderless = j["window"]["borderless"].get<bool>();
         m_flags.vSync      = j["window"]["vsync"].get<bool>();
         m_preferredDevice = j["window"]["preferred_device"].get<std::string_view>();
-        auto renderer = j["window"].find("preferred_renderer");
-        if (renderer != j["window"].end()) {
-            auto renderStr = renderer->get<std::string>();
-            if (renderStr == to_string(RendererID::Vulkan13)) {
-                m_preferredRenderer = RendererID::Vulkan13;
-            } else if (renderStr == to_string(RendererID::Any)) {
-                m_preferredRenderer = RendererID::Any;
-            } else {
-                m_preferredRenderer = RendererID::Any;
-                save();
-            }
-        } else {
-            m_preferredRenderer = RendererID::Any;
-            save();
-        }
     } catch (...) {
         // Settings either don't exist or are currupted
         i.close();
@@ -58,19 +43,16 @@ WindowSettings::WindowSettings() {
 }
 
 WindowSettings::WindowSettings(
-    glm::ivec2 dims, WindowFlags flags, RendererID preferredRenderer,
-    std::string_view preferredDevice
+    glm::ivec2 dims, WindowFlags flags, std::string_view preferredDevice
 )
-    : m_dims(dims)
-    , m_flags(flags)
-    , m_preferredRenderer(preferredRenderer)
-    , m_preferredDevice(preferredDevice) {
+    : m_dims{dims}
+    , m_flags{flags}
+    , m_preferredDevice{preferredDevice} {
 }
 
 void WindowSettings::reset() {
-    m_dims              = k_defaultWindowSize;
-    m_flags             = WindowFlags{};
-    m_preferredRenderer = RendererID::Any;
+    m_dims  = k_defaultWindowSize;
+    m_flags = WindowFlags{};
     m_preferredDevice.clear();
 }
 
@@ -82,8 +64,7 @@ void WindowSettings::save() {
           {"fullscreen", (bool)m_flags.fullscreen},
           {"borderless", (bool)m_flags.borderless},
           {"vsync", (bool)m_flags.vSync},
-          {"preferred_device", m_preferredDevice},
-          {"preferred_renderer", to_string(m_preferredRenderer)}}}
+          {"preferred_device", m_preferredDevice}}}
     };
 
     std::ofstream o(k_settingFilename, std::ofstream::trunc);

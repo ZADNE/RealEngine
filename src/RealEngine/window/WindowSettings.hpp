@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -38,10 +38,7 @@ public:
     /**
      * @brief Constructs settings from given parameters
      */
-    WindowSettings(
-        glm::ivec2 dims, WindowFlags flags, RendererID preferredRenderer,
-        std::string_view preferredDevice
-    );
+    WindowSettings(glm::ivec2 dims, WindowFlags flags, std::string_view preferredDevice);
 
     /**
      * @brief Gets a copy of the window flags
@@ -51,8 +48,6 @@ public:
     bool isFullscreen() const { return m_flags.fullscreen; }
     bool isBorderless() const { return m_flags.borderless; }
     bool isVSynced() const { return m_flags.vSync; }
-
-    RendererID preferredRenderer() const { return m_preferredRenderer; }
 
     std::string_view preferredDevice() const { return m_preferredDevice; }
 
@@ -70,10 +65,9 @@ protected:
     void reset();
 
     // NOLINTBEGIN(*-non-private-member-variables-in-classes): Intentional
-    glm::ivec2 m_dims{};            ///< Dimensions of the window
-    WindowFlags m_flags;            ///< Flags of the window
-    RendererID m_preferredRenderer; ///< The actual renderer may be different
-    std::string m_preferredDevice;  ///< The actual device may be different
+    glm::ivec2 m_dims{};           ///< Dimensions of the window
+    WindowFlags m_flags;           ///< Flags of the window
+    std::string m_preferredDevice; ///< The actual device may be different
     // NOLINTEND(*-non-private-member-variables-in-classes)
 };
 

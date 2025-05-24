@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -49,10 +49,10 @@ private:
 template<>
 struct std::hash<re::ResourceID> {
     size_t operator()(const re::ResourceID& id) const {
-        if constexpr (re::k_buildType == re::BuildType::Release) {
-            return id.m_id;
-        } else {
-            return std::hash<const char*>{}(id.m_path);
-        }
+#if RE_BUILDING_FOR_DEBUG
+        return std::hash<const char*>{}(id.m_path);
+#else // ^^^ RE_BUILDING_FOR_DEBUG
+        return id.m_id;
+#endif
     }
 };

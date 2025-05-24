@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/program/MainProgram.hpp>
@@ -100,6 +100,7 @@ bool RoomToEngineAccess::isWindowBorderless() const {
 void RoomToEngineAccess::setWindowVSync(bool vSync, bool save) {
     auto prev = m_window.flags();
     m_window.setVSync(vSync, save);
+    m_renderer.changePresentation(vSync);
     auto curr = m_window.flags();
     m_roomManager.notifyRooms<&Room::windowFlagsChangedCallback>(prev, curr);
 }
@@ -113,7 +114,7 @@ std::string_view RoomToEngineAccess::preferredDevice() const {
 }
 
 std::vector<std::string> RoomToEngineAccess::availableDevices() const {
-    return m_window.availableDevices();
+    return m_renderer.availableDevices();
 }
 
 void RoomToEngineAccess::setPreferredDevice(std::string_view preferredDevice, bool save) {
@@ -121,7 +122,7 @@ void RoomToEngineAccess::setPreferredDevice(std::string_view preferredDevice, bo
 }
 
 std::string RoomToEngineAccess::usedDevice() const {
-    return m_window.usedDevice();
+    return m_renderer.usedDevice();
 }
 
 void RoomToEngineAccess::setWindowTitle(const std::string& title) {
@@ -144,18 +145,6 @@ glm::ivec2 RoomToEngineAccess::windowDims() const {
     return m_window.dims();
 }
 
-void RoomToEngineAccess::setPreferredRenderer(RendererID renderer, bool save) {
-    m_window.setPreferredRenderer(renderer, save);
-}
-
-RendererID RoomToEngineAccess::preferredRenderer() const {
-    return m_window.preferredRenderer();
-}
-
-RendererID RoomToEngineAccess::usedRenderer() const {
-    return m_window.usedRenderer();
-}
-
 void RoomToEngineAccess::saveWindowSettings() {
     m_window.save();
 }
@@ -167,19 +156,19 @@ void RoomToEngineAccess::saveWindowSettings() {
 void RoomToEngineAccess::mainRenderPassBegin(
     std::span<const vk::ClearValue> clearValues /* = {&k_defaultClearColor, 1}*/
 ) {
-    m_window.mainRenderPassBegin(clearValues);
+    m_renderer.mainRenderPassBegin(clearValues);
 }
 
 void RoomToEngineAccess::mainRenderPassNextSubpass() {
-    m_window.mainRenderPassNextSubpass();
+    m_renderer.mainRenderPassNextSubpass();
 }
 
 void RoomToEngineAccess::mainRenderPassDrawImGui() {
-    m_window.mainRenderPassDrawImGui();
+    m_renderer.mainRenderPassDrawImGui();
 }
 
 void RoomToEngineAccess::mainRenderPassEnd() {
-    m_window.mainRenderPassEnd();
+    m_renderer.mainRenderPassEnd();
 }
 
 #pragma endregion

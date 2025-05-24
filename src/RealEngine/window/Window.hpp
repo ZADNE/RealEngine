@@ -8,8 +8,6 @@
 #include <SDL_video.h>
 #include <glm/vec2.hpp>
 
-#include <RealEngine/renderer/VulkanRenderer.hpp>
-#include <RealEngine/resources/hot_reload/HotReloadInitInfo.hpp>
 #include <RealEngine/utility/UniqueCPtr.hpp>
 #include <RealEngine/window/WindowSettings.hpp>
 #include <RealEngine/window/WindowSubsystems.hpp>
@@ -26,8 +24,7 @@ class MainProgram;
  * There can only be a single window within program
  * and it is created by the MainProgram.
  *
- * The window initializes all subsystems of the RealEngine (SDL2, renderer,
- * ImGui, ...).
+ * The window initializes some subsystems of the RealEngine (SDL2, ImGui, ...).
  */
 class Window: public WindowSettings {
 public:
@@ -36,46 +33,8 @@ public:
      *
      * @param settings Settings to initialize the window with.
      * @param title Title for the window
-     * @param vulkan
-     * @param hotReload
      */
-    Window(
-        const WindowSettings& settings, const std::string& title,
-        const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
-    );
-
-    Window(const Window&)         = delete; ///< Noncopyable
-    void operator=(const Window&) = delete; ///< Noncopyable
-
-    Window(Window&&)         = delete;      ///< Nonmovable
-    void operator=(Window&&) = delete;      ///< Nonmovable
-
-    ~Window();
-
-    void startStep();
-
-    void setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex);
-
-    /**
-     * @brief Prepares for rendering of new frame
-     * @return The command buffer that should be used for rendering of this frame
-     */
-    const CommandBuffer& prepareNewFrame();
-
-    void mainRenderPassBegin(std::span<const vk::ClearValue> clearValues);
-    void mainRenderPassNextSubpass();
-    void mainRenderPassDrawImGui();
-    void mainRenderPassEnd();
-
-    /**
-     * @brief Renders new frame
-     */
-    void finishNewFrame();
-
-    /**
-     * @brief Effectively finishes all work on GPU
-     */
-    void prepareForDestructionOfRendererObjects();
+    Window(const WindowSettings& settings, const std::string& title);
 
     /**
      * @brief Passes SDL event to ImGui
@@ -107,11 +66,6 @@ public:
     void setVSync(bool vSync, bool save);
 
     /**
-     * @brief Fetches names of all available devices (even if they are not suitable)
-     */
-    std::vector<std::string> availableDevices() const;
-
-    /**
      * @brief Sets name of the preferred device
      * @param preferredDevice Name of the device must match exactly the name
      *                        reported by underlying driver.
@@ -120,13 +74,6 @@ public:
      *       device must be suitable (support all requested features).
      */
     void setPreferredDevice(std::string_view preferredDevice, bool save);
-
-    /**
-     * @brief Returns name of the device that is currently used
-     * @note  If it is different to the preferred one, it either was not found
-     *        or it was not suitable
-     */
-    std::string usedDevice() const;
 
     /**
      * @brief Sets new title for the window
@@ -152,46 +99,17 @@ public:
     glm::ivec2 dims() const { return m_dims; }
 
     /**
-     * @brief       Sets the preferred renderer.
-     * @param renderer The renderer that will be used if it exists and is capable.
-     * @param save  Changed settings are saved to file if true.
-     * @details     Program needs to be restarted to change the renderer.
-     *              It is not guaranteed that the renderer will be used - a
-     *              different one may be used instead if the preferred one could
-     *              not be initialized.
+     * @brief Used only to initialize renderer
      */
-    void setPreferredRenderer(RendererID renderer, bool save);
-
-    /**
-     * @brief Gets the used renderer (this can be different from the requested one)
-     */
-    RendererID usedRenderer() const { return m_usedRenderer; }
-
-#if RE_BUILDING_FOR_DEBUG
-    PipelineHotLoader& pipelineHotLoader() {
-        return m_vk13.pipelineHotLoader();
-    }
-#endif // RE_BUILDING_FOR_DEBUG
+    SDL_Window* sdlWindow() { return m_SDLwindow.get(); }
 
 private:
-    void initForRenderer(
-        RendererID renderer, const VulkanInitInfo& vulkan,
-        const HotReloadInitInfo& hotReload
-    );
-    void initForVulkan13(const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload);
-
     using SDL_WindowRAII = UniqueCPtr<SDL_Window, SDL_DestroyWindow>;
-    SDL_WindowRAII createSDLWindow(RendererID renderer);
+    SDL_WindowRAII createSDLWindow();
 
     WindowSubsystems m_subsystems; ///< Initializes and de-initializes subsystems
     SDL_WindowRAII m_SDLwindow;
 
-    SDL_Window* sdlWindow() { return m_SDLwindow.get(); }
-
-    union {
-        VulkanRenderer m_vk13;
-    };
-    RendererID m_usedRenderer{}; ///< May be different from the preferred one
     std::string m_windowTitle;
 };
 

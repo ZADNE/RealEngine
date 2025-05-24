@@ -13,7 +13,7 @@
 #include <RealEngine/renderer/DebugMessageHandler.hpp>
 #include <RealEngine/renderer/PhysDeviceSuitability.hpp>
 #include <RealEngine/renderer/VulkanRenderer.hpp>
-#include <RealEngine/window/WindowSubsystems.hpp>
+#include <RealEngine/utility/Version.hpp>
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
 using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
@@ -58,7 +58,7 @@ const void* defaultDeviceCreateInfoChain() {
 
 VulkanRenderer::VulkanRenderer(
     SDL_Window* sdlWindow, bool vSync, std::string_view preferredDevice,
-    const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
+    const VulkanInitInfo& vulkan
 )
     : m_sdlWindow(sdlWindow)
     , m_instance(createInstance())
@@ -93,11 +93,8 @@ VulkanRenderer::VulkanRenderer(
     , m_descriptorPool(createDescriptorPool())
     , m_imageAvailableSems(createSemaphores())
     , m_renderingFinishedSems(createSemaphores())
-    , m_inFlightFences(createFences())
-#if RE_BUILDING_FOR_DEBUG
-    , m_pipelineHotLoader{m_deletionQueue, hotReload}
-#endif // RE_BUILDING_FOR_DEBUG
-{
+    , m_inFlightFences(createFences()) {
+
     // Implementations
     assignImplementationReferences();
     FrameDoubleBufferingState::setTotalIndex(m_frame++);
@@ -647,9 +644,6 @@ void VulkanRenderer::assignImplementationReferences() {
     ObjectUsingVulkan::s_oneTimeSubmitCmdBuf   = &m_oneTimeSubmitCmdBuf;
     ObjectUsingVulkan::s_dispatchLoaderDynamic = &(m_dispatchLoaderDynamic);
     ObjectUsingVulkan::s_deletionQueue         = &m_deletionQueue;
-#if RE_BUILDING_FOR_DEBUG
-    ObjectUsingVulkan::s_pipelineHotLoader = &m_pipelineHotLoader;
-#endif // RE_BUILDING_FOR_DEBUG
 }
 
 } // namespace re

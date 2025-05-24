@@ -9,6 +9,7 @@
 #include <glm/vec2.hpp>
 
 #include <RealEngine/program/Synchronizer.hpp>
+#include <RealEngine/renderer/VulkanRenderer.hpp>
 #include <RealEngine/resources/hot_reload/HotReloadInitInfo.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/rooms/RoomManager.hpp>
@@ -157,11 +158,15 @@ private:
 
     void performHotReload();
 
-    Window m_window; ///< Window also creates and initializes renderer backends
+    Window m_window;
+    VulkanRenderer m_renderer;
+#if RE_BUILDING_FOR_DEBUG
+    PipelineHotLoader m_pipelineHotLoader;
+#endif // RE_BUILDING_FOR_DEBUG
     RoomManager m_roomManager;
     InputManager m_inputManager;
     Synchronizer m_synchronizer{k_defaultStepsPerSecond, k_defaultFramesPerSecondLimit};
-    RoomToEngineAccess s_roomToEngineAccess;
+    RoomToEngineAccess m_roomToEngineAccess;
 
     bool m_programShouldRun = false;
     int m_programExitCode   = EXIT_SUCCESS;

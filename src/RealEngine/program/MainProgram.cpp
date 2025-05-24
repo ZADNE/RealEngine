@@ -124,13 +124,13 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
         }
 
         // Prepare for drawing
-        const auto& cb = m_window.prepareNewFrame();
+        const CommandBuffer& cb = m_renderer.prepareFrame();
 
         // Draw the frame
         render(cb, m_synchronizer.drawInterpolationFactor());
 
         // Finish the drawing
-        m_window.finishNewFrame();
+        m_renderer.finishFrame();
 
         performHotReload();
 
@@ -142,14 +142,14 @@ int MainProgram::doRun(size_t roomName, const RoomTransitionArguments& args) {
 
     // Exit the program
     m_roomManager.currentRoom()->sessionEnd();
-    m_window.prepareForDestructionOfRendererObjects();
+    m_renderer.prepareForDestructionOfRendererObjects();
 
     return m_programExitCode;
 }
 
 void MainProgram::step() {
     StepDoubleBufferingState::setTotalIndex(++m_stepN);
-    m_window.startStep();
+    m_renderer.deletionQueue().startNextIteration(DeletionQueue::Timeline::Step);
     m_roomManager.currentRoom()->step();
 }
 
@@ -210,7 +210,7 @@ void MainProgram::performHotReload() {
     auto callback = [this](vk::Pipeline pipeline, int identifier) {
         m_roomManager.notifyRooms<&Room::pipelineReloadedCallback>(pipeline, identifier);
     };
-    m_window.pipelineHotLoader().reloadChangedPipelines(callback);
+    m_pipelineHotLoader.reloadChangedPipelines(callback);
 #endif // RE_BUILDING_FOR_DEBUG
 }
 
@@ -224,7 +224,7 @@ void MainProgram::doRoomTransitionIfScheduled() {
     auto current = m_roomManager.goToRoom(m_nextRoomName, m_roomTransitionArgs);
     if (prev != current) { // If successfully changed the room
         // Update main renderpass
-        m_window.setMainRenderPass(
+        m_renderer.setMainRenderPass(
             current->mainRenderPass(), current->displaySettings().imGuiSubpassIndex
         );
         // Adopt the display settings of the entered room
@@ -264,13 +264,21 @@ void MainProgram::pollEvents() {
 }
 
 MainProgram::MainProgram(const MainProgramInitInfo& initInfo)
-    : m_window{
-        WindowSettings{}, WindowSubsystems::RealEngineVersionString(),
-        initInfo.vulkan, initInfo.hotReload}
-    , s_roomToEngineAccess(*this, m_inputManager, m_synchronizer, m_window, m_roomManager) {
+    : m_window{WindowSettings{}, WindowSubsystems::RealEngineVersionString()}
+    , m_renderer{m_window.sdlWindow(), m_window.isVSynced(),
+                 m_window.preferredDevice(), initInfo.vulkan}
+#if RE_BUILDING_FOR_DEBUG
+    , m_pipelineHotLoader{m_renderer.deletionQueue(), initInfo.hotReload}
+#endif // RE_BUILDING_FOR_DEBUG
+    , m_roomToEngineAccess{*this,    m_inputManager, m_synchronizer,
+                           m_window, m_renderer,     m_roomManager} {
 
-    Room::setRoomToEngineAccess(&s_roomToEngineAccess);
+    Room::setRoomToEngineAccess(&m_roomToEngineAccess);
     Room::setStaticReferences(this, &m_roomManager);
+
+#if RE_BUILDING_FOR_DEBUG
+    ObjectUsingVulkan::s_pipelineHotLoader = &m_pipelineHotLoader;
+#endif // RE_BUILDING_FOR_DEBUG
 }
 
 MainProgram& MainProgram::instance(const MainProgramInitInfo& initInfo) {

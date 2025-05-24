@@ -61,7 +61,7 @@ public:
      */
     VulkanRenderer(
         SDL_Window* sdlWindow, bool vSync, std::string_view preferredDevice,
-        const VulkanInitInfo& vulkan, const HotReloadInitInfo& hotReload
+        const VulkanInitInfo& vulkan
     );
 
     VulkanRenderer(const VulkanRenderer&)            = delete; ///< Noncopyable
@@ -92,10 +92,6 @@ public:
     std::string usedDevice() const;
 
     DeletionQueue& deletionQueue() { return m_deletionQueue; }
-
-#if RE_BUILDING_FOR_DEBUG
-    PipelineHotLoader& pipelineHotLoader() { return m_pipelineHotLoader; }
-#endif // RE_BUILDING_FOR_DEBUG
 
 private:
     // Vulkan objects
@@ -136,9 +132,6 @@ private:
     FrameDoubleBuffered<vk::raii::Fence> m_inFlightFences;
     bool m_recreteSwapchain = false;
     DeletionQueue m_deletionQueue{*m_device, m_allocator};
-#if RE_BUILDING_FOR_DEBUG
-    PipelineHotLoader m_pipelineHotLoader;
-#endif // RE_BUILDING_FOR_DEBUG
 
     // Active room dependent
     const RenderPass* m_mainRenderPass{};
