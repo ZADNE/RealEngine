@@ -8,7 +8,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
-#include <RealEngine/renderer/PipelineHotLoader.hpp>
+#include <RealEngine/resources/hot_reload/PipelineHotLoader.hpp>
 #include <RealEngine/utility/DebugString.hpp>
 
 namespace re {

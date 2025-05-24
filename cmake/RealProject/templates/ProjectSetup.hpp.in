@@ -2,7 +2,7 @@
  *  @author    Automatically generated file by RealProject
  */
 #pragma once
-#include <RealEngine/program/HotReloadInitInfo.hpp>
+#include <RealEngine/resources/hot_reload/HotReloadInitInfo.hpp>
 
 namespace re::setup {
 

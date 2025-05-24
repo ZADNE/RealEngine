@@ -7,8 +7,8 @@
 
 #include <RealEngine/graphics/pipelines/PipelineCreateInfos.hpp>
 #include <RealEngine/graphics/pipelines/PipelineSources.hpp>
-#include <RealEngine/program/HotReloadInitInfo.hpp>
 #include <RealEngine/renderer/DeletionQueue.hpp>
+#include <RealEngine/resources/hot_reload/HotReloadInitInfo.hpp>
 
 namespace re {
 

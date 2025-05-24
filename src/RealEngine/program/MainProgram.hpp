@@ -8,8 +8,8 @@
 #include <SDL_main.h>
 #include <glm/vec2.hpp>
 
-#include <RealEngine/program/HotReloadInitInfo.hpp>
 #include <RealEngine/program/Synchronizer.hpp>
+#include <RealEngine/resources/hot_reload/HotReloadInitInfo.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/rooms/RoomManager.hpp>
 #include <RealEngine/rooms/RoomToEngineAccess.hpp>
