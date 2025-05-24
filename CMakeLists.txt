@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.24)
 project(RealEngine)
 
 include(GNUInstallDirs)
@@ -28,7 +28,7 @@ endfunction()
     # OpenGL Mathematics
     set(GLM_BUILD_INSTALL ON CACHE INTERNAL "")
     FetchContent_Declare(glm
-        URL https://github.com/g-truc/glm/archive/refs/tags/1.0.0.tar.gz
+        URL https://github.com/g-truc/glm/archive/refs/tags/1.0.1.tar.gz
     )
     # bit7z
     set(BIT7Z_7ZIP_VERSION "23.01" CACHE INTERNAL "")
