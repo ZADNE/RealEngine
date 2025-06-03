@@ -150,7 +150,7 @@ void PipelineHotLoader::setPipelineIdentifier(vk::Pipeline pipeline, int identif
     }
 }
 
-void PipelineHotLoader::reloadChangedPipelines(
+size_t PipelineHotLoader::reloadChangedPipelines(
     const std::function<void(vk::Pipeline, int)>& reloadedCallback
 ) {
     auto& binPaths = m_impl->pathsToReload.read();
@@ -193,6 +193,8 @@ void PipelineHotLoader::reloadChangedPipelines(
         info->recreatePipelineFromSources(m_impl->deletionQueue);
         reloadedCallback(info->targetPipeline(), info->indentifier());
     }
+
+    return pipelinesToRecompile.size();
 }
 
 void PipelineHotLoader::unregisterPipelineForReloading(vk::Pipeline& pipeline) {

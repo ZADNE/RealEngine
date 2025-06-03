@@ -99,7 +99,7 @@ public:
     glm::ivec2 dims() const { return m_dims; }
 
     /**
-     * @brief Used only to initialize renderer
+     * @brief Used only by MainProgram
      */
     SDL_Window* sdlWindow() { return m_SDLwindow.get(); }
 

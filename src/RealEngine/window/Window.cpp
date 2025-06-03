@@ -86,10 +86,14 @@ Window::SDL_WindowRAII Window::createSDLWindow() {
     if (m_flags.borderless)
         SDL_flags |= SDL_WINDOW_BORDERLESS;
 
+    auto toSDLPos = [](int pos) -> int {
+        return pos == k_centeredWindowPosition ? SDL_WINDOWPOS_CENTERED : pos;
+    };
+
     // Create the window
     SDL_WindowRAII window{SDL_CreateWindow(
-        m_windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        m_dims.x, m_dims.y, SDL_flags
+        m_windowTitle.c_str(), toSDLPos(m_pos.x), toSDLPos(m_pos.y), m_dims.x,
+        m_dims.y, SDL_flags
     )};
 
     if (!window) {

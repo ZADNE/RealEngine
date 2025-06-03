@@ -28,6 +28,12 @@ struct WindowFlags {
  */
 class WindowSettings {
 public:
+
+    /**
+     * @brief Denotes that the window should be centered at the first monitor
+     */
+    static constexpr int k_centeredWindowPosition = std::numeric_limits<int>::max();
+
     /**
      * @brief Constructs settings from file that was saved before.
      *
@@ -38,7 +44,10 @@ public:
     /**
      * @brief Constructs settings from given parameters
      */
-    WindowSettings(glm::ivec2 dims, WindowFlags flags, std::string_view preferredDevice);
+    WindowSettings(
+        glm::ivec2 dims, glm::ivec2 pos, WindowFlags flags,
+        std::string_view preferredDevice
+    );
 
     /**
      * @brief Gets a copy of the window flags
@@ -66,6 +75,7 @@ protected:
 
     // NOLINTBEGIN(*-non-private-member-variables-in-classes): Intentional
     glm::ivec2 m_dims{};           ///< Dimensions of the window
+    glm::ivec2 m_pos{};            ///< Global position of the window
     WindowFlags m_flags;           ///< Flags of the window
     std::string m_preferredDevice; ///< The actual device may be different
     // NOLINTEND(*-non-private-member-variables-in-classes)

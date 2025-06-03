@@ -62,8 +62,9 @@ public:
     /**
      * @brief   Recreates all registered pipelines that had their sources changed
      * @details Must be called every frame.
+     * @return  The number of hot-reloaded pipelines
      */
-    void reloadChangedPipelines(const std::function<void(vk::Pipeline, int)>& reloadedCallback
+    size_t reloadChangedPipelines(const std::function<void(vk::Pipeline, int)>& reloadedCallback
     );
 
 private:

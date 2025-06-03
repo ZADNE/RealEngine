@@ -210,7 +210,9 @@ void MainProgram::performHotReload() {
     auto callback = [this](vk::Pipeline pipeline, int identifier) {
         m_roomManager.notifyRooms<&Room::pipelineReloadedCallback>(pipeline, identifier);
     };
-    m_pipelineHotLoader.reloadChangedPipelines(callback);
+    if (m_pipelineHotLoader.reloadChangedPipelines(callback) > 0) {
+        SDL_RaiseWindow(m_window.sdlWindow());
+    }
 #endif // RE_BUILDING_FOR_DEBUG
 }
 
