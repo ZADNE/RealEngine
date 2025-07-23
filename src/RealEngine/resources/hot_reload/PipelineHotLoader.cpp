@@ -85,15 +85,25 @@ struct PipelineHotLoader::Impl {
         TimePoint lastCMakeExecution = std::chrono::steady_clock::now();
         TimePoint lastIteration      = lastCMakeExecution;
         while (!stopToken.stop_requested()) {
-            if (lastSourceChange.load() > lastCMakeExecution) {
+            TimePoint locLastSourceChange = lastSourceChange.load();
+            if (locLastSourceChange > lastCMakeExecution) {
+                // Ensure at least a second has passed since the source edit to
+                // stabilize the filesystem and avoid duplicate runs
+                if (std::chrono::steady_clock::now() < locLastSourceChange + 1s) {
+                    std::this_thread::sleep_until(locLastSourceChange + 1s);
+                }
+                // Run CMake
                 lastCMakeExecution = std::chrono::steady_clock::now();
-                std::system(recompileShadersCommand.c_str());
+                if (std::system(recompileShadersCommand.c_str()) > 0) {
+                    re::error("Shader compilation failed");
+                }
             }
 
-            if (std::chrono::steady_clock::now() > lastIteration + 1s) {
+            // Check at most once a second to avoid active waiting
+            if (std::chrono::steady_clock::now() < lastIteration + 1s) {
                 std::this_thread::sleep_until(lastIteration + 1s);
-                lastIteration = std::chrono::steady_clock::now();
             }
+            lastIteration = std::chrono::steady_clock::now();
         }
     }};
 
