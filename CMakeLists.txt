@@ -16,6 +16,8 @@ function(FetchContent_MakeAvailableWithoutLinting)
 endfunction()
 
 # Find/fetch dependencies
+    # Git is required to download some dependencies
+    find_package(Git REQUIRED)
     # Vulkan
     find_package(Vulkan REQUIRED COMPONENTS glslc)
     # SDL2
