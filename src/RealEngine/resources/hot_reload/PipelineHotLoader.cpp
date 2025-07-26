@@ -26,8 +26,10 @@ const char* nulFile() {
 #endif
 }
 
+using StrDiffType = std::string::difference_type;
+
 constexpr void escapeDots(std::string& str) {
-    for (size_t i = 0; i < str.size(); ++i) { // Escape dots
+    for (StrDiffType i = 0; i < static_cast<StrDiffType>(str.size()); ++i) {
         if (str[i] == '.') {
             str.insert(str.begin() + i, '\\');
             ++i;
@@ -45,6 +47,15 @@ constexpr std::string spirvBinFileRegex() {
     auto str = std::string{"."} + details::k_shaderSPIRVBinFileExt;
     escapeDots(str);
     return ".*" + str + '$';
+}
+
+consteval StrDiffType strLength(const char* str) {
+    StrDiffType len = 0;
+    while (*str != '\0') {
+        str++;
+        len++;
+    }
+    return len;
 }
 
 } // namespace
@@ -175,7 +186,7 @@ size_t PipelineHotLoader::reloadChangedPipelines(
             // Search all pipelines that use the source file
             std::string path{
                 binPath.begin(),
-                binPath.end() - std::strlen(details::k_shaderSPIRVBinFileExt) - 1
+                binPath.end() - strLength(details::k_shaderSPIRVBinFileExt) - 1 // 1 for '.'
             };
             for (PipelineReloadInfo& info : m_impl->pipelineRegister) {
                 // Search all stages of the pipeline
