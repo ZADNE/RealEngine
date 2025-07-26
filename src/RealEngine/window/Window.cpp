@@ -87,7 +87,9 @@ Window::SDL_WindowRAII Window::createSDLWindow() {
         SDL_flags |= SDL_WINDOW_BORDERLESS;
 
     auto toSDLPos = [](int pos) -> int {
-        return pos == k_centeredWindowPosition ? SDL_WINDOWPOS_CENTERED : pos;
+        return pos == k_centeredWindowPosition
+                   ? static_cast<int>(SDL_WINDOWPOS_CENTERED)
+                   : pos;
     };
 
     // Create the window

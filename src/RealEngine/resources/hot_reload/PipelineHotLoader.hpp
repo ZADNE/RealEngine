@@ -13,16 +13,19 @@
 namespace re {
 
 /**
- * @brief   Allows recompilation of Vulkan pipelines during runtime (debug
- *          builds only)
+ * @brief   Allows recompilation of Vulkan pipelines during runtime (present in
+ *          debug builds only)
  */
 class PipelineHotLoader {
 public:
 
     PipelineHotLoader(DeletionQueue& deletionQueue, const HotReloadInitInfo& hotReload);
 
-    PipelineHotLoader(const PipelineHotLoader&)            = default;
-    PipelineHotLoader& operator=(const PipelineHotLoader&) = default;
+    PipelineHotLoader(const PipelineHotLoader&) = delete; ///< Noncopyable
+    PipelineHotLoader& operator=(const PipelineHotLoader&) = delete; ///< Noncopyable
+
+    PipelineHotLoader(PipelineHotLoader&&)            = default; ///< Movable
+    PipelineHotLoader& operator=(PipelineHotLoader&&) = default; ///< Movable
 
     ~PipelineHotLoader(); ///< Defined in source file to enable PImpl idiom
 

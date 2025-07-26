@@ -1,10 +1,10 @@
-﻿## How to set up a project using RealEngine
+## How to set up a project using RealEngine
 
 This document explains how to set up a project using [RealEngine](https://github.com/ZADNE/RealEngine). RealEngine is a simple engine-like library written in C++23. It uses Vulkan as rendering backed so it integrates shaders written in GLSL the best, though it can be fed SPIR-V directly. RealEngine is built using CMake.
 
 ### File structure setup
 
-A project using RealEngine should be created as a **direct subfolder of a freshly cloned [Real](https://github.com/ZADNE/Real) repo**. Real is a very lightweight repo (it does not contain RealEngine). If you need to build RealEngine from source, clone it next to your project. If you do not want build it from source, [get a prebuilt release](https://github.com/ZADNE/RealEngine/releases) and make sure the package can be found using the standard CMake `find_package mechanism`. Given project name `MyProject` and building RealEngine from source, the folder structure should look like this:
+A project using RealEngine should be created as a **direct subfolder of a freshly cloned [Real](https://github.com/ZADNE/Real) repo**. Real is a very lightweight repo (it does not contain RealEngine). If you need to build RealEngine from source, clone it next to your project. If you do not want build it from source, [get a prebuilt release](https://github.com/ZADNE/RealEngine/releases) and make sure the package can be found using the standard CMake `find_package` mechanism. Given project name `MyProject` and building RealEngine from source, the folder structure should look like this:
 
 ```
 Real/

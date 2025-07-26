@@ -6,6 +6,11 @@
 
 namespace re {
 
+// The macros defined here are used for things that still cannot be done better
+// (e.g. omitting member variables).
+
+// NOLINTBEGIN(*-macro-usage): See explanation above
+
 enum class BuildType {
     Debug,
     Release
@@ -55,5 +60,7 @@ constexpr BuildOS k_buildOS = BuildOS::Linux;
 #else
 #    error "Unsupported or undetected operating system"
 #endif
+
+// NOLINTEND(*-macro-usage)
 
 } // namespace re
