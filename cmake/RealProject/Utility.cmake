@@ -2,7 +2,7 @@
 
 function(_generate_configured_file in_file out_file)
     file(READ ${in_file} contents)
-    string(CONFIGURE "${contents}" contents @ONLY)
+    string(CONFIGURE "${contents}" contents)
     file(GENERATE
         OUTPUT ${out_file}
         CONTENT "${contents}"

@@ -134,9 +134,16 @@ struct PipelineHotLoader::Impl {
 };
 
 PipelineHotLoader::PipelineHotLoader(
-    DeletionQueue& deletionQueue, const HotReloadInitInfo& hotReload
+    DeletionQueue& deletionQueue, const HotReloadInitInfo* hotReload
 )
-    : m_impl{std::make_unique<Impl>(deletionQueue, hotReload)} {
+    : m_impl{[&]() -> std::unique_ptr<Impl> {
+        if (hotReload) {
+            return std::make_unique<Impl>(deletionQueue, *hotReload);
+        } else {
+            re::log("Hot reload of shaders disabled: init info not provided");
+            return nullptr;
+        }
+    }()} {
 }
 
 PipelineHotLoader::~PipelineHotLoader() = default;
@@ -145,6 +152,8 @@ void PipelineHotLoader::registerPipelineForReloading(
     vk::Pipeline& initial, const PipelineGraphicsCreateInfo& createInfo,
     const PipelineGraphicsSources& srcs
 ) {
+    if (!m_impl)
+        return;
     m_impl->pipelineRegister.emplace_back(initial, createInfo, srcs);
 }
 
@@ -152,12 +161,16 @@ void PipelineHotLoader::registerPipelineForReloading(
     vk::Pipeline& initial, const PipelineComputeCreateInfo& createInfo,
     const PipelineComputeSources& srcs
 ) {
+    if (!m_impl)
+        return;
     m_impl->pipelineRegister.emplace_back(initial, createInfo, srcs);
 }
 
 void PipelineHotLoader::moveRegisteredPipeline(
     vk::Pipeline& original, vk::Pipeline& moved
 ) {
+    if (!m_impl)
+        return;
     auto it = m_impl->findInRegister(original);
     if (it != m_impl->pipelineRegister.end()) {
         it->updateTargetPipeline(moved);
@@ -165,6 +178,8 @@ void PipelineHotLoader::moveRegisteredPipeline(
 }
 
 void PipelineHotLoader::setPipelineIdentifier(vk::Pipeline pipeline, int identifier) {
+    if (!m_impl)
+        return;
     auto it = m_impl->findInRegister(pipeline);
     if (it != m_impl->pipelineRegister.end()) {
         it->setIdentifier(identifier);
@@ -174,6 +189,8 @@ void PipelineHotLoader::setPipelineIdentifier(vk::Pipeline pipeline, int identif
 size_t PipelineHotLoader::reloadChangedPipelines(
     const std::function<void(vk::Pipeline, int)>& reloadedCallback
 ) {
+    if (!m_impl)
+        return 0;
     auto& binPaths = m_impl->pathsToReload.read();
     std::set<PipelineReloadInfo*> pipelinesToRecompile;
     std::vector<unsigned char> loadedFile;
@@ -219,6 +236,8 @@ size_t PipelineHotLoader::reloadChangedPipelines(
 }
 
 void PipelineHotLoader::unregisterPipelineForReloading(vk::Pipeline& pipeline) {
+    if (!m_impl)
+        return;
     auto it = m_impl->findInRegister(pipeline);
     if (it != m_impl->pipelineRegister.end()) {
         m_impl->pipelineRegister.erase(it); // O(n) shift

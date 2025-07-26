@@ -36,8 +36,13 @@ struct DisplayInfo {
 };
 
 struct MainProgramInitInfo {
+
     VulkanInitInfo vulkan{};
-    HotReloadInitInfo hotReload{};
+
+    /**
+     * @brief Hot reload will be disabled even in non-release builds if not provided
+     */
+    const HotReloadInitInfo* hotReload{};
 };
 
 /**

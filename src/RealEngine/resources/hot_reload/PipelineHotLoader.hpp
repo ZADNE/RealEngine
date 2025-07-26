@@ -19,7 +19,10 @@ namespace re {
 class PipelineHotLoader {
 public:
 
-    PipelineHotLoader(DeletionQueue& deletionQueue, const HotReloadInitInfo& hotReload);
+    /**
+     * @brief Initializes the object to a working state only if hotReload is non-null
+     */
+    PipelineHotLoader(DeletionQueue& deletionQueue, const HotReloadInitInfo* hotReload);
 
     PipelineHotLoader(const PipelineHotLoader&) = delete; ///< Noncopyable
     PipelineHotLoader& operator=(const PipelineHotLoader&) = delete; ///< Noncopyable
