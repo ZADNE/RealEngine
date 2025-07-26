@@ -4,6 +4,7 @@
 #pragma once
 #include <queue>
 #include <type_traits>
+#include <utility>
 
 #include <vma/vk_mem_alloc.hpp>
 #include <vulkan/vulkan.hpp>
