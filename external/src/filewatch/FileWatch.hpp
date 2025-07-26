@@ -700,7 +700,9 @@ namespace filewatch {
                   struct stat stat;
                   mbstate_t state;
 
-                  realpath((const char*)path.c_str(), buf);
+                  if (!realpath((const char*)path.c_str(), buf)) {
+                      return path; // Return the original in case of error
+                  }
                   ::stat((const char*)path.c_str(), &stat);
 
                   if (stat.st_mode & S_IFREG || stat.st_mode & S_IFLNK) {
