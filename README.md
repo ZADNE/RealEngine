@@ -1,4 +1,4 @@
-﻿# RealEngine: A Vulkan-based engine-like library
+# RealEngine: A Vulkan-based engine-like library
 
 [![CMake build](https://github.com/ZADNE/RealEngine/actions/workflows/build.yml/badge.svg)](https://github.com/ZADNE/RealEngine/actions/workflows/build.yml)
 [![C++ Core Guidelines](https://github.com/ZADNE/RealEngine/actions/workflows/cpp-core-guidelines.yml/badge.svg)](https://github.com/ZADNE/RealEngine/actions/workflows/cpp-core-guidelines.yml)
@@ -7,7 +7,8 @@
 ## Features:
 
 * A set of convenient classes to ease Vulkan 1.3 rendering
-* Automatic codegen to get SPIR-V from shaders or to reuse GLSL code in C++
+* Codegen to access SPIR-V of shaders and to call GLSL functions from C++
+* Hot reload of shaders from source files in non-release builds
 * Handling of mouse & keyboard input
 * Simulation speed decoupled from variable frame rate
 * A system of rooms / scenes / worlds with well defined transitions
