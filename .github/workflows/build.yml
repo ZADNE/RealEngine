@@ -13,19 +13,15 @@ jobs:
       matrix:
         os: [ubuntu-24.04, windows-2022]
         build_type: [Debug, Release]
-        c_compiler: [gcc-14, cl]
         include:
           - os: windows-2022
-            c_compiler: cl
-            cpp_compiler: cl
+            c_compiler: cl.exe
+            cpp_compiler: cl.exe
+            cmake_generator: Ninja
           - os: ubuntu-24.04
             c_compiler: gcc-14
             cpp_compiler: g++-14
-        exclude:
-          - os: windows-2022
-            c_compiler: gcc-14
-          - os: ubuntu-24.04
-            c_compiler: cl
+            cmake_generator: Unix Makefiles
 
     steps:
     - name: Set reusable strings
@@ -35,6 +31,9 @@ jobs:
         echo "build-dir=${{ github.workspace }}/Real/build" >> "$GITHUB_ENV"
         echo "source-dir=${{ github.workspace }}/Real" >> "$GITHUB_ENV"
         echo "install-dir=${{ github.workspace }}/Real/install" >> "$GITHUB_ENV"
+
+    - name: Set up Visual Studio environment variables (Windows)
+      uses: ilammy/msvc-dev-cmd@v1
 
     - name: Clone Real
       uses: actions/checkout@v4
@@ -73,15 +72,15 @@ jobs:
     - name: Configure CMake
       run: >
         cmake -B ${{ env.build-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -G "${{ matrix.cmake_generator }}"
+        -DCMAKE_C_COMPILER="${{ matrix.c_compiler }}"
+        -DCMAKE_CXX_COMPILER="${{ matrix.cpp_compiler }}"
+        -DCMAKE_BUILD_TYPE="${{ matrix.build_type }}"
         -S ${{ env.source-dir }}
 
     - name: Build
       run: >
         cmake --build ${{ env.build-dir }}
-        --config ${{ matrix.build_type }}
         --parallel 4
 
     - name: Test
