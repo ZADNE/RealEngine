@@ -34,4 +34,4 @@ using namespace glm;
 #pragma warning(push)
 #pragma warning(disable : 4200)
 
-#include <RealShaders/DefineSwizzlingMacros.hpp>
+#include <RealShaders/details/DefineSwizzlingMacros.hpp>

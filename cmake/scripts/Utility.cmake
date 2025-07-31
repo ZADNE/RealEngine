@@ -34,8 +34,14 @@ function(_parse_string_constant_from_cpp cpp_code var_name)
 endfunction()
 
 function(_load_shader_naming_constants)
+    if(REALENGINE_BUILDING_FROM_SOURCE)
+        set(realengine_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../src")
+    else()
+        get_target_property(base_dir RealEngine BINARY_DIR)
+        set(realengine_dir "${base_dir}/src")
+    endif()
     file(READ
-        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../src/RealEngine/utility/details/CMakeConstants.hpp"
+        "${realengine_dir}/RealEngine/utility/details/CMakeConstants.hpp"
         header_file
     )
     _parse_string_constant_from_cpp("${header_file}" k_shaderTargetSuffix)

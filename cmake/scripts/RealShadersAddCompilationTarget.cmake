@@ -1,6 +1,6 @@
 # author    Dubsky Tomas
 
-include("cmake/RealProject/Utility.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
 function(_add_shader_compilation_target target)
     # Check if this target has shaders
@@ -13,6 +13,8 @@ function(_add_shader_compilation_target target)
     get_target_property(base_dir ${target} realproject_base_dir_rel)
     get_target_property(shader_sources_rel ${target} realproject_glsl_sources_rel)
     get_target_property(target_includes ${target} INCLUDE_DIRECTORIES)
+    get_target_property(interface_target_includes ${target} INTERFACE_INCLUDE_DIRECTORIES)
+    set(all_target_includes "${target_includes};${interface_target_includes}")
     if (NOT shader_sources_rel)
         return()
     endif()
@@ -55,15 +57,15 @@ function(_add_shader_compilation_target target)
                 COMMAND ${Vulkan_GLSLC_EXECUTABLE}  # C + dependency
                         -MD -mfmt=c -MF ${shader_dep_abs} ${shader_source_abs}
                         -o ${shader_c_abs} --target-env=vulkan1.3 ${glslc_flags}
-                        "$<LIST:TRANSFORM,${target_includes},PREPEND,-I>"
+                        "$<LIST:TRANSFORM,${all_target_includes},PREPEND,-I>"
                 COMMAND ${Vulkan_GLSLC_EXECUTABLE}  # Disassembly
                         -S ${shader_source_abs}
                         -o ${shader_txt_abs} --target-env=vulkan1.3 ${glslc_flags}
-                        "$<LIST:TRANSFORM,${target_includes},PREPEND,-I>"
+                        "$<LIST:TRANSFORM,${all_target_includes},PREPEND,-I>"
                 COMMAND ${Vulkan_GLSLC_EXECUTABLE}  # Binary
                         ${shader_source_abs}
                         -o ${shader_bin_abs} --target-env=vulkan1.3 ${glslc_flags}
-                        "$<LIST:TRANSFORM,${target_includes},PREPEND,-I>"
+                        "$<LIST:TRANSFORM,${all_target_includes},PREPEND,-I>"
                 DEPENDS ${shader_source_abs}
                 BYPRODUCTS ${shader_dep_abs}
                 COMMENT "Compiling shader: ${shader_source_rel}"

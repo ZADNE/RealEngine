@@ -31,4 +31,4 @@
 #    undef RE_CPP_INTEGRATED
 #endif
 
-#include <RealShaders/UndefSwizzlingMacros.hpp>
+#include <RealShaders/details/UndefSwizzlingMacros.hpp>

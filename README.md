@@ -9,6 +9,7 @@
 * A set of convenient classes to ease Vulkan 1.3 rendering
 * Codegen to access SPIR-V of shaders and to call GLSL functions from C++
 * Hot reload of shaders from source files in non-release builds
+* Packaged and encrypted runtime data in release builds
 * Handling of mouse & keyboard input
 * Simulation speed decoupled from variable frame rate
 * A system of rooms / scenes / worlds with well defined transitions

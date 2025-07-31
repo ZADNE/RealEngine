@@ -5,8 +5,12 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(FetchContent)
 
-include("cmake/RealProject/RealProject.cmake")
-include("cmake/RealEngine/GetRealEngineVersion.cmake")
+set(REALENGINE_BUILDING_FROM_SOURCE TRUE
+    CACHE INTERNAL "Whether building RealEngine from source (as opposed to using installed)"
+)
+
+include("cmake/scripts/RealProject.cmake")
+include("cmake/scripts/GetRealEngineVersion.cmake")
 
 function(FetchContent_MakeAvailableWithoutLinting)
     set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
@@ -103,7 +107,7 @@ endfunction()
             "$<INSTALL_INTERFACE:.>"
     )
     real_target_init_file_sets(RealEngine BASE_DIR "src")
-    get_realengine_version()
+    get_realengine_version(REALENGINE_BUILDING_FROM_SOURCE)
     add_subdirectory("src")
 
     # Doxygen documentation
@@ -137,7 +141,6 @@ endfunction()
             argparse
             bit7z
     )
-    include("cmake/RealEngine/ResourcePackaging.cmake")
 
     # RTICreator (Windows only)
     if (WIN32)
@@ -178,6 +181,11 @@ endfunction()
         FILE_SET HEADERS
             DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
+    )
+    install( # Manually install RealShaders because it contains GLSL that normally is not installed
+        DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/src/RealShaders"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        COMPONENT RealEngine_Development
     )
 
     # Manually install headers and necessary scripts for bit7z
@@ -232,7 +240,7 @@ endfunction()
         COMPONENT RealEngine_Development
     )
     configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RealEngine/RealEngineConfig.cmake.in"
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_templates/RealEngineConfig.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake"
         @ONLY
     )
@@ -240,7 +248,14 @@ endfunction()
         FILES
             "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake"
-            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RealEngine/ResourcePackaging.cmake"
+        DESTINATION
+            "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
+        COMPONENT RealEngine_Development
+    )
+    install( # RealProject scripts and C++ template files
+        DIRECTORY
+            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cpp_templates"
+            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/scripts"
         DESTINATION
             "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
         COMPONENT RealEngine_Development

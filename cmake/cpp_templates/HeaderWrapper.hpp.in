@@ -4,9 +4,9 @@
 #pragma once
 
 @cpp_namespace_start@
-#include <RealShaders/GlslIntegrationBegin.hpp>
+#include <RealShaders/details/GlslIntegrationBegin.hpp>
 
 #include <@header_rel@>
 
-#include <RealShaders/GlslIntegrationEnd.hpp>
+#include <RealShaders/details/GlslIntegrationEnd.hpp>
 @cpp_namespace_end@

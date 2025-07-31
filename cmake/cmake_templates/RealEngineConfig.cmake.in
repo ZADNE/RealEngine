@@ -16,9 +16,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../bit7z/cmake/FilesystemDetect.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/../../bit7z/cmake/BuildOptions.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/../../bit7z/cmake/Dependencies.cmake")
 
-# CMake scripts for RealEngine's resource packaging
-include("${CMAKE_CURRENT_LIST_DIR}/ResourcePackaging.cmake")
-
 # Runtime artifacts needed by RealEngine
 if(WIN32)
     add_library(7z SHARED IMPORTED GLOBAL)
@@ -32,5 +29,13 @@ set(REALENGINE_RUNTIME_ARTIFACTS # A bit hacky...
     CACHE INTERNAL ""
 )
 
-# RealEngine
+# Not building from source
+set(REALENGINE_BUILDING_FROM_SOURCE FALSE
+    CACHE INTERNAL "Whether building RealEngine from source (as opposed to using installed)"
+)
+
+# RealEngine targets
 include("${CMAKE_CURRENT_LIST_DIR}/RealEngineTargets.cmake")
+
+# CMake functions needed by projects using RealEngine (e.g. add_real_executable)
+include("${CMAKE_CURRENT_LIST_DIR}/scripts/RealProject.cmake")

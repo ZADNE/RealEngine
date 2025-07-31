@@ -1,8 +1,9 @@
 # author     Dubsky Tomas
 
-include("cmake/RealProject/RealProjectGenerateSetupFile.cmake")
-include("cmake/RealProject/RealShadersAddCompilationTarget.cmake")
-include("cmake/RealProject/RealShadersGenerateCppFiles.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/RealProjectGenerateSetupFile.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/RealShadersAddCompilationTarget.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/RealShadersGenerateCppFiles.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/ResourcePackaging.cmake")
 
 # Cache variables
 set(REALPROJECT_HEADER_EXTENSIONS

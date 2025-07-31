@@ -1,6 +1,6 @@
 # author    Dubsky Tomas
 
-include("cmake/RealProject/Utility.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
 function(_generate_cpp_wrapper_for_stage target shader_rel)
     # Compose paths
@@ -58,7 +58,7 @@ function(_generate_cpp_wrappers_for_shaders target)
         set(cpp_namespace_start "namespace ${cpp_namespace} {\n")
         set(cpp_namespace_end "\n} // namespace ${cpp_namespace}")
     endif()
-    set(template_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/templates")
+    set(template_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../cpp_templates")
     
     # Generate stage wrappers
     set(shader_dirs)
@@ -98,12 +98,6 @@ function(_generate_cpp_wrappers_for_shaders target)
     foreach(header_rel IN LISTS shader_headers_rel)
         _generate_cpp_wrapper_to_expose_header(${target} ${header_rel})
     endforeach()
-    list(LENGTH shader_headers_rel exposed_header_count)
-    if(${exposed_header_count} GREATER 0)
-        target_include_directories(${target}
-            PUBLIC "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/include"
-        )
-    endif()
 
     # Set include path so that the generated code can be included
     target_include_directories(${target} BEFORE

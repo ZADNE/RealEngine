@@ -1,12 +1,12 @@
 # author    Dubsky Tomas
 
-include("cmake/RealProject/Utility.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
 function(_generate_cpp_setup_file target)
     # Load target properties and prepare variables
     get_target_property(base_dir ${target} realproject_base_dir_rel)
     get_target_property(setup_rel ${target} realproject_setup_filepath_rel)
-    set(template_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/templates")
+    set(template_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../cpp_templates")
     set(cmake_command ${CMAKE_COMMAND})
     set(source_dir ${CMAKE_SOURCE_DIR})
     set(binary_dir ${CMAKE_BINARY_DIR})
