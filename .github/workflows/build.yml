@@ -90,7 +90,7 @@ jobs:
     - name: Compose archive name
       shell: bash
       run: >
-        echo "archive-name=RealEngine-v$(cmake -P Real/RealEngine/cmake/RealEngine/GetRealEngineVersion.cmake)-${{ matrix.os }}-${{ matrix.build_type }}" >> "$GITHUB_ENV"
+        echo "archive-name=RealEngine-v$(cmake -P Real/RealEngine/cmake/scripts/GetRealEngineVersion.cmake)-${{ matrix.os }}-${{ matrix.build_type }}" >> "$GITHUB_ENV"
 
     - name: Create release
       run: >
