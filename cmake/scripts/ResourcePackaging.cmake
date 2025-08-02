@@ -27,7 +27,7 @@ function(real_target_package_resources)
     # Copy dummy index which will be used for debug builds
     if(NOT EXISTS ${ARG_INDEX_FILE})
         configure_file(
-            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/templates/ResourceIndex.hpp.in"
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../cpp_templates/ResourceIndex.hpp.in"
             ${ARG_INDEX_FILE}
             COPYONLY
         )

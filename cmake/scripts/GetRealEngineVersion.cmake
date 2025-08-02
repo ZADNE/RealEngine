@@ -1,14 +1,11 @@
 # author     Dubsky Tomas
 
-function(get_realengine_version building_from_source)
-    if(building_from_source)
-        set(realengine_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../src")
-    else()
-        get_target_property(base_dir RealEngine BINARY_DIR)
-        set(realengine_dir "${base_dir}/src")
-    endif()
+include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
+
+function(get_realengine_version)
+    get_realengine_base_dir_abs()
     file(READ
-        "${realengine_dir}/RealEngine/utility/Version.hpp"
+        "${realengine_base_dir_abs}/RealEngine/utility/Version.hpp"
         version_file
     )
     string(REGEX MATCH "constexpr int k_versionMajor = ([0-9]+)" _ ${version_file})
@@ -23,6 +20,6 @@ endfunction()
 
 # Print the version to stdout if running in script mode
 if(DEFINED CMAKE_ARGV0)
-    get_realengine_version(TRUE)
+    get_realengine_version()
     execute_process(COMMAND ${CMAKE_COMMAND} -E echo "${realengine_version}")
 endif()

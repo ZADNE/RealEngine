@@ -1,5 +1,17 @@
 # author    Dubsky Tomas
 
+function(get_realengine_base_dir_abs)
+    if(TARGET RealEngine)
+        get_target_property(base_dir RealEngine
+            HEADER_DIRS_realproject_public_headers
+        )
+    else()
+        # Assume building from source
+        set(base_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../src")
+    endif()
+    set(realengine_base_dir_abs "${base_dir}" PARENT_SCOPE)
+endfunction()
+
 function(_generate_configured_file in_file out_file)
     file(READ ${in_file} contents)
     string(CONFIGURE "${contents}" contents)
@@ -34,14 +46,9 @@ function(_parse_string_constant_from_cpp cpp_code var_name)
 endfunction()
 
 function(_load_shader_naming_constants)
-    if(REALENGINE_BUILDING_FROM_SOURCE)
-        set(realengine_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../src")
-    else()
-        get_target_property(base_dir RealEngine BINARY_DIR)
-        set(realengine_dir "${base_dir}/src")
-    endif()
+    get_realengine_base_dir_abs()
     file(READ
-        "${realengine_dir}/RealEngine/utility/details/CMakeConstants.hpp"
+        "${realengine_base_dir_abs}/RealEngine/utility/details/CMakeConstants.hpp"
         header_file
     )
     _parse_string_constant_from_cpp("${header_file}" k_shaderTargetSuffix)

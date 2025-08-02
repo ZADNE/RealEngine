@@ -98,6 +98,14 @@ function(_generate_cpp_wrappers_for_shaders target)
     foreach(header_rel IN LISTS shader_headers_rel)
         _generate_cpp_wrapper_to_expose_header(${target} ${header_rel})
     endforeach()
+    list(LENGTH shader_headers_rel exposed_header_count)
+    if(${exposed_header_count} GREATER 0)
+        # Add include path for RealShaders folder that header wrappers use
+        get_realengine_base_dir_abs()
+        target_include_directories(${target}
+            PUBLIC "${realengine_base_dir_abs}"
+        )
+    endif()
 
     # Set include path so that the generated code can be included
     target_include_directories(${target} BEFORE

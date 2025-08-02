@@ -107,7 +107,7 @@ endfunction()
             "$<INSTALL_INTERFACE:.>"
     )
     real_target_init_file_sets(RealEngine BASE_DIR "src")
-    get_realengine_version(REALENGINE_BUILDING_FROM_SOURCE)
+    get_realengine_version()
     add_subdirectory("src")
 
     # Doxygen documentation
