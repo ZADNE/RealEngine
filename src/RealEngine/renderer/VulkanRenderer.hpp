@@ -87,8 +87,15 @@ public:
 
     void prepareForDestructionOfRendererObjects();
 
+    /**
+     * @brief Lists devices (~GPUs) that can be used for rendering
+     */
     std::vector<std::string> availableDevices() const;
 
+    /**
+     * @brief Returns name of the device used for rendering
+     * @details The device is one of the ones from availableDevices().
+     */
     std::string usedDevice() const;
 
     DeletionQueue& deletionQueue() { return m_deletionQueue; }

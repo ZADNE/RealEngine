@@ -185,7 +185,7 @@ endfunction()
     install( # Manually install RealShaders because it contains GLSL that normally is not installed
         DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/src/RealShaders"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-        COMPONENT RealEngine_Development
+        COMPONENT   RealEngine_Development
     )
 
     # Manually install headers and necessary scripts for bit7z
@@ -208,8 +208,8 @@ endfunction()
     install(
         IMPORTED_RUNTIME_ARTIFACTS ${runtime_bundled_artifacts} # SDLs are not bundled
         RUNTIME
-            DESTINATION         "${CMAKE_INSTALL_BINDIR}"
-            COMPONENT           RealEngine_Development
+            DESTINATION "${CMAKE_INSTALL_BINDIR}"
+            COMPONENT   RealEngine_Development
     )
 
     # Downstream projects should install these runtime artifacts from these targets

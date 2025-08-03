@@ -113,16 +113,8 @@ std::string_view RoomToEngineAccess::preferredDevice() const {
     return m_window.preferredDevice();
 }
 
-std::vector<std::string> RoomToEngineAccess::availableDevices() const {
-    return m_renderer.availableDevices();
-}
-
 void RoomToEngineAccess::setPreferredDevice(std::string_view preferredDevice, bool save) {
     m_window.setPreferredDevice(preferredDevice, save);
-}
-
-std::string RoomToEngineAccess::usedDevice() const {
-    return m_renderer.usedDevice();
 }
 
 void RoomToEngineAccess::setWindowTitle(const std::string& title) {
@@ -152,6 +144,14 @@ void RoomToEngineAccess::saveWindowSettings() {
 #pragma endregion
 
 #pragma region Main RenderPass
+
+std::vector<std::string> RoomToEngineAccess::availableDevices() const {
+    return m_renderer.availableDevices();
+}
+
+std::string RoomToEngineAccess::usedDevice() const {
+    return m_renderer.usedDevice();
+}
 
 void RoomToEngineAccess::mainRenderPassBegin(
     std::span<const vk::ClearValue> clearValues /* = {&k_defaultClearColor, 1}*/

@@ -90,7 +90,3 @@ uniform WorldDrawingPC {
     vec2 p_minimapOffset;
 };
 ```
-
-### Including GLSL code into C++
-
-See documentation of RealShaders which integrate shaders into C++.

@@ -17,7 +17,7 @@ Real/
 ├─ CMakeLists.txt
 ```
 
-The top level `CMakeLists.txt` must stay intact. Real also contains RealEngine-default configuration files for various tools (clangformat etc.) but these are not strictly necessary. There can be multiple RealProjects next to each other.
+The top level `CMakeLists.txt` should stay intact. Real also contains RealEngine-default configuration files for various tools (clangformat etc.) but these are not strictly necessary. There can be multiple RealProjects next to each other.
 
 ### CMake setup
 
@@ -85,5 +85,3 @@ struct PlayerHitboxSB {
     vec2 velocityPx;
 };
 ```
-
-See `cmake/RealProject/include/RealShaders/` for details on the integration.

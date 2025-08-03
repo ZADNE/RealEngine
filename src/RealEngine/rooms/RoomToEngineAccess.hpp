@@ -151,19 +151,9 @@ public:
     std::string_view preferredDevice() const;
 
     /**
-     * @copydoc Window::availableDevices
-     */
-    std::vector<std::string> availableDevices() const;
-
-    /**
      * @copydoc Window::setPreferredDevice
      */
     void setPreferredDevice(std::string_view preferredDevice, bool save);
-
-    /**
-     * @copydoc Window::usedDevice
-     */
-    std::string usedDevice() const;
 
     /**
      * @copydoc Window::setTitle
@@ -194,28 +184,38 @@ public:
 
 #pragma region Main RenderPass
 
+    /**
+     * @copydoc VulkanRenderer::availableDevices
+     */
+    std::vector<std::string> availableDevices() const;
+
+    /**
+     * @copydoc VulkanRenderer::usedDevice
+     */
+    std::string usedDevice() const;
+
     constexpr static vk::ClearValue k_defaultClearColor =
         vk::ClearColorValue{1.0f, 1.0f, 1.0f, 1.0f};
 
     /**
-     * @copydoc Window::mainRenderPassBegin()
+     * @copydoc VulkanRenderer::mainRenderPassBegin()
      */
     void mainRenderPassBegin(
         std::span<const vk::ClearValue> clearValues = {&k_defaultClearColor, 1}
     );
 
     /**
-     * @copydoc Window::mainRenderPassNextSubpass()
+     * @copydoc VulkanRenderer::mainRenderPassNextSubpass()
      */
     void mainRenderPassNextSubpass();
 
     /**
-     * @copydoc Window::mainRenderPassDrawImGui()
+     * @copydoc VulkanRenderer::mainRenderPassDrawImGui()
      */
     void mainRenderPassDrawImGui();
 
     /**
-     * @copydoc Window::mainRenderPassEnd()
+     * @copydoc VulkanRenderer::mainRenderPassEnd()
      */
     void mainRenderPassEnd();
 
