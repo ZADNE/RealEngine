@@ -134,7 +134,6 @@ endfunction()
     set_target_properties(ResourcePackager PROPERTIES
         CXX_STANDARD 23
         INTERPROCEDURAL_OPTIMIZATION TRUE
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/tools/ResourcePackager"
     )
     target_link_libraries(ResourcePackager
         PRIVATE

@@ -29,7 +29,7 @@ macro(_add_real_target target)
     set_target_properties(${target} PROPERTIES
         realproject_base_dir_rel        "."
         realproject_base_dir_abs        "${source_dir}"
-        realproject_setup_filepath_rel  "${target}/Setup.gen.hpp"
+        realproject_setup_filepath_rel  "${target}Setup.gen.hpp"
         realproject_glsl_standard       "460"
         realproject_glsl_headers_rel    ""
         realproject_glsl_sources_rel    ""
