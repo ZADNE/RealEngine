@@ -112,17 +112,21 @@ endfunction()
 
     # Doxygen documentation
     find_package(Doxygen)
-    if (DOXYGEN_FOUND)
-        set(DOXYGEN_IN "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile")
-        set(DOXYGEN_OUT "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
-        configure_file("${DOXYGEN_IN}" "${DOXYGEN_OUT}" @ONLY)
+    if (Doxygen_FOUND)
+        set(doxyfile_template "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile")
+        set(doxyfile "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
+        configure_file(
+            "${doxyfile_template}"
+            "${doxyfile}"
+            @ONLY
+        )
 
         add_custom_target(RealEngine_Documentation
-            COMMAND "${DOXYGEN_EXECUTABLE}" "${DOXYGEN_OUT}"
+            COMMAND "${DOXYGEN_EXECUTABLE}" "${doxyfile}"
             WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
             VERBATIM
         )
-    endif(DOXYGEN_FOUND)
+    endif()
 
     # ResourcePackager
     add_real_executable(ResourcePackager)
@@ -218,13 +222,12 @@ endfunction()
     )
 
     # Install documentation
-    if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/doc/")
-        install(
-            DIRECTORY   "${CMAKE_CURRENT_BINARY_DIR}/doc/"
-            DESTINATION "${CMAKE_INSTALL_DOCDIR}"
-            COMPONENT   RealEngine_Development
-        )
-    endif()
+    install(
+        DIRECTORY   "${CMAKE_CURRENT_BINARY_DIR}/doc/"
+        DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+        COMPONENT   RealEngine_Development
+        OPTIONAL
+    )
 
     # Configure/generate and install CMake scripts
     write_basic_package_version_file(
