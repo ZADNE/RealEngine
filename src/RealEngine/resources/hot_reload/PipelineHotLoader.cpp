@@ -138,7 +138,12 @@ PipelineHotLoader::PipelineHotLoader(
 )
     : m_impl{[&]() -> std::unique_ptr<Impl> {
         if (hotReload) {
-            return std::make_unique<Impl>(deletionQueue, *hotReload);
+            try {
+                return std::make_unique<Impl>(deletionQueue, *hotReload);
+            } catch (const std::exception& e) {
+                re::error(std::string{"Hot reload of shaders disabled: "} + e.what());
+                return nullptr;
+            }
         } else {
             re::log("Hot reload of shaders disabled: init info not provided");
             return nullptr;
