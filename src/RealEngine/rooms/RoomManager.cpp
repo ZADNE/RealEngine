@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/rooms/Room.hpp>
@@ -21,6 +21,7 @@ Room* RoomManager::goToRoom(size_t name, const RoomTransitionArguments& args) {
             }
             m_currentRoom = room.get();
             m_currentRoom->sessionStart(args); // And start its session
+            break;
         }
     }
     return m_currentRoom;

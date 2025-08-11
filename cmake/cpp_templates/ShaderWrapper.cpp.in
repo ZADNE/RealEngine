@@ -1,0 +1,23 @@
+/**
+ *  @author    Automatically generated file by RealProject
+ */
+#include <@hpp_rel@>
+
+@cpp_namespace_start@
+#if 0
+// Navigation section - use #includes to jump to files (Visual Studio):
+// Source file:
+   #include <@shader_rel@>
+// Dependency file:
+   #include <@shader_rel@.@shader_dep_ext@>
+// Disassembly file:
+   #include <@shader_rel@.@shader_txt_ext@>
+#endif // 0 (navigation section)
+
+const re::ShaderSource @shader_@{
+    // SPIR-V used for normal build
+    #include <@shader_rel@.@shader_c_ext@>
+    , // Relative path to shader used for hot reload (debug only)
+    "@debug_shader_rel@"
+};
+@cpp_namespace_end@

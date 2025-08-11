@@ -6,7 +6,7 @@
 namespace re {
 
 constexpr int k_versionMajor = 2;
-constexpr int k_versionMinor = 1;
+constexpr int k_versionMinor = 2;
 constexpr int k_versionPatch = 0;
 
 /**

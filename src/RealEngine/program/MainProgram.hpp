@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  *  @file
  */
@@ -9,6 +9,8 @@
 #include <glm/vec2.hpp>
 
 #include <RealEngine/program/Synchronizer.hpp>
+#include <RealEngine/renderer/VulkanRenderer.hpp>
+#include <RealEngine/resources/hot_reload/HotReloadInitInfo.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/rooms/RoomManager.hpp>
 #include <RealEngine/rooms/RoomToEngineAccess.hpp>
@@ -31,6 +33,16 @@ struct DisplayInfo {
     int refreshRate{};         ///< Refresh rate
     uint32_t pixelFormat{};    ///< Pixel format @see SDL2's SDL_PixelFormatEnum
     void* driverSpecific{};
+};
+
+struct MainProgramInitInfo {
+
+    VulkanInitInfo vulkan{};
+
+    /**
+     * @brief Hot reload will be disabled even in non-release builds if not provided
+     */
+    const HotReloadInitInfo* hotReload{};
 };
 
 /**
@@ -61,7 +73,7 @@ public:
      * @brief Must be called before any Room is added
      * @warning Never call this more than once!
      */
-    static void initialize(const VulkanInitInfo& initInfo);
+    static void initialize(const MainProgramInitInfo& initInfo);
 
     /**
      * @brief Adds a Room to the management
@@ -131,12 +143,12 @@ private:
     /**
      * @brief Constructs the main program.
      */
-    explicit MainProgram(const VulkanInitInfo& initInfo);
+    explicit MainProgram(const MainProgramInitInfo& initInfo);
 
     /**
      * @brief Gets the singleton instance
      */
-    static MainProgram& instance(const VulkanInitInfo& initInfo);
+    static MainProgram& instance(const MainProgramInitInfo& initInfo);
 
     /**
      * @brief Does the actual game loop on the singleton instance
@@ -149,11 +161,17 @@ private:
     void pollEvents();
     void processEvent(SDL_Event* evnt);
 
-    Window m_window; ///< Window also creates and initializes renderer backends
+    void performHotReload();
+
+    Window m_window;
+    VulkanRenderer m_renderer;
+#if RE_BUILDING_FOR_DEBUG
+    PipelineHotLoader m_pipelineHotLoader;
+#endif // RE_BUILDING_FOR_DEBUG
     RoomManager m_roomManager;
     InputManager m_inputManager;
     Synchronizer m_synchronizer{k_defaultStepsPerSecond, k_defaultFramesPerSecondLimit};
-    RoomToEngineAccess s_roomToEngineAccess;
+    RoomToEngineAccess m_roomToEngineAccess;
 
     bool m_programShouldRun = false;
     int m_programExitCode   = EXIT_SUCCESS;

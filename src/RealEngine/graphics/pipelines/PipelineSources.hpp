@@ -7,30 +7,53 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <RealEngine/utility/DebugString.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 namespace re {
 
-/**
- * @brief Represents SPIR-V source code of a shader stage
- */
-struct ShaderSource {
-    /**
-     * @brief SPIR-V compiled for Vulkan 1.3 environment
-     */
-    std::basic_string<uint32_t> vk13;
-};
+struct ShaderSource;
 
 /**
  * @brief Represents a non-owning handle to source codes of a shader stage
  */
 struct ShaderSourceRef {
     constexpr ShaderSourceRef() {}
-    constexpr ShaderSourceRef(const ShaderSource& source)
-        : vk13(source.vk13) {}
+    constexpr ShaderSourceRef(const ShaderSource& source);
 
     std::basic_string_view<uint32_t> vk13{};
+    [[no_unique_address]] DebugString<> relPath{};
 };
+
+/**
+ * @brief Represents SPIR-V source code of a shader stage
+ */
+struct ShaderSource {
+    constexpr ShaderSource() {}
+    constexpr ShaderSource(
+        std::initializer_list<uint32_t> vk13_, [[maybe_unused]] const char* relPath_
+    )
+        : vk13{vk13_}
+        , relPath{relPath_} {}
+    constexpr ShaderSource(const ShaderSourceRef& sourceRef)
+        : vk13{sourceRef.vk13}
+        , relPath{sourceRef.relPath} {}
+
+    /**
+     * @brief SPIR-V compiled for Vulkan 1.3 environment
+     */
+    std::basic_string<uint32_t> vk13{};
+
+    /**
+     * @brief Full path to the GLSL source file of the shader (debug only)
+     */
+    [[no_unique_address]] DebugString<> relPath{};
+};
+
+constexpr ShaderSourceRef::ShaderSourceRef(const ShaderSource& source)
+    : vk13{source.vk13}
+    , relPath{source.relPath} {
+}
 
 /**
  * @brief POD representing source codes for all shaders within a graphics pipeline
@@ -111,7 +134,7 @@ struct PipelineComputeSources {
         }
     }
 
-    ShaderSourceRef comp{}; ///< Copute shader stage of the program
+    ShaderSourceRef comp{}; ///< Compute shader stage of the program
 };
 
 } // namespace re

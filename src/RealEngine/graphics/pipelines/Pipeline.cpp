@@ -25,6 +25,53 @@ constexpr vk::PipelineVertexInputStateCreateInfo k_emptyVertexInput{};
 
 Pipeline::Pipeline(
     const PipelineGraphicsCreateInfo& createInfo, const PipelineGraphicsSources& srcs
+)
+    : m_pipeline{create(createInfo, srcs)} {
+#if RE_BUILDING_FOR_DEBUG
+    pipelineHotLoader().registerPipelineForReloading(m_pipeline, createInfo, srcs);
+#endif // RE_BUILDING_FOR_DEBUG
+}
+
+Pipeline::Pipeline(
+    const PipelineComputeCreateInfo& createInfo, const PipelineComputeSources& srcs
+)
+    : m_pipeline{create(createInfo, srcs)} {
+#if RE_BUILDING_FOR_DEBUG
+    pipelineHotLoader().registerPipelineForReloading(m_pipeline, createInfo, srcs);
+#endif // RE_BUILDING_FOR_DEBUG
+}
+
+Pipeline::Pipeline(Pipeline&& other) noexcept
+    : m_pipeline{std::exchange(other.m_pipeline, nullptr)} {
+#if RE_BUILDING_FOR_DEBUG
+    pipelineHotLoader().moveRegisteredPipeline(other.m_pipeline, m_pipeline);
+#endif // RE_BUILDING_FOR_DEBUG
+}
+
+Pipeline& Pipeline::operator=(Pipeline&& other) noexcept {
+    std::swap(m_pipeline, other.m_pipeline);
+#if RE_BUILDING_FOR_DEBUG
+    pipelineHotLoader().moveRegisteredPipeline(other.m_pipeline, m_pipeline);
+    pipelineHotLoader().moveRegisteredPipeline(m_pipeline, other.m_pipeline);
+#endif // RE_BUILDING_FOR_DEBUG
+    return *this;
+}
+
+Pipeline::~Pipeline() {
+#if RE_BUILDING_FOR_DEBUG
+    pipelineHotLoader().unregisterPipelineForReloading(m_pipeline);
+#endif // RE_BUILDING_FOR_DEBUG
+    deletionQueue().enqueueDeletion(m_pipeline);
+}
+
+#if RE_BUILDING_FOR_DEBUG
+void Pipeline::setHotReloadIdentifier(int identifier) {
+    pipelineHotLoader().setPipelineIdentifier(m_pipeline, identifier);
+}
+#endif // RE_BUILDING_FOR_DEBUG
+
+vk::Pipeline Pipeline::create(
+    const PipelineGraphicsCreateInfo& createInfo, const PipelineGraphicsSources& srcs
 ) {
     // Create shader modules
     constexpr auto k_numStages = PipelineGraphicsSources::k_numStages;
@@ -94,7 +141,7 @@ Pipeline::Pipeline(
     vk::PipelineDynamicStateCreateInfo dynamic{{}, dynamicStates};
 
     // Create pipeline
-    m_pipeline =
+    vk::Pipeline pipeline =
         device()
             .createGraphicsPipeline(
                 pipelineCache(),
@@ -125,10 +172,12 @@ Pipeline::Pipeline(
         device().destroyShaderModule(modules[i]);
     }
 
-    setDebugUtilsObjectName(m_pipeline, createInfo.debugName);
+    setDebugUtilsObjectName(pipeline, createInfo.debugName);
+
+    return pipeline;
 }
 
-Pipeline::Pipeline(
+vk::Pipeline Pipeline::create(
     const PipelineComputeCreateInfo& createInfo, const PipelineComputeSources& srcs
 ) {
     // Create compute shader module
@@ -137,7 +186,7 @@ Pipeline::Pipeline(
     });
 
     // Create pipeline
-    m_pipeline =
+    vk::Pipeline pipeline =
         device()
             .createComputePipeline(
                 pipelineCache(),
@@ -160,20 +209,9 @@ Pipeline::Pipeline(
     // Destroy compute shader module
     device().destroyShaderModule(compShader);
 
-    setDebugUtilsObjectName(m_pipeline, createInfo.debugName);
-}
+    setDebugUtilsObjectName(pipeline, createInfo.debugName);
 
-Pipeline::Pipeline(Pipeline&& other) noexcept
-    : m_pipeline(std::exchange(other.m_pipeline, nullptr)) {
-}
-
-Pipeline& Pipeline::operator=(Pipeline&& other) noexcept {
-    std::swap(m_pipeline, other.m_pipeline);
-    return *this;
-}
-
-Pipeline::~Pipeline() {
-    device().destroyPipeline(m_pipeline);
+    return pipeline;
 }
 
 } // namespace re

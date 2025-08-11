@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #include <iostream>
@@ -12,8 +12,8 @@
 
 #include <RealEngine/renderer/DebugMessageHandler.hpp>
 #include <RealEngine/renderer/PhysDeviceSuitability.hpp>
-#include <RealEngine/renderer/VulkanFixture.hpp>
-#include <RealEngine/window/WindowSubsystems.hpp>
+#include <RealEngine/renderer/VulkanRenderer.hpp>
+#include <RealEngine/utility/Version.hpp>
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
 using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
@@ -56,28 +56,27 @@ const void* defaultDeviceCreateInfoChain() {
     return &s_default.get<>();
 }
 
-VulkanFixture::VulkanFixture(
+VulkanRenderer::VulkanRenderer(
     SDL_Window* sdlWindow, bool vSync, std::string_view preferredDevice,
-    const VulkanInitInfo& initInfo
+    const VulkanInitInfo& vulkan
 )
     : m_sdlWindow(sdlWindow)
     , m_instance(createInstance())
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
     , m_debugUtilsMessenger(createDebugUtilsMessenger())
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
     , m_surface(createSurface())
-    , m_physicalDevice(
-          createPhysicalDevice(preferredDevice, initInfo.deviceCreateInfoChain)
+    , m_physicalDevice(createPhysicalDevice(preferredDevice, vulkan.deviceCreateInfoChain)
       )
     , m_presentMode(selectClosestPresentMode(vSync))
-    , m_device(createDevice(initInfo.deviceCreateInfoChain))
+    , m_device(createDevice(vulkan.deviceCreateInfoChain))
     , m_allocator(createAllocator())
     , m_graphicsCompQueue(getQueue(m_graphicsCompQueueFamIndex))
     , m_presentationQueue(getQueue(m_presentationQueueFamIndex))
     , m_swapchain(createSwapchain())
     , m_swapchainImageViews(createSwapchainImageViews())
     , m_additionalBufferDescrs(
-          {initInfo.additionalBuffers.begin(), initInfo.additionalBuffers.end()}
+          {vulkan.additionalBuffers.begin(), vulkan.additionalBuffers.end()}
       )
     , m_additionalBuffers(createAdditionalBuffers())
     , m_commandPool(createCommandPool())
@@ -85,22 +84,23 @@ VulkanFixture::VulkanFixture(
         assignImplementationReferences(); // Deliberate side effect, ref to device
                                           // and pool is required to construct a cmd buf
         return FrameDoubleBuffered<CommandBuffer>{
-            CommandBuffer{{.debugName = "re::VulkanFixture::cbs[0]"}},
-            CommandBuffer{{.debugName = "re::VulkanFixture::cbs[1]"}}
+            CommandBuffer{{.debugName = "re::VulkanRenderer::cbs[0]"}},
+            CommandBuffer{{.debugName = "re::VulkanRenderer::cbs[1]"}}
         };
     }())
-    , m_oneTimeSubmitCmdBuf({.debugName = "re::VulkanFixture::oneTimeSubmit"})
+    , m_oneTimeSubmitCmdBuf({.debugName = "re::VulkanRenderer::oneTimeSubmit"})
     , m_pipelineCache(createPipelineCache())
     , m_descriptorPool(createDescriptorPool())
     , m_imageAvailableSems(createSemaphores())
     , m_renderingFinishedSems(createSemaphores())
     , m_inFlightFences(createFences()) {
+
     // Implementations
     assignImplementationReferences();
     FrameDoubleBufferingState::setTotalIndex(m_frame++);
 
-    VulkanObjectBase::setDebugUtilsObjectName(
-        *m_graphicsCompQueue, "re::VulkanFixture::graphicsCompQueue"
+    ObjectUsingVulkan::setDebugUtilsObjectName(
+        *m_graphicsCompQueue, "re::VulkanRenderer::graphicsCompQueue"
     );
 
     // Initialize ImGui for SDL2
@@ -109,13 +109,13 @@ VulkanFixture::VulkanFixture(
     }
 }
 
-VulkanFixture::~VulkanFixture() {
+VulkanRenderer::~VulkanRenderer() {
     m_device.waitIdle();
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplSDL2_Shutdown();
 }
 
-void VulkanFixture::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex) {
+void VulkanRenderer::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex) {
     if (m_mainRenderPass) {
         if (m_imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
             ImGui_ImplVulkan_Shutdown();
@@ -154,12 +154,11 @@ void VulkanFixture::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpas
     }
 }
 
-const CommandBuffer& VulkanFixture::prepareFrame() {
+const CommandBuffer& VulkanRenderer::prepareFrame() {
     // Wait for the previous frame to finish
     checkSuccess(m_device.waitForFences(**m_inFlightFences, true, k_maxTimeout));
 
-    m_deletionQueue.deleteNextGroup();
-    m_deletionQueue.beginNewGroup();
+    m_deletionQueue.startNextIteration(DeletionQueue::Timeline::Render);
 
     // Recreate swapchain if required
     if (m_recreteSwapchain) {
@@ -197,7 +196,7 @@ const CommandBuffer& VulkanFixture::prepareFrame() {
     return cb;
 }
 
-void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues
+void VulkanRenderer::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues
 ) {
     auto& cb = m_cbs.write();
     cb->beginRenderPass2(
@@ -230,22 +229,22 @@ void VulkanFixture::mainRenderPassBegin(std::span<const vk::ClearValue> clearVal
     );
 }
 
-void VulkanFixture::mainRenderPassNextSubpass() {
+void VulkanRenderer::mainRenderPassNextSubpass() {
     m_cbs.write()->nextSubpass2(
         vk::SubpassBeginInfo{vk::SubpassContents::eInline}, vk::SubpassEndInfo{}
     );
 }
 
-void VulkanFixture::mainRenderPassDrawImGui() {
+void VulkanRenderer::mainRenderPassDrawImGui() {
     ImGui::Render();
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), **m_cbs);
 }
 
-void VulkanFixture::mainRenderPassEnd() {
+void VulkanRenderer::mainRenderPassEnd() {
     m_cbs.write()->endRenderPass2(vk::SubpassEndInfo{});
 }
 
-void VulkanFixture::finishFrame() {
+void VulkanRenderer::finishFrame() {
     auto& cb = m_cbs.write();
     cb->end();
 
@@ -274,16 +273,16 @@ void VulkanFixture::finishFrame() {
     FrameDoubleBufferingState::setTotalIndex(m_frame++);
 }
 
-void VulkanFixture::changePresentation(bool vSync) {
+void VulkanRenderer::changePresentation(bool vSync) {
     m_presentMode      = selectClosestPresentMode(vSync);
     m_recreteSwapchain = true;
 }
 
-void VulkanFixture::prepareForDestructionOfRendererObjects() {
+void VulkanRenderer::prepareForDestructionOfRendererObjects() {
     m_device.waitIdle();
 }
 
-std::vector<std::string> VulkanFixture::availableDevices() const {
+std::vector<std::string> VulkanRenderer::availableDevices() const {
     auto physDevices = m_instance.enumeratePhysicalDevices();
     std::vector<std::string> rval;
     rval.reserve(physDevices.size());
@@ -294,21 +293,21 @@ std::vector<std::string> VulkanFixture::availableDevices() const {
     return rval;
 }
 
-std::string VulkanFixture::usedDevice() const {
+std::string VulkanRenderer::usedDevice() const {
     return m_physicalDevice.getProperties2().properties.deviceName;
 }
 
-vk::raii::Instance VulkanFixture::createInstance() {
+vk::raii::Instance VulkanRenderer::createInstance() {
     // Prepare default layers and extensions
     std::vector<const char*> extensions = {
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
         VK_EXT_DEBUG_UTILS_EXTENSION_NAME
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
     };
     std::vector<const char*> validationLayers = {
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
         "VK_LAYER_KHRONOS_validation"
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
     };
 
     // Add extensions required by SDL2
@@ -346,7 +345,7 @@ vk::raii::Instance VulkanFixture::createInstance() {
     };
 }
 
-vk::raii::DebugUtilsMessengerEXT VulkanFixture::createDebugUtilsMessenger() {
+vk::raii::DebugUtilsMessengerEXT VulkanRenderer::createDebugUtilsMessenger() {
     vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo{
         {},
         eVerbose | eInfo | eWarning | eError,
@@ -356,7 +355,7 @@ vk::raii::DebugUtilsMessengerEXT VulkanFixture::createDebugUtilsMessenger() {
     return vk::raii::DebugUtilsMessengerEXT{m_instance, debugMessengerCreateInfo};
 }
 
-vk::raii::SurfaceKHR VulkanFixture::createSurface() {
+vk::raii::SurfaceKHR VulkanRenderer::createSurface() {
     VkSurfaceKHR surface{};
     if (!SDL_Vulkan_CreateSurface(m_sdlWindow, *m_instance, &surface)) {
         throw std::runtime_error("SDL2 could not create Vulkan surface!");
@@ -364,7 +363,7 @@ vk::raii::SurfaceKHR VulkanFixture::createSurface() {
     return vk::raii::SurfaceKHR{m_instance, surface};
 }
 
-vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice(
+vk::raii::PhysicalDevice VulkanRenderer::createPhysicalDevice(
     std::string_view preferredDevice, const void* deviceCreateInfoChain
 ) {
     SelectedPhysDevice res = selectSuitablePhysDevice(
@@ -396,7 +395,7 @@ vk::raii::PhysicalDevice VulkanFixture::createPhysicalDevice(
     throw std::runtime_error("No physical device is suitable!");
 }
 
-vk::PresentModeKHR VulkanFixture::selectClosestPresentMode(bool vSync) {
+vk::PresentModeKHR VulkanRenderer::selectClosestPresentMode(bool vSync) {
     auto modes     = m_physicalDevice.getSurfacePresentModesKHR(*m_surface);
     auto idealMode = vSync ? eMailbox : eImmediate;
     auto acceptableMode  = vSync ? eFifo : eFifoRelaxed;
@@ -414,7 +413,7 @@ vk::PresentModeKHR VulkanFixture::selectClosestPresentMode(bool vSync) {
     return idealAvail ? idealMode : (acceptableAvail ? acceptableMode : eFifo);
 }
 
-vk::raii::Device VulkanFixture::createDevice(const void* deviceCreateInfoChain) {
+vk::raii::Device VulkanRenderer::createDevice(const void* deviceCreateInfoChain) {
     float deviceQueuePriority = 1.0f;
     std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos;
     deviceQueueCreateInfos.emplace_back(
@@ -433,7 +432,7 @@ vk::raii::Device VulkanFixture::createDevice(const void* deviceCreateInfoChain) 
     return vk::raii::Device{m_physicalDevice, createInfo};
 }
 
-vma::Allocator VulkanFixture::createAllocator() {
+vma::Allocator VulkanRenderer::createAllocator() {
     return vma::createAllocator(vma::AllocatorCreateInfo{
         vma::AllocatorCreateFlagBits::eExternallySynchronized,
         *m_physicalDevice, *m_device,
@@ -447,11 +446,11 @@ vma::Allocator VulkanFixture::createAllocator() {
     });
 }
 
-vk::raii::Queue VulkanFixture::getQueue(uint32_t familyIndex) {
+vk::raii::Queue VulkanRenderer::getQueue(uint32_t familyIndex) {
     return vk::raii::Queue{m_device, familyIndex, 0u};
 }
 
-vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
+vk::raii::SwapchainKHR VulkanRenderer::createSwapchain() {
     auto caps = m_physicalDevice.getSurfaceCapabilitiesKHR(*m_surface);
     // Minimum image count
     m_minImageCount = glm::clamp(
@@ -501,7 +500,7 @@ vk::raii::SwapchainKHR VulkanFixture::createSwapchain() {
     return vk::raii::SwapchainKHR{m_device, createInfo};
 }
 
-std::vector<vk::raii::ImageView> VulkanFixture::createSwapchainImageViews() {
+std::vector<vk::raii::ImageView> VulkanRenderer::createSwapchainImageViews() {
     auto images = m_swapchain.getImages();
     std::vector<vk::raii::ImageView> imageViews;
     imageViews.reserve(images.size());
@@ -521,10 +520,10 @@ std::vector<vk::raii::ImageView> VulkanFixture::createSwapchainImageViews() {
     return imageViews;
 }
 
-std::vector<Texture> VulkanFixture::createAdditionalBuffers() {
+std::vector<Texture> VulkanRenderer::createAdditionalBuffers() {
     // Ugly hack to be able to use re::Texture already
-    VulkanObjectBase::s_allocator = &m_allocator;
-    VulkanObjectBase::s_device    = &(*m_device);
+    ObjectUsingVulkan::s_allocator = &m_allocator;
+    ObjectUsingVulkan::s_device    = &(*m_device);
     std::vector<Texture> buffers;
     buffers.reserve(m_additionalBufferDescrs.size());
     for (const auto& descr : m_additionalBufferDescrs) {
@@ -541,7 +540,7 @@ std::vector<Texture> VulkanFixture::createAdditionalBuffers() {
     return buffers;
 }
 
-std::vector<vk::raii::Framebuffer> VulkanFixture::createSwapchainFramebuffers() {
+std::vector<vk::raii::Framebuffer> VulkanRenderer::createSwapchainFramebuffers() {
     std::vector<vk::ImageView> views;
     views.resize(1 + m_additionalBuffers.size());
     vk::FramebufferCreateInfo createInfo{
@@ -568,14 +567,14 @@ std::vector<vk::raii::Framebuffer> VulkanFixture::createSwapchainFramebuffers() 
     return framebuffers;
 }
 
-vk::raii::CommandPool VulkanFixture::createCommandPool() {
+vk::raii::CommandPool VulkanRenderer::createCommandPool() {
     vk::CommandPoolCreateInfo createInfo{
         vk::CommandPoolCreateFlagBits::eResetCommandBuffer, m_graphicsCompQueueFamIndex
     };
     return vk::raii::CommandPool{m_device, createInfo};
 }
 
-FrameDoubleBuffered<vk::raii::Semaphore> VulkanFixture::createSemaphores() {
+FrameDoubleBuffered<vk::raii::Semaphore> VulkanRenderer::createSemaphores() {
     vk::SemaphoreCreateInfo createInfo{};
     return {
         vk::raii::Semaphore{m_device, createInfo},
@@ -583,16 +582,16 @@ FrameDoubleBuffered<vk::raii::Semaphore> VulkanFixture::createSemaphores() {
     };
 }
 
-FrameDoubleBuffered<vk::raii::Fence> VulkanFixture::createFences() {
+FrameDoubleBuffered<vk::raii::Fence> VulkanRenderer::createFences() {
     vk::FenceCreateInfo createInfo{vk::FenceCreateFlagBits::eSignaled};
     return {vk::raii::Fence{m_device, createInfo}, vk::raii::Fence{m_device, createInfo}};
 }
 
-vk::raii::PipelineCache VulkanFixture::createPipelineCache() {
+vk::raii::PipelineCache VulkanRenderer::createPipelineCache() {
     return vk::raii::PipelineCache{m_device, vk::PipelineCacheCreateInfo{}};
 }
 
-vk::raii::DescriptorPool VulkanFixture::createDescriptorPool() {
+vk::raii::DescriptorPool VulkanRenderer::createDescriptorPool() {
     using enum vk::DescriptorType;
     constexpr std::array poolSizes = std::to_array<vk::DescriptorPoolSize>({
         {eSampler, 128},
@@ -616,7 +615,7 @@ vk::raii::DescriptorPool VulkanFixture::createDescriptorPool() {
     return vk::raii::DescriptorPool{m_device, createInfo};
 }
 
-void VulkanFixture::recreateSwapchain() {
+void VulkanRenderer::recreateSwapchain() {
     m_device.waitIdle();
     // Destroy all swapchain dependent objects
     m_swapChainFramebuffers.~vector();
@@ -634,17 +633,17 @@ void VulkanFixture::recreateSwapchain() {
     ){createSwapchainFramebuffers()};
 }
 
-void VulkanFixture::assignImplementationReferences() {
-    VulkanObjectBase::s_physicalDevice        = &(*m_physicalDevice);
-    VulkanObjectBase::s_device                = &(*m_device);
-    VulkanObjectBase::s_allocator             = &m_allocator;
-    VulkanObjectBase::s_graphicsCompQueue     = &(*m_graphicsCompQueue);
-    VulkanObjectBase::s_commandPool           = &(*m_commandPool);
-    VulkanObjectBase::s_descriptorPool        = &(*m_descriptorPool);
-    VulkanObjectBase::s_pipelineCache         = &(*m_pipelineCache);
-    VulkanObjectBase::s_oneTimeSubmitCmdBuf   = &m_oneTimeSubmitCmdBuf;
-    VulkanObjectBase::s_dispatchLoaderDynamic = &(m_dispatchLoaderDynamic);
-    VulkanObjectBase::s_deletionQueue         = &m_deletionQueue;
+void VulkanRenderer::assignImplementationReferences() {
+    ObjectUsingVulkan::s_physicalDevice        = &(*m_physicalDevice);
+    ObjectUsingVulkan::s_device                = &(*m_device);
+    ObjectUsingVulkan::s_allocator             = &m_allocator;
+    ObjectUsingVulkan::s_graphicsCompQueue     = &(*m_graphicsCompQueue);
+    ObjectUsingVulkan::s_commandPool           = &(*m_commandPool);
+    ObjectUsingVulkan::s_descriptorPool        = &(*m_descriptorPool);
+    ObjectUsingVulkan::s_pipelineCache         = &(*m_pipelineCache);
+    ObjectUsingVulkan::s_oneTimeSubmitCmdBuf   = &m_oneTimeSubmitCmdBuf;
+    ObjectUsingVulkan::s_dispatchLoaderDynamic = &(m_dispatchLoaderDynamic);
+    ObjectUsingVulkan::s_deletionQueue         = &m_deletionQueue;
 }
 
 } // namespace re

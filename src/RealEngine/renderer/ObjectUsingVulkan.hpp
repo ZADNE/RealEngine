@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -8,27 +8,27 @@
 #include <vulkan/vulkan.hpp>
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
-#include <RealEngine/utility/DebugName.hpp>
+#include <RealEngine/resources/hot_reload/PipelineHotLoader.hpp>
+#include <RealEngine/utility/DebugString.hpp>
 
 namespace re {
 
 class CommandBuffer;
 
 /**
- * @brief   Provides children Vulkan objects access to global Vulkan objects
- *          (such as device)
- * @details Children Vulkan objects (e.g. buffers, textures, pipelines) derive
- *          from this.
+ * @brief   Provides derived objects access to global Vulkan objects (such as device).
+ * @details Vulkan objects (e.g. buffers, textures, pipelines) derive from this.
  */
-class VulkanObjectBase {
-    friend class VulkanFixture;
+class ObjectUsingVulkan {
+    friend class VulkanRenderer;
+    friend class MainProgram;
 
 protected:
     /**
-     * @brief This constructor is deliberately protected as the VulkanObjectBase
-     * does not do anything on its own
+     * @brief This constructor is deliberately protected as an instance of this
+     *        class does not do anything on its own
      */
-    VulkanObjectBase() {}
+    ObjectUsingVulkan() = default;
 
     static const vk::PhysicalDevice& physicalDevice() {
         return *s_physicalDevice;
@@ -49,23 +49,26 @@ protected:
         return *s_dispatchLoaderDynamic;
     }
     static DeletionQueue& deletionQueue() { return *s_deletionQueue; }
+    static PipelineHotLoader& pipelineHotLoader() {
+        return *s_pipelineHotLoader;
+    }
 
     /**
      * @brief Assign a debug name to a given object, does nothing in release build
      */
     template<typename T>
         requires vk::isVulkanHandleType<T>::value
-    static void setDebugUtilsObjectName(T object, DebugName<> debugName) {
-        if constexpr (k_buildType == BuildType::Debug) {
-            device().setDebugUtilsObjectNameEXT(
-                vk::DebugUtilsObjectNameInfoEXT{
-                    T::objectType,
-                    reinterpret_cast<uint64_t>(static_cast<T::NativeType>(object)),
-                    static_cast<const char*>(debugName)
-                },
-                dispatchLoaderDynamic()
-            );
-        }
+    static void setDebugUtilsObjectName(T object, DebugString<> debugName) {
+#if RE_BUILDING_FOR_DEBUG
+        device().setDebugUtilsObjectNameEXT(
+            vk::DebugUtilsObjectNameInfoEXT{
+                T::objectType,
+                reinterpret_cast<uint64_t>(static_cast<T::NativeType>(object)),
+                static_cast<const char*>(debugName)
+            },
+            dispatchLoaderDynamic()
+        );
+#endif // RE_BUILDING_FOR_DEBUG
     }
 
 private:
@@ -79,7 +82,8 @@ private:
     static inline const CommandBuffer* s_oneTimeSubmitCmdBuf = nullptr;
     static inline const vk::DescriptorPool* s_descriptorPool = nullptr;
     static inline const vk::DispatchLoaderDynamic* s_dispatchLoaderDynamic = nullptr;
-    static inline DeletionQueue* s_deletionQueue = nullptr;
+    static inline DeletionQueue* s_deletionQueue         = nullptr;
+    static inline PipelineHotLoader* s_pipelineHotLoader = nullptr;
 };
 
 } // namespace re

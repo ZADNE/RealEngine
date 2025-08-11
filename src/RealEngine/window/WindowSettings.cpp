@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #include <filesystem>
@@ -24,27 +24,14 @@ WindowSettings::WindowSettings() {
         i >> j;
         m_dims.x           = j["window"]["width"].get<int>();
         m_dims.y           = j["window"]["height"].get<int>();
+        m_pos.x            = j["window"]["x"].get<int>();
+        m_pos.y            = j["window"]["y"].get<int>();
         m_flags.fullscreen = j["window"]["fullscreen"].get<bool>();
         m_flags.borderless = j["window"]["borderless"].get<bool>();
         m_flags.vSync      = j["window"]["vsync"].get<bool>();
         m_preferredDevice = j["window"]["preferred_device"].get<std::string_view>();
-        auto renderer = j["window"].find("preferred_renderer");
-        if (renderer != j["window"].end()) {
-            auto renderStr = renderer->get<std::string>();
-            if (renderStr == to_string(RendererID::Vulkan13)) {
-                m_preferredRenderer = RendererID::Vulkan13;
-            } else if (renderStr == to_string(RendererID::Any)) {
-                m_preferredRenderer = RendererID::Any;
-            } else {
-                m_preferredRenderer = RendererID::Any;
-                save();
-            }
-        } else {
-            m_preferredRenderer = RendererID::Any;
-            save();
-        }
     } catch (...) {
-        // Settings either don't exist or are currupted
+        // Settings either don't exist or are corrupted
         i.close();
         if (std::filesystem::exists(k_settingFilename)) {
             // Back up previous settings
@@ -58,32 +45,32 @@ WindowSettings::WindowSettings() {
 }
 
 WindowSettings::WindowSettings(
-    glm::ivec2 dims, WindowFlags flags, RendererID preferredRenderer,
-    std::string_view preferredDevice
+    glm::ivec2 dims, glm::ivec2 pos, WindowFlags flags, std::string_view preferredDevice
 )
-    : m_dims(dims)
-    , m_flags(flags)
-    , m_preferredRenderer(preferredRenderer)
-    , m_preferredDevice(preferredDevice) {
+    : m_dims{dims}
+    , m_pos{pos}
+    , m_flags{flags}
+    , m_preferredDevice{preferredDevice} {
 }
 
 void WindowSettings::reset() {
-    m_dims              = k_defaultWindowSize;
-    m_flags             = WindowFlags{};
-    m_preferredRenderer = RendererID::Any;
+    m_dims  = k_defaultWindowSize;
+    m_pos   = glm::ivec2{k_centeredWindowPosition};
+    m_flags = WindowFlags{};
     m_preferredDevice.clear();
 }
 
 void WindowSettings::save() {
     nlohmann::ordered_json j{
         {"window",
-         {{"width", (unsigned int)m_dims.x},
-          {"height", (unsigned int)m_dims.y},
-          {"fullscreen", (bool)m_flags.fullscreen},
-          {"borderless", (bool)m_flags.borderless},
-          {"vsync", (bool)m_flags.vSync},
-          {"preferred_device", m_preferredDevice},
-          {"preferred_renderer", to_string(m_preferredRenderer)}}}
+         {{"width", static_cast<int>(m_dims.x)},
+          {"height", static_cast<int>(m_dims.y)},
+          {"x", static_cast<int>(m_pos.x)},
+          {"y", static_cast<int>(m_pos.y)},
+          {"fullscreen", static_cast<bool>(m_flags.fullscreen)},
+          {"borderless", static_cast<bool>(m_flags.borderless)},
+          {"vsync", static_cast<bool>(m_flags.vSync)},
+          {"preferred_device", m_preferredDevice}}}
     };
 
     std::ofstream o(k_settingFilename, std::ofstream::trunc);

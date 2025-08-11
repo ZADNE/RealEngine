@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -8,7 +8,7 @@
 #include <vector>
 
 #include <RealEngine/renderer/DeletionQueue.hpp>
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
+#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 
 namespace re {
 
@@ -38,14 +38,14 @@ struct BufferCreateInfo {
     }; // Offset in bytes where initData will be placed
 
     // Debug
-    [[no_unique_address]] DebugName<> debugName;
+    [[no_unique_address]] DebugString<> debugName;
 };
 
 /**
  * @brief Is a continuous block of memory allocated by Vulkan
  * @note Use BufferMapped if you intend to map the buffer to CPU memory
  */
-class Buffer: public VulkanObjectBase {
+class Buffer: public ObjectUsingVulkan {
 public:
     /**
      * @brief Constructs a null buffer without any backing memory

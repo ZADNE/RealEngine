@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -13,7 +13,6 @@
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/renderer/Allocator.hpp>
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 
 struct SDL_Window;
@@ -50,28 +49,28 @@ struct VulkanInitInfo {
 };
 
 /**
- * @brief Enforces use of Vulkan graphics backend.
+ * @brief   Creates all objects necessary for Vulkan rendering.
  * @details This is used internally when the RealEngine starts.
  * @warning Never use this class directly!
  */
-class VulkanFixture {
+class VulkanRenderer {
 public:
     /**
      * @brief Sets up for Vulkan rendering
      * @throws If anything fails
      */
-    VulkanFixture(
+    VulkanRenderer(
         SDL_Window* sdlWindow, bool vSync, std::string_view preferredDevice,
-        const VulkanInitInfo& initInfo
+        const VulkanInitInfo& vulkan
     );
 
-    VulkanFixture(const VulkanFixture&)            = delete; ///< Noncopyable
-    VulkanFixture& operator=(const VulkanFixture&) = delete; ///< Noncopyable
+    VulkanRenderer(const VulkanRenderer&)            = delete; ///< Noncopyable
+    VulkanRenderer& operator=(const VulkanRenderer&) = delete; ///< Noncopyable
 
-    VulkanFixture(VulkanFixture&&)            = delete;      ///< Nonmovable
-    VulkanFixture& operator=(VulkanFixture&&) = delete;      ///< Nonmovable
+    VulkanRenderer(VulkanRenderer&&)            = delete;      ///< Nonmovable
+    VulkanRenderer& operator=(VulkanRenderer&&) = delete;      ///< Nonmovable
 
-    ~VulkanFixture();
+    ~VulkanRenderer();
 
     void setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex);
 
@@ -88,9 +87,18 @@ public:
 
     void prepareForDestructionOfRendererObjects();
 
+    /**
+     * @brief Lists devices (~GPUs) that can be used for rendering
+     */
     std::vector<std::string> availableDevices() const;
 
+    /**
+     * @brief Returns name of the device used for rendering
+     * @details The device is one of the ones from availableDevices().
+     */
     std::string usedDevice() const;
+
+    DeletionQueue& deletionQueue() { return m_deletionQueue; }
 
 private:
     // Vulkan objects
@@ -99,9 +107,9 @@ private:
     SDL_Window* m_sdlWindow = nullptr;
     vk::raii::Context m_context{};
     vk::raii::Instance m_instance;
-#ifndef NDEBUG
+#if RE_BUILDING_FOR_DEBUG
     vk::raii::DebugUtilsMessengerEXT m_debugUtilsMessenger;
-#endif // !NDEBUG
+#endif // RE_BUILDING_FOR_DEBUG
     vk::raii::SurfaceKHR m_surface;
     uint32_t m_graphicsCompQueueFamIndex{};
     uint32_t m_presentationQueueFamIndex{};

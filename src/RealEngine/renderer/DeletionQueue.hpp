@@ -1,9 +1,10 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <queue>
 #include <type_traits>
+#include <utility>
 
 #include <vma/vk_mem_alloc.hpp>
 #include <vulkan/vulkan.hpp>
@@ -11,9 +12,9 @@
 namespace re {
 
 /**
- * @brief   Allows delayed deletion of Vulkan and Vma objects
- * @details Objects in the queue are batched into groups.
- *          Objects are deleted in the order they were added in.
+ * @brief   Allows delayed deletion of Vulkan and VMA objects
+ * @details There are two queues: one for objects that are used in simulation
+ *          steps and one for objects that are used frame rendering.
  */
 class DeletionQueue {
 public:
@@ -27,18 +28,18 @@ public:
 
     ~DeletionQueue();
 
-    /**
-     * @brief   Begins new group
-     */
-    void beginNewGroup();
+    enum class Timeline {
+        Step,
+        Render
+    };
 
     /**
-     * @brief   Deletes next group (that is the oldest group that was not
-     * deleted yet)
-     * @return  True if the queue was not empty and the group was deleted, false
-     * otherwise
+     * @brief   Deletes all objects from the iteration before previous and
+     *          starts new iteration of the timeline.
+     * @details Subsequent deletions will be enqueued to the provided timeline,
+     *          until this function is called again.
      */
-    bool deleteNextGroup();
+    void startNextIteration(Timeline timeline);
 
     /**
      * @brief Enqueues deletion of a Vulkan object
@@ -47,7 +48,7 @@ public:
         requires vk::isVulkanHandleType<T>::value
     void enqueueDeletion(const T& object) {
         if (object) {
-            m_queue.emplace(
+            m_queues[std::to_underlying(m_currentTimeline)].emplace(
                 QueueRecord::Category::VulkanHandle, T::objectType,
                 static_cast<T::NativeType>(object)
             );
@@ -55,11 +56,11 @@ public:
     }
 
     /**
-     * @brief Enqueues freeing of a Vma allocation
+     * @brief Enqueues freeing of a VMA allocation
      */
     void enqueueDeletion(const vma::Allocation& allocation) {
         if (allocation) {
-            m_queue.emplace(
+            m_queues[std::to_underlying(m_currentTimeline)].emplace(
                 QueueRecord::Category::VmaAllocation, vk::ObjectType::eUnknown,
                 static_cast<VmaAllocation>(allocation)
             );
@@ -75,6 +76,12 @@ private:
             VmaAllocation
         };
 
+        static QueueRecord separator() {
+            return QueueRecord{
+                QueueRecord::Category::Separator, vk::ObjectType::eUnknown, nullptr
+            };
+        }
+
         QueueRecord(Category _cat, vk::ObjectType _type, void* _handle)
             : cat(_cat)
             , type(_type)
@@ -86,9 +93,12 @@ private:
         static_assert(VK_USE_64_BIT_PTR_DEFINES == 1);
     };
 
+    bool deleteIteration(std::queue<QueueRecord>& queue);
+
     void deleteVulkanHandle(vk::ObjectType type, void* handle);
 
-    std::queue<QueueRecord> m_queue;
+    Timeline m_currentTimeline{};
+    std::array<std::queue<QueueRecord>, 2> m_queues{};
     const vk::Device& m_device;
     const vma::Allocator& m_allocator;
 };

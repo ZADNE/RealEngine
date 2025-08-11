@@ -1,8 +1,9 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
+#include <RealEngine/graphics/output_control/RenderPassSubpass.hpp>
+#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 
 namespace re {
 
@@ -15,16 +16,7 @@ struct RenderPassCreateInfo {
     std::span<const vk::SubpassDependency2> dependencies;
 
     // Debug
-    [[no_unique_address]] DebugName<> debugName;
-};
-
-/**
- * @brief Identifies a subpass within a renderpass
- * @note This does not hold ownership of the renderpass!
- */
-struct RenderPassSubpass {
-    vk::RenderPass renderPass{};
-    uint32_t subpassIndex{};
+    [[no_unique_address]] DebugString<> debugName;
 };
 
 /**
@@ -32,7 +24,7 @@ struct RenderPassSubpass {
  * between the subpasses, and describes how the attachments are used over the
  * course of the subpasses.
  */
-class RenderPass: public VulkanObjectBase {
+class RenderPass: public ObjectUsingVulkan {
 public:
     /**
      * @brief Constructs a null renderpass that cannot be used for rendering

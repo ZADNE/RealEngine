@@ -1,54 +1,18 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <RealEngine/graphics/output_control/RenderPass.hpp>
+#include <RealEngine/graphics/pipelines/PipelineCreateInfos.hpp>
 #include <RealEngine/graphics/pipelines/PipelineSources.hpp>
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
+#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 
 namespace re {
-
-struct PipelineGraphicsCreateInfo {
-    // Specialization
-    const vk::SpecializationInfo* specializationInfo = nullptr;
-
-    // Input assembly
-    const vk::PipelineVertexInputStateCreateInfo* vertexInput = nullptr;
-    vk::PrimitiveTopology topology = vk::PrimitiveTopology::eTriangleList;
-    bool enablePrimitiveRestart    = false;
-
-    // Tessellation
-    uint32_t patchControlPoints = 0; // Zero means that tesselation is not used
-
-    // Rasterization
-    vk::PolygonMode polygonMode = vk::PolygonMode::eFill;
-    vk::CullModeFlags cullMode  = vk::CullModeFlagBits::eNone;
-    float lineWidth             = 1.0f;
-
-    bool enableDepth = false;
-    bool enableBlend = true;
-
-    vk::PipelineLayout pipelineLayout = nullptr;
-    RenderPassSubpass renderPassSubpass{};
-
-    // Debug
-    [[no_unique_address]] DebugName<> debugName;
-};
-
-struct PipelineComputeCreateInfo {
-    // Specialization
-    const vk::SpecializationInfo* specializationInfo = nullptr;
-
-    vk::PipelineLayout pipelineLayout = nullptr;
-
-    // Debug
-    [[no_unique_address]] DebugName<> debugName;
-};
 
 /**
  * @brief Controls how vertices are transformed and shaded or describes compute work
  */
-class Pipeline: public VulkanObjectBase {
+class Pipeline: public ObjectUsingVulkan {
+    friend class PipelineHotLoader;
 public:
     /**
      * @brief Constructs a null pipeline that cannot be used for rendering or compute
@@ -83,7 +47,23 @@ public:
 
     const vk::Pipeline& pipeline() const { return m_pipeline; }
 
+#if RE_BUILDING_FOR_DEBUG
+    /**
+     * @brief   Updates hot realod identifier
+     * @details 0 is the default value if not changed
+     */
+    void setHotReloadIdentifier(int identifier);
+#endif // RE_BUILDING_FOR_DEBUG
+
 private:
+    static vk::Pipeline create(
+        const PipelineGraphicsCreateInfo& createInfo,
+        const PipelineGraphicsSources& srcs
+    );
+    static vk::Pipeline create(
+        const PipelineComputeCreateInfo& createInfo, const PipelineComputeSources& srcs
+    );
+
     vk::Pipeline m_pipeline{};
 };
 

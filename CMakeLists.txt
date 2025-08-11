@@ -1,11 +1,16 @@
-﻿cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.24)
 project(RealEngine)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(FetchContent)
 
-include("cmake/GetRealEngineVersion.cmake")
+set(REALENGINE_BUILDING_FROM_SOURCE TRUE
+    CACHE INTERNAL "Whether building RealEngine from source (as opposed to using installed)"
+)
+
+include("cmake/scripts/RealProject.cmake")
+include("cmake/scripts/GetRealEngineVersion.cmake")
 
 function(FetchContent_MakeAvailableWithoutLinting)
     set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
@@ -15,6 +20,8 @@ function(FetchContent_MakeAvailableWithoutLinting)
 endfunction()
 
 # Find/fetch dependencies
+    # Git is required to download some dependencies
+    find_package(Git REQUIRED)
     # Vulkan
     find_package(Vulkan REQUIRED COMPONENTS glslc)
     # SDL2
@@ -27,7 +34,7 @@ endfunction()
     # OpenGL Mathematics
     set(GLM_BUILD_INSTALL ON CACHE INTERNAL "")
     FetchContent_Declare(glm
-        URL https://github.com/g-truc/glm/archive/refs/tags/1.0.0.tar.gz
+        URL https://github.com/g-truc/glm/archive/refs/tags/1.0.1.tar.gz
     )
     # bit7z
     set(BIT7Z_7ZIP_VERSION "23.01" CACHE INTERNAL "")
@@ -92,38 +99,41 @@ endfunction()
         PRIVATE
             spirv-cross-core
             spirv-cross-reflect
+            filewatch
     )
     target_include_directories(RealEngine
         PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-            $<INSTALL_INTERFACE:.>
-        PRIVATE
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external>
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
+            "$<INSTALL_INTERFACE:.>"
     )
-    real_target_init_file_sets(RealEngine BASE_DIR src)
+    real_target_init_file_sets(RealEngine BASE_DIR "src")
     get_realengine_version()
-    add_subdirectory(src)
+    add_subdirectory("src")
 
     # Doxygen documentation
     find_package(Doxygen)
-    if (DOXYGEN_FOUND)
-        set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
-        set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-        configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    if (Doxygen_FOUND)
+        set(doxyfile_template "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile")
+        set(doxyfile "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
+        configure_file(
+            "${doxyfile_template}"
+            "${doxyfile}"
+            @ONLY
+        )
 
         add_custom_target(RealEngine_Documentation
-            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMAND "${DOXYGEN_EXECUTABLE}" "${doxyfile}"
+            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
             VERBATIM
         )
-    endif(DOXYGEN_FOUND)
+    endif()
 
     # ResourcePackager
     add_real_executable(ResourcePackager)
     target_include_directories(ResourcePackager
         PRIVATE
-            src
-            tools
+            "src"
+            "tools"
     )
     set_target_properties(ResourcePackager PROPERTIES
         CXX_STANDARD 23
@@ -134,12 +144,11 @@ endfunction()
             argparse
             bit7z
     )
-    include("cmake/ResourcePackaging.cmake")
 
     # RTICreator (Windows only)
     if (WIN32)
         add_real_executable(RTICreator)
-        target_include_directories(RTICreator PRIVATE tools)
+        target_include_directories(RTICreator PRIVATE "tools")
         set_target_properties(RTICreator PROPERTIES
             CXX_STANDARD 23
             INTERPROCEDURAL_OPTIMIZATION TRUE
@@ -149,39 +158,44 @@ endfunction()
     else()
         set(RTICreator "")
     endif()
-    add_subdirectory(tools)
+    add_subdirectory("tools")
 
 # Installation
     # The main install command
     install(
         TARGETS
             RealEngine vma glm-header-only ${bit7z_aliased_target}
-            nlohmann_json ImGui lodepng argparse
+            nlohmann_json ImGui lodepng argparse filewatch
             ResourcePackager ${RTICreator}
         EXPORT                  RealEngineTargets
         RUNTIME # Tool executables are part of RealEngine development
-            DESTINATION         ${CMAKE_INSTALL_BINDIR}
+            DESTINATION         "${CMAKE_INSTALL_BINDIR}"
             COMPONENT           RealEngine_Development
         LIBRARY
-            DESTINATION         ${CMAKE_INSTALL_LIBDIR}
+            DESTINATION         "${CMAKE_INSTALL_LIBDIR}"
             COMPONENT           RealEngine_Development
             NAMELINK_COMPONENT  RealEngine_Development
         ARCHIVE
-            DESTINATION         ${CMAKE_INSTALL_LIBDIR}
+            DESTINATION         "${CMAKE_INSTALL_LIBDIR}"
             COMPONENT           RealEngine_Development
         FILE_SET realproject_public_headers
-            DESTINATION         ${CMAKE_INSTALL_INCLUDEDIR}
+            DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
         FILE_SET HEADERS
-            DESTINATION         ${CMAKE_INSTALL_INCLUDEDIR}
+            DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
+    )
+    install( # Manually install RealShaders because it contains GLSL that normally is not installed
+        DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/src/RealShaders"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        COMPONENT   RealEngine_Development
     )
 
     # Manually install headers and necessary scripts for bit7z
     # because it does not have install rules
     install(
         DIRECTORY   "${FETCHCONTENT_BASE_DIR}/bit7z-src/include/bit7z"
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         COMPONENT   RealEngine_Development
     )
     install(
@@ -197,8 +211,8 @@ endfunction()
     install(
         IMPORTED_RUNTIME_ARTIFACTS ${runtime_bundled_artifacts} # SDLs are not bundled
         RUNTIME
-            DESTINATION         ${CMAKE_INSTALL_BINDIR}
-            COMPONENT           RealEngine_Development
+            DESTINATION "${CMAKE_INSTALL_BINDIR}"
+            COMPONENT   RealEngine_Development
     )
 
     # Downstream projects should install these runtime artifacts from these targets
@@ -208,14 +222,12 @@ endfunction()
     )
 
     # Install documentation
-    if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/doc/")
-        install(
-            DIRECTORY
-                "${CMAKE_CURRENT_BINARY_DIR}/doc/"
-            DESTINATION ${CMAKE_INSTALL_DOCDIR}
-            COMPONENT RealEngine_Development
-        )
-    endif()
+    install(
+        DIRECTORY   "${CMAKE_CURRENT_BINARY_DIR}/doc/"
+        DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+        COMPONENT   RealEngine_Development
+        OPTIONAL
+    )
 
     # Configure/generate and install CMake scripts
     write_basic_package_version_file(
@@ -225,12 +237,12 @@ endfunction()
     )
     install(
         EXPORT RealEngineTargets
-        FILE RealEngineTargets.cmake
+        FILE "RealEngineTargets.cmake"
         DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
         COMPONENT RealEngine_Development
     )
     configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RealEngineConfig.cmake.in"
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_templates/RealEngineConfig.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake"
         @ONLY
     )
@@ -238,7 +250,14 @@ endfunction()
         FILES
             "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfig.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake"
-            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ResourcePackaging.cmake"
+        DESTINATION
+            "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
+        COMPONENT RealEngine_Development
+    )
+    install( # RealProject scripts and C++ template files
+        DIRECTORY
+            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cpp_templates"
+            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/scripts"
         DESTINATION
             "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
         COMPONENT RealEngine_Development

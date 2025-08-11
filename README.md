@@ -1,4 +1,4 @@
-﻿# RealEngine: A Vulkan-based engine-like library
+# RealEngine: A Vulkan-based engine-like library
 
 [![CMake build](https://github.com/ZADNE/RealEngine/actions/workflows/build.yml/badge.svg)](https://github.com/ZADNE/RealEngine/actions/workflows/build.yml)
 [![C++ Core Guidelines](https://github.com/ZADNE/RealEngine/actions/workflows/cpp-core-guidelines.yml/badge.svg)](https://github.com/ZADNE/RealEngine/actions/workflows/cpp-core-guidelines.yml)
@@ -6,8 +6,10 @@
 
 ## Features:
 
-* A set of convenient classes to ease Vulkan 1.3 rendering
-* Automatic codegen to get SPIR-V from shaders or to reuse GLSL code in C++
+* A set of __convenient__ classes to ease __Vulkan 1.3 rendering__
+* __Codegen to access SPIR-V__ of shaders __and to call GLSL__ functions from C++
+* __Hot reload of shaders__ from source files in non-release builds
+* __Packaged and encrypted runtime data__ in release builds
 * Handling of mouse & keyboard input
 * Simulation speed decoupled from variable frame rate
 * A system of rooms / scenes / worlds with well defined transitions
@@ -40,4 +42,4 @@
 * [SDL2_ttf](https://wiki.libsdl.org/SDL2_ttf/FrontPage) (for font rasterization)
 * [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) (for GPU-accelerated rendering and compute)
 
-See documentation on ![how to set up a project using RealEngine](https://github.com/ZADNE/Real/blob/main/doc/HowToSetUpProject.md).
+See documentation on ![how to set up a project using RealEngine](https://github.com/ZADNE/RealEngine/blob/main/doc/HowToSetUpProject.md).

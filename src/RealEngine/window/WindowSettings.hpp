@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -28,6 +28,12 @@ struct WindowFlags {
  */
 class WindowSettings {
 public:
+
+    /**
+     * @brief Denotes that the window should be centered at the first monitor
+     */
+    static constexpr int k_centeredWindowPosition = std::numeric_limits<int>::max();
+
     /**
      * @brief Constructs settings from file that was saved before.
      *
@@ -39,7 +45,7 @@ public:
      * @brief Constructs settings from given parameters
      */
     WindowSettings(
-        glm::ivec2 dims, WindowFlags flags, RendererID preferredRenderer,
+        glm::ivec2 dims, glm::ivec2 pos, WindowFlags flags,
         std::string_view preferredDevice
     );
 
@@ -51,8 +57,6 @@ public:
     bool isFullscreen() const { return m_flags.fullscreen; }
     bool isBorderless() const { return m_flags.borderless; }
     bool isVSynced() const { return m_flags.vSync; }
-
-    RendererID preferredRenderer() const { return m_preferredRenderer; }
 
     std::string_view preferredDevice() const { return m_preferredDevice; }
 
@@ -70,10 +74,10 @@ protected:
     void reset();
 
     // NOLINTBEGIN(*-non-private-member-variables-in-classes): Intentional
-    glm::ivec2 m_dims{};            ///< Dimensions of the window
-    WindowFlags m_flags;            ///< Flags of the window
-    RendererID m_preferredRenderer; ///< The actual renderer may be different
-    std::string m_preferredDevice;  ///< The actual device may be different
+    glm::ivec2 m_dims{};           ///< Dimensions of the window
+    glm::ivec2 m_pos{};            ///< Global position of the window
+    WindowFlags m_flags;           ///< Flags of the window
+    std::string m_preferredDevice; ///< The actual device may be different
     // NOLINTEND(*-non-private-member-variables-in-classes)
 };
 

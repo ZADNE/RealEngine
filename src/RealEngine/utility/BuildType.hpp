@@ -1,10 +1,15 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  *  @file
  */
 #pragma once
 
 namespace re {
+
+// The macros defined here are used for things that still cannot be done better
+// (e.g. omitting member variables).
+
+// NOLINTBEGIN(*-macro-usage): See explanation above
 
 enum class BuildType {
     Debug,
@@ -16,10 +21,16 @@ enum class BuildType {
  */
 #if defined(__DOXYGEN__)
 constexpr BuildType k_buildType = <build configuration dependent>;
+#    define RE_BUILDING_FOR_DEBUG 1
+#    define RE_BUILDING_FOR_RELEASE 1
 #elif !defined(NDEBUG)
 constexpr BuildType k_buildType = BuildType::Debug;
+#    define RE_BUILDING_FOR_DEBUG 1
+#    define RE_BUILDING_FOR_RELEASE 0
 #else
 constexpr BuildType k_buildType = BuildType::Release;
+#    define RE_BUILDING_FOR_DEBUG 0
+#    define RE_BUILDING_FOR_RELEASE 1
 #endif
 
 /**
@@ -36,12 +47,20 @@ enum class BuildOS {
  */
 #if defined(__DOXYGEN__)
 constexpr BuildOS k_buildOS = <build configuration dependent>;
+#    define RE_BUILDING_FOR_WINDOWS 1
+#    define RE_BUILDING_FOR_LINUX 1
 #elif defined(_WIN32)
 constexpr BuildOS k_buildOS = BuildOS::Windows;
+#    define RE_BUILDING_FOR_WINDOWS 1
+#    define RE_BUILDING_FOR_LINUX 0
 #elif defined(__linux__)
 constexpr BuildOS k_buildOS = BuildOS::Linux;
+#    define RE_BUILDING_FOR_WINDOWS 0
+#    define RE_BUILDING_FOR_LINUX 1
 #else
 #    error "Unsupported or undetected operating system"
 #endif
+
+// NOLINTEND(*-macro-usage)
 
 } // namespace re

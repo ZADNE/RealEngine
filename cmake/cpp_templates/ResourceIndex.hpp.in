@@ -5,8 +5,6 @@
  *  @details   This file is special. After running ResourcePackager at least
  *             once, a proper resource index will be generated in the build
  *             directory.
- *  @details   The real index will be generated at the same relative path so it
- *             will actually take precedense over this file.
  *  @details   So this file exists only to enable build of your application
  *             without running the ResourcePackager. That is useful for debug
  *             builds because those actually use unpackaged data.
@@ -18,7 +16,7 @@
 namespace re {
 
 /**
- * @brief Resolves a resource identified by string path into ID.
+ * @brief   Resolves a resource identified by string path into ID.
  * @details The ResourcePackager will generated a concrete specialization for
  *          each resource.
  */

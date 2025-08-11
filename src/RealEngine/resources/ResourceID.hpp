@@ -1,10 +1,10 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <cstdint>
 
-#include <RealEngine/utility/DebugName.hpp>
+#include <RealEngine/utility/DebugString.hpp>
 
 namespace re {
 
@@ -41,7 +41,7 @@ public:
 
 private:
     uint32_t m_id;
-    [[no_unique_address]] DebugName<> m_path;
+    [[no_unique_address]] DebugString<> m_path;
 };
 
 } // namespace re
@@ -49,10 +49,10 @@ private:
 template<>
 struct std::hash<re::ResourceID> {
     size_t operator()(const re::ResourceID& id) const {
-        if constexpr (re::k_buildType == re::BuildType::Release) {
-            return id.m_id;
-        } else {
-            return std::hash<const char*>{}(id.m_path);
-        }
+#if RE_BUILDING_FOR_DEBUG
+        return std::hash<const char*>{}(id.m_path);
+#else // ^^^ RE_BUILDING_FOR_DEBUG
+        return id.m_id;
+#endif
     }
 };

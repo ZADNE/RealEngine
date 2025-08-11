@@ -1,11 +1,11 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <glm/vec3.hpp>
 
 #include <RealEngine/graphics/commands/CommandBuffer.hpp>
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
+#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 
 namespace re {
 
@@ -41,13 +41,13 @@ struct TextureCreateInfo {
     std::span<const unsigned char> texels; // Only for 1 layer color images
 
     // Debug
-    [[no_unique_address]] DebugName<> debugName;
+    [[no_unique_address]] DebugString<> debugName;
 };
 
 /**
  * @brief Represents one (or more) images and, optionally, a sampler
  */
-class Texture: public VulkanObjectBase {
+class Texture: public ObjectUsingVulkan {
 public:
     /**
      * @brief Constructs a null Texture with no memory or images

@@ -5,7 +5,7 @@
 #     real_target_package_resources(
 #        TARGET <target>
 #        PACKAGE_DIR <directory_name>
-#        INDEX_FILE <file_path>
+#        [ INDEX_FILE <file_path> ]
 #        INPUT_DIRS <directory_name>...
 #     )
 # The index is a C++ header file containing re::ResourceIDs of the packaged files.
@@ -17,13 +17,17 @@ function(real_target_package_resources)
     set(multi_value_args INPUT_DIRS)
     cmake_parse_arguments(ARG "" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
+    if(NOT DEFINED ARG_INDEX_FILE)
+        get_target_property(base_dir ${ARG_TARGET} realproject_base_dir_rel)
+        set(ARG_INDEX_FILE "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${ARG_TARGET}/ResourceIndex.gen.hpp")
+    endif()
     set(output_package "${ARG_PACKAGE_DIR}/package.dat")
     get_target_property(realengine_source_dir RealEngine HEADER_DIRS_realproject_public_headers)
 
     # Copy dummy index which will be used for debug builds
     if(NOT EXISTS ${ARG_INDEX_FILE})
         configure_file(
-            "${realengine_source_dir}/RealEngine/resources/ResourceIndex.hpp"
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../cpp_templates/ResourceIndex.hpp.in"
             ${ARG_INDEX_FILE}
             COPYONLY
         )

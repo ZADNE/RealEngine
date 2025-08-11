@@ -1,8 +1,9 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
 #include <RealEngine/program/Synchronizer.hpp>
+#include <RealEngine/renderer/VulkanRenderer.hpp>
 #include <RealEngine/rooms/RoomManager.hpp>
 #include <RealEngine/user_input/InputManager.hpp>
 #include <RealEngine/window/Window.hpp>
@@ -25,13 +26,15 @@ public:
      */
     RoomToEngineAccess(
         MainProgram& mainProgram, InputManager& inputManager,
-        Synchronizer& synchronizer, Window& window, RoomManager& roomManager
+        Synchronizer& synchronizer, Window& window, VulkanRenderer& renderer,
+        RoomManager& roomManager
     )
-        : m_mainProgram(mainProgram)
-        , m_inputManager(inputManager)
-        , m_synchronizer(synchronizer)
-        , m_window(window)
-        , m_roomManager(roomManager) {}
+        : m_mainProgram{mainProgram}
+        , m_inputManager{inputManager}
+        , m_synchronizer{synchronizer}
+        , m_window{window}
+        , m_renderer{renderer}
+        , m_roomManager{roomManager} {}
 
 #pragma region MainProgram
 
@@ -148,19 +151,9 @@ public:
     std::string_view preferredDevice() const;
 
     /**
-     * @copydoc Window::availableDevices
-     */
-    std::vector<std::string> availableDevices() const;
-
-    /**
      * @copydoc Window::setPreferredDevice
      */
     void setPreferredDevice(std::string_view preferredDevice, bool save);
-
-    /**
-     * @copydoc Window::usedDevice
-     */
-    std::string usedDevice() const;
 
     /**
      * @copydoc Window::setTitle
@@ -183,21 +176,6 @@ public:
     glm::ivec2 windowDims() const;
 
     /**
-     * @copydoc Window::setPreferredRenderer
-     */
-    void setPreferredRenderer(RendererID renderer, bool save);
-
-    /**
-     * @copydoc Window::preferredRenderer
-     */
-    RendererID preferredRenderer() const;
-
-    /**
-     * @copydoc Window::usedRenderer
-     */
-    RendererID usedRenderer() const;
-
-    /**
      * @copydoc WindowSettings::save
      */
     void saveWindowSettings();
@@ -206,28 +184,38 @@ public:
 
 #pragma region Main RenderPass
 
+    /**
+     * @copydoc VulkanRenderer::availableDevices
+     */
+    std::vector<std::string> availableDevices() const;
+
+    /**
+     * @copydoc VulkanRenderer::usedDevice
+     */
+    std::string usedDevice() const;
+
     constexpr static vk::ClearValue k_defaultClearColor =
         vk::ClearColorValue{1.0f, 1.0f, 1.0f, 1.0f};
 
     /**
-     * @copydoc Window::mainRenderPassBegin()
+     * @copydoc VulkanRenderer::mainRenderPassBegin()
      */
     void mainRenderPassBegin(
         std::span<const vk::ClearValue> clearValues = {&k_defaultClearColor, 1}
     );
 
     /**
-     * @copydoc Window::mainRenderPassNextSubpass()
+     * @copydoc VulkanRenderer::mainRenderPassNextSubpass()
      */
     void mainRenderPassNextSubpass();
 
     /**
-     * @copydoc Window::mainRenderPassDrawImGui()
+     * @copydoc VulkanRenderer::mainRenderPassDrawImGui()
      */
     void mainRenderPassDrawImGui();
 
     /**
-     * @copydoc Window::mainRenderPassEnd()
+     * @copydoc VulkanRenderer::mainRenderPassEnd()
      */
     void mainRenderPassEnd();
 
@@ -238,6 +226,7 @@ private:
     InputManager& m_inputManager;
     Synchronizer& m_synchronizer;
     Window& m_window;
+    VulkanRenderer& m_renderer;
     RoomManager& m_roomManager;
 };
 

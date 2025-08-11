@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #pragma once
@@ -7,7 +7,7 @@
 #include <glm/vec4.hpp>
 
 #include <RealEngine/graphics/commands/BarrierHelperFuncs.hpp>
-#include <RealEngine/renderer/VulkanObjectBase.hpp>
+#include <RealEngine/renderer/ObjectUsingVulkan.hpp>
 
 namespace re {
 
@@ -19,13 +19,13 @@ struct CommandBufferCreateInfo {
     vk::CommandBufferLevel level = vk::CommandBufferLevel::ePrimary;
 
     // Debug
-    [[no_unique_address]] DebugName<> debugName;
+    [[no_unique_address]] DebugString<> debugName;
 };
 
 /**
  * @brief Records commands to be executed by device (= GPU)
  */
-class CommandBuffer: public VulkanObjectBase {
+class CommandBuffer: public ObjectUsingVulkan {
 public:
     /**
      * @brief Constructs a null CommandBuffer that cannot be used for recording
@@ -90,12 +90,12 @@ public:
      * @note  Does nothing in release build
      */
     void beginDebugRegion(const char* label, glm::vec4 color = {}) const {
-        if constexpr (k_buildType == BuildType::Debug) {
-            m_cb.beginDebugUtilsLabelEXT(
-                vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
-                dispatchLoaderDynamic()
-            );
-        }
+#if RE_BUILDING_FOR_DEBUG
+        m_cb.beginDebugUtilsLabelEXT(
+            vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
+            dispatchLoaderDynamic()
+        );
+#endif // RE_BUILDING_FOR_DEBUG
     }
 
     /**
@@ -103,9 +103,9 @@ public:
      * @note  Does nothing in release build
      */
     void endDebugRegion() const {
-        if constexpr (k_buildType == BuildType::Debug) {
-            m_cb.endDebugUtilsLabelEXT(dispatchLoaderDynamic());
-        }
+#if RE_BUILDING_FOR_DEBUG
+        m_cb.endDebugUtilsLabelEXT(dispatchLoaderDynamic());
+#endif // RE_BUILDING_FOR_DEBUG
     }
 
     /**
@@ -113,12 +113,12 @@ public:
      * @note  Does nothing in release build
      */
     void insertDebugLabel(const char* label, glm::vec4 color = {}) const {
-        if constexpr (k_buildType == BuildType::Debug) {
-            m_cb.insertDebugUtilsLabelEXT(
-                vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
-                dispatchLoaderDynamic()
-            );
-        }
+#if RE_BUILDING_FOR_DEBUG
+        m_cb.insertDebugUtilsLabelEXT(
+            vk::DebugUtilsLabelEXT{label, {color.r, color.g, color.b, color.a}},
+            dispatchLoaderDynamic()
+        );
+#endif // RE_BUILDING_FOR_DEBUG
     }
 
     /**

@@ -1,8 +1,7 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
-#include <any>
-
+#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 #include <RealEngine/renderer/DeletionQueue.hpp>
 #include <RealEngine/utility/Error.hpp>
 
@@ -11,24 +10,36 @@ namespace re {
 DeletionQueue::DeletionQueue(const vk::Device& device, const vma::Allocator& allocator)
     : m_device(device)
     , m_allocator(allocator) {
-}
-
-DeletionQueue::~DeletionQueue() {
-    while (deleteNextGroup()) {
-        // Delete all groups in the correct order
+    // Insert initial separators to delay deletion
+    for (auto& queue : m_queues) {
+        for (size_t i = 0; i < k_maxFramesInFlight; i++) {
+            queue.emplace(QueueRecord::separator());
+        }
     }
 }
 
-void DeletionQueue::beginNewGroup() {
-    m_queue.emplace(QueueRecord::Category::Separator, vk::ObjectType::eUnknown, nullptr);
+DeletionQueue::~DeletionQueue() {
+    // Delete objects in all queues in the correct order
+    for (auto& queue : m_queues) {
+        while (deleteIteration(queue)) {
+            // Delete all remaining iterations
+        }
+    }
 }
 
-bool DeletionQueue::deleteNextGroup() {
-    bool groupDeleted = false;
-    while (!m_queue.empty() && !groupDeleted) {
-        const QueueRecord& front = m_queue.front();
+void DeletionQueue::startNextIteration(Timeline timeline) {
+    m_currentTimeline = timeline;
+    auto& queue       = m_queues[std::to_underlying(timeline)];
+    queue.emplace(QueueRecord::separator());
+    deleteIteration(queue);
+}
+
+bool DeletionQueue::deleteIteration(std::queue<QueueRecord>& queue) {
+    bool iterationDeleted = false;
+    while (!queue.empty() && !iterationDeleted) {
+        const QueueRecord& front = queue.front();
         switch (front.cat) {
-        case QueueRecord::Category::Separator: groupDeleted = true; break;
+        case QueueRecord::Category::Separator: iterationDeleted = true; break;
         case QueueRecord::Category::VulkanHandle:
             deleteVulkanHandle(front.type, front.handle);
             break;
@@ -38,9 +49,9 @@ bool DeletionQueue::deleteNextGroup() {
         default: break;
         }
 
-        m_queue.pop();
+        queue.pop();
     }
-    return groupDeleted;
+    return iterationDeleted;
 }
 
 void DeletionQueue::deleteVulkanHandle(vk::ObjectType type, void* handle) {

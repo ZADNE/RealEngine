@@ -1,8 +1,10 @@
+add_subdirectory(details)
+
 real_target_sources(RealEngine
     PUBLIC
         BuildType.hpp               
         CompTimeString.hpp          
-        DebugName.hpp               
+        DebugString.hpp             
         Endianness.hpp              
         Error.hpp                   Error.cpp
         Math.hpp                    

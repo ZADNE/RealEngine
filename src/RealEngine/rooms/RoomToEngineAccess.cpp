@@ -1,4 +1,4 @@
-﻿/**
+/**
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/program/MainProgram.hpp>
@@ -100,6 +100,7 @@ bool RoomToEngineAccess::isWindowBorderless() const {
 void RoomToEngineAccess::setWindowVSync(bool vSync, bool save) {
     auto prev = m_window.flags();
     m_window.setVSync(vSync, save);
+    m_renderer.changePresentation(vSync);
     auto curr = m_window.flags();
     m_roomManager.notifyRooms<&Room::windowFlagsChangedCallback>(prev, curr);
 }
@@ -112,16 +113,8 @@ std::string_view RoomToEngineAccess::preferredDevice() const {
     return m_window.preferredDevice();
 }
 
-std::vector<std::string> RoomToEngineAccess::availableDevices() const {
-    return m_window.availableDevices();
-}
-
 void RoomToEngineAccess::setPreferredDevice(std::string_view preferredDevice, bool save) {
     m_window.setPreferredDevice(preferredDevice, save);
-}
-
-std::string RoomToEngineAccess::usedDevice() const {
-    return m_window.usedDevice();
 }
 
 void RoomToEngineAccess::setWindowTitle(const std::string& title) {
@@ -135,25 +128,13 @@ const std::string& RoomToEngineAccess::windowTitle() const {
 }
 
 void RoomToEngineAccess::setWindowDims(glm::ivec2 newDims, bool save) {
-    const auto& oldDims = m_window.dims();
+    glm::ivec2 oldDims = m_window.dims();
     m_window.setDims(newDims, save);
     m_roomManager.notifyRooms<&Room::windowResizedCallback>(oldDims, newDims);
 }
 
 glm::ivec2 RoomToEngineAccess::windowDims() const {
     return m_window.dims();
-}
-
-void RoomToEngineAccess::setPreferredRenderer(RendererID renderer, bool save) {
-    m_window.setPreferredRenderer(renderer, save);
-}
-
-RendererID RoomToEngineAccess::preferredRenderer() const {
-    return m_window.preferredRenderer();
-}
-
-RendererID RoomToEngineAccess::usedRenderer() const {
-    return m_window.usedRenderer();
 }
 
 void RoomToEngineAccess::saveWindowSettings() {
@@ -164,22 +145,30 @@ void RoomToEngineAccess::saveWindowSettings() {
 
 #pragma region Main RenderPass
 
+std::vector<std::string> RoomToEngineAccess::availableDevices() const {
+    return m_renderer.availableDevices();
+}
+
+std::string RoomToEngineAccess::usedDevice() const {
+    return m_renderer.usedDevice();
+}
+
 void RoomToEngineAccess::mainRenderPassBegin(
     std::span<const vk::ClearValue> clearValues /* = {&k_defaultClearColor, 1}*/
 ) {
-    m_window.mainRenderPassBegin(clearValues);
+    m_renderer.mainRenderPassBegin(clearValues);
 }
 
 void RoomToEngineAccess::mainRenderPassNextSubpass() {
-    m_window.mainRenderPassNextSubpass();
+    m_renderer.mainRenderPassNextSubpass();
 }
 
 void RoomToEngineAccess::mainRenderPassDrawImGui() {
-    m_window.mainRenderPassDrawImGui();
+    m_renderer.mainRenderPassDrawImGui();
 }
 
 void RoomToEngineAccess::mainRenderPassEnd() {
-    m_window.mainRenderPassEnd();
+    m_renderer.mainRenderPassEnd();
 }
 
 #pragma endregion
