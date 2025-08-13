@@ -1,4 +1,4 @@
-﻿real_target_sources(RealEngine
+﻿real_target_sources(RealEngine_rooms
     PUBLIC
         Room.hpp                    Room.cpp
         RoomDisplaySettings.hpp     

@@ -1,4 +1,4 @@
-real_target_sources(RealEngine
+real_target_sources(RealEngine_renderer
     PUBLIC
         Allocator.hpp               
         DeletionQueue.hpp           DeletionQueue.cpp

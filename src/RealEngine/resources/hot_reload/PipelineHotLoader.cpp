@@ -7,7 +7,6 @@
 
 #include <RealEngine/graphics/pipelines/Pipeline.hpp>
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
-#include <RealEngine/program/MainProgram.hpp>
 #include <RealEngine/resources/FileIO.hpp>
 #include <RealEngine/resources/hot_reload/PipelineHotLoader.hpp>
 #include <RealEngine/utility/details/CMakeConstants.hpp>

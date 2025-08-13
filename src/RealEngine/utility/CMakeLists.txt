@@ -1,6 +1,6 @@
 add_subdirectory(details)
 
-real_target_sources(RealEngine
+real_target_sources(RealEngine_utility
     PUBLIC
         BuildType.hpp               
         CompTimeString.hpp          

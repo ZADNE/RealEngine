@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.27)
 project(RealEngine)
 
 include(GNUInstallDirs)
@@ -20,6 +20,7 @@ function(FetchContent_MakeAvailableWithoutLinting)
 endfunction()
 
 # Find/fetch dependencies
+block(PROPAGATE bit7z_aliased_target)
     # Git is required to download some dependencies
     find_package(Git REQUIRED)
     # Vulkan
@@ -74,42 +75,69 @@ endfunction()
 
     # Add embedded libs
     add_subdirectory(external)
+endblock()
 
-# Declare projects
-    # RealEngine library
-    add_real_library(RealEngine STATIC)
-    set_target_properties(RealEngine PROPERTIES
-        CXX_STANDARD 23
-        realproject_shader_cxx_namespace "re::glsl"
-        INTERPROCEDURAL_OPTIMIZATION TRUE
-    )
-    target_link_libraries(RealEngine
-        PUBLIC
-            ${CMAKE_DL_LIBS}
-            Vulkan::Vulkan
-            vma
-            SDL2::SDL2main
-            SDL2::SDL2
-            SDL2_ttf::SDL2_ttf
-            glm::glm-header-only
-            bit7z
-            nlohmann_json::nlohmann_json
-            ImGui
-            lodepng
-        PRIVATE
-            spirv-cross-core
-            spirv-cross-reflect
-            filewatch
-    )
-    target_include_directories(RealEngine
-        PUBLIC
-            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
-            "$<INSTALL_INTERFACE:.>"
-    )
+# RealEngine libraries
+block(PROPAGATE RealEngine_sublibs)
+    # RealEngine is composed of a number of static sub-libraries
+    # This function sets common properties
+    function(_add_realengine_sublib target_name)
+        add_real_library(${target_name} STATIC)
+        real_target_init_file_sets(${target_name} BASE_DIR "src")
+        set_target_properties(${target_name} PROPERTIES
+            CXX_STANDARD 23
+            realproject_shader_cxx_namespace "re::glsl"
+            INTERPROCEDURAL_OPTIMIZATION TRUE
+        )
+        target_include_directories(${target_name}
+            PUBLIC
+                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
+                "$<INSTALL_INTERFACE:.>"
+        )
+        target_link_libraries(${target_name}
+            PUBLIC
+                ${CMAKE_DL_LIBS}
+                Vulkan::Vulkan
+                vma
+                SDL2::SDL2main
+                SDL2::SDL2
+                glm::glm-header-only
+                bit7z
+                nlohmann_json::nlohmann_json
+                ImGui
+                lodepng
+            PRIVATE
+                SDL2_ttf::SDL2_ttf
+                spirv-cross-core
+                spirv-cross-reflect
+                filewatch
+        )
+        list(APPEND RealEngine_sublibs ${target_name})
+        set(RealEngine_sublibs "${RealEngine_sublibs}" PARENT_SCOPE)
+    endfunction()
+
+    # RealEngine sublibs
+    _add_realengine_sublib(RealEngine_graphics)
+    _add_realengine_sublib(RealEngine_program)
+    _add_realengine_sublib(RealEngine_renderer)
+    _add_realengine_sublib(RealEngine_resources)
+    _add_realengine_sublib(RealEngine_rooms)
+    _add_realengine_sublib(RealEngine_user_input)
+    _add_realengine_sublib(RealEngine_utility)
+    _add_realengine_sublib(RealEngine_window)
+
+    # RealEngine main target
+    add_real_library(RealEngine INTERFACE)
     real_target_init_file_sets(RealEngine BASE_DIR "src")
-    get_realengine_version()
+    target_link_libraries(RealEngine
+        INTERFACE
+            ${RealEngine_sublibs}
+    )
     add_subdirectory("src")
+endblock()
 
+# Miscelaneous/supplementary target
+block(PROPAGATE RTICreator)
     # Doxygen documentation
     find_package(Doxygen)
     if (Doxygen_FOUND)
@@ -159,12 +187,15 @@ endfunction()
         set(RTICreator "")
     endif()
     add_subdirectory("tools")
+endblock()
 
 # Installation
+block()
     # The main install command
     install(
         TARGETS
-            RealEngine vma glm-header-only ${bit7z_aliased_target}
+            ${RealEngine_sublibs} RealEngine
+            vma glm-header-only ${bit7z_aliased_target}
             nlohmann_json ImGui lodepng argparse filewatch
             ResourcePackager ${RTICreator}
         EXPORT                  RealEngineTargets
@@ -230,6 +261,7 @@ endfunction()
     )
 
     # Configure/generate and install CMake scripts
+    get_realengine_version()
     write_basic_package_version_file(
         "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake"
         VERSION ${realengine_version}
@@ -262,3 +294,4 @@ endfunction()
             "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
         COMPONENT RealEngine_Development
     )
+endblock()

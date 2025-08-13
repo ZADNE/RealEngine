@@ -1,4 +1,4 @@
-﻿real_target_sources(RealEngine
+﻿real_target_sources(RealEngine_graphics
     PUBLIC
         Pipeline.hpp                Pipeline.cpp
         PipelineCreateInfos.hpp     
