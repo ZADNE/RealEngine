@@ -22,23 +22,24 @@ struct TextureCreateInfo {
     vk::ImageType type         = vk::ImageType::e2D;
     vk::Format format          = vk::Format::eR8G8B8A8Unorm;
     glm::uvec3 extent{};
-    uint32_t layers               = 1u;
+    uint32_t mipLevels            = 1u; ///< Number of mip levels
+    uint32_t layers               = 1u; ///< Number of array layers
     vk::ImageUsageFlags usage     = vk::ImageUsageFlagBits::eSampled;
     vk::ImageLayout initialLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
     const void* pNext             = nullptr;
 
     // ImageView-related
     vk::ImageAspectFlags aspects          = vk::ImageAspectFlagBits::eColor;
-    vk::ComponentMapping componentMapping = {}; // Identity mapping
+    vk::ComponentMapping componentMapping = {}; ///< Identity mapping
 
     // Sampler-related
-    bool hasSampler      = true; // No sampler is created if this is false
+    bool hasSampler      = true; ///< No sampler is created if this is false
     vk::Filter magFilter = vk::Filter::eNearest;
     vk::Filter minFilter = vk::Filter::eNearest;
     vk::SamplerMipmapMode mipmapMode = vk::SamplerMipmapMode::eNearest;
 
     // Raster-related
-    std::span<const unsigned char> texels; // Only for 1 layer color images
+    std::span<const unsigned char> texels; ///< Only for 1-mip-1-layer images
 
     // Debug
     [[no_unique_address]] DebugString<> debugName;
@@ -83,7 +84,7 @@ private:
         const CommandBuffer& cb, vk::ImageLayout oldLayout,
         vk::ImageLayout newLayout, vk::PipelineStageFlags srcStage,
         vk::PipelineStageFlags dstStage, vk::AccessFlags srcAccess,
-        vk::AccessFlags dstAccess, uint32_t layerCount
+        vk::AccessFlags dstAccess, const TextureCreateInfo& createInfo
     );
 };
 
