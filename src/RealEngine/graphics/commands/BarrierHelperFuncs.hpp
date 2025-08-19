@@ -14,7 +14,10 @@ constexpr vk::ImageMemoryBarrier2 imageMemoryBarrier(
     vk::PipelineStageFlags2 dstStageMask, vk::AccessFlags2 dstAccessMask,
     vk::ImageLayout oldLayout, vk::ImageLayout newLayout, vk::Image image,
     vk::ImageSubresourceRange range =
-        vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+        vk::ImageSubresourceRange{
+            vk::ImageAspectFlagBits::eColor, 0, vk::RemainingMipLevels, 0,
+            vk::RemainingArrayLayers
+        }
 ) {
     return vk::ImageMemoryBarrier2{
         srcStageMask,

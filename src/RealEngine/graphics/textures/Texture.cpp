@@ -144,7 +144,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
             eAllCommands,                       // Pipeline stage
             {},
             vk::AccessFlagBits::eTransferWrite, // Access flags
-            createInfo                          // Array layer count
+            createInfo
         );
         cb->copyBufferToImage(
             stagingBuffer.buffer(), m_image, eTransferDstOptimal,
