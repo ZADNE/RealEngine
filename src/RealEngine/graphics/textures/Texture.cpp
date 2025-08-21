@@ -91,7 +91,20 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
     // Create sampler
     if (createInfo.hasSampler) {
         m_sampler = device().createSampler(vk::SamplerCreateInfo{
-            {}, createInfo.magFilter, createInfo.minFilter, createInfo.mipmapMode
+            {},
+            createInfo.magFilter,
+            createInfo.minFilter,
+            createInfo.mipmapMode,
+            vk::SamplerAddressMode::eRepeat,
+            vk::SamplerAddressMode::eRepeat,
+            vk::SamplerAddressMode::eRepeat,
+            0.0f,            // Lod bias
+            false,           // Anisotropy enable
+            0.0f,            // Max anisotropy
+            false,           // Compare enable
+            vk::CompareOp::eNever,
+            0.0f,            // Min lod
+            vk::LodClampNone // Max lod
         });
     }
 
