@@ -60,8 +60,23 @@ block(PROPAGATE bit7z_aliased_target)
         set_target_properties(7z PROPERTIES
             IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/external/bin/win_x64/7z.dll"
         )
+
+        # Make sure the dll is bundled when installing
         list(APPEND runtime_bundled_artifacts 7z)
     endif()
+
+    # Define convenience copy function of 7z.dll
+    function(copy_7z_dll_to_target target)
+        if(WIN32)
+            get_target_property(7z_dll_path 7z IMPORTED_LOCATION)
+            add_custom_command(
+                TARGET ${target} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${7z_dll_path}"
+                    "$<TARGET_FILE_DIR:${target}>"
+            )
+        endif()
+    endfunction()
 
     # Remove interface headers with absolute paths from bit7z target
     get_target_property(bit7z_aliased_target bit7z ALIASED_TARGET)
@@ -172,6 +187,7 @@ block(PROPAGATE RTICreator)
             argparse
             bit7z
     )
+    copy_7z_dll_to_target(ResourcePackager)
 
     # RTICreator (Windows only)
     if (WIN32)

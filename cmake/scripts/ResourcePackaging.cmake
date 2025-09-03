@@ -33,6 +33,9 @@ function(real_target_package_resources)
         )
     endif()
 
+    # Copy 7z.dll to the target so that it can open the package
+    copy_7z_dll_to_target(${ARG_TARGET})
+
     # Add the packaging command
     add_custom_command(
         OUTPUT ${output_package}
