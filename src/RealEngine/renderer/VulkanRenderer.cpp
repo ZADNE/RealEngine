@@ -459,7 +459,7 @@ vk::raii::SwapchainKHR VulkanRenderer::createSwapchain() {
     );
 
     // Extent
-    if (caps.currentExtent == vk::Extent2D{0xFFFFFFFF, 0xFFFFFFFF}) {
+    if (caps.currentExtent != vk::Extent2D{0xFFFFFFFF, 0xFFFFFFFF}) {
         m_swapchainExtent = caps.currentExtent;
     } else {
         glm::ivec2 windowPx;
