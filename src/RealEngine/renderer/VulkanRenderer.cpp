@@ -66,8 +66,7 @@ VulkanRenderer::VulkanRenderer(
     , m_debugUtilsMessenger(createDebugUtilsMessenger())
 #endif // RE_BUILDING_FOR_DEBUG
     , m_surface(createSurface())
-    , m_physicalDevice(createPhysicalDevice(preferredDevice, vulkan.deviceCreateInfoChain)
-      )
+    , m_physicalDevice(createPhysicalDevice(preferredDevice, vulkan.deviceCreateInfoChain))
     , m_presentMode(selectClosestPresentMode(vSync))
     , m_device(createDevice(vulkan.deviceCreateInfoChain))
     , m_allocator(createAllocator())
@@ -111,7 +110,9 @@ VulkanRenderer::VulkanRenderer(
 
 VulkanRenderer::~VulkanRenderer() {
     m_device.waitIdle();
-    ImGui_ImplVulkan_Shutdown();
+    if (m_mainRenderPass) {
+        ImGui_ImplVulkan_Shutdown();
+    }
     ImGui_ImplSDL2_Shutdown();
 }
 
@@ -126,8 +127,9 @@ void VulkanRenderer::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpa
     m_mainRenderPass    = &rp;
     m_imGuiSubpassIndex = imGuiSubpassIndex;
 
-    new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers
-    ){createSwapchainFramebuffers()};
+    new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers){
+        createSwapchainFramebuffers()
+    };
 
     if (m_imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
         // Initialize ImGui for the new renderpass
@@ -196,8 +198,7 @@ const CommandBuffer& VulkanRenderer::prepareFrame() {
     return cb;
 }
 
-void VulkanRenderer::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues
-) {
+void VulkanRenderer::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues) {
     auto& cb = m_cbs.write();
     cb->beginRenderPass2(
         vk::RenderPassBeginInfo{
@@ -221,11 +222,10 @@ void VulkanRenderer::mainRenderPassBegin(std::span<const vk::ClearValue> clearVa
         }
     );
     cb->setScissor(
-        0u,
-        vk::Rect2D{
-            {0, 0},                                             // x, y
-            {m_swapchainExtent.width, m_swapchainExtent.height} // width, height
-        }
+        0u, vk::Rect2D{
+                {0, 0},                                             // x, y
+                {m_swapchainExtent.width, m_swapchainExtent.height} // width, height
+            }
     );
 }
 
@@ -367,12 +367,11 @@ vk::raii::PhysicalDevice VulkanRenderer::createPhysicalDevice(
     std::string_view preferredDevice, const void* deviceCreateInfoChain
 ) {
     SelectedPhysDevice res = selectSuitablePhysDevice(
-        *m_instance,
-        PhysDeviceRequirements{
-            .surface               = *m_surface,
-            .deviceCreateInfoChain = deviceCreateInfoChain,
-            .preferredDevice       = preferredDevice
-        }
+        *m_instance, PhysDeviceRequirements{
+                         .surface               = *m_surface,
+                         .deviceCreateInfoChain = deviceCreateInfoChain,
+                         .preferredDevice       = preferredDevice
+                     }
     );
 
     // If a device was selected (= suitable)
@@ -433,17 +432,19 @@ vk::raii::Device VulkanRenderer::createDevice(const void* deviceCreateInfoChain)
 }
 
 vma::Allocator VulkanRenderer::createAllocator() {
-    return vma::createAllocator(vma::AllocatorCreateInfo{
-        vma::AllocatorCreateFlagBits::eExternallySynchronized,
-        *m_physicalDevice, *m_device,
-        0,       // Use default large heap block size (256 MB as of writing)
-        nullptr, // Use default CPU memory allocation callbacks
-        nullptr, // Do not receive informative callbacks from VMA
-        nullptr, // No heap size limits
-        nullptr, // Let VMA load Vulkan functions on its own
-        *m_instance, vk::ApiVersion13,
-        nullptr, // No external memory handles
-    });
+    return vma::createAllocator(
+        vma::AllocatorCreateInfo{
+            vma::AllocatorCreateFlagBits::eExternallySynchronized,
+            *m_physicalDevice, *m_device,
+            0,       // Use default large heap block size (256 MB as of writing)
+            nullptr, // Use default CPU memory allocation callbacks
+            nullptr, // Do not receive informative callbacks from VMA
+            nullptr, // No heap size limits
+            nullptr, // Let VMA load Vulkan functions on its own
+            *m_instance, vk::ApiVersion13,
+            nullptr, // No external memory handles
+        }
+    );
 }
 
 vk::raii::Queue VulkanRenderer::getQueue(uint32_t familyIndex) {
@@ -527,15 +528,18 @@ std::vector<Texture> VulkanRenderer::createAdditionalBuffers() {
     std::vector<Texture> buffers;
     buffers.reserve(m_additionalBufferDescrs.size());
     for (const auto& descr : m_additionalBufferDescrs) {
-        buffers.emplace_back(TextureCreateInfo{
-            .allocFlags = vma::AllocationCreateFlagBits::eDedicatedMemory,
-            .format     = descr.format,
-            .extent = glm::uvec3{m_swapchainExtent.width, m_swapchainExtent.height, 1},
-            .usage         = descr.usage,
-            .initialLayout = vk::ImageLayout::eUndefined,
-            .aspects       = descr.aspects,
-            .hasSampler    = false
-        });
+        buffers.emplace_back(
+            TextureCreateInfo{
+                .allocFlags = vma::AllocationCreateFlagBits::eDedicatedMemory,
+                .format     = descr.format,
+                .extent =
+                    glm::uvec3{m_swapchainExtent.width, m_swapchainExtent.height, 1},
+                .usage         = descr.usage,
+                .initialLayout = vk::ImageLayout::eUndefined,
+                .aspects       = descr.aspects,
+                .hasSampler    = false
+            }
+        );
     }
     return buffers;
 }
@@ -625,12 +629,15 @@ void VulkanRenderer::recreateSwapchain() {
 
     // Recreate them with the new size
     new (&m_swapchain) decltype(m_swapchain){createSwapchain()};
-    new (&m_swapchainImageViews) decltype(m_swapchainImageViews
-    ){createSwapchainImageViews()};
-    new (&m_additionalBuffers) decltype(m_additionalBuffers
-    ){createAdditionalBuffers()};
-    new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers
-    ){createSwapchainFramebuffers()};
+    new (&m_swapchainImageViews) decltype(m_swapchainImageViews){
+        createSwapchainImageViews()
+    };
+    new (&m_additionalBuffers) decltype(m_additionalBuffers){
+        createAdditionalBuffers()
+    };
+    new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers){
+        createSwapchainFramebuffers()
+    };
 }
 
 void VulkanRenderer::assignImplementationReferences() {
