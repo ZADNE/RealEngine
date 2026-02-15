@@ -45,7 +45,7 @@ protected:
     static const vk::DescriptorPool& descriptorPool() {
         return *s_descriptorPool;
     }
-    static const vk::DispatchLoaderDynamic& dispatchLoaderDynamic() {
+    static const vk::detail::DispatchLoaderDynamic& dispatchLoaderDynamic() {
         return *s_dispatchLoaderDynamic;
     }
     static DeletionQueue& deletionQueue() { return *s_deletionQueue; }
@@ -81,7 +81,7 @@ private:
     static inline const vk::CommandPool* s_commandPool       = nullptr;
     static inline const CommandBuffer* s_oneTimeSubmitCmdBuf = nullptr;
     static inline const vk::DescriptorPool* s_descriptorPool = nullptr;
-    static inline const vk::DispatchLoaderDynamic* s_dispatchLoaderDynamic = nullptr;
+    static inline const vk::detail::DispatchLoaderDynamic* s_dispatchLoaderDynamic{};
     static inline DeletionQueue* s_deletionQueue         = nullptr;
     static inline PipelineHotLoader* s_pipelineHotLoader = nullptr;
 };

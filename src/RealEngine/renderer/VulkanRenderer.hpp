@@ -116,7 +116,7 @@ private:
     vk::raii::PhysicalDevice m_physicalDevice;
     vk::PresentModeKHR m_presentMode{};
     vk::raii::Device m_device;
-    vk::DispatchLoaderDynamic m_dispatchLoaderDynamic{
+    vk::detail::DispatchLoaderDynamic m_dispatchLoaderDynamic{
         *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr
     };
     Allocator m_allocator;

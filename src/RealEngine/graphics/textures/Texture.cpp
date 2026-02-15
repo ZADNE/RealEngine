@@ -56,7 +56,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         createInfo.allocFlags, createInfo.memoryUsage
     };
     // Create the image
-    std::tie(m_image, m_allocation) =
+    std::tie(m_allocation, m_image) =
         allocator().createImage(imageCreateInfo, allocCreateInfo);
     if (!createInfo.texels.empty()) {
         // Initialize texels of the image and transit to initial layout
