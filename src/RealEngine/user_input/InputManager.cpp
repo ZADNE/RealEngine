@@ -1,10 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/user_input/InputManager.hpp>
+
 #include <algorithm>
 #include <iostream>
-
-#include <RealEngine/user_input/InputManager.hpp>
 
 namespace re {
 

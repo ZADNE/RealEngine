@@ -1,13 +1,14 @@
 /**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/window/Window.hpp>
+
 #include <iostream>
 
 #include <ImGui/imgui_impl_sdl2.h>
 #include <SDL_events.h>
 
 #include <RealEngine/utility/Error.hpp>
-#include <RealEngine/window/Window.hpp>
 
 namespace re {
 
@@ -16,7 +17,6 @@ Window::Window(const WindowSettings& settings, const std::string& title)
     , m_subsystems{}
     , m_SDLwindow{createSDLWindow()}
     , m_windowTitle{title} {
-
     m_subsystems.printRealEngineVersion();
     m_subsystems.printSubsystemsVersions();
 }

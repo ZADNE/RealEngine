@@ -36,7 +36,6 @@ struct DisplayInfo {
 };
 
 struct MainProgramInitInfo {
-
     VulkanInitInfo vulkan{};
 
     /**

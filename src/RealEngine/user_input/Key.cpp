@@ -1,9 +1,9 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <SDL_mouse.h>
-
 #include <RealEngine/user_input/Key.hpp>
+
+#include <SDL_mouse.h>
 
 namespace {
 

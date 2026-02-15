@@ -1,9 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/resources/PNGLoader.hpp>
+
 #include <lodepng/lodepng.hpp>
 
-#include <RealEngine/resources/PNGLoader.hpp>
 #include <RealEngine/utility/Endianness.hpp>
 #include <RealEngine/utility/Error.hpp>
 

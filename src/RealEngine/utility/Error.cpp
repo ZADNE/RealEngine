@@ -1,10 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/utility/Error.hpp>
+
 #include <iostream>
 #include <string>
-
-#include <RealEngine/utility/Error.hpp>
 
 namespace re {
 

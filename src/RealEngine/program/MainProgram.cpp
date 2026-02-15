@@ -1,6 +1,8 @@
 /**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/program/MainProgram.hpp>
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -9,7 +11,6 @@
 #include <glm/common.hpp>
 
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
-#include <RealEngine/program/MainProgram.hpp>
 #include <RealEngine/rooms/Room.hpp>
 
 namespace re {

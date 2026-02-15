@@ -10,10 +10,14 @@ Semaphore::Semaphore()
 }
 
 Semaphore::Semaphore(uint64_t initialValue)
-    : m_semaphore(device().createSemaphore(vk::StructureChain{
-          vk::SemaphoreCreateInfo{},
-          vk::SemaphoreTypeCreateInfo{vk::SemaphoreType::eTimeline, initialValue}
-      }.get<vk::SemaphoreCreateInfo>())) {
+    : m_semaphore(
+          device().createSemaphore(
+              vk::StructureChain{
+                  vk::SemaphoreCreateInfo{},
+                  vk::SemaphoreTypeCreateInfo{vk::SemaphoreType::eTimeline, initialValue}
+              }.get<vk::SemaphoreCreateInfo>()
+          )
+      ) {
 }
 
 Semaphore::Semaphore(Semaphore&& other) noexcept

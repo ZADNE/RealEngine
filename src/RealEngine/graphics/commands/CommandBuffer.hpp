@@ -52,8 +52,7 @@ public:
      */
     template<std::invocable<const CommandBuffer&> F>
     static void doOneTimeSubmit(F op) {
-        oneTimeSubmitCmdBuf()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit
-        });
+        oneTimeSubmitCmdBuf()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
         op(oneTimeSubmitCmdBuf());
         oneTimeSubmitCmdBuf()->end();
         graphicsCompQueue().submit(vk::SubmitInfo{{}, {}, *oneTimeSubmitCmdBuf()});

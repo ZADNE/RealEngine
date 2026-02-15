@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/renderer/DebugMessageHandler.hpp>
+
 #include <RealEngine/utility/Error.hpp>
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;

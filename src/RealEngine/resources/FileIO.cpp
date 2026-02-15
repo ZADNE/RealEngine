@@ -1,9 +1,9 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <fstream>
-
 #include <RealEngine/resources/FileIO.hpp>
+
+#include <fstream>
 
 namespace re {
 

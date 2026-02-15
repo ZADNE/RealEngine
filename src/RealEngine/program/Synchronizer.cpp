@@ -1,10 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/program/Synchronizer.hpp>
+
 #include <cassert>
 #include <thread>
-
-#include <RealEngine/program/Synchronizer.hpp>
 
 using namespace std::chrono_literals;
 

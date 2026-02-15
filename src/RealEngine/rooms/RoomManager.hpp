@@ -53,8 +53,7 @@ public:
      */
     template<DerivedFromRoom RoomType, typename... ConstructorArgs>
     RoomType* addRoom(ConstructorArgs&&... args) {
-        auto ptr = std::make_unique<RoomType>(std::forward<ConstructorArgs>(args
-        )...);
+        auto ptr = std::make_unique<RoomType>(std::forward<ConstructorArgs>(args)...);
         auto* rval = ptr.get();
         m_rooms.push_back(std::move(ptr));
         return rval;

@@ -6,12 +6,13 @@
 namespace re {
 
 DescriptorSet::DescriptorSet(const DescriptorSetCreateInfo& createInfo)
-    : m_descriptorSet(device()
-                          .allocateDescriptorSets(vk::DescriptorSetAllocateInfo{
-                              descriptorPool(), createInfo.layout
-                          })
-                          .back()) {
-
+    : m_descriptorSet(
+          device()
+              .allocateDescriptorSets(
+                  vk::DescriptorSetAllocateInfo{descriptorPool(), createInfo.layout}
+              )
+              .back()
+      ) {
     setDebugUtilsObjectName(m_descriptorSet, createInfo.debugName);
 }
 

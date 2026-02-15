@@ -1,8 +1,9 @@
 /**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 #include <RealEngine/renderer/DeletionQueue.hpp>
+
+#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 namespace re {

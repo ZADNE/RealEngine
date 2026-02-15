@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/graphics/batches/GeometryBatch.hpp>
+
 #include <RealEngine/graphics/batches/shaders/AllShaders.gen.hpp>
 #include <RealEngine/graphics/commands/CommandBuffer.hpp>
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
@@ -40,12 +41,14 @@ const vk::PipelineVertexInputStateCreateInfo k_vertexInput{{}, k_bindings, k_att
 } // namespace
 
 GeometryBatch::GeometryBatch(const GeometryBatchCreateInfo& createInfo)
-    : m_verticesBuf(BufferCreateInfo{
-          .allocFlags  = eMapped | eHostAccessSequentialWrite,
-          .sizeInBytes = sizeof(VertexPoCo) * createInfo.maxVertices *
-                         k_maxFramesInFlight,
-          .usage = eVertexBuffer
-      })
+    : m_verticesBuf(
+          BufferCreateInfo{
+              .allocFlags  = eMapped | eHostAccessSequentialWrite,
+              .sizeInBytes = sizeof(VertexPoCo) * createInfo.maxVertices *
+                             k_maxFramesInFlight,
+              .usage = eVertexBuffer
+          }
+      )
     , m_maxVertices(createInfo.maxVertices)
     , m_pipelineLayout(
           PipelineLayoutCreateInfo{},

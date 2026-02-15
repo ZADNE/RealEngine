@@ -59,7 +59,6 @@ constexpr ShaderSourceRef::ShaderSourceRef(const ShaderSource& source)
  * @brief POD representing source codes for all shaders within a graphics pipeline
  */
 struct PipelineGraphicsSources {
-
     static constexpr size_t k_numStages = 5;
 
     ShaderSourceRef operator[](size_t type) const {
@@ -108,7 +107,6 @@ struct PipelineGraphicsSources {
  * @brief POD representing source codes for all shaders within a compute pipeline
  */
 struct PipelineComputeSources {
-
     static constexpr size_t k_numStages = 1;
 
     ShaderSourceRef operator[](size_t type) const {

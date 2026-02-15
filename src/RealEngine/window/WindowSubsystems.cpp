@@ -1,6 +1,8 @@
 /**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/window/WindowSubsystems.hpp>
+
 #include <print>
 #include <stdexcept>
 
@@ -10,7 +12,6 @@
 
 #include <RealEngine/utility/BuildType.hpp>
 #include <RealEngine/utility/Error.hpp>
-#include <RealEngine/window/WindowSubsystems.hpp>
 
 namespace re {
 

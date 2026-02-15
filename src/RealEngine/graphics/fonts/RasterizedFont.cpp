@@ -1,6 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/graphics/fonts/RasterizedFont.hpp>
+
 #include <bit>
 #include <format>
 #include <memory>
@@ -8,7 +10,6 @@
 
 #include <SDL_ttf.h>
 
-#include <RealEngine/graphics/fonts/RasterizedFont.hpp>
 #include <RealEngine/utility/Error.hpp>
 #include <RealEngine/utility/Math.hpp>
 #include <RealEngine/utility/Unicode.hpp>

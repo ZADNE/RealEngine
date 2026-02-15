@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/resources/ResourceLoader.hpp>
+
 #include <RealEngine/utility/BuildType.hpp>
 
 namespace re {

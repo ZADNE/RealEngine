@@ -1,9 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/renderer/PhysDeviceSuitability.hpp>
+
 #include <bitset>
 
-#include <RealEngine/renderer/PhysDeviceSuitability.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
 #include <RealEngine/utility/Error.hpp>
 

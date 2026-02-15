@@ -1,9 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/graphics/buffers/Buffer.hpp>
+
 #include <cassert>
 
-#include <RealEngine/graphics/buffers/Buffer.hpp>
 #include <RealEngine/graphics/commands/CommandBuffer.hpp>
 #include <RealEngine/utility/Error.hpp>
 

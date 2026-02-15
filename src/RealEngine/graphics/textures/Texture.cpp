@@ -1,8 +1,9 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/buffers/BufferMapped.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>
+
+#include <RealEngine/graphics/buffers/BufferMapped.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 using enum vk::ImageLayout;
@@ -74,38 +75,42 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         });
     }
     // Create image view
-    m_imageView = device().createImageView(vk::ImageViewCreateInfo{
-        {},
-        m_image,
-        imageViewType(createInfo.type, createInfo.layers),
-        createInfo.format,
-        createInfo.componentMapping,
-        vk::ImageSubresourceRange{
-            createInfo.aspects,
-            0u,                   // Base mip level
-            createInfo.mipLevels, // Mip level count
-            0u,                   // Base array layer
-            createInfo.layers     // Array layer count
+    m_imageView = device().createImageView(
+        vk::ImageViewCreateInfo{
+            {},
+            m_image,
+            imageViewType(createInfo.type, createInfo.layers),
+            createInfo.format,
+            createInfo.componentMapping,
+            vk::ImageSubresourceRange{
+                createInfo.aspects,
+                0u,                   // Base mip level
+                createInfo.mipLevels, // Mip level count
+                0u,                   // Base array layer
+                createInfo.layers     // Array layer count
+            }
         }
-    });
+    );
     // Create sampler
     if (createInfo.hasSampler) {
-        m_sampler = device().createSampler(vk::SamplerCreateInfo{
-            {},
-            createInfo.magFilter,
-            createInfo.minFilter,
-            createInfo.mipmapMode,
-            vk::SamplerAddressMode::eRepeat,
-            vk::SamplerAddressMode::eRepeat,
-            vk::SamplerAddressMode::eRepeat,
-            0.0f,            // Lod bias
-            false,           // Anisotropy enable
-            0.0f,            // Max anisotropy
-            false,           // Compare enable
-            vk::CompareOp::eNever,
-            0.0f,            // Min lod
-            vk::LodClampNone // Max lod
-        });
+        m_sampler = device().createSampler(
+            vk::SamplerCreateInfo{
+                {},
+                createInfo.magFilter,
+                createInfo.minFilter,
+                createInfo.mipmapMode,
+                vk::SamplerAddressMode::eRepeat,
+                vk::SamplerAddressMode::eRepeat,
+                vk::SamplerAddressMode::eRepeat,
+                0.0f,            // Lod bias
+                false,           // Anisotropy enable
+                0.0f,            // Max anisotropy
+                false,           // Compare enable
+                vk::CompareOp::eNever,
+                0.0f,            // Min lod
+                vk::LodClampNone // Max lod
+            }
+        );
     }
 
     setDebugUtilsObjectName(m_image, createInfo.debugName);

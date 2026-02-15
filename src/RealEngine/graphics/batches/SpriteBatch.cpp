@@ -1,11 +1,12 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/graphics/batches/SpriteBatch.hpp>
+
 #include <algorithm>
 
 #include <glm/common.hpp>
 
-#include <RealEngine/graphics/batches/SpriteBatch.hpp>
 #include <RealEngine/graphics/batches/shaders/AllShaders.gen.hpp>
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
 
@@ -14,12 +15,15 @@ using enum vk::DescriptorBindingFlagBits;
 namespace re {
 
 SpriteBatch::SpriteBatch(const SpriteBatchCreateInfo& createInfo)
-    : m_spritesBuf(BufferCreateInfo{
-          .allocFlags = vma::AllocationCreateFlagBits::eMapped |
-                        vma::AllocationCreateFlagBits::eHostAccessRandom,
-          .sizeInBytes = k_maxFramesInFlight * createInfo.maxSprites * sizeof(Sprite),
-          .usage = eVertexBuffer
-      })
+    : m_spritesBuf(
+          BufferCreateInfo{
+              .allocFlags = vma::AllocationCreateFlagBits::eMapped |
+                            vma::AllocationCreateFlagBits::eHostAccessRandom,
+              .sizeInBytes = k_maxFramesInFlight * createInfo.maxSprites *
+                             sizeof(Sprite),
+              .usage = eVertexBuffer
+          }
+      )
     , m_maxSprites(createInfo.maxSprites)
     , m_maxTextures(createInfo.maxTextures)
     , m_pipelineLayout(createPipelineLayout(createInfo.maxTextures))
@@ -94,8 +98,7 @@ void SpriteBatch::addSprite(
 }
 
 void SpriteBatch::addSubimage(
-    const TextureShaped& tex, glm::vec2 pos, glm::vec2 subimgSpr,
-    Color col /* = k_white*/
+    const TextureShaped& tex, glm::vec2 pos, glm::vec2 subimgSpr, Color col /* = k_white*/
 ) {
     m_spritesBuf[nextSpriteIndex()] = Sprite{
         .pos = glm::vec4(pos - tex.pivot(), tex.subimageDims()),
@@ -143,8 +146,7 @@ PipelineLayout SpriteBatch::createPipelineLayout(unsigned int maxTextures) {
     static constexpr vk::DescriptorBindingFlags bindingFlags = {
         eUpdateUnusedWhilePending | ePartiallyBound
     };
-    auto bindingFlagsArray = vk::ArrayProxy<vk::DescriptorBindingFlags>(bindingFlags
-    );
+    auto bindingFlagsArray = vk::ArrayProxy<vk::DescriptorBindingFlags>(bindingFlags);
     return PipelineLayout{
         PipelineLayoutCreateInfo{
             .descriptorBindingFlags = {bindingFlagsArray},

@@ -80,8 +80,8 @@ VulkanRenderer::VulkanRenderer(
     , m_additionalBuffers(createAdditionalBuffers())
     , m_commandPool(createCommandPool())
     , m_cbs([&]() {
-        assignImplementationReferences(); // Deliberate side effect, ref to device
-                                          // and pool is required to construct a cmd buf
+        // ref to device and pool is required to construct a cmd buf
+        assignImplementationReferences();
         return FrameDoubleBuffered<CommandBuffer>{
             CommandBuffer{{.debugName = "re::VulkanRenderer::cbs[0]"}},
             CommandBuffer{{.debugName = "re::VulkanRenderer::cbs[1]"}}
