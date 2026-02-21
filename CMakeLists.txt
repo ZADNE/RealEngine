@@ -24,13 +24,13 @@ block(PROPAGATE bit7z_aliased_target)
     # Git is required to download some dependencies
     find_package(Git REQUIRED)
     # Vulkan
-    find_package(Vulkan REQUIRED COMPONENTS glslc)
+    find_package(Vulkan 1.4.341 REQUIRED COMPONENTS glslc)
     # SDL2
     find_package(SDL2 CONFIG REQUIRED GLOBAL)
     find_package(SDL2_ttf CONFIG REQUIRED GLOBAL)
     # SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross
-        URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.290.0.tar.gz
+        URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.4.341.0.tar.gz
     )
     # OpenGL Mathematics
     set(GLM_BUILD_INSTALL ON CACHE INTERNAL "")
