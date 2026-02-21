@@ -87,6 +87,15 @@ block(PROPAGATE bit7z_aliased_target)
         PROPERTIES
             INTERFACE_SOURCES ""
     )
+    if (MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        # Remove redundant compiler flags from bit7z causing compilation error
+        get_target_property(bit7z_compile_options ${bit7z_aliased_target} COMPILE_OPTIONS)
+        list(REMOVE_ITEM bit7z_compile_options "/Zc:throwingNew" "/Zc:referenceBinding")
+        set_target_properties(${bit7z_aliased_target}
+            PROPERTIES
+                COMPILE_OPTIONS "${bit7z_compile_options}"
+        )
+    endif()
 
     # Add embedded libs
     add_subdirectory(external)
