@@ -23,11 +23,11 @@ endfunction()
 block(PROPAGATE bit7z_aliased_target)
     # Git is required to download some dependencies
     find_package(Git REQUIRED)
-    # Vulkan
+    # Vulkan 1.4 SDK
     find_package(Vulkan 1.4.341 REQUIRED COMPONENTS glslc)
-    # SDL2
-    find_package(SDL2 CONFIG REQUIRED GLOBAL)
-    find_package(SDL2_ttf CONFIG REQUIRED GLOBAL)
+    # SDL3
+    find_package(SDL3 CONFIG REQUIRED GLOBAL COMPONENTS SDL3-shared)
+    find_package(SDL3_ttf CONFIG REQUIRED GLOBAL COMPONENTS SDL3_ttf-shared)
     # SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross
         URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.4.341.0.tar.gz
@@ -123,15 +123,14 @@ block(PROPAGATE RealEngine_sublibs)
                 ${CMAKE_DL_LIBS}
                 Vulkan::Vulkan
                 vma
-                SDL2::SDL2main
-                SDL2::SDL2
+                SDL3::SDL3
                 glm::glm-header-only
                 bit7z
                 nlohmann_json::nlohmann_json
                 ImGui
                 lodepng
             PRIVATE
-                SDL2_ttf::SDL2_ttf
+                SDL3_ttf::SDL3_ttf
                 spirv-cross-core
                 spirv-cross-reflect
                 filewatch
@@ -273,7 +272,7 @@ block()
 
     # Downstream projects should install these runtime artifacts from these targets
     set(REALENGINE_RUNTIME_ARTIFACTS 
-        SDL2::SDL2 SDL2_ttf::SDL2_ttf ${runtime_bundled_artifacts}
+        SDL3::SDL3-shared SDL3_ttf::SDL3_ttf-shared ${runtime_bundled_artifacts}
         CACHE INTERNAL ""
     )
 

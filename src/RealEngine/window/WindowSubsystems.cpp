@@ -7,8 +7,8 @@
 #include <stdexcept>
 
 #include <ImGui/imgui.h>
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include <RealEngine/utility/BuildType.hpp>
 #include <RealEngine/utility/Error.hpp>
@@ -17,15 +17,15 @@ namespace re {
 
 WindowSubsystems::WindowSubsystems() {
     // SDL2
-    if (auto err = SDL_Init(SDL_INIT_EVERYTHING)) {
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
         const char* errorStr = SDL_GetError();
         error(errorStr);
         throw std::runtime_error{errorStr};
     }
 
     // SDL2_ttf
-    if (TTF_Init() != 0) {
-        const char* errorStr = TTF_GetError();
+    if (!TTF_Init()) {
+        const char* errorStr = SDL_GetError();
         error(errorStr);
         throw std::runtime_error{errorStr};
     }
@@ -47,32 +47,31 @@ void WindowSubsystems::printRealEngineVersion() {
 }
 
 void WindowSubsystems::printSubsystemsVersions() const {
-    { // SDL2
+    { // SDL3
 #if RE_BUILDING_FOR_DEBUG
-        SDL_version compiled;
-        SDL_VERSION(&compiled);
         std::println(
-            "SDL compiled: {}.{}.{}", compiled.major, compiled.minor, compiled.patch
+            "SDL compiled: {}.{}.{}", SDL_MAJOR_VERSION, SDL_MINOR_VERSION,
+            SDL_MICRO_VERSION
         );
 #endif // RE_BUILDING_FOR_DEBUG
-        SDL_version linked;
-        SDL_GetVersion(&linked);
+        auto linked = SDL_GetVersion();
         std::println(
-            "SDL linked:   {}.{}.{}", linked.major, linked.minor, linked.patch
+            "SDL linked:   {}.{}.{}", SDL_VERSIONNUM_MAJOR(linked),
+            SDL_VERSIONNUM_MINOR(linked), SDL_VERSIONNUM_MICRO(linked)
         );
     }
 
-    { // SDL2_ttf
+    { // SDL3_ttf
 #if RE_BUILDING_FOR_DEBUG
-        SDL_version compiled;
-        SDL_TTF_VERSION(&compiled);
         std::println(
-            "TTF compiled: {}.{}.{}", compiled.major, compiled.minor, compiled.patch
+            "TTF compiled: {}.{}.{}", SDL_TTF_MAJOR_VERSION,
+            SDL_TTF_MINOR_VERSION, SDL_TTF_MICRO_VERSION
         );
 #endif // RE_BUILDING_FOR_DEBUG
-        const SDL_version* linked = TTF_Linked_Version();
+        auto linked = TTF_Version();
         std::println(
-            "TTF linked:   {}.{}.{}", linked->major, linked->minor, linked->patch
+            "TTF linked:   {}.{}.{}", SDL_VERSIONNUM_MAJOR(linked),
+            SDL_VERSIONNUM_MINOR(linked), SDL_VERSIONNUM_MICRO(linked)
         );
     }
 

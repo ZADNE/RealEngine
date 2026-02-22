@@ -13,7 +13,7 @@
 * Handling of mouse & keyboard input
 * Simulation speed decoupled from variable frame rate
 * A system of rooms / scenes / worlds with well defined transitions
-* Supports Windows (MSVC) and Linux (GCC)
+* Supports Windows (MSVC, Clang) and Linux (GCC)
 
 ## Design goals:
 
@@ -38,8 +38,8 @@
 
 ## The following libraries must be installed to build:
 
-* [SDL2](https://www.libsdl.org/) (for user input and window creation)
-* [SDL2_ttf](https://wiki.libsdl.org/SDL2_ttf/FrontPage) (for font rasterization)
-* [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) (for GPU-accelerated rendering and compute)
+* [SDL3](https://github.com/libsdl-org/SDL) (for user input and window creation)
+* [SDL3_ttf](https://github.com/libsdl-org/SDL_ttf) (for font rasterization)
+* [Vulkan 1.4 SDK](https://www.lunarg.com/vulkan-sdk/) (for GPU-accelerated rendering and compute)
 
 See documentation on ![how to set up a project using RealEngine](https://github.com/ZADNE/RealEngine/blob/main/doc/HowToSetUpProject.md).

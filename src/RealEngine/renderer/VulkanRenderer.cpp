@@ -3,9 +3,9 @@
  */
 #include <iostream>
 
-#include <ImGui/imgui_impl_sdl2.h>
+#include <ImGui/imgui_impl_sdl3.h>
 #include <ImGui/imgui_impl_vulkan.h>
-#include <SDL_vulkan.h>
+#include <SDL3/SDL_vulkan.h>
 #include <glm/common.hpp>
 #define VMA_IMPLEMENTATION
 #include <vma/vk_mem_alloc.hpp>
@@ -103,7 +103,7 @@ VulkanRenderer::VulkanRenderer(
     );
 
     // Initialize ImGui for SDL2
-    if (!ImGui_ImplSDL2_InitForVulkan(m_sdlWindow)) {
+    if (!ImGui_ImplSDL3_InitForVulkan(m_sdlWindow)) {
         throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
     }
 }
@@ -113,7 +113,7 @@ VulkanRenderer::~VulkanRenderer() {
     if (m_mainRenderPass) {
         ImGui_ImplVulkan_Shutdown();
     }
-    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
 }
 
 void VulkanRenderer::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex) {
@@ -310,22 +310,17 @@ vk::raii::Instance VulkanRenderer::createInstance() {
 #endif // RE_BUILDING_FOR_DEBUG
     };
 
-    // Add extensions required by SDL2
-    unsigned int sdl2ExtensionCount{};
-    if (!SDL_Vulkan_GetInstanceExtensions(m_sdlWindow, &sdl2ExtensionCount, nullptr)) {
+    // Add extensions required by SDL
+    Uint32 sdlExtensionCount{};
+    const char* const* sdlExtensions{};
+    if (sdlExtensions = SDL_Vulkan_GetInstanceExtensions(&sdlExtensionCount)) {
         throw std::runtime_error(
-            "Could not get number of Vulkan extensions required for SDL2!"
+            "Failed to query Vulkan extensions required by SDL!"
         );
     }
     size_t defaultExtensionsCount = extensions.size();
-    extensions.resize(defaultExtensionsCount + sdl2ExtensionCount);
-    if (!SDL_Vulkan_GetInstanceExtensions(
-            m_sdlWindow, &sdl2ExtensionCount, &extensions[defaultExtensionsCount]
-        )) {
-        throw std::runtime_error(
-            "Could not get Vulkan extensions required for SDL2!"
-        );
-    }
+    extensions.reserve(defaultExtensionsCount + sdl2ExtensionCount);
+    std::copy(sdlExtensions, sdlExtensions + sdlExtensionCount, extensions.back());
 
     // Create Vulkan instance
     vk::ApplicationInfo applicationInfo(

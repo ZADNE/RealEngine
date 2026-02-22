@@ -3,7 +3,7 @@
  */
 #include <RealEngine/user_input/Key.hpp>
 
-#include <SDL_mouse.h>
+#include <SDL3/SDL_mouse.h>
 
 namespace {
 
@@ -52,32 +52,32 @@ Key toKey(SDL_Keycode key) {
     case SDLK_LEFTBRACKET:  return Key::LeftBracket;
     case SDLK_BACKSLASH:    return Key::Backslash;
     case SDLK_RIGHTBRACKET: return Key::RightBracket;
-    case SDLK_a:            return Key::A;
-    case SDLK_b:            return Key::B;
-    case SDLK_c:            return Key::C;
-    case SDLK_d:            return Key::D;
-    case SDLK_e:            return Key::E;
-    case SDLK_f:            return Key::F;
-    case SDLK_g:            return Key::G;
-    case SDLK_h:            return Key::H;
-    case SDLK_i:            return Key::I;
-    case SDLK_j:            return Key::J;
-    case SDLK_k:            return Key::K;
-    case SDLK_l:            return Key::L;
-    case SDLK_m:            return Key::M;
-    case SDLK_n:            return Key::N;
-    case SDLK_o:            return Key::O;
-    case SDLK_p:            return Key::P;
-    case SDLK_q:            return Key::Q;
-    case SDLK_r:            return Key::R;
-    case SDLK_s:            return Key::S;
-    case SDLK_t:            return Key::T;
-    case SDLK_u:            return Key::U;
-    case SDLK_v:            return Key::V;
-    case SDLK_w:            return Key::W;
-    case SDLK_x:            return Key::X;
-    case SDLK_y:            return Key::Y;
-    case SDLK_z:            return Key::Z;
+    case SDLK_A:            return Key::A;
+    case SDLK_B:            return Key::B;
+    case SDLK_C:            return Key::C;
+    case SDLK_D:            return Key::D;
+    case SDLK_E:            return Key::E;
+    case SDLK_F:            return Key::F;
+    case SDLK_G:            return Key::G;
+    case SDLK_H:            return Key::H;
+    case SDLK_I:            return Key::I;
+    case SDLK_J:            return Key::J;
+    case SDLK_K:            return Key::K;
+    case SDLK_L:            return Key::L;
+    case SDLK_M:            return Key::M;
+    case SDLK_N:            return Key::N;
+    case SDLK_O:            return Key::O;
+    case SDLK_P:            return Key::P;
+    case SDLK_Q:            return Key::Q;
+    case SDLK_R:            return Key::R;
+    case SDLK_S:            return Key::S;
+    case SDLK_T:            return Key::T;
+    case SDLK_U:            return Key::U;
+    case SDLK_V:            return Key::V;
+    case SDLK_W:            return Key::W;
+    case SDLK_X:            return Key::X;
+    case SDLK_Y:            return Key::Y;
+    case SDLK_Z:            return Key::Z;
     case SDLK_DELETE:       return Key::Delete;
     case SDLK_KP_0:         return Key::Numpad0;
     case SDLK_KP_1:         return Key::Numpad1;

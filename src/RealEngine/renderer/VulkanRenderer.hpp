@@ -2,11 +2,8 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <array>
-#include <memory>
 #include <vector>
 
-#include <glm/vec4.hpp>
 #include <vma/vk_mem_alloc.hpp>
 #include <vulkan/vulkan_raii.hpp>
 
