@@ -30,8 +30,7 @@ struct DisplayInfo {
     glm::ivec4 boundsUsable{}; ///< Bounds with system-reserved parts removed; XYWH
     glm::ivec2 dims{};         ///< Dimensions
     int refreshRate{};         ///< Refresh rate
-    uint32_t pixelFormat{};    ///< Pixel format @see SDL2's SDL_PixelFormatEnum
-    void* driverSpecific{};
+    uint32_t pixelFormat{};    ///< Pixel format @see SDL_PixelFormat enum
 };
 
 struct MainProgramInitInfo {

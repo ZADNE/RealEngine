@@ -9,6 +9,7 @@ real_target_sources(RealEngine_utility
         Error.hpp                   Error.cpp
         Math.hpp                    
         OffsetOfArr.hpp             
+        SDLProperties.hpp           
         Unicode.hpp                 
         UniqueCPtr.hpp              
         Version.hpp                 

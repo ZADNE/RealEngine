@@ -51,6 +51,12 @@ endmacro()
 macro(add_real_executable)
     add_executable(${ARGV})
     _add_real_target(${ARGV0})
+    # Copy DLLs in post build step
+    add_custom_command(TARGET ${ARGV0} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E
+            copy -t "$<TARGET_FILE_DIR:${ARGV0}>" "$<TARGET_RUNTIME_DLLS:${ARGV0}>"
+        COMMAND_EXPAND_LISTS
+    )
 endmacro()
 
 # Initializes base dirs of file sets

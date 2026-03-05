@@ -10,35 +10,27 @@
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include <RealEngine/utility/Math.hpp>
+#include <RealEngine/utility/SDLProperties.hpp>
 #include <RealEngine/utility/Unicode.hpp>
 #include <RealEngine/utility/UniqueCPtr.hpp>
 
 namespace re {
 
 using SDL_IOStreamRAII = UniqueCPtr<SDL_IOStream, SDL_CloseIO>;
-using SDL_PropertiesIDRAII = UniqueCHandle<SDL_PropertiesID, SDL_DestroyProperties>;
-using TTF_FontRAII    = UniqueCPtr<TTF_Font, TTF_CloseFont>;
-using SDL_SurfaceRAII = UniqueCPtr<SDL_Surface, SDL_DestroySurface>;
+using TTF_FontRAII     = UniqueCPtr<TTF_Font, TTF_CloseFont>;
+using SDL_SurfaceRAII  = UniqueCPtr<SDL_Surface, SDL_DestroySurface>;
 
 RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     SDL_IOStreamRAII ioStream{SDL_IOFromConstMem(
         createInfo.ttfBytes.data(),
         static_cast<int>(createInfo.ttfBytes.size_bytes())
     )};
-    SDL_PropertiesIDRAII fontProps{SDL_CreateProperties()};
-    SDL_SetPointerProperty(
-        fontProps.get(), TTF_PROP_FONT_CREATE_IOSTREAM_POINTER, ioStream.get()
-    );
-    SDL_SetBooleanProperty(
-        fontProps.get(), TTF_PROP_FONT_CREATE_IOSTREAM_AUTOCLOSE_BOOLEAN, false
-    );
-    SDL_SetFloatProperty(
-        fontProps.get(), TTF_PROP_FONT_CREATE_SIZE_FLOAT, createInfo.pointSize
-    );
-    SDL_SetNumberProperty(
-        fontProps.get(), TTF_PROP_FONT_CREATE_FACE_NUMBER, createInfo.faceIndex
-    );
-    TTF_FontRAII font{TTF_OpenFontWithProperties(fontProps.get())};
+    SDLProperties fontProps{};
+    fontProps.setProperty(TTF_PROP_FONT_CREATE_IOSTREAM_POINTER, ioStream.get());
+    fontProps.setProperty(TTF_PROP_FONT_CREATE_IOSTREAM_AUTOCLOSE_BOOLEAN, false);
+    fontProps.setProperty(TTF_PROP_FONT_CREATE_SIZE_FLOAT, createInfo.pointSize);
+    fontProps.setProperty(TTF_PROP_FONT_CREATE_FACE_NUMBER, createInfo.faceIndex);
+    TTF_FontRAII font{TTF_OpenFontWithProperties(fontProps)};
 
     // Count the expected number of characters
     int glyphCount = std::accumulate(

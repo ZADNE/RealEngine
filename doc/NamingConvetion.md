@@ -28,7 +28,7 @@ Identifiers of a variables consist of two parts: **scope identifier followed by 
 
 * `k_` for compile-time constants of any kind
 * `m_` for a member variable of a class (both private and protected)
-* `s_` for static member variables (both private and protected)
+* `s_` for static variables (both member and inside functions)
 * `g_` for (rare) global variables
 * Other variables (any locals and public struct members) do not use any prefix.
 

@@ -42,11 +42,11 @@ jobs:
         version: 1.4.341.1
         cache: true
 
-    - name: Set up SDL2
+    - name: Set up SDL3 (Linux)
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install libsdl2-dev libsdl2-2.0-0 libsdl2-ttf-dev libsdl2-ttf-2.0-0 -y;
+        sudo apt-get install libsdl3-dev libsdl3-0 libsdl3-ttf-dev libsdl3-ttf0 -y;
 
     - name: Configure CMake
       run: >

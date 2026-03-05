@@ -5,10 +5,11 @@
 
 #include <iostream>
 
-#include <ImGui/imgui_impl_sdl2.h>
-#include <SDL_events.h>
+#include <ImGui/imgui_impl_sdl3.h>
+#include <SDL3/SDL_events.h>
 
 #include <RealEngine/utility/Error.hpp>
+#include <RealEngine/utility/SDLProperties.hpp>
 
 namespace re {
 
@@ -22,16 +23,16 @@ Window::Window(const WindowSettings& settings, const std::string& title)
 }
 
 bool Window::passSDLEvent(const SDL_Event& evnt) {
-    ImGui_ImplSDL2_ProcessEvent(&evnt);
+    ImGui_ImplSDL3_ProcessEvent(&evnt);
     auto& io = ImGui::GetIO();
     switch (evnt.type) {
-    case SDL_KEYUP:
-    case SDL_KEYDOWN:         return io.WantCaptureKeyboard;
-    case SDL_MOUSEBUTTONDOWN:
-    case SDL_MOUSEBUTTONUP:
-    case SDL_MOUSEMOTION:
-    case SDL_MOUSEWHEEL:      return io.WantCaptureMouse;
-    default:                  return false;
+    case SDL_EVENT_KEY_DOWN:
+    case SDL_EVENT_KEY_UP:            return io.WantCaptureKeyboard;
+    case SDL_EVENT_MOUSE_MOTION:
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    case SDL_EVENT_MOUSE_BUTTON_UP:
+    case SDL_EVENT_MOUSE_WHEEL:       return io.WantCaptureMouse;
+    default:                          return false;
     }
 }
 
@@ -45,7 +46,7 @@ void Window::setFullscreen(bool fullscreen, bool save) {
 
 void Window::setBorderless(bool borderless, bool save) {
     m_flags.borderless = borderless;
-    SDL_SetWindowBordered(sdlWindow(), (borderless) ? SDL_FALSE : SDL_TRUE);
+    SDL_SetWindowBordered(sdlWindow(), !borderless);
     if (save)
         this->save();
 }
@@ -76,7 +77,7 @@ void Window::setDims(glm::ivec2 newDims, bool save) {
         this->save();
 }
 
-Window::SDL_WindowRAII Window::createSDLWindow() {
+Window::SDL_WindowRAII Window::createSDLWindow() const {
     // Prepare window flags
     Uint32 SDL_flags = SDL_WINDOW_VULKAN;
     if (m_flags.invisible)
@@ -93,10 +94,14 @@ Window::SDL_WindowRAII Window::createSDLWindow() {
     };
 
     // Create the window
-    SDL_WindowRAII window{SDL_CreateWindow(
-        m_windowTitle.c_str(), toSDLPos(m_pos.x), toSDLPos(m_pos.y), m_dims.x,
-        m_dims.y, SDL_flags
-    )};
+    SDLProperties props{};
+    props.setProperty(SDL_PROP_WINDOW_CREATE_TITLE_STRING, m_windowTitle.c_str());
+    props.setProperty(SDL_PROP_WINDOW_CREATE_X_NUMBER, toSDLPos(m_pos.x));
+    props.setProperty(SDL_PROP_WINDOW_CREATE_Y_NUMBER, toSDLPos(m_pos.y));
+    props.setProperty(SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, m_dims.x);
+    props.setProperty(SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, m_dims.y);
+    props.setProperty(SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, SDL_flags);
+    SDL_WindowRAII window{SDL_CreateWindowWithProperties(props)};
 
     if (!window) {
         error(SDL_GetError());

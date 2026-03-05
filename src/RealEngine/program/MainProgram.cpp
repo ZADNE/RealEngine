@@ -7,7 +7,9 @@
 #include <fstream>
 #include <iostream>
 
-#include <SDL_events.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_video.h>
 #include <glm/common.hpp>
 
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
@@ -47,45 +49,44 @@ void MainProgram::pollEventsInMainThread(bool poll) {
 
 std::vector<DisplayInfo> MainProgram::searchDisplays() const {
     std::vector<DisplayInfo> infos;
-    int numberOfDisplays = SDL_GetNumVideoDisplays();
-    if (numberOfDisplays < 0) {
-        return infos;
-    }
+    int numberOfDisplays{};
+    SDL_DisplayID* displays = SDL_GetDisplays(&numberOfDisplays);
     infos.reserve(numberOfDisplays);
-    for (int i = 0; i < numberOfDisplays; ++i) {
+    std::span<const SDL_DisplayID> displayIDs{displays, displays + numberOfDisplays};
+    for (const SDL_DisplayID& displayID : displayIDs) {
         DisplayInfo info;
-        info.name = SDL_GetDisplayName(i);
+        info.name = SDL_GetDisplayName(displayID);
         SDL_Rect rect;
-        if (SDL_GetDisplayBounds(i, &rect)) {
+        if (SDL_GetDisplayBounds(displayID, &rect)) {
             continue;
         }
         info.bounds.x = rect.x;
         info.bounds.y = rect.y;
         info.bounds.z = rect.w;
         info.bounds.w = rect.h;
-        if (SDL_GetDisplayUsableBounds(i, &rect)) {
+        if (SDL_GetDisplayUsableBounds(displayID, &rect)) {
             continue;
         }
-        info.boundsUsable.x = rect.x;
-        info.boundsUsable.y = rect.y;
-        info.boundsUsable.z = rect.w;
-        info.boundsUsable.w = rect.h;
-        SDL_DisplayMode mode;
-        if (SDL_GetCurrentDisplayMode(i, &mode)) {
+        info.boundsUsable.x         = rect.x;
+        info.boundsUsable.y         = rect.y;
+        info.boundsUsable.z         = rect.w;
+        info.boundsUsable.w         = rect.h;
+        const SDL_DisplayMode* mode = nullptr;
+        if (mode = SDL_GetCurrentDisplayMode(displayID); !mode) {
             continue;
         }
-        info.dims.x         = mode.w;
-        info.dims.y         = mode.h;
-        info.refreshRate    = mode.refresh_rate;
-        info.driverSpecific = mode.driverdata;
-        info.pixelFormat    = mode.format;
+        info.dims.x      = mode->w;
+        info.dims.y      = mode->h;
+        info.refreshRate = mode->refresh_rate;
+        info.pixelFormat = mode->format;
         infos.push_back(info);
     }
+    SDL_free(displays);
     return infos;
 }
 
 void MainProgram::setRelativeCursorMode(bool relative) {
-    SDL_SetRelativeMouseMode(relative ? SDL_TRUE : SDL_FALSE);
+    SDL_SetWindowRelativeMouseMode(m_window.sdlWindow(), relative);
 }
 
 void MainProgram::adoptRoomDisplaySettings(const RoomDisplaySettings& s) {
@@ -159,31 +160,18 @@ void MainProgram::render(const CommandBuffer& cb, double interpolationFactor) {
 }
 
 void MainProgram::processEvent(SDL_Event* evnt) {
-    Key key = Key::UnknownKey;
     switch (evnt->type) {
-    case SDL_KEYDOWN:
-        key = toKey(evnt->key.keysym.sym);
+    case SDL_EVENT_KEY_DOWN:
         if (evnt->key.repeat == 0) {
-            m_inputManager.press(key);
+            m_inputManager.press(toKey(evnt->key.key));
         }
         break;
-    case SDL_KEYUP:
+    case SDL_EVENT_KEY_UP:
         if (evnt->key.repeat == 0) {
-            m_inputManager.release(toKey(evnt->key.keysym.sym));
+            m_inputManager.release(toKey(evnt->key.key));
         }
         break;
-    case SDL_MOUSEBUTTONDOWN:
-        if (evnt->key.repeat == 0) {
-            auto key = toKey(evnt->button.button);
-            m_inputManager.press(key, evnt->button.clicks);
-        }
-        break;
-    case SDL_MOUSEBUTTONUP:
-        if (evnt->key.repeat == 0) {
-            m_inputManager.release(toKey(evnt->button.button));
-        }
-        break;
-    case SDL_MOUSEMOTION:
+    case SDL_EVENT_MOUSE_MOTION:
         // Y coords are inverted to get standard math coordinates
         // Coords also have to be clamped to window dims
         // because SDL reports coords outside of the window when a key is held
@@ -195,14 +183,25 @@ void MainProgram::processEvent(SDL_Event* evnt) {
             {evnt->motion.xrel, -evnt->motion.yrel}
         );
         break;
-    case SDL_MOUSEWHEEL:
-        key = (evnt->wheel.y > 0) ? (Key::UMW) : (Key::DMW);
-        m_inputManager.press(key, std::abs(evnt->wheel.y));
-
-        key = (evnt->wheel.x > 0) ? (Key::RMW) : (Key::LMW);
-        m_inputManager.press(key, std::abs(evnt->wheel.x));
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        if (evnt->key.repeat == 0) {
+            m_inputManager.press(toKey(evnt->button.button), evnt->button.clicks);
+        }
         break;
-    case SDL_QUIT: scheduleExit(); break;
+    case SDL_EVENT_MOUSE_BUTTON_UP:
+        if (evnt->key.repeat == 0) {
+            m_inputManager.release(toKey(evnt->button.button));
+        }
+        break;
+    case SDL_EVENT_MOUSE_WHEEL:
+        m_inputManager.press(
+            (evnt->wheel.y > 0) ? Key::UMW : Key::DMW, std::abs(evnt->wheel.y)
+        );
+        m_inputManager.press(
+            (evnt->wheel.x > 0) ? Key::RMW : Key::LMW, std::abs(evnt->wheel.x)
+        );
+        break;
+    case SDL_EVENT_QUIT: scheduleExit(); break;
     }
 }
 

@@ -53,21 +53,21 @@ jobs:
         version: 1.4.341.1
         cache: true
 
-    - name: Set up SDL2 (Windows)
+    - name: Set up SDL3 (Windows)
       if: runner.os == 'Windows'
       uses: libsdl-org/setup-sdl@main
       id: sdl
       with:
         build-type: ${{ matrix.build_type }}
         install-linux-dependencies: true
-        version: 2.30.7
-        version-sdl-ttf: 2.22.0
+        version: 3.4.2
+        version-sdl-ttf: 3.2.2
 
-    - name: Set up SDL2 (Linux)
+    - name: Set up SDL3 (Linux)
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install libsdl2-dev libsdl2-2.0-0 libsdl2-ttf-dev libsdl2-ttf-2.0-0 -y;
+        sudo apt-get install libsdl3-dev libsdl3-0 libsdl3-ttf-dev libsdl3-ttf0 -y;
 
     - name: Configure CMake
       run: >

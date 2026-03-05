@@ -12,36 +12,43 @@ set(REALENGINE_BUILDING_FROM_SOURCE TRUE
 include("cmake/scripts/RealProject.cmake")
 include("cmake/scripts/GetRealEngineVersion.cmake")
 
-function(FetchContent_MakeAvailableWithoutLinting)
+function(_real_FetchContent_MakeAvailable)
     set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
     set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
     set(CMAKE_CXX_CLANG_TIDY "")
     FetchContent_MakeAvailable(${ARGV})
 endfunction()
 
+
 # Find/fetch dependencies
 block(PROPAGATE bit7z_aliased_target)
-    # Git is required to download some dependencies
+    # Git (required to download some dependencies)
     find_package(Git REQUIRED)
+
     # Vulkan 1.4 SDK
     find_package(Vulkan 1.4.341 REQUIRED COMPONENTS glslc)
+
     # SDL3
     find_package(SDL3 CONFIG REQUIRED GLOBAL COMPONENTS SDL3-shared)
     find_package(SDL3_ttf CONFIG REQUIRED GLOBAL COMPONENTS SDL3_ttf-shared)
+
     # SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross
         URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.4.341.0.tar.gz
     )
+
     # OpenGL Mathematics
     set(GLM_BUILD_INSTALL ON CACHE INTERNAL "")
     FetchContent_Declare(glm
         URL https://github.com/g-truc/glm/archive/refs/tags/1.0.1.tar.gz
     )
+
     # bit7z
     set(BIT7Z_7ZIP_VERSION "23.01" CACHE INTERNAL "")
     FetchContent_Declare(bit7z
-        URL https://github.com/rikyoz/bit7z/archive/refs/tags/v4.0.9.zip
+        URL https://github.com/rikyoz/bit7z/archive/refs/tags/v4.0.11.zip
     )
+
     # nlohmann json
     set(JSON_Install ON CACHE INTERNAL "")
     FetchContent_Declare(json
@@ -52,23 +59,25 @@ block(PROPAGATE bit7z_aliased_target)
     set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME RealEngine_Development)
 
     # Download remote libs
-    FetchContent_MakeAvailableWithoutLinting(SPIRV-Cross glm bit7z json)
+    _real_FetchContent_MakeAvailable(SPIRV-Cross glm bit7z json)
 
-    # Create imported target for 7z.dll
+    # Create imported targets for dlls
     if(WIN32)
-        add_library(7z SHARED IMPORTED GLOBAL)
-        set_target_properties(7z PROPERTIES
-            IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/external/bin/win_x64/7z.dll"
-        )
+        function(_real_declare_dll target path)
+            add_library(${target} MODULE IMPORTED GLOBAL)
+            set_target_properties(${target} PROPERTIES
+                IMPORTED_LOCATION ${path}
+            )
+            list(APPEND runtime_bundled_artifacts ${target})
+        endfunction()
 
-        # Make sure the dll is bundled when installing
-        list(APPEND runtime_bundled_artifacts 7z)
+        _real_declare_dll(7z_dll "${CMAKE_CURRENT_SOURCE_DIR}/external/bin/win_x64/7z.dll")
     endif()
 
     # Define convenience copy function of 7z.dll
-    function(copy_7z_dll_to_target target)
+    function(real_copy_7z_dll_to_target target)
         if(WIN32)
-            get_target_property(7z_dll_path 7z IMPORTED_LOCATION)
+            get_target_property(7z_dll_path 7z_dll IMPORTED_LOCATION)
             add_custom_command(
                 TARGET ${target} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -87,15 +96,6 @@ block(PROPAGATE bit7z_aliased_target)
         PROPERTIES
             INTERFACE_SOURCES ""
     )
-    if (MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        # Remove redundant compiler flags from bit7z causing compilation error
-        get_target_property(bit7z_compile_options ${bit7z_aliased_target} COMPILE_OPTIONS)
-        list(REMOVE_ITEM bit7z_compile_options "/Zc:throwingNew" "/Zc:referenceBinding")
-        set_target_properties(${bit7z_aliased_target}
-            PROPERTIES
-                COMPILE_OPTIONS "${bit7z_compile_options}"
-        )
-    endif()
 
     # Add embedded libs
     add_subdirectory(external)
@@ -105,7 +105,7 @@ endblock()
 block(PROPAGATE RealEngine_sublibs)
     # RealEngine is composed of a number of static sub-libraries
     # This function sets common properties
-    function(_add_realengine_sublib target_name)
+    function(_real_add_realengine_sublib target_name)
         add_real_library(${target_name} STATIC)
         real_target_init_file_sets(${target_name} BASE_DIR "src")
         set_target_properties(${target_name} PROPERTIES
@@ -140,14 +140,14 @@ block(PROPAGATE RealEngine_sublibs)
     endfunction()
 
     # RealEngine sublibs
-    _add_realengine_sublib(RealEngine_graphics)
-    _add_realengine_sublib(RealEngine_program)
-    _add_realengine_sublib(RealEngine_renderer)
-    _add_realengine_sublib(RealEngine_resources)
-    _add_realengine_sublib(RealEngine_rooms)
-    _add_realengine_sublib(RealEngine_user_input)
-    _add_realengine_sublib(RealEngine_utility)
-    _add_realengine_sublib(RealEngine_window)
+    _real_add_realengine_sublib(RealEngine_graphics)
+    _real_add_realengine_sublib(RealEngine_program)
+    _real_add_realengine_sublib(RealEngine_renderer)
+    _real_add_realengine_sublib(RealEngine_resources)
+    _real_add_realengine_sublib(RealEngine_rooms)
+    _real_add_realengine_sublib(RealEngine_user_input)
+    _real_add_realengine_sublib(RealEngine_utility)
+    _real_add_realengine_sublib(RealEngine_window)
 
     # RealEngine main target
     add_real_library(RealEngine INTERFACE)
@@ -195,7 +195,7 @@ block(PROPAGATE RTICreator)
             argparse
             bit7z
     )
-    copy_7z_dll_to_target(ResourcePackager)
+    real_copy_7z_dll_to_target(ResourcePackager)
 
     # RTICreator (Windows only)
     if (WIN32)

@@ -102,9 +102,34 @@ VulkanRenderer::VulkanRenderer(
         *m_graphicsCompQueue, "re::VulkanRenderer::graphicsCompQueue"
     );
 
-    // Initialize ImGui for SDL2
+    // Initialize ImGui for SDL3
     if (!ImGui_ImplSDL3_InitForVulkan(m_sdlWindow)) {
         throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
+    }
+
+    // Initialize ImGui for Vulkan
+    ImGui_ImplVulkan_InitInfo imGuiInitInfo{
+        .ApiVersion         = vk::ApiVersion13,
+        .Instance           = *m_instance,
+        .PhysicalDevice     = *m_physicalDevice,
+        .Device             = *m_device,
+        .QueueFamily        = m_graphicsCompQueueFamIndex,
+        .Queue              = *m_graphicsCompQueue,
+        .DescriptorPool     = nullptr,
+        .DescriptorPoolSize = IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE,
+        .MinImageCount      = m_minImageCount,
+        .ImageCount       = static_cast<uint32_t>(m_swapchainImageViews.size()),
+        .PipelineCache    = *m_pipelineCache,
+        .PipelineInfoMain = ImGui_ImplVulkan_PipelineInfo{nullptr, 0, {}},
+        .UseDynamicRendering        = false,
+        .Allocator                  = nullptr,
+        .CheckVkResultFn            = &checkSuccessImGui,
+        .MinAllocationSize          = 1024 * 1024,
+        .CustomShaderVertCreateInfo = {},
+        .CustomShaderFragCreateInfo = {}
+    };
+    if (!ImGui_ImplVulkan_Init(&imGuiInitInfo)) {
+        throw std::runtime_error{"Could not initialize ImGui for Vulkan!"};
     }
 }
 
@@ -118,9 +143,6 @@ VulkanRenderer::~VulkanRenderer() {
 
 void VulkanRenderer::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex) {
     if (m_mainRenderPass) {
-        if (m_imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
-            ImGui_ImplVulkan_Shutdown();
-        }
         m_swapChainFramebuffers.~vector();
     }
 
@@ -133,26 +155,13 @@ void VulkanRenderer::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpa
 
     if (m_imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
         // Initialize ImGui for the new renderpass
-        ImGui_ImplVulkan_InitInfo imGuiInitInfo{
-            .Instance       = *m_instance,
-            .PhysicalDevice = *m_physicalDevice,
-            .Device         = *m_device,
-            .QueueFamily    = m_graphicsCompQueueFamIndex,
-            .Queue          = *m_graphicsCompQueue,
-            .DescriptorPool = *m_descriptorPool,
-            .RenderPass     = **m_mainRenderPass,
-            .MinImageCount  = m_minImageCount,
-            .ImageCount  = static_cast<uint32_t>(m_swapchainImageViews.size()),
-            .MSAASamples = VK_SAMPLE_COUNT_1_BIT,
-            .PipelineCache       = *m_pipelineCache,
-            .Subpass             = imGuiSubpassIndex,
-            .UseDynamicRendering = false,
-            .Allocator           = nullptr,
-            .CheckVkResultFn     = &checkSuccessImGui
+        ImGui_ImplVulkan_PipelineInfo imGuiPipelineInfo{
+            .RenderPass                  = **m_mainRenderPass,
+            .Subpass                     = imGuiSubpassIndex,
+            .MSAASamples                 = VK_SAMPLE_COUNT_1_BIT,
+            .PipelineRenderingCreateInfo = {}
         };
-        if (!ImGui_ImplVulkan_Init(&imGuiInitInfo)) {
-            throw std::runtime_error{"Could not initialize ImGui for Vulkan!"};
-        }
+        ImGui_ImplVulkan_CreateMainPipeline(&imGuiPipelineInfo);
     }
 }
 
@@ -185,13 +194,8 @@ const CommandBuffer& VulkanRenderer::prepareFrame() {
 
     // Begin ImGui frame
     if (m_imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
-        // Rebuild fonts if new fonts have been added
-        if (!ImGui::GetIO().Fonts->IsBuilt()) {
-            ImGui_ImplVulkan_CreateFontsTexture();
-        }
-
         ImGui_ImplVulkan_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
     }
 
@@ -312,15 +316,19 @@ vk::raii::Instance VulkanRenderer::createInstance() {
 
     // Add extensions required by SDL
     Uint32 sdlExtensionCount{};
-    const char* const* sdlExtensions{};
-    if (sdlExtensions = SDL_Vulkan_GetInstanceExtensions(&sdlExtensionCount)) {
+    const char* const* sdlExtensions =
+        SDL_Vulkan_GetInstanceExtensions(&sdlExtensionCount);
+    if (!sdlExtensions) {
         throw std::runtime_error(
             "Failed to query Vulkan extensions required by SDL!"
         );
     }
     size_t defaultExtensionsCount = extensions.size();
-    extensions.reserve(defaultExtensionsCount + sdl2ExtensionCount);
-    std::copy(sdlExtensions, sdlExtensions + sdlExtensionCount, extensions.back());
+    extensions.reserve(defaultExtensionsCount + sdlExtensionCount);
+    std::copy(
+        sdlExtensions, sdlExtensions + sdlExtensionCount,
+        std::back_inserter(extensions)
+    );
 
     // Create Vulkan instance
     vk::ApplicationInfo applicationInfo(
@@ -352,7 +360,7 @@ vk::raii::DebugUtilsMessengerEXT VulkanRenderer::createDebugUtilsMessenger() {
 
 vk::raii::SurfaceKHR VulkanRenderer::createSurface() {
     VkSurfaceKHR surface{};
-    if (!SDL_Vulkan_CreateSurface(m_sdlWindow, *m_instance, &surface)) {
+    if (!SDL_Vulkan_CreateSurface(m_sdlWindow, *m_instance, nullptr, &surface)) {
         throw std::runtime_error("SDL2 could not create Vulkan surface!");
     }
     return vk::raii::SurfaceKHR{m_instance, surface};
@@ -459,7 +467,7 @@ vk::raii::SwapchainKHR VulkanRenderer::createSwapchain() {
         m_swapchainExtent = caps.currentExtent;
     } else {
         glm::ivec2 windowPx;
-        SDL_Vulkan_GetDrawableSize(m_sdlWindow, &windowPx.x, &windowPx.y);
+        SDL_GetWindowSizeInPixels(m_sdlWindow, &windowPx.x, &windowPx.y);
         m_swapchainExtent.width = std::clamp(
             static_cast<uint32_t>(windowPx.x), caps.minImageExtent.width,
             caps.maxImageExtent.width

@@ -105,7 +105,7 @@ public:
 
 private:
     using SDL_WindowRAII = UniqueCPtr<SDL_Window, SDL_DestroyWindow>;
-    SDL_WindowRAII createSDLWindow();
+    SDL_WindowRAII createSDLWindow() const;
 
     WindowSubsystems m_subsystems; ///< Initializes and de-initializes subsystems
     SDL_WindowRAII m_SDLwindow;
