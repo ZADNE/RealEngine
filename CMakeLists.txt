@@ -21,7 +21,7 @@ endfunction()
 
 
 # Find/fetch dependencies
-block(PROPAGATE bit7z_aliased_target)
+block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
     # Git (required to download some dependencies)
     find_package(Git REQUIRED)
 
@@ -31,6 +31,7 @@ block(PROPAGATE bit7z_aliased_target)
     # SDL3
     find_package(SDL3 CONFIG REQUIRED GLOBAL COMPONENTS SDL3-shared)
     find_package(SDL3_ttf CONFIG REQUIRED GLOBAL COMPONENTS SDL3_ttf-shared)
+    list(APPEND runtime_bundled_artifacts SDL3::SDL3-shared SDL3_ttf::SDL3_ttf-shared)
 
     # SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross
@@ -64,11 +65,12 @@ block(PROPAGATE bit7z_aliased_target)
     # Create imported targets for dlls
     if(WIN32)
         function(_real_declare_dll target path)
-            add_library(${target} MODULE IMPORTED GLOBAL)
+            add_library(${target} SHARED IMPORTED GLOBAL)
             set_target_properties(${target} PROPERTIES
                 IMPORTED_LOCATION ${path}
             )
             list(APPEND runtime_bundled_artifacts ${target})
+            set(runtime_bundled_artifacts "${runtime_bundled_artifacts}" PARENT_SCOPE)
         endfunction()
 
         _real_declare_dll(7z_dll "${CMAKE_CURRENT_SOURCE_DIR}/external/bin/win_x64/7z.dll")
@@ -271,10 +273,7 @@ block()
     )
 
     # Downstream projects should install these runtime artifacts from these targets
-    set(REALENGINE_RUNTIME_ARTIFACTS 
-        SDL3::SDL3-shared SDL3_ttf::SDL3_ttf-shared ${runtime_bundled_artifacts}
-        CACHE INTERNAL ""
-    )
+    set(REALENGINE_RUNTIME_ARTIFACTS ${runtime_bundled_artifacts} CACHE INTERNAL "")
 
     # Install documentation
     install(
