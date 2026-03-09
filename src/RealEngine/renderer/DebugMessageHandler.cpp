@@ -52,15 +52,23 @@ void handleValidationMessage(
     const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData
 ) {
     std::string str{"##"};
-    // Show nested debug labels
+    // Show nested debug labels - queue first
+    for (int i = 0; i < callbackData->queueLabelCount; i++) {
+        str += callbackData->pQueueLabels[i].pLabelName;
+        if (i < callbackData->queueLabelCount - 1 ||
+            callbackData->cmdBufLabelCount > 0) {
+            str += "<-";
+        }
+    }
+    // Then command buffer labels
     for (int i = 0; i < callbackData->cmdBufLabelCount; i++) {
         str += callbackData->pCmdBufLabels[i].pLabelName;
         if (i < callbackData->cmdBufLabelCount - 1) {
-            str += "->";
+            str += "<-";
         }
     }
     str += "\n  ";
-    const char* msg = skipMessageHeader(callbackData->pMessage);
+    const char* msg = callbackData->pMessage;
 
     // Report the message
     switch (static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(sev)) {
