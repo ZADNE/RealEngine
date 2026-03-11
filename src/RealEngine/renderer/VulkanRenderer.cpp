@@ -90,8 +90,20 @@ VulkanRenderer::VulkanRenderer(
     , m_oneTimeSubmitCmdBuf({.debugName = "re::VulkanRenderer::oneTimeSubmit"})
     , m_pipelineCache(createPipelineCache())
     , m_descriptorPool(createDescriptorPool())
-    , m_imageAvailableSems(createSemaphores())
-    , m_renderingFinishedSems(createSemaphores())
+    , m_imageAvailableSems{FrameDoubleBuffered<re::Semaphore>{
+          Semaphore{{.debugName = "re::VulkanRenderer::imageAvailable[0]"}},
+          Semaphore{{.debugName = "re::VulkanRenderer::imageAvailable[1]"}}
+      }}
+    , m_renderingFinishedSems([&]() {
+        std::vector<Semaphore> sems;
+        sems.reserve(m_swapchainImageViews.size());
+        for (size_t i = 0; i < m_swapchainImageViews.size(); ++i) {
+            std::string debugName =
+                std::format("re::VulkanRenderer::renderingFinished[{}]", i);
+            sems.emplace_back(SemaphoreCreateInfo{.debugName = debugName.c_str()});
+        }
+        return sems;
+    }())
     , m_inFlightFences(createFences()) {
 
     // Implementations
@@ -256,17 +268,17 @@ void VulkanRenderer::finishFrame() {
     vk::PipelineStageFlags waitDstStageMask =
         vk::PipelineStageFlagBits::eColorAttachmentOutput;
     vk::SubmitInfo submitInfo{
-        **m_imageAvailableSems,   // Wait for image to be available
-        waitDstStageMask,         // Wait just before writing output
+        **m_imageAvailableSems, // Wait for image to be available
+        waitDstStageMask,       // Wait just before writing output
         *cb,
-        **m_renderingFinishedSems // Signal that the rendering has
-                                  // finished once done
+        *m_renderingFinishedSems[m_imageIndex] // Signal that the rendering has
+                                               // finished once done
     };
     m_graphicsCompQueue.submit(submitInfo, **m_inFlightFences);
 
     // Present new image
     vk::PresentInfoKHR presentInfo{
-        **m_renderingFinishedSems, // Wait for rendering to finish
+        *m_renderingFinishedSems[m_imageIndex], // Wait for rendering to finish
         *m_swapchain, m_imageIndex
     };
 
@@ -579,14 +591,6 @@ vk::raii::CommandPool VulkanRenderer::createCommandPool() {
         vk::CommandPoolCreateFlagBits::eResetCommandBuffer, m_graphicsCompQueueFamIndex
     };
     return vk::raii::CommandPool{m_device, createInfo};
-}
-
-FrameDoubleBuffered<vk::raii::Semaphore> VulkanRenderer::createSemaphores() {
-    vk::SemaphoreCreateInfo createInfo{};
-    return {
-        vk::raii::Semaphore{m_device, createInfo},
-        vk::raii::Semaphore{m_device, createInfo}
-    };
 }
 
 FrameDoubleBuffered<vk::raii::Fence> VulkanRenderer::createFences() {

@@ -8,6 +8,7 @@
 #include <vulkan/vulkan_raii.hpp>
 
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
+#include <RealEngine/graphics/synchronization/Semaphore.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>
 #include <RealEngine/renderer/Allocator.hpp>
 #include <RealEngine/rooms/RoomDisplaySettings.hpp>
@@ -117,6 +118,7 @@ private:
         *m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr
     };
     Allocator m_allocator;
+    DeletionQueue m_deletionQueue{*m_device, m_allocator};
     vk::raii::Queue m_graphicsCompQueue;
     vk::raii::Queue m_presentationQueue;
     uint32_t m_minImageCount{};
@@ -125,17 +127,16 @@ private:
     std::vector<vk::raii::ImageView> m_swapchainImageViews;
     std::vector<VulkanInitInfo::BufferDescr> m_additionalBufferDescrs;
     std::vector<Texture> m_additionalBuffers;
-    std::vector<vk::raii::Framebuffer> m_swapChainFramebuffers;
+    std::vector<vk::raii::Framebuffer> m_swapChainFramebuffers; ///< Per swapchain image
     vk::raii::CommandPool m_commandPool;
     FrameDoubleBuffered<CommandBuffer> m_cbs;
     CommandBuffer m_oneTimeSubmitCmdBuf;
     vk::raii::PipelineCache m_pipelineCache;
     vk::raii::DescriptorPool m_descriptorPool;
-    FrameDoubleBuffered<vk::raii::Semaphore> m_imageAvailableSems;
-    FrameDoubleBuffered<vk::raii::Semaphore> m_renderingFinishedSems;
+    FrameDoubleBuffered<re::Semaphore> m_imageAvailableSems;
+    std::vector<re::Semaphore> m_renderingFinishedSems; ///< Per swapchain image
     FrameDoubleBuffered<vk::raii::Fence> m_inFlightFences;
     bool m_recreteSwapchain = false;
-    DeletionQueue m_deletionQueue{*m_device, m_allocator};
 
     // Active room dependent
     const RenderPass* m_mainRenderPass{};
@@ -160,7 +161,6 @@ private:
     std::vector<Texture> createAdditionalBuffers();
     std::vector<vk::raii::Framebuffer> createSwapchainFramebuffers();
     vk::raii::CommandPool createCommandPool();
-    FrameDoubleBuffered<vk::raii::Semaphore> createSemaphores();
     FrameDoubleBuffered<vk::raii::Fence> createFences();
     vk::raii::PipelineCache createPipelineCache();
     vk::raii::DescriptorPool createDescriptorPool();

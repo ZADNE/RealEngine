@@ -5,19 +5,14 @@
 
 namespace re {
 
-Semaphore::Semaphore()
-    : m_semaphore(device().createSemaphore(vk::SemaphoreCreateInfo{})) {
-}
-
-Semaphore::Semaphore(uint64_t initialValue)
+Semaphore::Semaphore(const SemaphoreCreateInfo& createInfo)
     : m_semaphore(
           device().createSemaphore(
-              vk::StructureChain{
-                  vk::SemaphoreCreateInfo{},
-                  vk::SemaphoreTypeCreateInfo{vk::SemaphoreType::eTimeline, initialValue}
-              }.get<vk::SemaphoreCreateInfo>()
+              vk::StructureChain{vk::SemaphoreCreateInfo{}, createInfo.type}
+                  .get<vk::SemaphoreCreateInfo>()
           )
       ) {
+    setDebugUtilsObjectName(m_semaphore, createInfo.debugName);
 }
 
 Semaphore::Semaphore(Semaphore&& other) noexcept
