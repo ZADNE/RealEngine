@@ -16,14 +16,14 @@
 namespace re {
 
 WindowSubsystems::WindowSubsystems() {
-    // SDL2
+    // SDL3
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         const char* errorStr = SDL_GetError();
         error(errorStr);
         throw std::runtime_error{errorStr};
     }
 
-    // SDL2_ttf
+    // SDL3_ttf
     if (!TTF_Init()) {
         const char* errorStr = SDL_GetError();
         error(errorStr);

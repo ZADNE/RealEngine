@@ -24,7 +24,7 @@ class MainProgram;
  * There can only be a single window within program
  * and it is created by the MainProgram.
  *
- * The window initializes some subsystems of the RealEngine (SDL2, ImGui, ...).
+ * The window initializes some subsystems of the RealEngine (SDL, ImGui, ...).
  */
 class Window: public WindowSettings {
 public:

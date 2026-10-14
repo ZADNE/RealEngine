@@ -116,7 +116,7 @@ VulkanRenderer::VulkanRenderer(
 
     // Initialize ImGui for SDL3
     if (!ImGui_ImplSDL3_InitForVulkan(m_sdlWindow)) {
-        throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
+        throw std::runtime_error{"Could not initialize ImGui-SDL for Vulkan!"};
     }
 
     // Initialize ImGui for Vulkan
@@ -373,7 +373,7 @@ vk::raii::DebugUtilsMessengerEXT VulkanRenderer::createDebugUtilsMessenger() {
 vk::raii::SurfaceKHR VulkanRenderer::createSurface() {
     VkSurfaceKHR surface{};
     if (!SDL_Vulkan_CreateSurface(m_sdlWindow, *m_instance, nullptr, &surface)) {
-        throw std::runtime_error("SDL2 could not create Vulkan surface!");
+        throw std::runtime_error("SDL could not create Vulkan surface!");
     }
     return vk::raii::SurfaceKHR{m_instance, surface};
 }
