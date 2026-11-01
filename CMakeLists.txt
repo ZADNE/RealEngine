@@ -26,7 +26,7 @@ block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
     find_package(Git REQUIRED)
 
     # Vulkan 1.4 SDK
-    find_package(Vulkan 1.4.341 REQUIRED COMPONENTS glslc)
+    find_package(Vulkan 1.4.363 REQUIRED COMPONENTS glslc)
 
     # SDL3
     find_package(SDL3 CONFIG REQUIRED GLOBAL COMPONENTS SDL3-shared)
@@ -35,7 +35,7 @@ block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
 
     # SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross
-        URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.4.341.0.tar.gz
+        URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.4.363.0.tar.gz
     )
 
     # OpenGL Mathematics

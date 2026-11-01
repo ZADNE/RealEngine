@@ -50,7 +50,7 @@ jobs:
     - name: Set up Vulkan SDK
       uses: humbletim/install-vulkan-sdk@main
       with:
-        version: 1.4.341.1
+        version: 1.4.363.0
         cache: true
 
     - name: Set up SDL3 (Windows)
