@@ -46,7 +46,7 @@ GeometryBatch::GeometryBatch(const GeometryBatchCreateInfo& createInfo)
               .allocFlags  = eMapped | eHostAccessSequentialWrite,
               .sizeInBytes = sizeof(VertexPoCo) * createInfo.maxVertices *
                              k_maxFramesInFlight,
-              .usage = eVertexBuffer
+              .usage       = eVertexBuffer
           }
       )
     , m_maxVertices(createInfo.maxVertices)

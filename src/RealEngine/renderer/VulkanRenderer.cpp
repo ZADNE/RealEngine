@@ -450,13 +450,15 @@ vma::Allocator VulkanRenderer::createAllocator() {
     return vma::createAllocator(
         vma::AllocatorCreateInfo{
             vma::AllocatorCreateFlagBits::eExternallySynchronized,
-            *m_physicalDevice, *m_device,
+            *m_physicalDevice,
+            *m_device,
             0,       // Use default large heap block size (256 MB as of writing)
             nullptr, // Use default CPU memory allocation callbacks
             nullptr, // Do not receive informative callbacks from VMA
             nullptr, // No heap size limits
             nullptr, // Let VMA load Vulkan functions on its own
-            *m_instance, vk::ApiVersion13,
+            *m_instance,
+            vk::ApiVersion13,
             nullptr, // No external memory handles
         }
     );

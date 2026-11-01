@@ -17,11 +17,11 @@ namespace re {
 SpriteBatch::SpriteBatch(const SpriteBatchCreateInfo& createInfo)
     : m_spritesBuf(
           BufferCreateInfo{
-              .allocFlags = vma::AllocationCreateFlagBits::eMapped |
-                            vma::AllocationCreateFlagBits::eHostAccessRandom,
+              .allocFlags  = vma::AllocationCreateFlagBits::eMapped |
+                             vma::AllocationCreateFlagBits::eHostAccessRandom,
               .sizeInBytes = k_maxFramesInFlight * createInfo.maxSprites *
                              sizeof(Sprite),
-              .usage = eVertexBuffer
+              .usage       = eVertexBuffer
           }
       )
     , m_maxSprites(createInfo.maxSprites)

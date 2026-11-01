@@ -37,7 +37,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
     using enum vk::ImageUsageFlagBits;
     bool requiresStagingBuffer = !createInfo.texels.empty() &&
                                  !(createInfo.allocFlags & k_hostAccess);
-    auto imageCreateInfo = vk::ImageCreateInfo{
+    auto imageCreateInfo       = vk::ImageCreateInfo{
         createInfo.flags,
         createInfo.type,
         createInfo.format,
