@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #pragma once
-#include <SDL3/SDL_Properties.h>
+#include <SDL3/SDL_properties.h>
 
 namespace re {
 
