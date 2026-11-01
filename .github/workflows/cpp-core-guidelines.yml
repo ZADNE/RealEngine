@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ubuntu-26.04]
         build_type: [Debug]
-        clang_tidy: [clang-tidy-18]
+        clang_tidy: [clang-tidy-22]
 
     steps:
     - name: Prepare variables
