@@ -48,9 +48,9 @@ jobs:
         path: 'Real/${{ env.repo-name }}'
 
     - name: Set up Vulkan SDK
-      uses: humbletim/install-vulkan-sdk@033219e2d69dd4d3e873e217eb385fdd4b4438f4
+      uses: jakoch/install-vulkan-sdk-action@v1
       with:
-        version: 1.4.363.0
+        vulkan_version: 1.4.363.0
         cache: true
 
     - name: Set up SDL3 (Windows)
