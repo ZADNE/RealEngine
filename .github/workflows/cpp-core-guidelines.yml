@@ -58,7 +58,7 @@ jobs:
 
     - name: Compile shaders
       run: >
-        cmake --build ${{ env.build-dir }} --target RealEngine_Shaders --parallel 4
+        cmake --build ${{ env.build-dir }} --target RealEngine_graphics_Shaders --parallel 4
 
     - name: Real linting check
       uses: ZADNE/RealLinting@v0.1
