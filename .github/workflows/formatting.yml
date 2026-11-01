@@ -15,8 +15,9 @@ jobs:
 
     steps:
     - name: Real formatting check
-      uses: ZADNE/RealFormatting@v0.1
+      uses: ZADNE/RealFormatting@v0.2
       with:
         repository: ${{ github.repository }}
         ref: ${{ github.ref }}
         path: src
+        clang-format-version: 22
