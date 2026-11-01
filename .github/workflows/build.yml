@@ -11,14 +11,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, windows-2022]
+        os: [ubuntu-26.04, windows-2022]
         build_type: [Debug, Release]
         include:
           - os: windows-2022
             c_compiler: cl.exe
             cpp_compiler: cl.exe
             cmake_generator: Ninja
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             c_compiler: gcc-14
             cpp_compiler: g++-14
             cmake_generator: Unix Makefiles
