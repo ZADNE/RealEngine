@@ -18,11 +18,11 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../bit7z/cmake/Dependencies.cmake")
 
 # Runtime artifacts needed by RealEngine
 if(WIN32)
-    add_library(7z SHARED IMPORTED GLOBAL)
-    set_target_properties(7z PROPERTIES
+    add_library(7z_dll SHARED IMPORTED GLOBAL)
+    set_target_properties(7z_dll PROPERTIES
         IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/../../../bin/7z.dll"
     )
-    list(APPEND runtime_bundled_artifacts 7z)
+    list(APPEND runtime_bundled_artifacts 7z_dll)
 endif()
 set(REALENGINE_RUNTIME_ARTIFACTS # A bit hacky...
     SDL3::SDL3-shared SDL3_ttf::SDL3_ttf-shared ${runtime_bundled_artifacts}
