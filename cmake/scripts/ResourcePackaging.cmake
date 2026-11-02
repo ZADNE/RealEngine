@@ -1,6 +1,6 @@
 ﻿# author     Dubsky Tomas
 
-include("cmake/scripts/Utility.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
 # Create a custom target that will index and package files:
 # Syntax:
