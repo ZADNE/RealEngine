@@ -29,7 +29,7 @@ struct DisplayInfo {
     glm::ivec4 bounds{};       ///< Bounds in pixels; XYWH
     glm::ivec4 boundsUsable{}; ///< Bounds with system-reserved parts removed; XYWH
     glm::ivec2 dims{};         ///< Dimensions
-    int refreshRate{};         ///< Refresh rate
+    float refreshRate{};       ///< Refresh rate
     uint32_t pixelFormat{};    ///< Pixel format @see SDL_PixelFormat enum
 };
 

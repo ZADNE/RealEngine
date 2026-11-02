@@ -171,18 +171,19 @@ void MainProgram::processEvent(SDL_Event* evnt) {
             m_inputManager.release(toKey(evnt->key.key));
         }
         break;
-    case SDL_EVENT_MOUSE_MOTION:
+    case SDL_EVENT_MOUSE_MOTION: {
+        glm::vec2 windowDims = glm::vec2{m_window.dims()};
         // Y coords are inverted to get standard math coordinates
         // Coords also have to be clamped to window dims
         // because SDL reports coords outside of the window when a key is held
         m_inputManager.setCursor(
             glm::clamp(
-                {evnt->motion.x, m_window.dims().y - evnt->motion.y - 1},
-                glm::ivec2(0), m_window.dims() - 1
+                {evnt->motion.x, windowDims.y - evnt->motion.y - 1.0f},
+                glm::vec2{0.0f}, windowDims - 1.0f
             ),
             {evnt->motion.xrel, -evnt->motion.yrel}
         );
-        break;
+    } break;
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
         if (evnt->key.repeat == 0) {
             m_inputManager.press(toKey(evnt->button.button), evnt->button.clicks);
@@ -195,10 +196,12 @@ void MainProgram::processEvent(SDL_Event* evnt) {
         break;
     case SDL_EVENT_MOUSE_WHEEL:
         m_inputManager.press(
-            (evnt->wheel.y > 0) ? Key::UMW : Key::DMW, std::abs(evnt->wheel.y)
+            (evnt->wheel.y > 0.0f) ? Key::UMW : Key::DMW,
+            glm::abs(static_cast<int>(evnt->wheel.y))
         );
         m_inputManager.press(
-            (evnt->wheel.x > 0) ? Key::RMW : Key::LMW, std::abs(evnt->wheel.x)
+            (evnt->wheel.x > 0.0f) ? Key::RMW : Key::LMW,
+            glm::abs(static_cast<int>(evnt->wheel.x))
         );
         break;
     case SDL_EVENT_QUIT: scheduleExit(); break;

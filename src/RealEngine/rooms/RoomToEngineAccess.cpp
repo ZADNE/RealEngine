@@ -40,11 +40,11 @@ int RoomToEngineAccess::wasKeyReleased(Key key) const {
     return m_inputManager.wasReleased(key);
 }
 
-glm::ivec2 RoomToEngineAccess::cursorAbs() const {
+glm::vec2 RoomToEngineAccess::cursorAbs() const {
     return m_inputManager.cursorAbs();
 }
 
-glm::ivec2 RoomToEngineAccess::cursorRel() const {
+glm::vec2 RoomToEngineAccess::cursorRel() const {
     return m_inputManager.cursorRel();
 }
 
