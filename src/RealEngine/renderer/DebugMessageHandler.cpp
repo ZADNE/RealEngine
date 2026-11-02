@@ -47,9 +47,9 @@ const char* skipFunctionName(const char* msg) {
 }
 
 void handleValidationMessage(
-    VkDebugUtilsMessageSeverityFlagBitsEXT sev,
-    VkDebugUtilsMessageTypeFlagsEXT type,
-    const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData
+    vk::DebugUtilsMessageSeverityFlagBitsEXT sev,
+    vk::DebugUtilsMessageTypeFlagsEXT type,
+    const vk::DebugUtilsMessengerCallbackDataEXT* callbackData, void* userData
 ) {
     std::string str{"##"};
     // Show nested debug labels - queue first
@@ -71,7 +71,7 @@ void handleValidationMessage(
     const char* msg = callbackData->pMessage;
 
     // Report the message
-    switch (static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(sev)) {
+    switch (sev) {
     case eVerbose:
     case eInfo:
     case eWarning: log(str + msg); break;
@@ -83,9 +83,9 @@ void handleValidationMessage(
 } // namespace
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallbackHandler(
-    VkDebugUtilsMessageSeverityFlagBitsEXT sev,
-    VkDebugUtilsMessageTypeFlagsEXT type,
-    const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData
+    vk::DebugUtilsMessageSeverityFlagBitsEXT sev,
+    vk::DebugUtilsMessageTypeFlagsEXT type,
+    const vk::DebugUtilsMessengerCallbackDataEXT* callbackData, void* userData
 ) {
     switch (callbackData->messageIdNumber) {
     case 0x0:        // Ignore loader messages
