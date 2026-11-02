@@ -33,11 +33,12 @@ namespace re {
  * listenChangeBinding().
  *
  * @tparam KeyBinding       Enum class that contains the binding points. The
- *                          values must be continous sequence 0..N-1
+ *                          common values must be continous sequence 0..N-1 and
+ *                          the Nth value must be named 'Count'.
  * @tparam KeyBindingInfo   A type that holds additional info about the
  *                          binding point. It must have member 'defaultValue'
- *                          that return Key and member 'name' that return a string
- *                          type.
+ *                          that returns Key and member 'name' that returns a
+ *                          string type.
  */
 template<typename KeyBinding, typename KeyBindingInfo>
 class KeyBinder {
