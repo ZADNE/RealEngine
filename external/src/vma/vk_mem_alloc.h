@@ -1,4 +1,5 @@
-// NOLINTBEGIN(clang-diagnostic-*)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnullability-completeness"
 //
 // Copyright (c) 2017-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
@@ -19974,5 +19975,5 @@ Features deliberately excluded from the scope of this library:
 -# This is a C++ library with C interface. **Bindings or ports to any other programming languages** are welcome as external projects but
    are not going to be included into this repository.
 */
-// NOLINTEND(clang-diagnostic-*)
+#pragma clang diagnostic pop
 
