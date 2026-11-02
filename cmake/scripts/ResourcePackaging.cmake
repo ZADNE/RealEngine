@@ -1,5 +1,7 @@
 ﻿# author     Dubsky Tomas
 
+include("cmake/scripts/Utility.cmake")
+
 # Create a custom target that will index and package files:
 # Syntax:
 #     real_target_package_resources(
