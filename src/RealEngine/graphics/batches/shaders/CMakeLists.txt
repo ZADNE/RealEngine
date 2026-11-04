@@ -1,4 +1,4 @@
-﻿real_target_sources(RealEngine_graphics
+﻿real_target_sources(RealEngine_visual
     PRIVATE
         geometry.frag               
         geometry.vert               

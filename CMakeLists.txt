@@ -128,15 +128,10 @@ block(PROPAGATE RealEngine_sublibs)
         set(RealEngine_sublibs "${RealEngine_sublibs}" PARENT_SCOPE)
     endfunction()
 
-    # RealEngine sublibs
-    _real_add_realengine_sublib(RealEngine_graphics)
-    _real_add_realengine_sublib(RealEngine_program)
-    _real_add_realengine_sublib(RealEngine_renderer)
-    _real_add_realengine_sublib(RealEngine_resources)
-    _real_add_realengine_sublib(RealEngine_rooms)
-    _real_add_realengine_sublib(RealEngine_user_input)
+    # RealEngine sublibs in order of dependecy
     _real_add_realengine_sublib(RealEngine_utility)
-    _real_add_realengine_sublib(RealEngine_window)
+    _real_add_realengine_sublib(RealEngine_visual)
+    _real_add_realengine_sublib(RealEngine_systems)
 
     # RealEngine main target
     add_real_library(RealEngine INTERFACE)
