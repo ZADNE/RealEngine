@@ -185,14 +185,10 @@ void MainProgram::processEvent(SDL_Event* evnt) {
         );
     } break;
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
-        if (evnt->key.repeat == 0) {
-            m_inputManager.press(toKey(evnt->button.button), evnt->button.clicks);
-        }
+        m_inputManager.press(toKey(evnt->button.button), evnt->button.clicks);
         break;
     case SDL_EVENT_MOUSE_BUTTON_UP:
-        if (evnt->key.repeat == 0) {
-            m_inputManager.release(toKey(evnt->button.button));
-        }
+        m_inputManager.release(toKey(evnt->button.button));
         break;
     case SDL_EVENT_MOUSE_WHEEL:
         m_inputManager.press(
