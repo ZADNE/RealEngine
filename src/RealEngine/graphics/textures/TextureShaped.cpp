@@ -7,13 +7,15 @@ namespace re {
 
 TextureShaped::TextureShaped(const PNGLoader::PNGData& pngData)
     : Texture(TextureCreateInfo{.extent = {pngData.dims, 1u}, .texels = pngData.texels})
-    , m_shape(TextureShape{
-          .subimageDims = pngData.shape.subimageDims == glm::vec2{0.0f, 0.0f}
-                              ? glm::vec2{pngData.dims}
-                              : pngData.shape.subimageDims,
-          .pivot        = pngData.shape.pivot,
-          .subimagesSpritesCount = pngData.shape.subimagesSpritesCount
-      })
+    , m_shape(
+          TextureShape{
+              .subimageDims = pngData.shape.subimageDims == glm::vec2{0.0f, 0.0f}
+                                  ? glm::vec2{pngData.dims}
+                                  : pngData.shape.subimageDims,
+              .pivot                 = pngData.shape.pivot,
+              .subimagesSpritesCount = pngData.shape.subimagesSpritesCount
+          }
+      )
     , m_trueDims(pngData.dims) {
 }
 

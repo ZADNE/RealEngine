@@ -75,12 +75,12 @@ public:
     /**
      * @copydoc InputManager::cursorAbs
      */
-    glm::ivec2 cursorAbs() const;
+    glm::vec2 cursorAbs() const;
 
     /**
      * @copydoc InputManager::cursorRel
      */
-    glm::ivec2 cursorRel() const;
+    glm::vec2 cursorRel() const;
 
 #pragma endregion
 

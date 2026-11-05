@@ -3,9 +3,9 @@
  */
 #include <iostream>
 
-#include <ImGui/imgui_impl_sdl2.h>
+#include <ImGui/imgui_impl_sdl3.h>
 #include <ImGui/imgui_impl_vulkan.h>
-#include <SDL_vulkan.h>
+#include <SDL3/SDL_vulkan.h>
 #include <glm/common.hpp>
 #define VMA_IMPLEMENTATION
 #include <vma/vk_mem_alloc.hpp>
@@ -66,8 +66,7 @@ VulkanRenderer::VulkanRenderer(
     , m_debugUtilsMessenger(createDebugUtilsMessenger())
 #endif // RE_BUILDING_FOR_DEBUG
     , m_surface(createSurface())
-    , m_physicalDevice(createPhysicalDevice(preferredDevice, vulkan.deviceCreateInfoChain)
-      )
+    , m_physicalDevice(createPhysicalDevice(preferredDevice, vulkan.deviceCreateInfoChain))
     , m_presentMode(selectClosestPresentMode(vSync))
     , m_device(createDevice(vulkan.deviceCreateInfoChain))
     , m_allocator(createAllocator())
@@ -81,8 +80,8 @@ VulkanRenderer::VulkanRenderer(
     , m_additionalBuffers(createAdditionalBuffers())
     , m_commandPool(createCommandPool())
     , m_cbs([&]() {
-        assignImplementationReferences(); // Deliberate side effect, ref to device
-                                          // and pool is required to construct a cmd buf
+        // ref to device and pool is required to construct a cmd buf
+        assignImplementationReferences();
         return FrameDoubleBuffered<CommandBuffer>{
             CommandBuffer{{.debugName = "re::VulkanRenderer::cbs[0]"}},
             CommandBuffer{{.debugName = "re::VulkanRenderer::cbs[1]"}}
@@ -91,8 +90,20 @@ VulkanRenderer::VulkanRenderer(
     , m_oneTimeSubmitCmdBuf({.debugName = "re::VulkanRenderer::oneTimeSubmit"})
     , m_pipelineCache(createPipelineCache())
     , m_descriptorPool(createDescriptorPool())
-    , m_imageAvailableSems(createSemaphores())
-    , m_renderingFinishedSems(createSemaphores())
+    , m_imageAvailableSems{FrameDoubleBuffered<re::Semaphore>{
+          Semaphore{{.debugName = "re::VulkanRenderer::imageAvailable[0]"}},
+          Semaphore{{.debugName = "re::VulkanRenderer::imageAvailable[1]"}}
+      }}
+    , m_renderingFinishedSems([&]() {
+        std::vector<Semaphore> sems;
+        sems.reserve(m_swapchainImageViews.size());
+        for (size_t i = 0; i < m_swapchainImageViews.size(); ++i) {
+            std::string debugName =
+                std::format("re::VulkanRenderer::renderingFinished[{}]", i);
+            sems.emplace_back(SemaphoreCreateInfo{.debugName = debugName.c_str()});
+        }
+        return sems;
+    }())
     , m_inFlightFences(createFences()) {
 
     // Implementations
@@ -103,54 +114,66 @@ VulkanRenderer::VulkanRenderer(
         *m_graphicsCompQueue, "re::VulkanRenderer::graphicsCompQueue"
     );
 
-    // Initialize ImGui for SDL2
-    if (!ImGui_ImplSDL2_InitForVulkan(m_sdlWindow)) {
-        throw std::runtime_error{"Could not initialize ImGui-SDL2 for Vulkan!"};
+    // Initialize ImGui for SDL3
+    if (!ImGui_ImplSDL3_InitForVulkan(m_sdlWindow)) {
+        throw std::runtime_error{"Could not initialize ImGui-SDL for Vulkan!"};
+    }
+
+    // Initialize ImGui for Vulkan
+    ImGui_ImplVulkan_InitInfo imGuiInitInfo{
+        .ApiVersion         = vk::ApiVersion13,
+        .Instance           = *m_instance,
+        .PhysicalDevice     = *m_physicalDevice,
+        .Device             = *m_device,
+        .QueueFamily        = m_graphicsCompQueueFamIndex,
+        .Queue              = *m_graphicsCompQueue,
+        .DescriptorPool     = nullptr,
+        .DescriptorPoolSize = IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE,
+        .MinImageCount      = m_minImageCount,
+        .ImageCount       = static_cast<uint32_t>(m_swapchainImageViews.size()),
+        .PipelineCache    = *m_pipelineCache,
+        .PipelineInfoMain = ImGui_ImplVulkan_PipelineInfo{nullptr, 0, {}},
+        .UseDynamicRendering        = false,
+        .Allocator                  = nullptr,
+        .CheckVkResultFn            = &checkSuccessImGui,
+        .MinAllocationSize          = 1024 * 1024,
+        .CustomShaderVertCreateInfo = {},
+        .CustomShaderFragCreateInfo = {}
+    };
+    if (!ImGui_ImplVulkan_Init(&imGuiInitInfo)) {
+        throw std::runtime_error{"Could not initialize ImGui for Vulkan!"};
     }
 }
 
 VulkanRenderer::~VulkanRenderer() {
     m_device.waitIdle();
-    ImGui_ImplVulkan_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    if (m_mainRenderPass) {
+        ImGui_ImplVulkan_Shutdown();
+    }
+    ImGui_ImplSDL3_Shutdown();
 }
 
 void VulkanRenderer::setMainRenderPass(const RenderPass& rp, uint32_t imGuiSubpassIndex) {
     if (m_mainRenderPass) {
-        if (m_imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
-            ImGui_ImplVulkan_Shutdown();
-        }
         m_swapChainFramebuffers.~vector();
     }
 
     m_mainRenderPass    = &rp;
     m_imGuiSubpassIndex = imGuiSubpassIndex;
 
-    new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers
-    ){createSwapchainFramebuffers()};
+    new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers){
+        createSwapchainFramebuffers()
+    };
 
     if (m_imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
         // Initialize ImGui for the new renderpass
-        ImGui_ImplVulkan_InitInfo imGuiInitInfo{
-            .Instance       = *m_instance,
-            .PhysicalDevice = *m_physicalDevice,
-            .Device         = *m_device,
-            .QueueFamily    = m_graphicsCompQueueFamIndex,
-            .Queue          = *m_graphicsCompQueue,
-            .DescriptorPool = *m_descriptorPool,
-            .RenderPass     = **m_mainRenderPass,
-            .MinImageCount  = m_minImageCount,
-            .ImageCount  = static_cast<uint32_t>(m_swapchainImageViews.size()),
-            .MSAASamples = VK_SAMPLE_COUNT_1_BIT,
-            .PipelineCache       = *m_pipelineCache,
-            .Subpass             = imGuiSubpassIndex,
-            .UseDynamicRendering = false,
-            .Allocator           = nullptr,
-            .CheckVkResultFn     = &checkSuccessImGui
+        ImGui_ImplVulkan_PipelineInfo imGuiPipelineInfo{
+            .RenderPass                  = **m_mainRenderPass,
+            .Subpass                     = imGuiSubpassIndex,
+            .MSAASamples                 = VK_SAMPLE_COUNT_1_BIT,
+            .PipelineRenderingCreateInfo = {}
         };
-        if (!ImGui_ImplVulkan_Init(&imGuiInitInfo)) {
-            throw std::runtime_error{"Could not initialize ImGui for Vulkan!"};
-        }
+        ImGui_ImplVulkan_CreateMainPipeline(&imGuiPipelineInfo);
     }
 }
 
@@ -183,21 +206,15 @@ const CommandBuffer& VulkanRenderer::prepareFrame() {
 
     // Begin ImGui frame
     if (m_imGuiSubpassIndex != RoomDisplaySettings::k_notUsingImGui) {
-        // Rebuild fonts if new fonts have been added
-        if (!ImGui::GetIO().Fonts->IsBuilt()) {
-            ImGui_ImplVulkan_CreateFontsTexture();
-        }
-
         ImGui_ImplVulkan_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
     }
 
     return cb;
 }
 
-void VulkanRenderer::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues
-) {
+void VulkanRenderer::mainRenderPassBegin(std::span<const vk::ClearValue> clearValues) {
     auto& cb = m_cbs.write();
     cb->beginRenderPass2(
         vk::RenderPassBeginInfo{
@@ -221,11 +238,10 @@ void VulkanRenderer::mainRenderPassBegin(std::span<const vk::ClearValue> clearVa
         }
     );
     cb->setScissor(
-        0u,
-        vk::Rect2D{
-            {0, 0},                                             // x, y
-            {m_swapchainExtent.width, m_swapchainExtent.height} // width, height
-        }
+        0u, vk::Rect2D{
+                {0, 0},                                             // x, y
+                {m_swapchainExtent.width, m_swapchainExtent.height} // width, height
+            }
     );
 }
 
@@ -252,17 +268,17 @@ void VulkanRenderer::finishFrame() {
     vk::PipelineStageFlags waitDstStageMask =
         vk::PipelineStageFlagBits::eColorAttachmentOutput;
     vk::SubmitInfo submitInfo{
-        **m_imageAvailableSems,   // Wait for image to be available
-        waitDstStageMask,         // Wait just before writing output
+        **m_imageAvailableSems, // Wait for image to be available
+        waitDstStageMask,       // Wait just before writing output
         *cb,
-        **m_renderingFinishedSems // Signal that the rendering has
-                                  // finished once done
+        *m_renderingFinishedSems[m_imageIndex] // Signal that the rendering has
+                                               // finished once done
     };
     m_graphicsCompQueue.submit(submitInfo, **m_inFlightFences);
 
     // Present new image
     vk::PresentInfoKHR presentInfo{
-        **m_renderingFinishedSems, // Wait for rendering to finish
+        *m_renderingFinishedSems[m_imageIndex], // Wait for rendering to finish
         *m_swapchain, m_imageIndex
     };
 
@@ -310,22 +326,21 @@ vk::raii::Instance VulkanRenderer::createInstance() {
 #endif // RE_BUILDING_FOR_DEBUG
     };
 
-    // Add extensions required by SDL2
-    unsigned int sdl2ExtensionCount{};
-    if (!SDL_Vulkan_GetInstanceExtensions(m_sdlWindow, &sdl2ExtensionCount, nullptr)) {
+    // Add extensions required by SDL
+    Uint32 sdlExtensionCount{};
+    const char* const* sdlExtensions =
+        SDL_Vulkan_GetInstanceExtensions(&sdlExtensionCount);
+    if (!sdlExtensions) {
         throw std::runtime_error(
-            "Could not get number of Vulkan extensions required for SDL2!"
+            "Failed to query Vulkan extensions required by SDL!"
         );
     }
     size_t defaultExtensionsCount = extensions.size();
-    extensions.resize(defaultExtensionsCount + sdl2ExtensionCount);
-    if (!SDL_Vulkan_GetInstanceExtensions(
-            m_sdlWindow, &sdl2ExtensionCount, &extensions[defaultExtensionsCount]
-        )) {
-        throw std::runtime_error(
-            "Could not get Vulkan extensions required for SDL2!"
-        );
-    }
+    extensions.reserve(defaultExtensionsCount + sdlExtensionCount);
+    std::copy(
+        sdlExtensions, sdlExtensions + sdlExtensionCount,
+        std::back_inserter(extensions)
+    );
 
     // Create Vulkan instance
     vk::ApplicationInfo applicationInfo(
@@ -357,8 +372,8 @@ vk::raii::DebugUtilsMessengerEXT VulkanRenderer::createDebugUtilsMessenger() {
 
 vk::raii::SurfaceKHR VulkanRenderer::createSurface() {
     VkSurfaceKHR surface{};
-    if (!SDL_Vulkan_CreateSurface(m_sdlWindow, *m_instance, &surface)) {
-        throw std::runtime_error("SDL2 could not create Vulkan surface!");
+    if (!SDL_Vulkan_CreateSurface(m_sdlWindow, *m_instance, nullptr, &surface)) {
+        throw std::runtime_error("SDL could not create Vulkan surface!");
     }
     return vk::raii::SurfaceKHR{m_instance, surface};
 }
@@ -367,12 +382,11 @@ vk::raii::PhysicalDevice VulkanRenderer::createPhysicalDevice(
     std::string_view preferredDevice, const void* deviceCreateInfoChain
 ) {
     SelectedPhysDevice res = selectSuitablePhysDevice(
-        *m_instance,
-        PhysDeviceRequirements{
-            .surface               = *m_surface,
-            .deviceCreateInfoChain = deviceCreateInfoChain,
-            .preferredDevice       = preferredDevice
-        }
+        *m_instance, PhysDeviceRequirements{
+                         .surface               = *m_surface,
+                         .deviceCreateInfoChain = deviceCreateInfoChain,
+                         .preferredDevice       = preferredDevice
+                     }
     );
 
     // If a device was selected (= suitable)
@@ -433,17 +447,21 @@ vk::raii::Device VulkanRenderer::createDevice(const void* deviceCreateInfoChain)
 }
 
 vma::Allocator VulkanRenderer::createAllocator() {
-    return vma::createAllocator(vma::AllocatorCreateInfo{
-        vma::AllocatorCreateFlagBits::eExternallySynchronized,
-        *m_physicalDevice, *m_device,
-        0,       // Use default large heap block size (256 MB as of writing)
-        nullptr, // Use default CPU memory allocation callbacks
-        nullptr, // Do not receive informative callbacks from VMA
-        nullptr, // No heap size limits
-        nullptr, // Let VMA load Vulkan functions on its own
-        *m_instance, vk::ApiVersion13,
-        nullptr, // No external memory handles
-    });
+    return vma::createAllocator(
+        vma::AllocatorCreateInfo{
+            vma::AllocatorCreateFlagBits::eExternallySynchronized,
+            *m_physicalDevice,
+            *m_device,
+            0,       // Use default large heap block size (256 MB as of writing)
+            nullptr, // Use default CPU memory allocation callbacks
+            nullptr, // Do not receive informative callbacks from VMA
+            nullptr, // No heap size limits
+            nullptr, // Let VMA load Vulkan functions on its own
+            *m_instance,
+            vk::ApiVersion13,
+            nullptr, // No external memory handles
+        }
+    );
 }
 
 vk::raii::Queue VulkanRenderer::getQueue(uint32_t familyIndex) {
@@ -459,11 +477,11 @@ vk::raii::SwapchainKHR VulkanRenderer::createSwapchain() {
     );
 
     // Extent
-    if (caps.currentExtent == vk::Extent2D{0xFFFFFFFF, 0xFFFFFFFF}) {
+    if (caps.currentExtent != vk::Extent2D{0xFFFFFFFF, 0xFFFFFFFF}) {
         m_swapchainExtent = caps.currentExtent;
     } else {
         glm::ivec2 windowPx;
-        SDL_Vulkan_GetDrawableSize(m_sdlWindow, &windowPx.x, &windowPx.y);
+        SDL_GetWindowSizeInPixels(m_sdlWindow, &windowPx.x, &windowPx.y);
         m_swapchainExtent.width = std::clamp(
             static_cast<uint32_t>(windowPx.x), caps.minImageExtent.width,
             caps.maxImageExtent.width
@@ -527,15 +545,18 @@ std::vector<Texture> VulkanRenderer::createAdditionalBuffers() {
     std::vector<Texture> buffers;
     buffers.reserve(m_additionalBufferDescrs.size());
     for (const auto& descr : m_additionalBufferDescrs) {
-        buffers.emplace_back(TextureCreateInfo{
-            .allocFlags = vma::AllocationCreateFlagBits::eDedicatedMemory,
-            .format     = descr.format,
-            .extent = glm::uvec3{m_swapchainExtent.width, m_swapchainExtent.height, 1},
-            .usage         = descr.usage,
-            .initialLayout = vk::ImageLayout::eUndefined,
-            .aspects       = descr.aspects,
-            .hasSampler    = false
-        });
+        buffers.emplace_back(
+            TextureCreateInfo{
+                .allocFlags = vma::AllocationCreateFlagBits::eDedicatedMemory,
+                .format     = descr.format,
+                .extent =
+                    glm::uvec3{m_swapchainExtent.width, m_swapchainExtent.height, 1},
+                .usage         = descr.usage,
+                .initialLayout = vk::ImageLayout::eUndefined,
+                .aspects       = descr.aspects,
+                .hasSampler    = false
+            }
+        );
     }
     return buffers;
 }
@@ -572,14 +593,6 @@ vk::raii::CommandPool VulkanRenderer::createCommandPool() {
         vk::CommandPoolCreateFlagBits::eResetCommandBuffer, m_graphicsCompQueueFamIndex
     };
     return vk::raii::CommandPool{m_device, createInfo};
-}
-
-FrameDoubleBuffered<vk::raii::Semaphore> VulkanRenderer::createSemaphores() {
-    vk::SemaphoreCreateInfo createInfo{};
-    return {
-        vk::raii::Semaphore{m_device, createInfo},
-        vk::raii::Semaphore{m_device, createInfo}
-    };
 }
 
 FrameDoubleBuffered<vk::raii::Fence> VulkanRenderer::createFences() {
@@ -625,12 +638,15 @@ void VulkanRenderer::recreateSwapchain() {
 
     // Recreate them with the new size
     new (&m_swapchain) decltype(m_swapchain){createSwapchain()};
-    new (&m_swapchainImageViews) decltype(m_swapchainImageViews
-    ){createSwapchainImageViews()};
-    new (&m_additionalBuffers) decltype(m_additionalBuffers
-    ){createAdditionalBuffers()};
-    new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers
-    ){createSwapchainFramebuffers()};
+    new (&m_swapchainImageViews) decltype(m_swapchainImageViews){
+        createSwapchainImageViews()
+    };
+    new (&m_additionalBuffers) decltype(m_additionalBuffers){
+        createAdditionalBuffers()
+    };
+    new (&m_swapChainFramebuffers) decltype(m_swapChainFramebuffers){
+        createSwapchainFramebuffers()
+    };
 }
 
 void VulkanRenderer::assignImplementationReferences() {

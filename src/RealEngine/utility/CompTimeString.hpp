@@ -29,8 +29,7 @@ struct CompTimeString {
     }
 
     template<std::size_t N2>
-    consteval CompTimeString<N + N2 - 1> operator+(const CompTimeString<N2> str
-    ) const {
+    consteval CompTimeString<N + N2 - 1> operator+(const CompTimeString<N2> str) const {
         char newchar[N + N2 - 1]{};
         std::copy_n(data, N - 1, newchar);
         std::copy_n(str.data, N2, newchar + N - 1);

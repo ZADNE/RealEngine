@@ -20,7 +20,6 @@ using namespace ImGui;
 MainMenuRoom::MainMenuRoom(re::CommandLineArguments args)
     : Room(0, re::RoomDisplaySettings{.framesPerSecondLimit = 144, .imGuiSubpassIndex = 0})
     , m_texView(engine().windowDims()) {
-
     engine().setWindowTitle("RTICreator v4.0.0");
 
     // Set last visited location to location of this executable
@@ -46,9 +45,10 @@ void MainMenuRoom::sessionEnd() {
 void MainMenuRoom::step() {
     if (m_texture) {
         // Handle input
-        auto cursorPos = (glm::vec2)engine().cursorAbs();
+        auto cursorPos = engine().cursorAbs();
         if (engine().isKeyDown(re::Key::MMB) && m_texture) {
-            m_texView.shiftPosition((glm::vec2{m_cursorPosPrev - cursorPos} / m_drawScale)
+            m_texView.shiftPosition(
+                (glm::vec2{m_cursorPosPrev - cursorPos} / m_drawScale)
             );
         }
         if (engine().wasKeyPressed(re::Key::UMW)) {
@@ -164,12 +164,11 @@ void MainMenuRoom::save(const std::string& loc) {
         return;
     }
     re::PNGLoader::replaceParameters(
-        loc,
-        re::TextureShape{
-            .subimageDims          = m_subimageDims,
-            .pivot                 = m_pivot,
-            .subimagesSpritesCount = m_subimagesSprites
-        }
+        loc, re::TextureShape{
+                 .subimageDims          = m_subimageDims,
+                 .pivot                 = m_pivot,
+                 .subimagesSpritesCount = m_subimagesSprites
+             }
     );
 }
 

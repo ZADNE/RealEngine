@@ -8,8 +8,7 @@
 namespace re {
 
 struct PipelineLayoutCreateInfo {
-    vk::ArrayProxy<vk::ArrayProxy<vk::DescriptorBindingFlags>> descriptorBindingFlags{
-    };
+    vk::ArrayProxy<vk::ArrayProxy<vk::DescriptorBindingFlags>> descriptorBindingFlags{};
     vk::SpecializationInfo specializationInfo{};
 };
 

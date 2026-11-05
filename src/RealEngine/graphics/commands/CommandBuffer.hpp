@@ -52,8 +52,7 @@ public:
      */
     template<std::invocable<const CommandBuffer&> F>
     static void doOneTimeSubmit(F op) {
-        oneTimeSubmitCmdBuf()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit
-        });
+        oneTimeSubmitCmdBuf()->begin({vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
         op(oneTimeSubmitCmdBuf());
         oneTimeSubmitCmdBuf()->end();
         graphicsCompQueue().submit(vk::SubmitInfo{{}, {}, *oneTimeSubmitCmdBuf()});
@@ -66,14 +65,14 @@ public:
      */
     static void submitToGraphicsCompQueue(
         const vk::ArrayProxy<const vk::SubmitInfo2>& submits,
-        const vk::Fence& signalFence = nullptr
+        vk::Fence signalFence = nullptr
     );
 
     /**
      * @brief Submits the command buffer to a queue which support graphics,
      * compute and transfer work
      */
-    void submitToGraphicsCompQueue(const vk::Fence& signalFence = nullptr) const;
+    void submitToGraphicsCompQueue(vk::Fence signalFence = nullptr) const;
 
 #pragma endregion
 

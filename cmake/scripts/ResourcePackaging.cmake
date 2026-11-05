@@ -1,5 +1,7 @@
 ﻿# author     Dubsky Tomas
 
+include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
+
 # Create a custom target that will index and package files:
 # Syntax:
 #     real_target_package_resources(
@@ -32,6 +34,9 @@ function(real_target_package_resources)
             COPYONLY
         )
     endif()
+
+    # Copy 7z.dll to the target so that it can open the package
+    real_copy_7z_dll_to_target(${ARG_TARGET})
 
     # Add the packaging command
     add_custom_command(

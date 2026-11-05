@@ -1,142 +1,70 @@
+// Macros
+#ifndef VMA_HPP_NAMESPACE
+#define VMA_HPP_NAMESPACE vma
+#endif
+#ifndef VMA_HPP_RAII_NAMESPACE
+#define VMA_HPP_RAII_NAMESPACE raii
+#endif
+#include <vulkan/vulkan_hpp_macros.hpp>
+
+#ifndef VULKAN_HPP_EXPORT
+#define VULKAN_HPP_EXPORT
+#endif
+
+// The body
 #ifndef VULKAN_MEMORY_ALLOCATOR_HPP
 #define VULKAN_MEMORY_ALLOCATOR_HPP
 
-#if !defined(AMD_VULKAN_MEMORY_ALLOCATOR_H)
-
-// Following defines supress clang-tidy errors because not all functions in vk_mem_alloc.h are marked
-#define VMA_NULLABLE
-#define VMA_NOT_NULL
-
-#include <vma/vk_mem_alloc.h>
+#ifndef VULKAN_HPP_CXX_MODULE
+#ifndef AMD_VULKAN_MEMORY_ALLOCATOR_H
+#include "vk_mem_alloc.h"
 #endif
-
 #include <vulkan/vulkan.hpp>
-
-#if !defined(VMA_HPP_NAMESPACE)
-#define VMA_HPP_NAMESPACE vma
 #endif
 
 #define VMA_HPP_NAMESPACE_STRING VULKAN_HPP_STRINGIFY(VMA_HPP_NAMESPACE)
+#define VMA_HPP_RAII_NAMESPACE_STRING VULKAN_HPP_STRINGIFY(VMA_HPP_NAMESPACE::VMA_HPP_RAII_NAMESPACE)
 
-#ifndef VULKAN_HPP_NO_SMART_HANDLE
-namespace VMA_HPP_NAMESPACE {
-  struct Dispatcher {}; // VMA uses function pointers from VmaAllocator instead
-  class Allocator;
-
-  template<class T>
-  VULKAN_HPP_NAMESPACE::UniqueHandle<T, Dispatcher> createUniqueHandle(const T& t) VULKAN_HPP_NOEXCEPT {
-    return VULKAN_HPP_NAMESPACE::UniqueHandle<T, Dispatcher>(t);
-  }
-  template<class T, class O>
-  VULKAN_HPP_NAMESPACE::UniqueHandle<T, Dispatcher> createUniqueHandle(const T& t, O o) VULKAN_HPP_NOEXCEPT {
-    return VULKAN_HPP_NAMESPACE::UniqueHandle<T, Dispatcher>(t, o);
-  }
-  template<class F, class S, class O>
-  std::pair<VULKAN_HPP_NAMESPACE::UniqueHandle<F, Dispatcher>, VULKAN_HPP_NAMESPACE::UniqueHandle<S, Dispatcher>>
-          createUniqueHandle(const std::pair<F, S>& t, O o) VULKAN_HPP_NOEXCEPT {
-    return {
-            VULKAN_HPP_NAMESPACE::UniqueHandle<F, Dispatcher>(t.first, o),
-            VULKAN_HPP_NAMESPACE::UniqueHandle<S, Dispatcher>(t.second, o)
-    };
-  }
-
-  template<class T, class UniqueVectorAllocator, class VectorAllocator, class O>
-  std::vector<VULKAN_HPP_NAMESPACE::UniqueHandle<T, Dispatcher>, UniqueVectorAllocator>
-        createUniqueHandleVector(const std::vector<T, VectorAllocator>& vector, O o,
-                                 const UniqueVectorAllocator& vectorAllocator) VULKAN_HPP_NOEXCEPT {
-    std::vector<VULKAN_HPP_NAMESPACE::UniqueHandle<T, Dispatcher>, UniqueVectorAllocator> result(vectorAllocator);
-    result.reserve(vector.size());
-    for (const T& t : vector) result.emplace_back(t, o);
-    return result;
-  }
-
-  template<class T, class Owner> class Deleter {
-    Owner owner;
-  public:
-    Deleter() = default;
-    Deleter(Owner owner) VULKAN_HPP_NOEXCEPT : owner(owner) {}
-  protected:
-    void destroy(const T& t) VULKAN_HPP_NOEXCEPT; // Implemented manually for each handle type
-  };
-  template<class T> class Deleter<T, void> {
-  protected:
-    void destroy(const T& t) VULKAN_HPP_NOEXCEPT { t.destroy(); }
-  };
-}
-namespace VULKAN_HPP_NAMESPACE {
-  template<> class UniqueHandleTraits<Buffer, VMA_HPP_NAMESPACE::Dispatcher> {
-    public:
-    using deleter = VMA_HPP_NAMESPACE::Deleter<Buffer, VMA_HPP_NAMESPACE::Allocator>;
-  };
-  template<> class UniqueHandleTraits<Image, VMA_HPP_NAMESPACE::Dispatcher> {
-    public:
-    using deleter = VMA_HPP_NAMESPACE::Deleter<Image, VMA_HPP_NAMESPACE::Allocator>;
-  };
-}
-namespace VMA_HPP_NAMESPACE {
-  using UniqueBuffer = VULKAN_HPP_NAMESPACE::UniqueHandle<VULKAN_HPP_NAMESPACE::Buffer, Dispatcher>;
-  using UniqueImage = VULKAN_HPP_NAMESPACE::UniqueHandle<VULKAN_HPP_NAMESPACE::Image, Dispatcher>;
-}
+// Workaround for breaking changes in Vulkan-Hpp:
+// https://github.com/KhronosGroup/Vulkan-Hpp/commit/a0a4c22975c89f70202542cc52d0f182db296002
+// Just add dummy operators, so that using declarations would always compile.
+namespace VMA_HPP_NAMESPACE { class Dummy; }
+VULKAN_HPP_EXPORT namespace VULKAN_HPP_NAMESPACE {
+  void operator<(VMA_HPP_NAMESPACE::Dummy, VMA_HPP_NAMESPACE::Dummy);
+  void operator<=(VMA_HPP_NAMESPACE::Dummy, VMA_HPP_NAMESPACE::Dummy);
+  void operator>(VMA_HPP_NAMESPACE::Dummy, VMA_HPP_NAMESPACE::Dummy);
+  void operator>=(VMA_HPP_NAMESPACE::Dummy, VMA_HPP_NAMESPACE::Dummy);
+#ifdef VULKAN_HPP_HAS_SPACESHIP_OPERATOR
+  void operator<=>(VMA_HPP_NAMESPACE::Dummy, VMA_HPP_NAMESPACE::Dummy);
 #endif
+}
+
+VULKAN_HPP_EXPORT namespace VMA_HPP_NAMESPACE {
+  using VULKAN_HPP_NAMESPACE::operator&;
+  using VULKAN_HPP_NAMESPACE::operator|;
+  using VULKAN_HPP_NAMESPACE::operator^;
+  using VULKAN_HPP_NAMESPACE::operator~;
+  using VULKAN_HPP_NAMESPACE::operator<;
+  using VULKAN_HPP_NAMESPACE::operator<=;
+  using VULKAN_HPP_NAMESPACE::operator>;
+  using VULKAN_HPP_NAMESPACE::operator>=;
+  using VULKAN_HPP_NAMESPACE::operator==;
+  using VULKAN_HPP_NAMESPACE::operator!=;
+#ifdef VULKAN_HPP_HAS_SPACESHIP_OPERATOR
+  using VULKAN_HPP_NAMESPACE::operator<=>;
+#endif
+}
 
 #include "vk_mem_alloc_enums.hpp"
-#include "vk_mem_alloc_handles.hpp"
-#include "vk_mem_alloc_structs.hpp"
-#include "vk_mem_alloc_funcs.hpp"
 
-namespace VMA_HPP_NAMESPACE {
-  
-#ifndef VULKAN_HPP_NO_SMART_HANDLE
-# define VMA_HPP_DESTROY_IMPL(NAME) \
-  template<> VULKAN_HPP_INLINE void VULKAN_HPP_NAMESPACE::UniqueHandleTraits<NAME, Dispatcher>::deleter::destroy(const NAME& t) VULKAN_HPP_NOEXCEPT
-
-  VMA_HPP_DESTROY_IMPL(VULKAN_HPP_NAMESPACE::Buffer) { owner.destroyBuffer(t, nullptr); }
-  VMA_HPP_DESTROY_IMPL(VULKAN_HPP_NAMESPACE::Image) { owner.destroyImage(t, nullptr); }
-  VMA_HPP_DESTROY_IMPL(Pool) { owner.destroyPool(t); }
-  VMA_HPP_DESTROY_IMPL(Allocation) { owner.freeMemory(t); }
-  VMA_HPP_DESTROY_IMPL(VirtualAllocation) { owner.virtualFree(t); }
-
-# undef VMA_HPP_DESTROY_IMPL
+#ifndef VULKAN_HPP_NO_TO_STRING
+#include "vk_mem_alloc_to_string.hpp"
 #endif
 
-  template<class InstanceDispatcher, class DeviceDispatcher>
-  VULKAN_HPP_CONSTEXPR VulkanFunctions functionsFromDispatcher(InstanceDispatcher const * instance,
-                                                               DeviceDispatcher const * device) VULKAN_HPP_NOEXCEPT {
-    return VulkanFunctions {
-            instance->vkGetInstanceProcAddr,
-            instance->vkGetDeviceProcAddr,
-            instance->vkGetPhysicalDeviceProperties,
-            instance->vkGetPhysicalDeviceMemoryProperties,
-            device->vkAllocateMemory,
-            device->vkFreeMemory,
-            device->vkMapMemory,
-            device->vkUnmapMemory,
-            device->vkFlushMappedMemoryRanges,
-            device->vkInvalidateMappedMemoryRanges,
-            device->vkBindBufferMemory,
-            device->vkBindImageMemory,
-            device->vkGetBufferMemoryRequirements,
-            device->vkGetImageMemoryRequirements,
-            device->vkCreateBuffer,
-            device->vkDestroyBuffer,
-            device->vkCreateImage,
-            device->vkDestroyImage,
-            device->vkCmdCopyBuffer,
-            device->vkGetBufferMemoryRequirements2KHR ? device->vkGetBufferMemoryRequirements2KHR : device->vkGetBufferMemoryRequirements2,
-            device->vkGetImageMemoryRequirements2KHR ? device->vkGetImageMemoryRequirements2KHR : device->vkGetImageMemoryRequirements2,
-            device->vkBindBufferMemory2KHR ? device->vkBindBufferMemory2KHR : device->vkBindBufferMemory2,
-            device->vkBindImageMemory2KHR ? device->vkBindImageMemory2KHR : device->vkBindImageMemory2,
-            instance->vkGetPhysicalDeviceMemoryProperties2KHR ? instance->vkGetPhysicalDeviceMemoryProperties2KHR : instance->vkGetPhysicalDeviceMemoryProperties2,
-            device->vkGetDeviceBufferMemoryRequirements,
-            device->vkGetDeviceImageMemoryRequirements
-    };
-  }
+#include "vk_mem_alloc_handles.hpp"
 
-  template<class Dispatch = VULKAN_HPP_DEFAULT_DISPATCHER_TYPE>
-  VULKAN_HPP_CONSTEXPR VulkanFunctions functionsFromDispatcher(Dispatch const & dispatch
-    VULKAN_HPP_DEFAULT_DISPATCHER_ASSIGNMENT) VULKAN_HPP_NOEXCEPT {
-    return functionsFromDispatcher(&dispatch, &dispatch);
-  }
-}
+#include "vk_mem_alloc_structs.hpp"
+
+#include "vk_mem_alloc_funcs.hpp"
 
 #endif

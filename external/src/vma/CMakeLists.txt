@@ -5,5 +5,9 @@ real_target_sources(vma
         vk_mem_alloc_enums.hpp
         vk_mem_alloc_funcs.hpp
         vk_mem_alloc_handles.hpp
+        vk_mem_alloc_imported.hpp
+        vk_mem_alloc_raii.hpp
+        vk_mem_alloc_static_assertions.hpp
         vk_mem_alloc_structs.hpp
+        vk_mem_alloc_to_string.hpp
 )

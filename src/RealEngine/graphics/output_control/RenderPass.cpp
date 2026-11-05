@@ -6,10 +6,13 @@
 namespace re {
 
 RenderPass::RenderPass(const RenderPassCreateInfo& createInfo)
-    : m_renderPass(device().createRenderPass2(vk::RenderPassCreateInfo2{
-          {}, createInfo.attachments, createInfo.subpasses, createInfo.dependencies
-      })) {
-
+    : m_renderPass(
+          device().createRenderPass2(
+              vk::RenderPassCreateInfo2{
+                  {}, createInfo.attachments, createInfo.subpasses, createInfo.dependencies
+              }
+          )
+      ) {
     setDebugUtilsObjectName(m_renderPass, createInfo.debugName);
 }
 

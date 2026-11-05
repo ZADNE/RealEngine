@@ -1,15 +1,15 @@
 /**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/resources/hot_reload/PipelineHotLoader.hpp>
+
 #include <set>
 
 #include <filewatch/FileWatch.hpp>
 
 #include <RealEngine/graphics/pipelines/Pipeline.hpp>
 #include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
-#include <RealEngine/program/MainProgram.hpp>
 #include <RealEngine/resources/FileIO.hpp>
-#include <RealEngine/resources/hot_reload/PipelineHotLoader.hpp>
 #include <RealEngine/utility/details/CMakeConstants.hpp>
 
 namespace re {
@@ -81,13 +81,13 @@ struct PipelineHotLoader::Impl {
         , binaryDirWatch{
               hotReload.binaryDir, std::regex{spirvBinFileRegex()},
               [this](const std::string& path, const filewatch::Event changeType) {
-                  pathsToReload.write().emplace(path);
+                  pathsToReload.write().emplace(path, false);
               }
           } {}
 
     DeletionQueue& deletionQueue;
     std::vector<PipelineReloadInfo> pipelineRegister;
-    FrameDoubleBuffered<std::set<std::string>> pathsToReload;
+    FrameDoubleBuffered<std::unordered_map<std::string, bool>> pathsToReload; // bool tells if reloaded
     std::string recompileShadersCommand;
     std::string binaryDir;
     filewatch::FileWatch<std::string> sourceDirWatch;
@@ -199,11 +199,17 @@ size_t PipelineHotLoader::reloadChangedPipelines(
     auto& binPaths = m_impl->pathsToReload.read();
     std::set<PipelineReloadInfo*> pipelinesToRecompile;
     std::vector<unsigned char> loadedFile;
-    for (const auto& binPath : binPaths) { // For each modified source
+    for (auto& [binPath, reloaded] : binPaths) { // For each modified source
+        if (reloaded) {
+            continue;
+        }
         try {
             // Load the SPIRV
             loadedFile = readBinaryFile(m_impl->binaryDir + '/' + binPath);
-            assert((loadedFile.size() % sizeof(uint32_t)) == 0);
+            if (loadedFile.size() == 0 ||
+                (loadedFile.size() % sizeof(uint32_t)) != 0) {
+                continue;
+            }
 
             // Search all pipelines that use the source file
             std::string path{
@@ -227,9 +233,10 @@ size_t PipelineHotLoader::reloadChangedPipelines(
                     }
                 }
             }
+            reloaded = true;
         } catch (...) {}
     }
-    binPaths.clear();
+    std::erase_if(binPaths, [](const auto& pair) { return pair.second; });
 
     // Recreate all affected pipelines
     for (const auto& info : pipelinesToRecompile) {

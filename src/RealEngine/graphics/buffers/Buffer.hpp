@@ -34,8 +34,7 @@ struct BufferCreateInfo {
 
     // Initial data
     std::span<const std::byte> initData = {};
-    vk::DeviceSize initDataDstOffset    = {
-    }; // Offset in bytes where initData will be placed
+    vk::DeviceSize initDataDstOffset = {}; // Offset in bytes where initData will be placed
 
     // Debug
     [[no_unique_address]] DebugString<> debugName;
@@ -81,7 +80,7 @@ protected:
 
 private:
 
-    std::pair<vk::Buffer, vma::Allocation> allocateBuffer(
+    std::pair<vma::Allocation, vk::Buffer> allocateBuffer(
         const BufferCreateInfo& createInfo, void** pointerToMapped
     ) const;
 

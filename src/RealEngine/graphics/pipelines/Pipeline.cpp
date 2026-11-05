@@ -181,9 +181,9 @@ vk::Pipeline Pipeline::create(
     const PipelineComputeCreateInfo& createInfo, const PipelineComputeSources& srcs
 ) {
     // Create compute shader module
-    vk::ShaderModule compShader = device().createShaderModule(vk::ShaderModuleCreateInfo{
-        {}, srcs.comp.vk13.size() * 4, srcs.comp.vk13.data()
-    });
+    vk::ShaderModule compShader = device().createShaderModule(
+        vk::ShaderModuleCreateInfo{{}, srcs.comp.vk13.size() * 4, srcs.comp.vk13.data()}
+    );
 
     // Create pipeline
     vk::Pipeline pipeline =

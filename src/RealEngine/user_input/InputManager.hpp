@@ -40,17 +40,17 @@ public:
     /**
      * @brief Gets absolute position of the cursor.
      */
-    glm::ivec2 cursorAbs() const;
+    glm::vec2 cursorAbs() const;
 
     /**
      * @brief Gets position of the cursor relative to previous step.
      */
-    glm::ivec2 cursorRel() const;
+    glm::vec2 cursorRel() const;
 
 #pragma region AccessForMainProgram
 
     void step();
-    void setCursor(glm::ivec2 abs, glm::ivec2 rel);
+    void setCursor(glm::vec2 abs, glm::vec2 rel);
     void press(Key key, int times = 1);
     void release(Key key);
 
@@ -68,8 +68,8 @@ private:
     mutable StateMap m_stateMap{};
     mutable StateMap m_stateMapPrev{};
 
-    glm::ivec2 m_cursorAbs = glm::ivec2(0u, 0u);
-    glm::ivec2 m_cursorRel = glm::ivec2(0u, 0u);
+    glm::vec2 m_cursorAbs{};
+    glm::vec2 m_cursorRel{};
 };
 
 } // namespace re

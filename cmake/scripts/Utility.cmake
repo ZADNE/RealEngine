@@ -12,6 +12,19 @@ function(get_realengine_base_dir_abs)
     set(realengine_base_dir_abs "${base_dir}" PARENT_SCOPE)
 endfunction()
 
+# Convenience copy function of 7z.dll
+function(real_copy_7z_dll_to_target target)
+    if(WIN32)
+        get_target_property(7z_dll_path 7z_dll IMPORTED_LOCATION)
+        add_custom_command(
+            TARGET ${target} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${7z_dll_path}"
+                "$<TARGET_FILE_DIR:${target}>"
+        )
+    endif()
+endfunction()
+
 function(_generate_configured_file in_file out_file)
     file(READ ${in_file} contents)
     string(CONFIGURE "${contents}" contents)

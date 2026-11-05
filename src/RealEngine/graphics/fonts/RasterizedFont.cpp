@@ -1,33 +1,36 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/graphics/fonts/RasterizedFont.hpp>
+
 #include <bit>
-#include <format>
 #include <memory>
 #include <numeric>
 
-#include <SDL_ttf.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
-#include <RealEngine/graphics/fonts/RasterizedFont.hpp>
-#include <RealEngine/utility/Error.hpp>
 #include <RealEngine/utility/Math.hpp>
+#include <RealEngine/utility/SDLProperties.hpp>
 #include <RealEngine/utility/Unicode.hpp>
 #include <RealEngine/utility/UniqueCPtr.hpp>
 
 namespace re {
 
-using TTF_RWopsRAII   = UniqueCPtr<SDL_RWops, SDL_FreeRW>;
-using TTF_FontRAII    = UniqueCPtr<TTF_Font, TTF_CloseFont>;
-using SDL_SurfaceRAII = UniqueCPtr<SDL_Surface, SDL_FreeSurface>;
+using SDL_IOStreamRAII = UniqueCPtr<SDL_IOStream, SDL_CloseIO>;
+using TTF_FontRAII     = UniqueCPtr<TTF_Font, TTF_CloseFont>;
+using SDL_SurfaceRAII  = UniqueCPtr<SDL_Surface, SDL_DestroySurface>;
 
 RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
-    TTF_RWopsRAII rWops{SDL_RWFromConstMem(
+    SDL_IOStreamRAII ioStream{SDL_IOFromConstMem(
         createInfo.ttfBytes.data(),
         static_cast<int>(createInfo.ttfBytes.size_bytes())
     )};
-    TTF_FontRAII font{TTF_OpenFontIndexRW(
-        rWops.get(), false, createInfo.pointSize, createInfo.faceIndex
-    )};
+    SDLProperties fontProps{};
+    fontProps.setProperty(TTF_PROP_FONT_CREATE_IOSTREAM_POINTER, ioStream.get());
+    fontProps.setProperty(TTF_PROP_FONT_CREATE_IOSTREAM_AUTOCLOSE_BOOLEAN, false);
+    fontProps.setProperty(TTF_PROP_FONT_CREATE_SIZE_FLOAT, createInfo.pointSize);
+    fontProps.setProperty(TTF_PROP_FONT_CREATE_FACE_NUMBER, createInfo.faceIndex);
+    TTF_FontRAII font{TTF_OpenFontWithProperties(fontProps)};
 
     // Count the expected number of characters
     int glyphCount = std::accumulate(
@@ -48,13 +51,12 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
     for (const UnicodeRange& r : createInfo.ranges) {
         assert(r.firstChar <= r.lastChar);
         for (char32_t c = r.firstChar; c <= r.lastChar; ++c) {
-            const SDL_SurfaceRAII& surf = surfs.emplace_back(
-                TTF_RenderGlyph32_Blended(font.get(), c, k_fgCol)
-            );
+            const SDL_SurfaceRAII& surf =
+                surfs.emplace_back(TTF_RenderGlyph_Blended(font.get(), c, k_fgCol));
             if (surf) { // If there is a glyph for the character
                 totalWidth += surf->w;
                 int advance{};
-                TTF_GlyphMetrics32(
+                TTF_GetGlyphMetrics(
                     font.get(), c, &dontCare, &dontCare, &dontCare, &dontCare, &advance
                 );
                 m_glyphs.emplace_back(
@@ -67,9 +69,9 @@ RasterizedFont::RasterizedFont(const RasterizedFontCreateInfo& createInfo) {
         }
         m_offsets.emplace_back(r.lastChar, static_cast<int>(m_glyphs.size()) - 1);
     }
-    int height   = TTF_FontHeight(font.get());
-    m_ascentPx   = static_cast<float>(TTF_FontAscent(font.get()));
-    m_lineSkipPx = static_cast<float>(TTF_FontLineSkip(font.get()));
+    int height   = TTF_GetFontHeight(font.get());
+    m_ascentPx   = static_cast<float>(TTF_GetFontAscent(font.get()));
+    m_lineSkipPx = static_cast<float>(TTF_GetFontLineSkip(font.get()));
 
     // Calculate size of the texture and prepare stage
     const uint32_t minArea = totalWidth * height;

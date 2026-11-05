@@ -2,6 +2,7 @@
  *  @author    Dubsky Tomas
  */
 #include <RealEngine/renderer/DebugMessageHandler.hpp>
+
 #include <RealEngine/utility/Error.hpp>
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
@@ -46,23 +47,31 @@ const char* skipFunctionName(const char* msg) {
 }
 
 void handleValidationMessage(
-    VkDebugUtilsMessageSeverityFlagBitsEXT sev,
-    VkDebugUtilsMessageTypeFlagsEXT type,
-    const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData
+    vk::DebugUtilsMessageSeverityFlagBitsEXT sev,
+    vk::DebugUtilsMessageTypeFlagsEXT type,
+    const vk::DebugUtilsMessengerCallbackDataEXT* callbackData, void* userData
 ) {
     std::string str{"##"};
-    // Show nested debug labels
+    // Show nested debug labels - queue first
+    for (int i = 0; i < callbackData->queueLabelCount; i++) {
+        str += callbackData->pQueueLabels[i].pLabelName;
+        if (i < callbackData->queueLabelCount - 1 ||
+            callbackData->cmdBufLabelCount > 0) {
+            str += "<-";
+        }
+    }
+    // Then command buffer labels
     for (int i = 0; i < callbackData->cmdBufLabelCount; i++) {
         str += callbackData->pCmdBufLabels[i].pLabelName;
         if (i < callbackData->cmdBufLabelCount - 1) {
-            str += "->";
+            str += "<-";
         }
     }
     str += "\n  ";
-    const char* msg = skipMessageHeader(callbackData->pMessage);
+    const char* msg = callbackData->pMessage;
 
     // Report the message
-    switch (static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(sev)) {
+    switch (sev) {
     case eVerbose:
     case eInfo:
     case eWarning: log(str + msg); break;
@@ -74,15 +83,15 @@ void handleValidationMessage(
 } // namespace
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debugMessengerCallbackHandler(
-    VkDebugUtilsMessageSeverityFlagBitsEXT sev,
-    VkDebugUtilsMessageTypeFlagsEXT type,
-    const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData
+    vk::DebugUtilsMessageSeverityFlagBitsEXT sev,
+    vk::DebugUtilsMessageTypeFlagsEXT type,
+    const vk::DebugUtilsMessengerCallbackDataEXT* callbackData, void* userData
 ) {
     switch (callbackData->messageIdNumber) {
     case 0x0:        // Ignore loader messages
         break;
-    case 0x76589099: // NOLINT(*-magic-numbers): Log debug printf
-        log(skipFunctionName(skipMessageHeader(callbackData->pMessage)), false);
+    case 0x4fe1fef9: // NOLINT(*-magic-numbers): Log debug printf
+        log(skipMessageHeader(callbackData->pMessage), false);
         break;
     default: // Log validation message
         handleValidationMessage(sev, type, callbackData, userData);

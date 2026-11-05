@@ -1,11 +1,12 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/graphics/cameras/View2D.hpp>
+
 #include <algorithm>
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <RealEngine/graphics/cameras/View2D.hpp>
 #include <RealEngine/user_input/InputManager.hpp>
 
 namespace re {

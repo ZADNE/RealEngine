@@ -1,9 +1,9 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <spirv_glsl.hpp>
-
 #include <RealEngine/graphics/pipelines/PipelineLayout.hpp>
+
+#include <spirv_glsl.hpp>
 
 namespace re {
 
@@ -39,10 +39,12 @@ PipelineLayout::PipelineLayout(
         }
         // Create this descriptor set
         m_descriptorSetLayouts.emplace_back(
-            device().createDescriptorSetLayout(vk::StructureChain{
-                vk::DescriptorSetLayoutCreateInfo{{}, description.bindings[i]},
-                vk::DescriptorSetLayoutBindingFlagsCreateInfo{flagsCount, flags}
-            }.get<>())
+            device().createDescriptorSetLayout(
+                vk::StructureChain{
+                    vk::DescriptorSetLayoutCreateInfo{{}, description.bindings[i]},
+                    vk::DescriptorSetLayoutBindingFlagsCreateInfo{flagsCount, flags}
+                }.get<>()
+            )
         );
     }
     // Create pipeline layout

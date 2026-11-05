@@ -9,20 +9,19 @@
 
 namespace re {
 
+struct SemaphoreCreateInfo {
+    vk::SemaphoreTypeCreateInfo type{vk::SemaphoreType::eBinary};
+
+    // Debug
+    [[no_unique_address]] DebugString<> debugName;
+};
+
 /**
  * @brief Allows synchronization CPU<->GPU and also GPU<->GPU
  */
 class Semaphore: public ObjectUsingVulkan {
 public:
-    /**
-     * @brief Creates binary unsignaled semaphore
-     */
-    Semaphore();
-
-    /**
-     * @brief Creates timeline semaphore with given initial time
-     */
-    Semaphore(uint64_t initialValue);
+    explicit Semaphore(const SemaphoreCreateInfo& createInfo);
 
     Semaphore(const Semaphore&)            = delete;  ///< Noncopyable
     Semaphore& operator=(const Semaphore&) = delete;  ///< Noncopyable
@@ -36,6 +35,7 @@ public:
 
     /**
      * @brief Blocks the calling thread until the semaphore reaches the value
+     * @warning Supported only by timeline semaphores
      */
     vk::Result wait(uint64_t waitForValue, uint64_t timeout = k_maxTimeout);
 

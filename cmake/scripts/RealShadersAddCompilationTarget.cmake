@@ -35,6 +35,9 @@ function(_add_shader_compilation_target target)
     endif()
     get_target_property(glsl_standard ${target} realproject_glsl_standard)
     list(APPEND glslc_flags "-std=${glsl_standard}")
+    set(glslc_include_paths
+        "$<LIST:REMOVE_ITEM,$<LIST:TRANSFORM,$<LIST:REMOVE_DUPLICATES,${target_includes}>,PREPEND,-I>,-I>"
+    )
 
     # Create commands to compile the shaders
     foreach(shader_source_rel IN LISTS shader_sources_rel)
@@ -55,15 +58,15 @@ function(_add_shader_compilation_target target)
                 COMMAND ${Vulkan_GLSLC_EXECUTABLE}  # C + dependency
                         -MD -mfmt=c -MF ${shader_dep_abs} ${shader_source_abs}
                         -o ${shader_c_abs} --target-env=vulkan1.3 ${glslc_flags}
-                        "$<LIST:TRANSFORM,${target_includes},PREPEND,-I>"
+                        "${glslc_include_paths}"
                 COMMAND ${Vulkan_GLSLC_EXECUTABLE}  # Disassembly
                         -S ${shader_source_abs}
                         -o ${shader_txt_abs} --target-env=vulkan1.3 ${glslc_flags}
-                        "$<LIST:TRANSFORM,${target_includes},PREPEND,-I>"
+                        "${glslc_include_paths}"
                 COMMAND ${Vulkan_GLSLC_EXECUTABLE}  # Binary
                         ${shader_source_abs}
                         -o ${shader_bin_abs} --target-env=vulkan1.3 ${glslc_flags}
-                        "$<LIST:TRANSFORM,${target_includes},PREPEND,-I>"
+                        "${glslc_include_paths}"
                 DEPENDS ${shader_source_abs}
                 BYPRODUCTS ${shader_dep_abs}
                 COMMENT "Compiling shader: ${shader_source_rel}"

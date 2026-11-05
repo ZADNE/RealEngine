@@ -6,12 +6,13 @@
 namespace re {
 
 CommandBuffer::CommandBuffer(const CommandBufferCreateInfo& createInfo)
-    : m_cb(device()
-               .allocateCommandBuffers(vk::CommandBufferAllocateInfo{
-                   commandPool(), createInfo.level, 1u
-               })
-               .back()) {
-
+    : m_cb(
+          device()
+              .allocateCommandBuffers(
+                  vk::CommandBufferAllocateInfo{commandPool(), createInfo.level, 1u}
+              )
+              .back()
+      ) {
     setDebugUtilsObjectName(m_cb, createInfo.debugName);
 }
 
@@ -30,13 +31,12 @@ CommandBuffer::~CommandBuffer() {
 
 void CommandBuffer::submitToGraphicsCompQueue(
     const vk::ArrayProxy<const vk::SubmitInfo2>& submits,
-    const vk::Fence& signalFence /* = nullptr*/
+    vk::Fence signalFence /* = nullptr*/
 ) {
     graphicsCompQueue().submit2(submits, signalFence);
 }
 
-void CommandBuffer::submitToGraphicsCompQueue(const vk::Fence&
-                                                  signalFence /* = nullptr*/) const {
+void CommandBuffer::submitToGraphicsCompQueue(vk::Fence signalFence /* = nullptr*/) const {
     graphicsCompQueue().submit(vk::SubmitInfo{{}, {}, m_cb}, signalFence);
 }
 

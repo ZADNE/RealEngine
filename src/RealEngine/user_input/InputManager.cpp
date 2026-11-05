@@ -1,10 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/user_input/InputManager.hpp>
+
 #include <algorithm>
 #include <iostream>
-
-#include <RealEngine/user_input/InputManager.hpp>
 
 namespace re {
 
@@ -32,16 +32,16 @@ int InputManager::wasReleased(Key key) const {
     return (wasDown(key) > isDown(key)) ? m_stateMapPrev[cast(key)] : 0;
 }
 
-glm::ivec2 InputManager::cursorAbs() const {
+glm::vec2 InputManager::cursorAbs() const {
     return m_cursorAbs;
 }
 
-glm::ivec2 InputManager::cursorRel() const {
+glm::vec2 InputManager::cursorRel() const {
     return m_cursorRel;
 }
 
 void InputManager::step() {
-    m_cursorRel = glm::ivec2(0, 0);
+    m_cursorRel = glm::vec2(0.0f, 0.0f);
     release(Key::UMW);
     release(Key::DMW);
     release(Key::LMW);
@@ -60,7 +60,7 @@ void InputManager::step() {
     m_stateMap[cast(Key::NoKey)]      = longestHeld == 0;
 }
 
-void InputManager::setCursor(glm::ivec2 abs, glm::ivec2 rel) {
+void InputManager::setCursor(glm::vec2 abs, glm::vec2 rel) {
     m_cursorAbs = abs;
     m_cursorRel = rel;
 }

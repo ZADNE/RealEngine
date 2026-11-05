@@ -1,8 +1,9 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/buffers/BufferMapped.hpp>
 #include <RealEngine/graphics/textures/Texture.hpp>
+
+#include <RealEngine/graphics/buffers/BufferMapped.hpp>
 #include <RealEngine/utility/Error.hpp>
 
 using enum vk::ImageLayout;
@@ -36,12 +37,12 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
     using enum vk::ImageUsageFlagBits;
     bool requiresStagingBuffer = !createInfo.texels.empty() &&
                                  !(createInfo.allocFlags & k_hostAccess);
-    auto imageCreateInfo = vk::ImageCreateInfo{
+    auto imageCreateInfo       = vk::ImageCreateInfo{
         createInfo.flags,
         createInfo.type,
         createInfo.format,
         {createInfo.extent.x, createInfo.extent.y, createInfo.extent.z},
-        1u, // Mip level count
+        createInfo.mipLevels,
         createInfo.layers,
         vk::SampleCountFlagBits::e1,
         vk::ImageTiling::eOptimal,
@@ -56,7 +57,7 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
         createInfo.allocFlags, createInfo.memoryUsage
     };
     // Create the image
-    std::tie(m_image, m_allocation) =
+    std::tie(m_allocation, m_image) =
         allocator().createImage(imageCreateInfo, allocCreateInfo);
     if (!createInfo.texels.empty()) {
         // Initialize texels of the image and transit to initial layout
@@ -69,30 +70,47 @@ Texture::Texture(const TextureCreateInfo& createInfo) {
                 createInfo.initialLayout, // Image layouts
                 eTopOfPipe,
                 eTransfer,                // Pipeline stage
-                {}, {}, createInfo.layers
+                {}, {}, createInfo
             );
         });
     }
     // Create image view
-    m_imageView = device().createImageView(vk::ImageViewCreateInfo{
-        {},
-        m_image,
-        imageViewType(createInfo.type, createInfo.layers),
-        createInfo.format,
-        createInfo.componentMapping,
-        vk::ImageSubresourceRange{
-            createInfo.aspects,
-            0u,               // Mip level
-            1u,               // Mip level count
-            0u,               // Base array layer
-            createInfo.layers // Array layer count
+    m_imageView = device().createImageView(
+        vk::ImageViewCreateInfo{
+            {},
+            m_image,
+            imageViewType(createInfo.type, createInfo.layers),
+            createInfo.format,
+            createInfo.componentMapping,
+            vk::ImageSubresourceRange{
+                createInfo.aspects,
+                0u,                   // Base mip level
+                createInfo.mipLevels, // Mip level count
+                0u,                   // Base array layer
+                createInfo.layers     // Array layer count
+            }
         }
-    });
+    );
     // Create sampler
     if (createInfo.hasSampler) {
-        m_sampler = device().createSampler(vk::SamplerCreateInfo{
-            {}, createInfo.magFilter, createInfo.minFilter, createInfo.mipmapMode
-        });
+        m_sampler = device().createSampler(
+            vk::SamplerCreateInfo{
+                {},
+                createInfo.magFilter,
+                createInfo.minFilter,
+                createInfo.mipmapMode,
+                vk::SamplerAddressMode::eRepeat,
+                vk::SamplerAddressMode::eRepeat,
+                vk::SamplerAddressMode::eRepeat,
+                0.0f,            // Lod bias
+                false,           // Anisotropy enable
+                0.0f,            // Max anisotropy
+                false,           // Compare enable
+                vk::CompareOp::eNever,
+                0.0f,            // Min lod
+                vk::LodClampNone // Max lod
+            }
+        );
     }
 
     setDebugUtilsObjectName(m_image, createInfo.debugName);
@@ -123,6 +141,7 @@ Texture::~Texture() {
 }
 
 void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
+    assert(createInfo.mipLevels == 1 && createInfo.layers == 1);
     // Create a staging buffer
     BufferMapped<std::byte> stagingBuffer{BufferCreateInfo{
         .allocFlags  = eHostAccessSequentialWrite | eMapped,
@@ -143,7 +162,7 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
             eAllCommands,                       // Pipeline stage
             {},
             vk::AccessFlagBits::eTransferWrite, // Access flags
-            createInfo.layers                   // Array layer count
+            createInfo
         );
         cb->copyBufferToImage(
             stagingBuffer.buffer(), m_image, eTransferDstOptimal,
@@ -169,15 +188,16 @@ void Texture::initializeTexels(const TextureCreateInfo& createInfo) {
             eFragmentShader,          // Pipeline stage
             eTransferWrite,
             eShaderRead,              // Access flags
-            createInfo.layers         // Array layer count
+            createInfo
         );
     });
 }
 
 void Texture::pipelineImageBarrier(
-    const CommandBuffer& cb, vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
-    vk::PipelineStageFlags srcStage, vk::PipelineStageFlags dstStage,
-    vk::AccessFlags srcAccess, vk::AccessFlags dstAccess, uint32_t layerCount
+    const CommandBuffer& cb, vk::ImageLayout oldLayout,
+    vk::ImageLayout newLayout, vk::PipelineStageFlags srcStage,
+    vk::PipelineStageFlags dstStage, vk::AccessFlags srcAccess,
+    vk::AccessFlags dstAccess, const TextureCreateInfo& createInfo
 ) {
     cb->pipelineBarrier(
         srcStage, dstStage, vk::DependencyFlags{}, {}, // Memory barriers
@@ -189,10 +209,10 @@ void Texture::pipelineImageBarrier(
             m_image,
             vk::ImageSubresourceRange{
                 vk::ImageAspectFlagBits::eColor,
-                0u,        // Mip level
-                1u,        // Mip level count
-                0u,        // Base array layer
-                layerCount // Array layer count
+                0u,                   // Base mip level
+                createInfo.mipLevels, // Mip level count
+                0u,                   // Base array layer
+                createInfo.layers     // Array layer count
             }
         }
     );

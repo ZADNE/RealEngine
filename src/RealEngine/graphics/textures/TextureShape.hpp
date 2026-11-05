@@ -20,7 +20,6 @@ namespace re {
  * be multiple sprites in single shape so these are placed under each other.
  */
 struct TextureShape {
-
     /**
      * @brief   Dimensions of subimages
      * @details All subimages have the same dimensions

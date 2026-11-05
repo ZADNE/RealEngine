@@ -3,8 +3,8 @@
  *  @file
  */
 #pragma once
+#include <cstdlib>
 #include <stdexcept>
-#include <stdlib.h>
 #include <string_view>
 
 namespace re {

@@ -1,9 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/graphics/buffers/Buffer.hpp>
+
 #include <cassert>
 
-#include <RealEngine/graphics/buffers/Buffer.hpp>
 #include <RealEngine/graphics/commands/CommandBuffer.hpp>
 #include <RealEngine/utility/Error.hpp>
 
@@ -36,7 +37,7 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
         // Create the main buffer
         auto mainCreateInfo = createInfo;
         mainCreateInfo.usage |= eTransferDst;
-        std::tie(m_buffer, m_allocation) =
+        std::tie(m_allocation, m_buffer) =
             allocateBuffer(mainCreateInfo, pointerToMapped);
         // Copy data to staging buffer
         std::memcpy(
@@ -46,7 +47,7 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
         // Copy from staging to main buffer
         CommandBuffer::doOneTimeSubmit([&](const CommandBuffer& cb) {
             cb->copyBuffer(
-                stage.first, m_buffer,
+                stage.second, m_buffer,
                 vk::BufferCopy{
                     0u, createInfo.initDataDstOffset,
                     createInfo.initData.size_bytes()
@@ -54,9 +55,9 @@ Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
             );
         });
         // Destroy the temporary stage
-        allocator().destroyBuffer(stage.first, stage.second);
+        allocator().destroyBuffer(stage.second, stage.first);
     } else { // Stage is not required
-        std::tie(m_buffer, m_allocation) = allocateBuffer(createInfo, pointerToMapped);
+        std::tie(m_allocation, m_buffer) = allocateBuffer(createInfo, pointerToMapped);
         if (!createInfo.initData.empty()) {
             // Copy init data to directly to the buffer
             std::byte* dst = reinterpret_cast<std::byte*>(*pointerToMapped) + // NOLINT
@@ -86,7 +87,7 @@ Buffer::~Buffer() {
     deletionQueue().enqueueDeletion(m_allocation);
 }
 
-std::pair<vk::Buffer, vma::Allocation> Buffer::allocateBuffer(
+std::pair<vma::Allocation, vk::Buffer> Buffer::allocateBuffer(
     const BufferCreateInfo& createInfo, void** pointerToMapped
 ) const {
     vma::AllocationInfo allocInfo;

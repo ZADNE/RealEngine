@@ -1,10 +1,10 @@
 /**
  *  @author    Dubsky Tomas
  */
+#include <RealEngine/window/WindowSettings.hpp>
+
 #include <filesystem>
 #include <fstream>
-
-#include <RealEngine/window/WindowSettings.hpp>
 
 #include <nlohmann/json.hpp>
 

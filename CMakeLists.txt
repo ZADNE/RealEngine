@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.27)
 project(RealEngine)
 
 include(GNUInstallDirs)
@@ -12,35 +12,44 @@ set(REALENGINE_BUILDING_FROM_SOURCE TRUE
 include("cmake/scripts/RealProject.cmake")
 include("cmake/scripts/GetRealEngineVersion.cmake")
 
-function(FetchContent_MakeAvailableWithoutLinting)
+function(_real_FetchContent_MakeAvailable)
     set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
     set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
     set(CMAKE_CXX_CLANG_TIDY "")
     FetchContent_MakeAvailable(${ARGV})
 endfunction()
 
+
 # Find/fetch dependencies
-    # Git is required to download some dependencies
+block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
+    # Git (required to download some dependencies)
     find_package(Git REQUIRED)
-    # Vulkan
-    find_package(Vulkan REQUIRED COMPONENTS glslc)
-    # SDL2
-    find_package(SDL2 CONFIG REQUIRED GLOBAL)
-    find_package(SDL2_ttf CONFIG REQUIRED GLOBAL)
+
+    # Vulkan 1.4 SDK
+    find_package(Vulkan 1.4.363 REQUIRED COMPONENTS glslc)
+
+    # SDL3
+    find_package(SDL3 CONFIG REQUIRED GLOBAL COMPONENTS SDL3-shared)
+    find_package(SDL3_ttf CONFIG REQUIRED GLOBAL COMPONENTS SDL3_ttf-shared)
+    list(APPEND runtime_bundled_artifacts SDL3::SDL3-shared SDL3_ttf::SDL3_ttf-shared)
+
     # SPIRV-Cross
     FetchContent_Declare(SPIRV-Cross
-        URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.290.0.tar.gz
+        URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.4.363.0.tar.gz
     )
+
     # OpenGL Mathematics
     set(GLM_BUILD_INSTALL ON CACHE INTERNAL "")
     FetchContent_Declare(glm
         URL https://github.com/g-truc/glm/archive/refs/tags/1.0.1.tar.gz
     )
+
     # bit7z
     set(BIT7Z_7ZIP_VERSION "23.01" CACHE INTERNAL "")
     FetchContent_Declare(bit7z
-        URL https://github.com/rikyoz/bit7z/archive/refs/tags/v4.0.9.zip
+        URL https://github.com/rikyoz/bit7z/archive/refs/tags/v4.0.11.zip
     )
+
     # nlohmann json
     set(JSON_Install ON CACHE INTERNAL "")
     FetchContent_Declare(json
@@ -51,15 +60,20 @@ endfunction()
     set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME RealEngine_Development)
 
     # Download remote libs
-    FetchContent_MakeAvailableWithoutLinting(SPIRV-Cross glm bit7z json)
+    _real_FetchContent_MakeAvailable(SPIRV-Cross glm bit7z json)
 
-    # Create imported target for 7z.dll
+    # Create imported targets for dlls
     if(WIN32)
-        add_library(7z SHARED IMPORTED GLOBAL)
-        set_target_properties(7z PROPERTIES
-            IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/external/bin/win_x64/7z.dll"
-        )
-        list(APPEND runtime_bundled_artifacts 7z)
+        function(_real_declare_dll target path)
+            add_library(${target} SHARED IMPORTED GLOBAL)
+            set_target_properties(${target} PROPERTIES
+                IMPORTED_LOCATION ${path}
+            )
+            list(APPEND runtime_bundled_artifacts ${target})
+            set(runtime_bundled_artifacts "${runtime_bundled_artifacts}" PARENT_SCOPE)
+        endfunction()
+
+        _real_declare_dll(7z_dll "${CMAKE_CURRENT_SOURCE_DIR}/external/bin/win_x64/7z.dll")
     endif()
 
     # Remove interface headers with absolute paths from bit7z target
@@ -74,42 +88,63 @@ endfunction()
 
     # Add embedded libs
     add_subdirectory(external)
+endblock()
 
-# Declare projects
-    # RealEngine library
-    add_real_library(RealEngine STATIC)
-    set_target_properties(RealEngine PROPERTIES
-        CXX_STANDARD 23
-        realproject_shader_cxx_namespace "re::glsl"
-        INTERPROCEDURAL_OPTIMIZATION TRUE
-    )
-    target_link_libraries(RealEngine
-        PUBLIC
-            ${CMAKE_DL_LIBS}
-            Vulkan::Vulkan
-            vma
-            SDL2::SDL2main
-            SDL2::SDL2
-            SDL2_ttf::SDL2_ttf
-            glm::glm-header-only
-            bit7z
-            nlohmann_json::nlohmann_json
-            ImGui
-            lodepng
-        PRIVATE
-            spirv-cross-core
-            spirv-cross-reflect
-            filewatch
-    )
-    target_include_directories(RealEngine
-        PUBLIC
-            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
-            "$<INSTALL_INTERFACE:.>"
-    )
+# RealEngine libraries
+block(PROPAGATE RealEngine_sublibs)
+    # RealEngine is composed of a number of static sub-libraries
+    # This function sets common properties
+    function(_real_add_realengine_sublib target_name)
+        add_real_library(${target_name} STATIC)
+        real_target_init_file_sets(${target_name} BASE_DIR "src")
+        set_target_properties(${target_name} PROPERTIES
+            CXX_STANDARD 23
+            realproject_shader_cxx_namespace "re::glsl"
+            INTERPROCEDURAL_OPTIMIZATION TRUE
+        )
+        target_include_directories(${target_name}
+            PUBLIC
+                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>"
+                "$<INSTALL_INTERFACE:.>"
+        )
+        target_link_libraries(${target_name}
+            PUBLIC
+                ${CMAKE_DL_LIBS}
+                Vulkan::Vulkan
+                vma
+                SDL3::SDL3
+                glm::glm-header-only
+                bit7z
+                nlohmann_json::nlohmann_json
+                ImGui
+                lodepng
+            PRIVATE
+                SDL3_ttf::SDL3_ttf
+                spirv-cross-core
+                spirv-cross-reflect
+                filewatch
+        )
+        list(APPEND RealEngine_sublibs ${target_name})
+        set(RealEngine_sublibs "${RealEngine_sublibs}" PARENT_SCOPE)
+    endfunction()
+
+    # RealEngine sublibs in order of dependecy
+    _real_add_realengine_sublib(RealEngine_utility)
+    _real_add_realengine_sublib(RealEngine_visual)
+    _real_add_realengine_sublib(RealEngine_systems)
+
+    # RealEngine main target
+    add_real_library(RealEngine INTERFACE)
     real_target_init_file_sets(RealEngine BASE_DIR "src")
-    get_realengine_version()
+    target_link_libraries(RealEngine
+        INTERFACE
+            ${RealEngine_sublibs}
+    )
     add_subdirectory("src")
+endblock()
 
+# Miscelaneous/supplementary target
+block(PROPAGATE RTICreator)
     # Doxygen documentation
     find_package(Doxygen)
     if (Doxygen_FOUND)
@@ -144,6 +179,7 @@ endfunction()
             argparse
             bit7z
     )
+    real_copy_7z_dll_to_target(ResourcePackager)
 
     # RTICreator (Windows only)
     if (WIN32)
@@ -159,12 +195,15 @@ endfunction()
         set(RTICreator "")
     endif()
     add_subdirectory("tools")
+endblock()
 
 # Installation
+block()
     # The main install command
     install(
         TARGETS
-            RealEngine vma glm-header-only ${bit7z_aliased_target}
+            ${RealEngine_sublibs} RealEngine
+            vma glm-header-only ${bit7z_aliased_target}
             nlohmann_json ImGui lodepng argparse filewatch
             ResourcePackager ${RTICreator}
         EXPORT                  RealEngineTargets
@@ -216,10 +255,7 @@ endfunction()
     )
 
     # Downstream projects should install these runtime artifacts from these targets
-    set(REALENGINE_RUNTIME_ARTIFACTS 
-        SDL2::SDL2 SDL2_ttf::SDL2_ttf ${runtime_bundled_artifacts}
-        CACHE INTERNAL ""
-    )
+    set(REALENGINE_RUNTIME_ARTIFACTS ${runtime_bundled_artifacts} CACHE INTERNAL "")
 
     # Install documentation
     install(
@@ -230,6 +266,7 @@ endfunction()
     )
 
     # Configure/generate and install CMake scripts
+    get_realengine_version()
     write_basic_package_version_file(
         "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake"
         VERSION ${realengine_version}
@@ -262,3 +299,4 @@ endfunction()
             "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
         COMPONENT RealEngine_Development
     )
+endblock()

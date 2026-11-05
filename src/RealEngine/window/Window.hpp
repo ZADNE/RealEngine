@@ -5,7 +5,7 @@
 #include <string>
 
 #include <ImGui/imgui.h>
-#include <SDL_video.h>
+#include <SDL3/SDL_video.h>
 #include <glm/vec2.hpp>
 
 #include <RealEngine/utility/UniqueCPtr.hpp>
@@ -24,7 +24,7 @@ class MainProgram;
  * There can only be a single window within program
  * and it is created by the MainProgram.
  *
- * The window initializes some subsystems of the RealEngine (SDL2, ImGui, ...).
+ * The window initializes some subsystems of the RealEngine (SDL, ImGui, ...).
  */
 class Window: public WindowSettings {
 public:
@@ -105,7 +105,7 @@ public:
 
 private:
     using SDL_WindowRAII = UniqueCPtr<SDL_Window, SDL_DestroyWindow>;
-    SDL_WindowRAII createSDLWindow();
+    SDL_WindowRAII createSDLWindow() const;
 
     WindowSubsystems m_subsystems; ///< Initializes and de-initializes subsystems
     SDL_WindowRAII m_SDLwindow;

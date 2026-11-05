@@ -69,7 +69,6 @@ public:
 
 private:
     struct QueueRecord {
-
         enum class Category {
             Separator,
             VulkanHandle,

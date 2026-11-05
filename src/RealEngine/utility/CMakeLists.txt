@@ -1,6 +1,6 @@
 add_subdirectory(details)
 
-real_target_sources(RealEngine
+real_target_sources(RealEngine_utility
     PUBLIC
         BuildType.hpp               
         CompTimeString.hpp          
@@ -9,6 +9,7 @@ real_target_sources(RealEngine
         Error.hpp                   Error.cpp
         Math.hpp                    
         OffsetOfArr.hpp             
+        SDLProperties.hpp           
         Unicode.hpp                 
         UniqueCPtr.hpp              
         Version.hpp                 
