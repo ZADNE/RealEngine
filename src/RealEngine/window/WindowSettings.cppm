@@ -1,7 +1,7 @@
 /**
  *  @author    Dubsky Tomas
  */
-export module realengine:window.windowsettings;
+export module realengine:window.WindowSettings;
 import std;
 import glm;
 

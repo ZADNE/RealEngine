@@ -1,9 +1,9 @@
 /**
  *  @author    Dubsky Tomas
  */
-export module realengine:window.windowsubsystems;
+export module realengine:window.WindowSubsystems;
 import std;
-import :utility.version;
+import :utility.Version;
 
 /** @mainpage RealEngine
  *

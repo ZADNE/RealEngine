@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  *  @file
  */
-export module realengine:utility.buildtype;
+export module realengine:utility.BuildType;
 
 export namespace re {
 

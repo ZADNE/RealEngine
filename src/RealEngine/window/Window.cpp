@@ -5,11 +5,11 @@ module;
 #include <ImGui/imgui_impl_sdl3.h>
 #include <SDL3/SDL_events.h>
 
-export module realengine:window.window_impl;
+export module realengine:window.Window_impl;
 import std;
-import :window.window;
-import :utility.error;
-import :utility.sdlproperties;
+import :window.Window;
+import :utility.Error;
+import :utility.SDLProperties;
 
 namespace re {
 

@@ -1,8 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-export module realengine:utility.error_impl;
-import :utility.error;
+export module realengine:utility.Error_impl;
+import :utility.Error;
 
 namespace re {
 

@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  *  @file
  */
-export module realengine:utility.error;
+export module realengine:utility.Error;
 import std;
 
 export namespace re {

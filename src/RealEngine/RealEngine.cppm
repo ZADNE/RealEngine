@@ -5,19 +5,19 @@
 export module realengine;
 
 // utility
-export import :utility.buildtype;
-export import :utility.comptimestring;
-export import :utility.debugstring;
-export import :utility.endianness;
-export import :utility.error;
-export import :utility.math;
-export import :utility.sdlproperties;
-export import :utility.unicode;
-export import :utility.uniquecptr;
-export import :utility.version;
+export import :utility.BuildType;
+export import :utility.CompTimeString;
+export import :utility.DebugString;
+export import :utility.Endianness;
+export import :utility.Error;
+export import :utility.Math;
+export import :utility.SDLProperties;
+export import :utility.Unicode;
+export import :utility.UniqueCPtr;
+export import :utility.Version;
 // utility/details
-export import :utility.details.cmakeconstants;
+export import :utility.details.CMakeConstants;
 // window
-export import :window.window;
-export import :window.windowsettings;
-export import :window.windowsubsystems;
+export import :window.Window;
+export import :window.WindowSettings;
+export import :window.WindowSubsystems;

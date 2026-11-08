@@ -1,7 +1,7 @@
 /**
  *  @author    Dubsky Tomas
  */
-export module realengine:utility.math;
+export module realengine:utility.Math;
 import std;
 
 export namespace re {

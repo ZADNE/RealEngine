@@ -1,7 +1,7 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-export module realengine:utility.version;
+export module realengine:utility.Version;
 import std;
 
 export namespace re {

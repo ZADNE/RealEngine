@@ -6,10 +6,9 @@ module;
 #include <SDL3/SDL_init.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-export module realengine:window.windowsubsystems_impl;
-import :window.windowsubsystems;
-import :utility.buildtype;
-import :utility.error;
+export module realengine:window.WindowSubsystems_impl;
+import :window.WindowSubsystems;
+import :utility.Error;
 
 namespace re {
 

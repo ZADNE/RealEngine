@@ -2,8 +2,8 @@
  *  @author    Dubsky Tomas
  *  @file
  */
-export module realengine:utility.debugstring;
-import :utility.buildtype;
+export module realengine:utility.DebugString;
+import :utility.BuildType;
 
 export namespace re {
 

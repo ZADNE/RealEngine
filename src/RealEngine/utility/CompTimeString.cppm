@@ -1,7 +1,7 @@
 ﻿/**
  *  @author    Horu / sgf4 (DEV Community: Strings as template parameters)
  */
-export module realengine:utility.comptimestring;
+export module realengine:utility.CompTimeString;
 import std;
 
 export namespace re {

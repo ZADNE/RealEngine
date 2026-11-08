@@ -5,18 +5,16 @@ module;
 #include <ImGui/imgui.h>
 #include <SDL3/SDL_video.h>
 
-export module realengine:window.window;
+export module realengine:window.Window;
 import std;
 import glm;
-import :utility.uniquecptr;
-import :window.windowsettings;
-import :window.windowsubsystems;
+import :utility.UniqueCPtr;
+import :window.WindowSettings;
+import :window.WindowSubsystems;
 
 union SDL_Event;
 
 export namespace re {
-
-class MainProgram;
 
 /**
  * @brief Displays the scene.

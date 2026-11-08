@@ -6,10 +6,8 @@
 module;
 #include <cassert>
 
-export module realengine:utility.unicode;
+export module realengine:utility.Unicode;
 import std;
-import :utility.buildtype;
-import :utility.error;
 
 export namespace re {
 

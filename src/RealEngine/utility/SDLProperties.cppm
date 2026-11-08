@@ -4,7 +4,7 @@
 module;
 #include <SDL3/SDL_properties.h>
 
-export module realengine:utility.sdlproperties;
+export module realengine:utility.SDLProperties;
 import std;
 
 export namespace re {

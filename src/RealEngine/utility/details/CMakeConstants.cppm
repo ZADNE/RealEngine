@@ -3,7 +3,7 @@
  *  @file
  *  @brief  Declares constants used by both CMake and runtime (eg. for hot reload)
  */
-export module realengine:utility.details.cmakeconstants;
+export module realengine:utility.details.CMakeConstants;
 
 namespace re::details {
 

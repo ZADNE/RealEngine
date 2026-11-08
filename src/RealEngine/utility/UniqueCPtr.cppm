@@ -1,7 +1,7 @@
 ﻿/**
  *  @author    Andreas Fertig (C++ Insights: Lambdas in unevaluated contexts)
  */
-export module realengine:utility.uniquecptr;
+export module realengine:utility.UniqueCPtr;
 import std;
 
 export namespace re {

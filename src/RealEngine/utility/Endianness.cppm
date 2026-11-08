@@ -1,7 +1,7 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-export module realengine:utility.endianness;
+export module realengine:utility.Endianness;
 import std;
 
 export namespace re {
