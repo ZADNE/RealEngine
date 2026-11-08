@@ -1,15 +1,15 @@
 /**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/window/Window.hpp>
-
-#include <iostream>
-
+module;
 #include <ImGui/imgui_impl_sdl3.h>
 #include <SDL3/SDL_events.h>
 
-#include <RealEngine/utility/Error.hpp>
-#include <RealEngine/utility/SDLProperties.hpp>
+export module realengine:window.window_impl;
+import std;
+import :window.window;
+import :utility.error;
+import :utility.sdlproperties;
 
 namespace re {
 

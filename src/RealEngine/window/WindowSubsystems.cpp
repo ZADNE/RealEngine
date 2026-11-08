@@ -1,17 +1,15 @@
 /**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/window/WindowSubsystems.hpp>
-
-#include <print>
-#include <stdexcept>
-
+module;
 #include <ImGui/imgui.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-#include <RealEngine/utility/BuildType.hpp>
-#include <RealEngine/utility/Error.hpp>
+export module realengine:window.windowsubsystems_impl;
+import :window.windowsubsystems;
+import :utility.buildtype;
+import :utility.error;
 
 namespace re {
 

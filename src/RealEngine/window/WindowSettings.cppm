@@ -1,15 +1,11 @@
 /**
  *  @author    Dubsky Tomas
  */
-#pragma once
+export module realengine:window.windowsettings;
+import std;
+import glm;
 
-#include <string>
-
-#include <glm/vec2.hpp>
-
-#include <RealEngine/window/WindowSubsystems.hpp>
-
-namespace re {
+export namespace re {
 
 /**
  * @brief Specify ancillary parameters of a window

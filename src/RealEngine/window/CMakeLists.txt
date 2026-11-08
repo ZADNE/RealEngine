@@ -1,6 +1,6 @@
-﻿real_target_sources(RealEngine_systems
+﻿real_target_sources(RealEngine_utility
     PUBLIC
-        Window.hpp                  Window.cpp
-        WindowSettings.hpp          WindowSettings.cpp
-        WindowSubsystems.hpp        WindowSubsystems.cpp
+        Window.cppm                 Window.cpp
+        WindowSettings.cppm         WindowSettings.cpp
+        WindowSubsystems.cppm       WindowSubsystems.cpp
 )

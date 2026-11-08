@@ -1,10 +1,9 @@
 /**
  *  @author    Dubsky Tomas
  */
-#pragma once
-#include <string>
-
-#include <RealEngine/utility/Version.hpp>
+export module realengine:window.windowsubsystems;
+import std;
+import :utility.version;
 
 /** @mainpage RealEngine
  *
@@ -35,7 +34,7 @@
  * @brief Not to be used directly, used for internal implementation
  */
 
-namespace re {
+export namespace re {
 
 /**
  * @brief Represents RealEngine's subsystems

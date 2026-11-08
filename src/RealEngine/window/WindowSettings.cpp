@@ -1,12 +1,13 @@
 /**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/window/WindowSettings.hpp>
-
-#include <filesystem>
-#include <fstream>
-
+module;
 #include <nlohmann/json.hpp>
+
+export module realengine:window.windowsettings_impl;
+import std;
+
+import :window.windowsettings;
 
 namespace {
 

@@ -1,20 +1,20 @@
 /**
  *  @author    Dubsky Tomas
  */
-#pragma once
-#include <string>
-
+module;
 #include <ImGui/imgui.h>
 #include <SDL3/SDL_video.h>
-#include <glm/vec2.hpp>
 
-#include <RealEngine/utility/UniqueCPtr.hpp>
-#include <RealEngine/window/WindowSettings.hpp>
-#include <RealEngine/window/WindowSubsystems.hpp>
+export module realengine:window.window;
+import std;
+import glm;
+import :utility.uniquecptr;
+import :window.windowsettings;
+import :window.windowsubsystems;
 
 union SDL_Event;
 
-namespace re {
+export namespace re {
 
 class MainProgram;
 
