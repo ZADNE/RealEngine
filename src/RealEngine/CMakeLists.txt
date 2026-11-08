@@ -6,3 +6,8 @@ add_subdirectory(rooms)
 add_subdirectory(user_input)
 add_subdirectory(utility)
 add_subdirectory(window)
+
+real_target_sources(RealEngine_utility
+    PUBLIC
+        RealEngine.cppm             
+)

@@ -1,23 +1,10 @@
 ﻿/**
  *  @author    Andreas Fertig (C++ Insights: Lambdas in unevaluated contexts)
  */
-#pragma once
-#include <memory>
+export module realengine:utility.uniquecptr;
+import std;
 
-namespace re {
-
-namespace details {
-/**
- * @todo Use lambda instead of this once GCC in CI can handle it.
- */
-template<auto DeleteFn>
-struct UniqueCPtrDeleter {
-    template<class T>
-    void operator()(T* ptr) const {
-        DeleteFn(ptr);
-    }
-};
-} // namespace details
+export namespace re {
 
 /**
  * @brief           Implements RAII principle for C-style pointer-to-opaque objects
@@ -25,7 +12,7 @@ struct UniqueCPtrDeleter {
  * @tparam DeleteFn A function that is used to delete T.
  */
 template<typename T, auto DeleteFn>
-using UniqueCPtr = std::unique_ptr<T, details::UniqueCPtrDeleter<DeleteFn>>;
+using UniqueCPtr = std::unique_ptr<T, decltype([](T* obj) { DeleteFn(obj); })>;
 
 /**
  * @brief           Implements RAII principle for an opaque handle that is not a pointer

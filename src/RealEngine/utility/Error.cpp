@@ -1,16 +1,14 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/utility/Error.hpp>
-
-#include <iostream>
-#include <string>
+export module realengine:utility.error_impl;
+import :utility.error;
 
 namespace re {
 
-void fatalError(std::string_view error, int exitCode /* = EXIT_FAILURE*/) {
+void fatalError(std::string_view error, int exitCode /* = 1*/) {
     std::cerr << error << std::endl;
-    exit(exitCode);
+    std::exit(exitCode);
 }
 
 void error(std::string_view error, bool appendEOL /* = true*/) {

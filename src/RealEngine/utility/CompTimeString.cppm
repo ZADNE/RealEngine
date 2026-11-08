@@ -1,10 +1,10 @@
 ﻿/**
  *  @author    Horu / sgf4 (DEV Community: Strings as template parameters)
  */
-#pragma once
-#include <algorithm>
+export module realengine:utility.comptimestring;
+import std;
 
-namespace re {
+export namespace re {
 
 /**
  * @brief   Allows C string literals to be used as template parameters.

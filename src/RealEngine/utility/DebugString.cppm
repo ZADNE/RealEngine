@@ -2,10 +2,10 @@
  *  @author    Dubsky Tomas
  *  @file
  */
-#pragma once
-#include <RealEngine/utility/BuildType.hpp>
+export module realengine:utility.debugstring;
+import :utility.buildtype;
 
-namespace re {
+export namespace re {
 
 /**
  * @brief Holds a string in debug build but is an empty type in release build

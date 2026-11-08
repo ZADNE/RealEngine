@@ -109,7 +109,7 @@ block(PROPAGATE RealEngine_sublibs)
     # This function sets common properties
     function(_real_add_realengine_sublib target_name)
         add_real_library(${target_name} STATIC)
-        real_target_init_file_sets(${target_name} BASE_DIR "src")
+        real_target_init_file_sets(${target_name} BASE_DIR "src" SOURCES_AS_CXX_MODULE_IMPL_UNITS)
         set_target_properties(${target_name} PROPERTIES
             CXX_STANDARD 23
             realproject_shader_cxx_namespace "re::glsl"

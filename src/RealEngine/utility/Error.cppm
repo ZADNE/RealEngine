@@ -2,12 +2,10 @@
  *  @author    Dubsky Tomas
  *  @file
  */
-#pragma once
-#include <cstdlib>
-#include <stdexcept>
-#include <string_view>
+export module realengine:utility.error;
+import std;
 
-namespace re {
+export namespace re {
 
 /**
  * @brief Logs a fatal error and ends program immediately.
@@ -15,7 +13,7 @@ namespace re {
  * @param exitCode Program's exit code
  * @note This function never returns.
  */
-[[noreturn]] void fatalError(std::string_view error, int exitCode = EXIT_FAILURE);
+[[noreturn]] void fatalError(std::string_view error, int exitCode = 1);
 
 /**
  * @brief Logs an error

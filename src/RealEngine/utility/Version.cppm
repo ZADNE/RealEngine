@@ -1,9 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#pragma once
+export module realengine:utility.version;
+import std;
 
-namespace re {
+export namespace re {
 
 constexpr int k_versionMajor = 2;
 constexpr int k_versionMinor = 3;

@@ -1,18 +1,17 @@
 ﻿/**
  *  @author    Dubsky Tomas
- *  @file      Unicode.hpp
+ *  @file
  *  @brief     A minimalistic set of functions concerned with UNICODE
  */
-#pragma once
-#include <array>
-#include <bit>
+module;
 #include <cassert>
-#include <string_view>
 
-#include <RealEngine/utility/BuildType.hpp>
-#include <RealEngine/utility/Error.hpp>
+export module realengine:utility.unicode;
+import std;
+import :utility.buildtype;
+import :utility.error;
 
-namespace re {
+export namespace re {
 
 // NOLINTBEGIN(*-magic-numbers): UTF-8
 
@@ -45,8 +44,8 @@ constexpr std::array k_czechUnicodeRanges =
  * @brief Counts number of bytes representing the first character
  */
 constexpr int codeSize(std::u8string_view str) {
-    uint8_t c = str[0] & 0b1111'0000;
-    int ones  = std::countl_one(c);
+    std::uint8_t c = str[0] & 0b1111'0000;
+    int ones       = std::countl_one(c);
     return ones + static_cast<int>(!ones);
 }
 

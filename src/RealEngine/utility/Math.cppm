@@ -1,10 +1,10 @@
 /**
  *  @author    Dubsky Tomas
  */
-#pragma once
-#include <concepts>
+export module realengine:utility.math;
+import std;
 
-namespace re {
+export namespace re {
 
 /**
  * @brief Divides two unsigned numbers and rounds them towards positive infinity

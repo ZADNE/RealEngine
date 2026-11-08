@@ -1,12 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#pragma once
-#include <algorithm>
-#include <array>
-#include <bit>
+export module realengine:utility.endianness;
+import std;
 
-namespace re {
+export namespace re {
 
 /**
  * @brief Checks at compile-time whether the system uses big endian byte order

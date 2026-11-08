@@ -2,9 +2,9 @@
  *  @author    Dubsky Tomas
  *  @file
  */
-#pragma once
+export module realengine:utility.buildtype;
 
-namespace re {
+export namespace re {
 
 // The macros defined here are used for things that still cannot be done better
 // (e.g. omitting member variables).

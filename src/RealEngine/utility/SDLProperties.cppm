@@ -1,10 +1,13 @@
 /**
  *  @author    Dubsky Tomas
  */
-#pragma once
+module;
 #include <SDL3/SDL_properties.h>
 
-namespace re {
+export module realengine:utility.sdlproperties;
+import std;
+
+export namespace re {
 
 /**
  * @brief Is RAII wrapper around SDL_PropertiesID with convenience functions
