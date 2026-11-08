@@ -6,6 +6,10 @@ include("${CMAKE_CURRENT_LIST_DIR}/RealShadersGenerateCppFiles.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ResourcePackaging.cmake")
 
 # Cache variables
+set(REALPROJECT_MODULE_INTERFACE_EXTENSIONS
+    ".cppm;.ixx"
+    CACHE STRING "List of file extensions interpreted as C/C++ interface or partition module units"
+)
 set(REALPROJECT_HEADER_EXTENSIONS
     ".hpp;.h"
     CACHE STRING "List of file extensions interpreted as C/C++ header files"
@@ -27,12 +31,15 @@ set(REALPROJECT_GLSL_STAGE_EXTENSIONS
 macro(_add_real_target target)
     get_target_property(source_dir ${target} SOURCE_DIR)
     set_target_properties(${target} PROPERTIES
-        realproject_base_dir_rel        "."
-        realproject_base_dir_abs        "${source_dir}"
-        realproject_setup_filepath_rel  "${target}Setup.gen.hpp"
-        realproject_glsl_standard       "460"
-        realproject_glsl_headers_rel    ""
-        realproject_glsl_sources_rel    ""
+        CXX_STANDARD                            23
+        CXX_MODULE_STD                          ON
+        realproject_sources_as_cxx_impl_units   OFF
+        realproject_base_dir_rel                "."
+        realproject_base_dir_abs                "${source_dir}"
+        realproject_setup_filepath_rel          "${target}Setup.gen.hpp"
+        realproject_glsl_standard               "460"
+        realproject_glsl_headers_rel            ""
+        realproject_glsl_sources_rel            ""
     )
     cmake_language(DEFER CALL _generate_cpp_setup_file ${target})
     cmake_language(DEFER CALL _generate_cpp_wrappers_for_shaders ${target})
@@ -59,10 +66,21 @@ macro(add_real_executable)
     )
 endmacro()
 
-# Initializes base dirs of file sets
+# Initializes file sets of real target
+# Syntax:
+#     real_target_init_file_sets(
+#        <target>
+#        BASE_DIR <directory_name>
+#        [ SOURCES_AS_CXX_MODULE_IMPL_UNITS ]
+#     )
+# BASE_DIR: Header includes will be relative to this
+# SOURCES_AS_CXX_MODULE_IMPL_UNITS: C++ sources (identified by file extension)
+#                                   will be treated as module implementation units.
+#                                   Ignored for INTERFACE libraries.
 function(real_target_init_file_sets target)
-    set(multi_value_args BASE_DIR)
-    cmake_parse_arguments(ARG "" "" "${multi_value_args}" ${ARGN})
+    set(option_keywords SOURCES_AS_CXX_MODULE_IMPL_UNITS)
+    set(one_value_keywords BASE_DIR)
+    cmake_parse_arguments(ARG "${option_keywords}" "${one_value_keywords}" "" ${ARGN})
 
     get_target_property(source_dir ${target} SOURCE_DIR)
     set_target_properties(${target} PROPERTIES
@@ -72,22 +90,55 @@ function(real_target_init_file_sets target)
     target_sources(${target} PUBLIC FILE_SET realproject_public_headers
         TYPE HEADERS BASE_DIRS "${ARG_BASE_DIR}"
     )
+
+    # Module file sets
+    get_target_property(target_type ${target} TYPE)
+    if(NOT (${target_type} STREQUAL "INTERFACE_LIBRARY"))
+        target_sources(${target} PUBLIC FILE_SET realproject_module_interfaces
+            TYPE CXX_MODULES BASE_DIRS "${ARG_BASE_DIR}"
+        )
+        if(${ARG_SOURCES_AS_CXX_MODULE_IMPL_UNITS})
+            set_target_properties(${target} PROPERTIES
+                realproject_sources_as_cxx_impl_units ON
+            )
+            target_sources(${target} PRIVATE FILE_SET realproject_module_impl_units
+                TYPE CXX_MODULES BASE_DIRS "${ARG_BASE_DIR}"
+            )
+        endif()
+    endif()
 endfunction()
 
 # Based on file extensions, add source files into the target
 function(_incorporate_scoped_sources target path_rel header_scope)
+    get_target_property(sources_as_cxx_impl_units ${target} realproject_sources_as_cxx_impl_units)
     foreach(source IN LISTS ARGN)
         get_filename_component(source_ext ${source} LAST_EXT)
-        if(${source_ext} IN_LIST REALPROJECT_HEADER_EXTENSIONS)
+        if(${source_ext} IN_LIST REALPROJECT_MODULE_INTERFACE_EXTENSIONS)
+            target_sources(${target}
+                PUBLIC
+                    FILE_SET realproject_module_interfaces
+                    FILES ${source}
+            )
+        elseif(${source_ext} IN_LIST REALPROJECT_HEADER_EXTENSIONS)
             if(${header_scope} STREQUAL "PUBLIC")
                 target_sources(${target}
-                    ${header_scope} FILE_SET realproject_public_headers FILES ${source}
+                    PUBLIC
+                        FILE_SET realproject_public_headers
+                        FILES ${source}
                 )
             elseif(${header_scope} STREQUAL "PRIVATE")
                 target_sources(${target} PRIVATE ${source})
             endif()
         elseif(${source_ext} IN_LIST REALPROJECT_SOURCE_EXTENSIONS)
-            target_sources(${target} PRIVATE ${source})
+            if(${sources_as_cxx_impl_units})
+                target_sources(${target}
+                    PRIVATE
+                        FILE_SET realproject_module_impl_units
+                        FILES ${source}
+                )
+            else()
+                target_sources(${target} PRIVATE ${source})
+            endif()
         elseif(${source_ext} IN_LIST REALPROJECT_GLSL_HEADER_EXTENSIONS)
             set_property(TARGET ${target}
                 APPEND PROPERTY realproject_glsl_headers_rel
