@@ -61,7 +61,7 @@ endfunction()
 function(_load_shader_naming_constants)
     get_realengine_base_dir_abs()
     file(READ
-        "${realengine_base_dir_abs}/RealEngine/utility/details/CMakeConstants.hpp"
+        "${realengine_base_dir_abs}/RealEngine/utility/details/CMakeConstants.cppm"
         header_file
     )
     _parse_string_constant_from_cpp("${header_file}" k_shaderTargetSuffix)

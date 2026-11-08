@@ -66,7 +66,7 @@ macro(add_real_executable)
     )
 endmacro()
 
-# Initializes file sets of real target
+# Initializes file sets of a real target
 # Syntax:
 #     real_target_init_file_sets(
 #        <target>

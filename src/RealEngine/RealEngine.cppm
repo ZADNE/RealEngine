@@ -14,3 +14,4 @@ export import :utility.sdlproperties;
 export import :utility.unicode;
 export import :utility.uniquecptr;
 export import :utility.version;
+export import :utility.details.cmakeconstants;
