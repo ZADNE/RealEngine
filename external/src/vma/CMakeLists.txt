@@ -1,5 +1,6 @@
 real_target_sources(vma
     PUBLIC
+        vk_mem_alloc.cppm
         vk_mem_alloc.h
         vk_mem_alloc.hpp
         vk_mem_alloc_enums.hpp

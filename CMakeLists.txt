@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 4.5)
 project(RealEngine)
 
 include(GNUInstallDirs)
@@ -27,6 +27,19 @@ block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
 
     # Vulkan 1.4 SDK
     find_package(Vulkan 1.4.363 REQUIRED COMPONENTS glslc)
+    if(NOT TARGET Vulkan::HppModule)
+        add_library(Vulkan-HppModule OBJECT)
+        add_library(Vulkan::HppModule ALIAS Vulkan-HppModule)
+        target_sources(Vulkan-HppModule PUBLIC
+            FILE_SET CXX_MODULES
+            BASE_DIRS ${Vulkan_INCLUDE_DIR}
+            FILES
+                ${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm
+                ${Vulkan_INCLUDE_DIR}/vulkan/vulkan_video.cppm)
+        target_compile_features(Vulkan-HppModule PUBLIC cxx_std_23)
+        set_target_properties(Vulkan-HppModule PROPERTIES CXX_MODULE_STD ON)
+        target_include_directories(Vulkan-HppModule PUBLIC ${Vulkan_INCLUDE_DIR})
+    endif()
 
     # SDL3
     find_package(SDL3 CONFIG REQUIRED GLOBAL COMPONENTS SDL3-shared)
@@ -148,6 +161,7 @@ block(PROPAGATE RTICreator)
     # Doxygen documentation
     find_package(Doxygen)
     if (Doxygen_FOUND)
+        get_realengine_version()
         set(doxyfile_template "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile")
         set(doxyfile "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
         configure_file(
@@ -202,9 +216,9 @@ block()
     # The main install command
     install(
         TARGETS
-            ${RealEngine_sublibs} RealEngine
-            vma glm-header-only ${bit7z_aliased_target}
+            Vulkan-HppModule vma glm-header-only ${bit7z_aliased_target}
             nlohmann_json ImGui lodepng argparse filewatch
+            ${RealEngine_sublibs} RealEngine
             ResourcePackager ${RTICreator}
         EXPORT                  RealEngineTargets
         RUNTIME # Tool executables are part of RealEngine development
@@ -221,6 +235,15 @@ block()
             DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
         FILE_SET HEADERS
+            DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
+            COMPONENT           RealEngine_Development
+        FILE_SET realproject_module_interfaces
+            DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
+            COMPONENT           RealEngine_Development
+        FILE_SET CXX_MODULES
+            DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
+            COMPONENT           RealEngine_Development
+        CXX_MODULES_BMI
             DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
     )

@@ -3,15 +3,15 @@ set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
 set(CMAKE_CXX_CLANG_TIDY "")
 
-# Filewatch
-add_real_library(filewatch INTERFACE)
-real_target_init_file_sets(filewatch BASE_DIR ".")
-add_subdirectory(filewatch)
-
 # argparse
-add_real_library(argparse INTERFACE)
+add_real_library(argparse OBJECT)
 real_target_init_file_sets(argparse BASE_DIR ".")
 add_subdirectory(argparse)
+
+# Filewatch
+add_real_library(filewatch OBJECT)
+real_target_init_file_sets(filewatch BASE_DIR ".")
+add_subdirectory(filewatch)
 
 # Dear ImGui
 add_real_library(ImGui STATIC)
@@ -30,6 +30,10 @@ real_target_init_file_sets(lodepng BASE_DIR ".")
 add_subdirectory(lodepng)
 
 # Vulkan Memory Allocator
-add_real_library(vma INTERFACE)
+add_real_library(vma OBJECT)
 real_target_init_file_sets(vma BASE_DIR ".")
+target_link_libraries(vma
+    PRIVATE
+        Vulkan::HppModule
+)
 add_subdirectory(vma)
