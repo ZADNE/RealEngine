@@ -137,6 +137,15 @@ block(PROPAGATE RealEngine_sublibs)
                 spirv-cross-reflect
                 filewatch
         )
+        target_compile_definitions(${target_name}
+            PUBLIC
+                "RE_BUILDING_FOR_DEBUG=$<CONFIG:Debug>"
+                "RE_BUILDING_FOR_RELEASE=$<CONFIG:Release>"
+
+                "RE_BUILDING_FOR_WINDOWS=$<PLATFORM_ID:Windows>"
+                "RE_BUILDING_FOR_LINUX=$<CONFIG:Linux>"
+                
+        )
         list(APPEND RealEngine_sublibs ${target_name})
         set(RealEngine_sublibs "${RealEngine_sublibs}" PARENT_SCOPE)
     endfunction()

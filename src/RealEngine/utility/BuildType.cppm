@@ -6,11 +6,14 @@ export module realengine:utility.buildtype;
 
 export namespace re {
 
-// The macros defined here are used for things that still cannot be done better
-// (e.g. omitting member variables).
+#if !defined(RE_BUILDING_FOR_DEBUG) || !defined(RE_BUILDING_FOR_RELEASE)
+#    error "RE_BUILDING_FOR_* macros must be defined by CMake."
+#endif
+static_assert(RE_BUILDING_FOR_DEBUG + RE_BUILDING_FOR_RELEASE == 1);
 
-// NOLINTBEGIN(*-macro-usage): See explanation above
-
+/**
+ * @brief Supported build configuration types
+ */
 enum class BuildType {
     Debug,
     Release
@@ -19,19 +22,21 @@ enum class BuildType {
 /**
  * @brief Holds the current build type (Debug/Release)
  */
+constexpr BuildType k_buildType
 #if defined(__DOXYGEN__)
-constexpr BuildType k_buildType = <build configuration dependent>;
-#    define RE_BUILDING_FOR_DEBUG 1
-#    define RE_BUILDING_FOR_RELEASE 1
-#elif !defined(NDEBUG)
-constexpr BuildType k_buildType = BuildType::Debug;
-#    define RE_BUILDING_FOR_DEBUG 1
-#    define RE_BUILDING_FOR_RELEASE 0
+    = <build configuration dependent>;
+#elif RE_BUILDING_FOR_DEBUG
+    = BuildType::Debug;
+#elif RE_BUILDING_FOR_RELEASE
+    = BuildType::Release;
 #else
-constexpr BuildType k_buildType = BuildType::Release;
-#    define RE_BUILDING_FOR_DEBUG 0
-#    define RE_BUILDING_FOR_RELEASE 1
+#    error "Unknown build type"
 #endif
+
+#if !defined(RE_BUILDING_FOR_WINDOWS) || !defined(RE_BUILDING_FOR_LINUX)
+#    error "RE_BUILDING_FOR_* macros must be defined by CMake."
+#endif
+static_assert(RE_BUILDING_FOR_WINDOWS + RE_BUILDING_FOR_LINUX == 1);
 
 /**
  * @brief The types of operating systems that RealEngine can be built for
@@ -45,22 +50,15 @@ enum class BuildOS {
 /**
  * @brief Holds the build operating system (Windows/Linux)
  */
+constexpr BuildOS k_buildOS
 #if defined(__DOXYGEN__)
-constexpr BuildOS k_buildOS = <build configuration dependent>;
-#    define RE_BUILDING_FOR_WINDOWS 1
-#    define RE_BUILDING_FOR_LINUX 1
-#elif defined(_WIN32)
-constexpr BuildOS k_buildOS = BuildOS::Windows;
-#    define RE_BUILDING_FOR_WINDOWS 1
-#    define RE_BUILDING_FOR_LINUX 0
-#elif defined(__linux__)
-constexpr BuildOS k_buildOS = BuildOS::Linux;
-#    define RE_BUILDING_FOR_WINDOWS 0
-#    define RE_BUILDING_FOR_LINUX 1
+    = <build configuration dependent>;
+#elif RE_BUILDING_FOR_WINDOWS
+    = BuildOS::Windows;
+#elif RE_BUILDING_FOR_LINUX
+    = BuildOS::Linux;
 #else
-#    error "Unsupported or undetected operating system"
+#    error "Unknown build OS"
 #endif
-
-// NOLINTEND(*-macro-usage)
 
 } // namespace re
