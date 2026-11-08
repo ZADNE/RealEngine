@@ -27,6 +27,7 @@ block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
 
     # Vulkan 1.4 SDK
     find_package(Vulkan 1.4.363 REQUIRED COMPONENTS glslc)
+    # Vulkan as C++ module
     if(NOT TARGET Vulkan::HppModule)
         add_library(Vulkan-HppModule OBJECT)
         add_library(Vulkan::HppModule ALIAS Vulkan-HppModule)
@@ -35,9 +36,12 @@ block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
             BASE_DIRS ${Vulkan_INCLUDE_DIR}
             FILES
                 ${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm
-                ${Vulkan_INCLUDE_DIR}/vulkan/vulkan_video.cppm)
-        target_compile_features(Vulkan-HppModule PUBLIC cxx_std_23)
-        set_target_properties(Vulkan-HppModule PROPERTIES CXX_MODULE_STD ON)
+                ${Vulkan_INCLUDE_DIR}/vulkan/vulkan_video.cppm
+        )
+        set_target_properties(Vulkan-HppModule PROPERTIES
+            CXX_STANDARD 23
+            CXX_MODULE_STD ON
+        )
         target_include_directories(Vulkan-HppModule PUBLIC ${Vulkan_INCLUDE_DIR})
     endif()
 
@@ -51,8 +55,9 @@ block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
         URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.4.363.0.tar.gz
     )
 
-    # OpenGL Mathematics
+    # OpenGL Mathematics (GLM)
     set(GLM_BUILD_INSTALL ON CACHE INTERNAL "")
+    set(GLM_BUILD_LIBRARY OFF CACHE INTERNAL "")
     FetchContent_Declare(glm
         URL https://github.com/g-truc/glm/archive/refs/tags/1.0.1.tar.gz
     )
@@ -74,6 +79,22 @@ block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
 
     # Download remote libs
     _real_FetchContent_MakeAvailable(SPIRV-Cross glm bit7z json)
+
+    # GLM as C++20 module
+    if(NOT TARGET glm::glm-cpp-module)
+        get_target_property(glm_include_dirs glm::glm-header-only INTERFACE_INCLUDE_DIRECTORIES)
+        list(GET glm_include_dirs 0 glm_include_dir)
+        add_library(glm-glm-cpp-module OBJECT)
+        target_sources(glm-glm-cpp-module PUBLIC
+            FILE_SET CXX_MODULES
+            BASE_DIRS ${glm_include_dir}
+            FILES
+                ${glm_include_dir}/glm/glm.cppm
+        )
+        set_target_properties(glm-glm-cpp-module PROPERTIES CXX_STANDARD 23)
+        target_include_directories(glm-glm-cpp-module PUBLIC ${glm_include_dir})
+        add_library(glm::glm-cpp-module ALIAS glm-glm-cpp-module)
+    endif()
 
     # Create imported targets for dlls
     if(WIN32)
@@ -126,7 +147,7 @@ block(PROPAGATE RealEngine_sublibs)
                 Vulkan::Vulkan
                 vma
                 SDL3::SDL3
-                glm::glm-header-only
+                glm::glm-cpp-module
                 bit7z
                 nlohmann_json::nlohmann_json
                 ImGui
@@ -144,7 +165,6 @@ block(PROPAGATE RealEngine_sublibs)
 
                 "RE_BUILDING_FOR_WINDOWS=$<PLATFORM_ID:Windows>"
                 "RE_BUILDING_FOR_LINUX=$<CONFIG:Linux>"
-                
         )
         list(APPEND RealEngine_sublibs ${target_name})
         set(RealEngine_sublibs "${RealEngine_sublibs}" PARENT_SCOPE)
@@ -225,7 +245,7 @@ block()
     # The main install command
     install(
         TARGETS
-            Vulkan-HppModule vma glm-header-only ${bit7z_aliased_target}
+            Vulkan-HppModule vma glm::glm-cpp-module ${bit7z_aliased_target}
             nlohmann_json ImGui lodepng argparse filewatch
             ${RealEngine_sublibs} RealEngine
             ResourcePackager ${RTICreator}
