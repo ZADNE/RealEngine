@@ -7,7 +7,7 @@
 ## Features:
 
 * A set of __convenient__ classes to ease __Vulkan 1.3 rendering__
-* __Codegen to access SPIR-V__ of shaders __and to call GLSL__ functions from C++
+* __Codegen to access SPIR-V__ of shaders and to __call GLSL functions from C++__
 * __Hot reload of shaders__ from source files in non-release builds
 * __Packaged and encrypted runtime data__ in release builds
 * Handling of mouse & keyboard input
