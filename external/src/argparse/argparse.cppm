@@ -2,7 +2,6 @@
  *  @author    Dubsky Tomas
  */
 module;
-
 #include <argparse/argparse.hpp>
 
 export module argparse;
