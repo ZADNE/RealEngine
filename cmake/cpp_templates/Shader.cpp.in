@@ -1,11 +1,12 @@
 /**
  *  @author    Automatically generated file by RealProject
  */
-#include <@hpp_rel@>
+module @module_name@:@module_partition@_impl;
+import :@module_partition@;
 
 @cpp_namespace_start@
 #if 0
-// Navigation section - use #includes to jump to files (Visual Studio):
+// Navigation section - use #includes to jump to files:
 // Source file:
    #include <@shader_rel@>
 // Dependency file:

@@ -1,9 +1,0 @@
-/**
- *  @author    Automatically generated file by RealProject
- */
-#pragma once
-#include <RealEngine/graphics/pipelines/PipelineSources.hpp>
-
-@cpp_namespace_start@
-@shader_declarations@
-@cpp_namespace_end@

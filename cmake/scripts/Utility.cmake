@@ -62,16 +62,16 @@ function(_load_shader_naming_constants)
     get_realengine_base_dir_abs()
     file(READ
         "${realengine_base_dir_abs}/RealEngine/utility/details/CMakeConstants.cppm"
-        header_file
+        constants_file
     )
-    _parse_string_constant_from_cpp("${header_file}" k_shaderTargetSuffix)
+    _parse_string_constant_from_cpp("${constants_file}" k_shaderTargetSuffix)
     set(shader_target_suffix ${k_shaderTargetSuffix_VAL} PARENT_SCOPE)
-    _parse_string_constant_from_cpp("${header_file}" k_shaderSPIRVCFileExt)
+    _parse_string_constant_from_cpp("${constants_file}" k_shaderSPIRVCFileExt)
     set(shader_c_ext ${k_shaderSPIRVCFileExt_VAL} PARENT_SCOPE)
-    _parse_string_constant_from_cpp("${header_file}" k_shaderDepFileExt)
+    _parse_string_constant_from_cpp("${constants_file}" k_shaderDepFileExt)
     set(shader_dep_ext ${k_shaderDepFileExt_VAL} PARENT_SCOPE)
-    _parse_string_constant_from_cpp("${header_file}" k_shaderSPIRVDisFileExt)
+    _parse_string_constant_from_cpp("${constants_file}" k_shaderSPIRVDisFileExt)
     set(shader_txt_ext ${k_shaderSPIRVDisFileExt_VAL} PARENT_SCOPE)
-    _parse_string_constant_from_cpp("${header_file}" k_shaderSPIRVBinFileExt)
+    _parse_string_constant_from_cpp("${constants_file}" k_shaderSPIRVBinFileExt)
     set(shader_bin_ext ${k_shaderSPIRVBinFileExt_VAL} PARENT_SCOPE)
 endfunction()

@@ -1,0 +1,152 @@
+# author     Dubsky Tomas
+
+# Cache variables
+set(REALPROJECT_MODULE_INTERFACE_EXTENSIONS
+    ".cppm;.ixx"
+    CACHE STRING "List of file extensions interpreted as C/C++ interface or partition module units"
+)
+set(REALPROJECT_HEADER_EXTENSIONS
+    ".hpp;.h"
+    CACHE STRING "List of file extensions interpreted as C/C++ header files"
+)
+set(REALPROJECT_SOURCE_EXTENSIONS
+    ".cpp;.c"
+    CACHE STRING "List of file extensions interpreted as C/C++ source files"
+)
+set(REALPROJECT_GLSL_HEADER_EXTENSIONS
+    ".glsl"
+    CACHE STRING "List of file extensions interpreted as GLSL header files"
+)
+set(REALPROJECT_GLSL_STAGE_EXTENSIONS
+    ".vert;.tesc;.tese;.geom;.frag;.comp"
+    CACHE STRING "List of file extensions interpreted as GLSL stage files"
+)
+
+# Initializes file sets of a real target
+# Syntax:
+#     real_target_init_file_sets(
+#        <target>
+#        BASE_DIR <directory_name>
+#        [ SOURCES_AS_CXX_MODULE_IMPL_UNITS ]
+#     )
+# BASE_DIR: Header includes will be relative to this
+# SOURCES_AS_CXX_MODULE_IMPL_UNITS: C++ sources (identified by file extension)
+#                                   will be treated as module implementation units.
+#                                   Ignored for INTERFACE libraries.
+function(real_target_init_file_sets target)
+    set(option_keywords SOURCES_AS_CXX_MODULE_IMPL_UNITS)
+    set(one_value_keywords BASE_DIR)
+    cmake_parse_arguments(ARG "${option_keywords}" "${one_value_keywords}" "" ${ARGN})
+
+    get_target_property(source_dir ${target} SOURCE_DIR)
+    set_target_properties(${target} PROPERTIES
+        realproject_base_dir_rel "${ARG_BASE_DIR}"
+        realproject_base_dir_abs "${source_dir}/${ARG_BASE_DIR}"
+    )
+    target_sources(${target} PUBLIC FILE_SET realproject_public_headers
+        TYPE HEADERS BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/${ARG_BASE_DIR}"
+    )
+
+    # Module file sets
+    get_target_property(target_type ${target} TYPE)
+    if(NOT (${target_type} STREQUAL "INTERFACE_LIBRARY"))
+        target_sources(${target} PUBLIC FILE_SET realproject_module_interfaces
+            TYPE CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/${ARG_BASE_DIR}"
+        )
+        target_sources(${target}
+            PUBLIC
+                FILE_SET realproject_module_interfaces
+                TYPE CXX_MODULES
+                BASE_DIRS
+                    "${CMAKE_CURRENT_SOURCE_DIR}/${ARG_BASE_DIR}"
+                    "${CMAKE_CURRENT_BINARY_DIR}/${ARG_BASE_DIR}"
+            PRIVATE
+                FILE_SET realproject_module_impl_units
+                TYPE CXX_MODULES
+                BASE_DIRS
+                    "${CMAKE_CURRENT_SOURCE_DIR}/${ARG_BASE_DIR}"
+                    "${CMAKE_CURRENT_BINARY_DIR}/${ARG_BASE_DIR}"
+        )
+        set_target_properties(${target} PROPERTIES
+            realproject_sources_as_cxx_impl_units ${ARG_SOURCES_AS_CXX_MODULE_IMPL_UNITS}
+        )
+    endif()
+endfunction()
+
+# Based on file extensions, add source files into the target
+function(_incorporate_scoped_sources target path_rel header_scope)
+    get_target_property(sources_as_cxx_impl_units ${target} realproject_sources_as_cxx_impl_units)
+    foreach(source IN LISTS ARGN)
+        get_filename_component(source_ext ${source} LAST_EXT)
+        if(${source_ext} IN_LIST REALPROJECT_MODULE_INTERFACE_EXTENSIONS)
+            target_sources(${target}
+                PUBLIC
+                    FILE_SET realproject_module_interfaces
+                    FILES ${source}
+            )
+        elseif(${source_ext} IN_LIST REALPROJECT_HEADER_EXTENSIONS)
+            if(${header_scope} STREQUAL "PUBLIC")
+                target_sources(${target}
+                    PUBLIC
+                        FILE_SET realproject_public_headers
+                        FILES ${source}
+                )
+            elseif(${header_scope} STREQUAL "PRIVATE")
+                target_sources(${target} PRIVATE ${source})
+            endif()
+        elseif(${source_ext} IN_LIST REALPROJECT_SOURCE_EXTENSIONS)
+            if(${sources_as_cxx_impl_units})
+                target_sources(${target}
+                    PRIVATE
+                        FILE_SET realproject_module_impl_units
+                        FILES ${source}
+                )
+            else()
+                target_sources(${target} PRIVATE ${source})
+            endif()
+        elseif(${source_ext} IN_LIST REALPROJECT_GLSL_HEADER_EXTENSIONS)
+            set_property(TARGET ${target}
+                APPEND PROPERTY realproject_glsl_headers_rel
+                "${path_rel}/${source}"
+            )
+        elseif(${source_ext} IN_LIST REALPROJECT_GLSL_STAGE_EXTENSIONS)
+            set_property(TARGET ${target}
+                APPEND PROPERTY realproject_glsl_sources_rel
+                "${path_rel}/${source}"
+            )
+        else()
+            message(FATAL_ERROR
+                "Target ${target}: ${path_rel}/${source} has unknown file extension."
+            )
+        endif()
+    endforeach()
+endfunction()
+
+# Adds C++ source files (headers, source, shaders) files to a target
+# C++ headers maintain the scope (PUBLIC, PRIVATE)
+# C++ sources and GLSL headers/stages are always private
+function(real_target_sources target)
+    # Sanity check
+    get_property(is_real_target TARGET ${target} PROPERTY realproject_base_dir_rel SET)
+    if(NOT ${is_real_target})
+        message(FATAL_ERROR
+            "Target ${target} is not a Real target, "
+            "and thus real_target_sources cannot be used on it."
+        )
+        return()
+    endif()
+
+    # Separate sources into public and private categories
+    set(multi_value_args "PUBLIC" "PRIVATE")
+    cmake_parse_arguments(ARG "" "" "${multi_value_args}" ${ARGN})
+
+    # Get relative path
+    get_target_property(target_base_dir ${target} realproject_base_dir_abs)
+    cmake_path(RELATIVE_PATH CMAKE_CURRENT_SOURCE_DIR
+        BASE_DIRECTORY ${target_base_dir} OUTPUT_VARIABLE path_rel
+    )
+
+    # Incorporate the sources
+    _incorporate_scoped_sources(${target} ${path_rel} PUBLIC ${ARG_PUBLIC})
+    _incorporate_scoped_sources(${target} ${path_rel} PRIVATE ${ARG_PRIVATE})
+endfunction()

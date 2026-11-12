@@ -1,9 +1,0 @@
-/**
- *  @author    Automatically generated file by RealProject
- */
-#pragma once
-#include <RealEngine/graphics/pipelines/PipelineSources.hpp>
-
-@cpp_namespace_start@
-extern const re::ShaderSource @shader_@;
-@cpp_namespace_end@

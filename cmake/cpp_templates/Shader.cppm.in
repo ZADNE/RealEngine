@@ -1,0 +1,9 @@
+/**
+ *  @author    Automatically generated file by RealProject
+ */
+export module @module_name@:@module_partition@;
+import :graphics.pipelines.PipelineSources;
+
+@cpp_export_namespace_start@
+extern const re::ShaderSource @shader_@;
+@cpp_export_namespace_end@

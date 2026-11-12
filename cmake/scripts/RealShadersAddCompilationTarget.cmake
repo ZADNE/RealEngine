@@ -28,9 +28,9 @@ function(_add_shader_compilation_target target)
     else()
         set(glslc_flags "-O0" "-g")
         if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-            message(WARNING "Configuting unknown configuration
-            (not Release, Debug, RelWithDebInfo or MinSizeRel). 
-            GLSL will be compiled as Debug.")
+            message(WARNING "Unknown configuration (not Release, Debug, "
+                            "RelWithDebInfo or MinSizeRel). "
+                            "GLSL will be compiled as Debug.")
         endif()
     endif()
     get_target_property(glsl_standard ${target} realproject_glsl_standard)
