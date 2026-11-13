@@ -76,7 +76,7 @@ void MainMenuRoom::render(const re::CommandBuffer& cmdBuf, double interpolationF
     }
 
     // Menu
-    if (Begin("RTICreator v4.0.0", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (Begin("RTICreator v4.0.1", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         if (BeginTabBar("##TabBar")) {
             if (BeginTabItem("File")) {
                 if (Button("Load a texture"))
