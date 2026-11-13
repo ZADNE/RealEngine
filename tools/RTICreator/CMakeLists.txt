@@ -1,5 +1,5 @@
 real_target_sources(RTICreator
     PRIVATE 
-                                    main.cpp
+                                    Main.cpp
         MainMenuRoom.hpp            MainMenuRoom.cpp
 )
