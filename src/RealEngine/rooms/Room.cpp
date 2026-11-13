@@ -1,9 +1,12 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rooms/Room.hpp>
+module;
+#include <cassert>
 
-#include <RealEngine/program/MainProgram.hpp>
+module realengine:rooms.Room_impl;
+import :rooms.Room;
+import :program.MainProgram;
 
 namespace re {
 

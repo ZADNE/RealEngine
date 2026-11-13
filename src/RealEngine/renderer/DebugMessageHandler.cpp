@@ -1,9 +1,12 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/renderer/DebugMessageHandler.hpp>
+module;
+#include <vulkan/vulkan.h>
 
-#include <RealEngine/utility/Error.hpp>
+module realengine:renderer.DebugMessageHandler_impl;
+import :renderer.DebugMessageHandler;
+import :utility.Error;
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
 using enum vk::DebugUtilsMessageTypeFlagBitsEXT;

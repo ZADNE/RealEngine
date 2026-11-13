@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/output_control/Framebuffer.hpp>
+module realengine:graphics.output_control.Framebuffer_impl;
+import :graphics.output_control.Framebuffer;
 
 namespace re {
 

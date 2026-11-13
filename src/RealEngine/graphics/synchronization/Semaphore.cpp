@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/synchronization/Semaphore.hpp>
+module realengine:graphics.synchronization.Semaphore_impl;
+import :graphics.synchronization.Semaphore;
 
 namespace re {
 

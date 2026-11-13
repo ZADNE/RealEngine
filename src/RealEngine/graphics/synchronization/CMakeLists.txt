@@ -1,6 +1,6 @@
-﻿real_target_sources(RealEngine_visual
+﻿real_target_sources(RealEngine_utility
     PUBLIC
-        DoubleBuffered.hpp          
-        Fence.hpp                   Fence.cpp
-        Semaphore.hpp               Semaphore.cpp
+        DoubleBuffered.cppm         
+        Fence.cppm                  Fence.cpp
+        Semaphore.cppm              Semaphore.cpp
 )

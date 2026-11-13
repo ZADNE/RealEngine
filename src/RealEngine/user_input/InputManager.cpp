@@ -1,10 +1,11 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/user_input/InputManager.hpp>
+module;
+#include <cassert>
 
-#include <algorithm>
-#include <iostream>
+module realengine:user_input.InputManager_impl;
+import :user_input.InputManager;
 
 namespace re {
 

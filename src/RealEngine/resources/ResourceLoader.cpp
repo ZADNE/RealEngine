@@ -1,9 +1,9 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/resources/ResourceLoader.hpp>
-
-#include <RealEngine/utility/BuildType.hpp>
+module realengine:resources.ResourceLoader_impl;
+import :resources.ResourceLoader;
+import :utility.BuildType;
 
 namespace re {
 

@@ -1,19 +1,17 @@
 /**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/program/MainProgram.hpp>
-
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-
+module;
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_video.h>
-#include <glm/common.hpp>
 
-#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
-#include <RealEngine/rooms/Room.hpp>
+module realengine:program.MainProgram_impl;
+import std;
+import glm;
+import :program.MainProgram;
+import :graphics.synchronization.DoubleBuffered;
+import :rooms.Room;
 
 namespace re {
 
@@ -36,7 +34,7 @@ int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
     } catch (...) { fatalError("Unknown exception!"); }
 }
 
-void MainProgram::scheduleExit(int exitcode /* = EXIT_SUCCESS*/) {
+void MainProgram::scheduleExit(int exitcode /* = 1*/) {
     m_programShouldRun = false;
     m_programExitCode  = exitcode;
 }

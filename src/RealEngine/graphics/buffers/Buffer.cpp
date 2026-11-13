@@ -1,12 +1,14 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/buffers/Buffer.hpp>
-
+module;
 #include <cassert>
 
-#include <RealEngine/graphics/commands/CommandBuffer.hpp>
-#include <RealEngine/utility/Error.hpp>
+module realengine:graphics.buffers.Buffer_impl;
+import :graphics.buffers.Buffer;
+import std;
+import :graphics.commands.CommandBuffer;
+import :utility.Error;
 
 using enum vk::BufferUsageFlagBits;
 using enum vma::AllocationCreateFlagBits;

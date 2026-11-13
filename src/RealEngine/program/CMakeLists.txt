@@ -1,6 +1,6 @@
-real_target_sources(RealEngine_systems
+real_target_sources(RealEngine_utility
     PUBLIC
-        CommandLineArguments.hpp    
-        MainProgram.hpp             MainProgram.cpp
-        Synchronizer.hpp            Synchronizer.cpp
+        CommandLineArguments.cppm   
+        MainProgram.cppm            MainProgram.cpp
+        Synchronizer.cppm           Synchronizer.cpp
 )

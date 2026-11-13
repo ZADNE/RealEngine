@@ -1,9 +1,11 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/pipelines/PipelineLayout.hpp>
-
+module;
 #include <spirv_glsl.hpp>
+
+module realengine:graphics.pipelines.PipelineLayout_impl;
+import :graphics.pipelines.PipelineLayout;
 
 namespace re {
 

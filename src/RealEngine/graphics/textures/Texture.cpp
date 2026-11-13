@@ -1,10 +1,13 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/textures/Texture.hpp>
+module;
+#include <cassert>
 
-#include <RealEngine/graphics/buffers/BufferMapped.hpp>
-#include <RealEngine/utility/Error.hpp>
+module realengine:graphics.textures.Texture_impl;
+import :graphics.textures.Texture;
+import :graphics.buffers.BufferMapped;
+import :utility.Error;
 
 using enum vk::ImageLayout;
 using enum vk::PipelineStageFlagBits;

@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/synchronization/Fence.hpp>
+module realengine:graphics.synchronization.Fence_impl;
+import :graphics.synchronization.Fence;
 
 namespace re {
 

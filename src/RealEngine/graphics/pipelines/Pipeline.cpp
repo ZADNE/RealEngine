@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/pipelines/Pipeline.hpp>
+module realengine:graphics.pipelines.Pipeline_impl;
+import :graphics.pipelines.Pipeline;
 
 using enum vk::BlendFactor;
 using enum vk::BlendOp;

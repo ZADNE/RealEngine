@@ -4,9 +4,8 @@
 module;
 #include <nlohmann/json.hpp>
 
-export module realengine:window.WindowSettings_impl;
+module realengine:window.WindowSettings_impl;
 import std;
-
 import :window.WindowSettings;
 
 namespace {

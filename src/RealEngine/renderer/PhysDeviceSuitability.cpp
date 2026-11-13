@@ -1,12 +1,14 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/renderer/PhysDeviceSuitability.hpp>
+module;
+#include <cassert>
 
-#include <bitset>
-
-#include <RealEngine/rooms/RoomDisplaySettings.hpp>
-#include <RealEngine/utility/Error.hpp>
+module realengine:renderer.PhysDeviceSuitability_impl;
+import :renderer.PhysDeviceSuitability;
+import std;
+import :rooms.RoomDisplaySettings;
+import :utility.Error;
 
 namespace re {
 

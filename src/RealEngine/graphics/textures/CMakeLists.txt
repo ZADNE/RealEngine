@@ -1,7 +1,7 @@
-﻿real_target_sources(RealEngine_visual
+﻿real_target_sources(RealEngine_utility
     PUBLIC
-        ImageView.hpp               ImageView.cpp
-        Texture.hpp                 Texture.cpp
-        TextureShape.hpp            
-        TextureShaped.hpp           TextureShaped.cpp
+        ImageView.cppm              ImageView.cpp
+        Texture.cppm                Texture.cpp
+        TextureShape.cppm           
+        TextureShaped.cppm          TextureShaped.cpp
 )

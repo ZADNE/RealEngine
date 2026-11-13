@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/descriptors/DescriptorSet.hpp>
+module realengine:graphics.descriptors.DescriptorSet_impl;
+import :graphics.descriptors.DescriptorSet;
 
 namespace re {
 

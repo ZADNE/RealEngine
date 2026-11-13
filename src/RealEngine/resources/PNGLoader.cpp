@@ -1,12 +1,13 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/resources/PNGLoader.hpp>
-
+module;
 #include <lodepng/lodepng.hpp>
 
-#include <RealEngine/utility/Endianness.hpp>
-#include <RealEngine/utility/Error.hpp>
+module realengine:resources.PNGLoader_impl;
+import :resources.PNGLoader;
+import :utility.Endianness;
+import :utility.Error;
 
 namespace re {
 

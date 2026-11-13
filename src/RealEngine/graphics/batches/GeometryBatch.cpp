@@ -1,11 +1,16 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/batches/GeometryBatch.hpp>
+module;
+#include <cassert>
+#include <cstddef>
 
-#include <RealEngine/graphics/batches/shaders/AllShaders.gen.hpp>
-#include <RealEngine/graphics/commands/CommandBuffer.hpp>
-#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
+module realengine:graphics.batches.GeometryBatch_impl;
+import :graphics.batches.GeometryBatch;
+import :graphics.batches.shaders.geometry_frag;
+import :graphics.batches.shaders.geometry_vert;
+import :graphics.commands.CommandBuffer;
+import :graphics.synchronization.DoubleBuffered;
 
 using enum vk::BufferUsageFlagBits;
 using enum vk::MemoryPropertyFlagBits;

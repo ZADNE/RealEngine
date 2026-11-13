@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/textures/TextureShaped.hpp>
+module realengine:graphics.textures.TextureShaped_impl;
+import :graphics.textures.TextureShaped;
 
 namespace re {
 

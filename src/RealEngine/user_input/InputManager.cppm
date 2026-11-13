@@ -1,0 +1,72 @@
+﻿/**
+ *  @author    Dubsky Tomas
+ */
+export module realengine:user_input.InputManager;
+import glm;
+import :user_input.Key;
+
+export namespace re {
+
+/**
+ * @brief Keeps track of mouse and keyboard input.
+ */
+class InputManager {
+public:
+    InputManager() {}
+
+    /**
+     * @brief Checks whether the key is currently pressed
+     * @return For how many steps straight it has been down (0 = is not
+     * currently down)
+     */
+    int isDown(Key key) const;
+
+    /**
+     * @brief Checks whther the key has just been pressed (= right before this step)
+     * @return  How many times it has been pressed before this step (by how many
+     * steps the mouse wheel was rotated) Usually returns 0 or 1.
+     */
+    int wasPressed(Key key) const;
+
+    /**
+     * @brief Checks whther the key has just been released (= right before this step)
+     * @return 1 if the key has just been released, 0 otherwise
+     */
+    int wasReleased(Key key) const;
+
+    /**
+     * @brief Gets absolute position of the cursor.
+     */
+    glm::vec2 cursorAbs() const;
+
+    /**
+     * @brief Gets position of the cursor relative to previous step.
+     */
+    glm::vec2 cursorRel() const;
+
+#pragma region AccessForMainProgram
+
+    void step();
+    void setCursor(glm::vec2 abs, glm::vec2 rel);
+    void press(Key key, int times = 1);
+    void release(Key key);
+
+#pragma endregion
+
+private:
+
+    int wasDown(Key key) const;
+
+    /**
+     * @brief Key (= index) => the number of steps that it has been pressed
+     * continuously
+     */
+    using StateMap = std::array<int, static_cast<size_t>(Key::NumberOfKeys)>;
+    mutable StateMap m_stateMap{};
+    mutable StateMap m_stateMapPrev{};
+
+    glm::vec2 m_cursorAbs{};
+    glm::vec2 m_cursorRel{};
+};
+
+} // namespace re

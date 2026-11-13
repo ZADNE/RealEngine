@@ -1,16 +1,14 @@
 /**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/resources/hot_reload/PipelineHotLoader.hpp>
-
-#include <set>
-
-#include <filewatch/FileWatch.hpp>
-
-#include <RealEngine/graphics/pipelines/Pipeline.hpp>
-#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
-#include <RealEngine/resources/FileIO.hpp>
-#include <RealEngine/utility/details/CMakeConstants.hpp>
+module realengine:resources.hot_reload.PipelineHotLoader_impl;
+import std;
+import filewatch;
+import :resources.hot_reload.PipelineHotLoader;
+import :graphics.pipelines.Pipeline;
+import :graphics.synchronization.DoubleBuffered;
+import :resources.FileIO;
+import :utility.details.CMakeConstants;
 
 namespace re {
 

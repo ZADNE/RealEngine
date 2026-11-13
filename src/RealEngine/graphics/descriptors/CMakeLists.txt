@@ -1,4 +1,4 @@
-﻿real_target_sources(RealEngine_visual
+﻿real_target_sources(RealEngine_utility
     PUBLIC
-        DescriptorSet.hpp           DescriptorSet.cpp
+        DescriptorSet.cppm          DescriptorSet.cpp
 )

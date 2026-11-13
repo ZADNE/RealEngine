@@ -1,10 +1,12 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/program/Synchronizer.hpp>
-
+module;
 #include <cassert>
-#include <thread>
+
+module realengine:program.Synchronizer_impl;
+import :program.Synchronizer;
+import std;
 
 using namespace std::chrono_literals;
 

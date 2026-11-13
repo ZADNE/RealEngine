@@ -1,9 +1,9 @@
 /**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rooms/RoomManager.hpp>
-
-#include <RealEngine/rooms/Room.hpp>
+module realengine:rooms.RoomManager_impl;
+import :rooms.RoomManager;
+import :rooms.Room;
 
 namespace re {
 

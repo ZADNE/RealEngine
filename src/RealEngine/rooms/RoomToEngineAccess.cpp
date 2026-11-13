@@ -1,10 +1,10 @@
 /**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/rooms/RoomToEngineAccess.hpp>
-
-#include <RealEngine/program/MainProgram.hpp>
-#include <RealEngine/rooms/Room.hpp>
+module realengine:rooms.RoomToEngineAccess_impl;
+import :rooms.RoomToEngineAccess;
+import :rooms.Room;
+import :program.MainProgram;
 
 namespace re {
 

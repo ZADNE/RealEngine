@@ -1,6 +1,6 @@
-﻿real_target_sources(RealEngine_systems
+﻿real_target_sources(RealEngine_utility
     PUBLIC
-        InputManager.hpp            InputManager.cpp
-        Key.hpp                     Key.cpp
-        KeyBinder.hpp               
+        InputManager.cppm           InputManager.cpp
+        Key.cppm                    Key.cpp
+        KeyBinder.cppm              
 )

@@ -6,6 +6,16 @@ export module realengine:utility.BuildType;
 
 export namespace re {
 
+/**
+ * @def RE_BUILDING_FOR_DEBUG
+ * @brief Defined as 1 when building Debug config, 0 otherwise
+ */
+
+/**
+ * @def RE_BUILDING_FOR_RELEASE
+ * @brief Defined as 1 when building Release config, 0 otherwise
+ */
+
 #if !defined(RE_BUILDING_FOR_DEBUG) || !defined(RE_BUILDING_FOR_RELEASE)
 #    error "RE_BUILDING_FOR_* macros must be defined by CMake."
 #endif
@@ -32,6 +42,16 @@ constexpr BuildType k_buildType
 #else
 #    error "Unknown build type"
 #endif
+
+/**
+ * @def RE_BUILDING_FOR_WINDOWS
+ * @brief Defined as 1 when building a Windows build, 0 otherwise
+ */
+
+/**
+ * @def RE_BUILDING_FOR_LINUX
+ * @brief Defined as 1 when building a Linux build, 0 otherwise
+ */
 
 #if !defined(RE_BUILDING_FOR_WINDOWS) || !defined(RE_BUILDING_FOR_LINUX)
 #    error "RE_BUILDING_FOR_* macros must be defined by CMake."

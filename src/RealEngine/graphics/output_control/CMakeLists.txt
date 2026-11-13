@@ -1,6 +1,6 @@
-﻿real_target_sources(RealEngine_visual
+﻿real_target_sources(RealEngine_utility
     PUBLIC
-        Framebuffer.hpp             Framebuffer.cpp
-        RenderPass.hpp              RenderPass.cpp
-        RenderPassSubpass.hpp       
+        Framebuffer.cppm            Framebuffer.cpp
+        RenderPass.cppm             RenderPass.cpp
+        RenderPassSubpass.cppm      
 )

@@ -1,8 +1,8 @@
-﻿real_target_sources(RealEngine_visual
+﻿real_target_sources(RealEngine_utility
     PUBLIC
-        Pipeline.hpp                Pipeline.cpp
-        PipelineCreateInfos.hpp     
-        PipelineLayout.hpp          PipelineLayout.cpp
-        PipelineSources.hpp         
-        Vertex.hpp                  
+        Pipeline.cppm               Pipeline.cpp
+        PipelineCreateInfos.cppm    
+        PipelineLayout.cppm         PipelineLayout.cpp
+        PipelineSources.cppm        
+        Vertex.cppm                 
 )

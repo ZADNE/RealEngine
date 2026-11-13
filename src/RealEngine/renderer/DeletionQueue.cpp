@@ -1,10 +1,10 @@
 /**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/renderer/DeletionQueue.hpp>
-
-#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
-#include <RealEngine/utility/Error.hpp>
+module realengine:renderer.DeletionQueue_impl;
+import :renderer.DeletionQueue;
+import :graphics.synchronization.DoubleBuffered;
+import :utility.Error;
 
 namespace re {
 
@@ -45,7 +45,9 @@ bool DeletionQueue::deleteIteration(std::queue<QueueRecord>& queue) {
             deleteVulkanHandle(front.type, front.handle);
             break;
         case QueueRecord::Category::VmaAllocation:
-            m_allocator.freeMemory(reinterpret_cast<VmaAllocation>(front.handle));
+            m_allocator.freeMemory(
+                reinterpret_cast<vma::Allocation::NativeType>(front.handle)
+            );
             break;
         default: break;
         }
@@ -58,43 +60,43 @@ bool DeletionQueue::deleteIteration(std::queue<QueueRecord>& queue) {
 void DeletionQueue::deleteVulkanHandle(vk::ObjectType type, void* handle) {
     switch (type) {
     case vk::ObjectType::eSemaphore:
-        m_device.destroy(reinterpret_cast<VkSemaphore>(handle));
+        m_device.destroy(reinterpret_cast<vk::Semaphore::NativeType>(handle));
         break;
     case vk::ObjectType::eFence:
-        m_device.destroy(reinterpret_cast<VkFence>(handle));
+        m_device.destroy(reinterpret_cast<vk::Fence::NativeType>(handle));
         break;
     case vk::ObjectType::eDeviceMemory:
-        m_device.free(reinterpret_cast<VkDeviceMemory>(handle));
+        m_device.free(reinterpret_cast<vk::DeviceMemory::NativeType>(handle));
         break;
     case vk::ObjectType::eBuffer:
-        m_device.destroy(reinterpret_cast<VkBuffer>(handle));
+        m_device.destroy(reinterpret_cast<vk::Buffer::NativeType>(handle));
         break;
     case vk::ObjectType::eImage:
-        m_device.destroy(reinterpret_cast<VkImage>(handle));
+        m_device.destroy(reinterpret_cast<vk::Image::NativeType>(handle));
         break;
     case vk::ObjectType::eBufferView:
-        m_device.destroy(reinterpret_cast<VkBufferView>(handle));
+        m_device.destroy(reinterpret_cast<vk::BufferView::NativeType>(handle));
         break;
     case vk::ObjectType::eImageView:
-        m_device.destroy(reinterpret_cast<VkImageView>(handle));
+        m_device.destroy(reinterpret_cast<vk::ImageView::NativeType>(handle));
         break;
     case vk::ObjectType::ePipelineLayout:
-        m_device.destroy(reinterpret_cast<VkPipelineLayout>(handle));
+        m_device.destroy(reinterpret_cast<vk::PipelineLayout::NativeType>(handle));
         break;
     case vk::ObjectType::eRenderPass:
-        m_device.destroy(reinterpret_cast<VkRenderPass>(handle));
+        m_device.destroy(reinterpret_cast<vk::RenderPass::NativeType>(handle));
         break;
     case vk::ObjectType::ePipeline:
-        m_device.destroy(reinterpret_cast<VkPipeline>(handle));
+        m_device.destroy(reinterpret_cast<vk::Pipeline::NativeType>(handle));
         break;
     case vk::ObjectType::eDescriptorSetLayout:
-        m_device.destroy(reinterpret_cast<VkDescriptorSetLayout>(handle));
+        m_device.destroy(reinterpret_cast<vk::DescriptorSetLayout::NativeType>(handle));
         break;
     case vk::ObjectType::eSampler:
-        m_device.destroy(reinterpret_cast<VkSampler>(handle));
+        m_device.destroy(reinterpret_cast<vk::Sampler::NativeType>(handle));
         break;
     case vk::ObjectType::eFramebuffer:
-        m_device.destroy(reinterpret_cast<VkFramebuffer>(handle));
+        m_device.destroy(reinterpret_cast<vk::Framebuffer::NativeType>(handle));
         break;
     default: error("Unsupported object queued for deletion");
     }

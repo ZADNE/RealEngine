@@ -1,6 +1,6 @@
-real_target_sources(RealEngine_visual
+real_target_sources(RealEngine_utility
     PUBLIC
-        ActionCommandBuffer.hpp     
-        BarrierHelperFuncs.hpp      
-        CommandBuffer.hpp           CommandBuffer.cpp
+        ActionCommandBuffer.cppm    
+        BarrierHelperFuncs.cppm     
+        CommandBuffer.cppm          CommandBuffer.cpp
 )

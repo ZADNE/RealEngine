@@ -1,14 +1,19 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/batches/SpriteBatch.hpp>
+module;
+#include <cassert>
+#include <cstddef>
 
-#include <algorithm>
-
-#include <glm/common.hpp>
-
-#include <RealEngine/graphics/batches/shaders/AllShaders.gen.hpp>
-#include <RealEngine/graphics/synchronization/DoubleBuffered.hpp>
+module realengine:graphics.batches.SpriteBatch_impl;
+import :graphics.batches.SpriteBatch;
+import std;
+import glm;
+import :graphics.batches.shaders.sprite_frag;
+import :graphics.batches.shaders.sprite_tesc;
+import :graphics.batches.shaders.sprite_tese;
+import :graphics.batches.shaders.sprite_vert;
+import :graphics.synchronization.DoubleBuffered;
 
 using enum vk::DescriptorBindingFlagBits;
 

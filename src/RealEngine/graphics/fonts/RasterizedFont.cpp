@@ -1,18 +1,18 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/fonts/RasterizedFont.hpp>
-
-#include <bit>
-#include <memory>
-#include <numeric>
+module;
+#include <cassert>
 
 #include <SDL3_ttf/SDL_ttf.h>
 
-#include <RealEngine/utility/Math.hpp>
-#include <RealEngine/utility/SDLProperties.hpp>
-#include <RealEngine/utility/Unicode.hpp>
-#include <RealEngine/utility/UniqueCPtr.hpp>
+module realengine:graphics.fonts.RasterizedFont_impl;
+import std;
+import :graphics.fonts.RasterizedFont;
+import :utility.Math;
+import :utility.SDLProperties;
+import :utility.Unicode;
+import :utility.UniqueCPtr;
 
 namespace re {
 

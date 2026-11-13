@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/textures/ImageView.hpp>
+module realengine:graphics.textures.ImageView_impl;
+import :graphics.textures.ImageView;
 
 namespace re {
 

@@ -1,19 +1,20 @@
 /**
  *  @author    Dubsky Tomas
  */
-#include <iostream>
-
+module;
 #include <ImGui/imgui_impl_sdl3.h>
 #include <ImGui/imgui_impl_vulkan.h>
 #include <SDL3/SDL_vulkan.h>
-#include <glm/common.hpp>
-#define VMA_IMPLEMENTATION
-#include <vma/vk_mem_alloc.hpp>
+#include <vulkan/vulkan.h>
 
-#include <RealEngine/renderer/DebugMessageHandler.hpp>
-#include <RealEngine/renderer/PhysDeviceSuitability.hpp>
-#include <RealEngine/renderer/VulkanRenderer.hpp>
-#include <RealEngine/utility/Version.hpp>
+module realengine:renderer.VulkanRenderer_impl;
+import std;
+import glm;
+import vk_mem_alloc;
+import :renderer.DebugMessageHandler;
+import :renderer.PhysDeviceSuitability;
+import :renderer.VulkanRenderer;
+import :utility.Version;
 
 using enum vk::DebugUtilsMessageSeverityFlagBitsEXT;
 using enum vk::DebugUtilsMessageTypeFlagBitsEXT;
@@ -69,6 +70,7 @@ VulkanRenderer::VulkanRenderer(
     , m_physicalDevice(createPhysicalDevice(preferredDevice, vulkan.deviceCreateInfoChain))
     , m_presentMode(selectClosestPresentMode(vSync))
     , m_device(createDevice(vulkan.deviceCreateInfoChain))
+    , m_dispatchLoaderDynamic{*m_instance, vkGetInstanceProcAddr, *m_device, vkGetDeviceProcAddr}
     , m_allocator(createAllocator())
     , m_graphicsCompQueue(getQueue(m_graphicsCompQueueFamIndex))
     , m_presentationQueue(getQueue(m_presentationQueueFamIndex))

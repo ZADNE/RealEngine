@@ -1,11 +1,9 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <glm/gtc/matrix_transform.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
-
-#include <RealEngine/graphics/cameras/FlyingCamera3D.hpp>
+module realengine:graphics.cameras.FlyingCamera3D_impl;
+import glm;
+import :graphics.cameras.FlyingCamera3D;
 
 namespace re {
 
@@ -37,7 +35,7 @@ glm::mat4 FlyingCamera3D::calculateRelativeViewMat(
 }
 
 glm::mat4 FlyingCamera3D::calculateViewMat(glm::quat dirQuat, glm::vec3 pos) const {
-    return glm::translate(glm::toMat4(dirQuat), -pos);
+    return glm::gtc::translate(glm::gtc::mat4_cast(dirQuat), -pos);
 }
 
 } // namespace re

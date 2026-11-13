@@ -1,8 +1,8 @@
-﻿real_target_sources(RealEngine_systems
+﻿real_target_sources(RealEngine_utility
     PUBLIC
-        Room.hpp                    Room.cpp
-        RoomDisplaySettings.hpp     
-        RoomManager.hpp             RoomManager.cpp
-        RoomToEngineAccess.hpp      RoomToEngineAccess.cpp
-        RoomTransitionArguments.hpp 
+        Room.cppm                   Room.cpp
+        RoomDisplaySettings.cppm    
+        RoomManager.cppm            RoomManager.cpp
+        RoomToEngineAccess.cppm     RoomToEngineAccess.cpp
+        RoomTransitionArguments.cppm 
 )

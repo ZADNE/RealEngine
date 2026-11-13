@@ -1,10 +1,10 @@
-real_target_sources(RealEngine_visual
+real_target_sources(RealEngine_utility
     PUBLIC
-        Allocator.hpp               
-        DeletionQueue.hpp           DeletionQueue.cpp
-        ObjectUsingVulkan.hpp       
-        VulkanRenderer.hpp          VulkanRenderer.cpp
+        Allocator.cppm              
+        DeletionQueue.cppm          DeletionQueue.cpp
+        ObjectUsingVulkan.cppm      
+        VulkanRenderer.cppm         VulkanRenderer.cpp
     PRIVATE
-        DebugMessageHandler.hpp     DebugMessageHandler.cpp
-        PhysDeviceSuitability.hpp   PhysDeviceSuitability.cpp
+        DebugMessageHandler.cppm    DebugMessageHandler.cpp
+        PhysDeviceSuitability.cppm  PhysDeviceSuitability.cpp
 )

@@ -1,9 +1,12 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/user_input/Key.hpp>
-
+module;
+#include <SDL3/SDL_keycode.h>
 #include <SDL3/SDL_mouse.h>
+
+module realengine:user_input.Key_impl;
+import :user_input.Key;
 
 namespace {
 

@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/output_control/RenderPass.hpp>
+module realengine:graphics.output_control.RenderPass_impl;
+import :graphics.output_control.RenderPass;
 
 namespace re {
 

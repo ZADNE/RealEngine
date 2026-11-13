@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/resources/ResourceManager.hpp>
+module realengine:resources.ResourceManager_impl;
+import :resources.ResourceManager;
 
 namespace re {
 

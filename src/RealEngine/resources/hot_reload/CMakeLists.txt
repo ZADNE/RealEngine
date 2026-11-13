@@ -1,5 +1,5 @@
-real_target_sources(RealEngine_visual
+real_target_sources(RealEngine_utility
     PUBLIC
-        HotReloadInitInfo.hpp       
-        PipelineHotLoader.hpp       PipelineHotLoader.cpp
+        HotReloadInitInfo.cppm      
+        PipelineHotLoader.cppm      PipelineHotLoader.cpp
 )

@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/batches/Sprite.hpp>
+module realengine:graphics.batches.Sprite_impl;
+import :graphics.batches.Sprite;
 
 namespace re {
 

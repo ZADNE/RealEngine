@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/resources/ResourceCache.hpp>
+module realengine:resources.ResourceCache_impl;
+import :resources.ResourceCache;
 
 namespace re {
 

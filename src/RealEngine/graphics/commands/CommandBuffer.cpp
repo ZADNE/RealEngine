@@ -1,7 +1,8 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/graphics/commands/CommandBuffer.hpp>
+module realengine:graphics.commands.CommandBuffer_impl;
+import :graphics.commands.CommandBuffer;
 
 namespace re {
 

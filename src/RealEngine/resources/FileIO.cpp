@@ -1,9 +1,9 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <RealEngine/resources/FileIO.hpp>
-
-#include <fstream>
+module realengine:resources.FileIO_impl;
+import :resources.FileIO;
+import std;
 
 namespace re {
 
