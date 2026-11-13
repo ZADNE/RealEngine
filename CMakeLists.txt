@@ -35,8 +35,8 @@ block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
             FILE_SET CXX_MODULES
             BASE_DIRS ${Vulkan_INCLUDE_DIR}
             FILES
-                ${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm
-                ${Vulkan_INCLUDE_DIR}/vulkan/vulkan_video.cppm
+                "${Vulkan_INCLUDE_DIR}/vulkan/vulkan.cppm"
+                "${Vulkan_INCLUDE_DIR}/vulkan/vulkan_video.cppm"
         )
         set_target_properties(Vulkan-HppModule PROPERTIES
             CXX_STANDARD 23
@@ -89,7 +89,7 @@ block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
             FILE_SET CXX_MODULES
             BASE_DIRS ${glm_include_dir}
             FILES
-                ${glm_include_dir}/glm/glm.cppm
+                "${glm_include_dir}/glm/glm.cppm"
         )
         set_target_properties(glm-glm-cpp-module PROPERTIES CXX_STANDARD 23)
         target_include_directories(glm-glm-cpp-module PUBLIC ${glm_include_dir})
@@ -147,7 +147,7 @@ block(PROPAGATE RealEngine_sublibs)
         target_link_libraries(${target_name}
             PUBLIC
                 ${CMAKE_DL_LIBS}
-                Vulkan::Vulkan
+                Vulkan::HppModule
                 vma
                 SDL3::SDL3
                 glm::glm-cpp-module
@@ -230,7 +230,10 @@ block(PROPAGATE RTICreator)
     # RTICreator (Windows only)
     if (WIN32)
         add_real_executable(RTICreator)
-        target_include_directories(RTICreator PRIVATE "tools")
+        real_target_init_file_sets(RTICreator
+            BASE_DIR "tools"
+            SOURCES_AS_CXX_MODULE_IMPL_UNITS
+        )
         set_target_properties(RTICreator PROPERTIES
             CXX_STANDARD 23
             INTERPROCEDURAL_OPTIMIZATION TRUE

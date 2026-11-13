@@ -1,19 +1,17 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <algorithm>
-#include <iostream>
-
-#if not defined(WIN32) && not defined(_WIN32) && not defined(__WIN32__)
-#    error \
-        "Since this tool requires file selection dialog window and I did not want another library dependency, it is a Windows-only tool. Sorry!"
+module;
+#if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32__)
+#    error "RTICreator is a Windows-only tool"
 #endif
 #define NOMINMAX 1
 #include <Windows.h>
 
-#include <RealEngine/utility/Error.hpp>
+#include <ImGui/imgui.h>
 
-#include <RTICreator/MainMenuRoom.hpp>
+module rticreator:MainMenuRoom_impl;
+import :MainMenuRoom;
 
 using namespace ImGui;
 
