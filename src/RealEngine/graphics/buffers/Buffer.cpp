@@ -16,7 +16,7 @@ using enum vma::MemoryUsage;
 
 namespace re {
 
-constexpr auto k_hostAccess = eHostAccessRandom | eHostAccessSequentialWrite;
+static constexpr auto k_hostAccess = eHostAccessRandom | eHostAccessSequentialWrite;
 
 Buffer::Buffer(const BufferCreateInfo& createInfo, void** pointerToMapped) {
     assert(

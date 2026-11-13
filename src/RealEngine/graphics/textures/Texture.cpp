@@ -16,7 +16,7 @@ using enum vma::MemoryUsage;
 
 namespace re {
 
-constexpr auto k_hostAccess = eHostAccessRandom | eHostAccessSequentialWrite;
+static constexpr auto k_hostAccess = eHostAccessRandom | eHostAccessSequentialWrite;
 
 vk::ImageViewType imageViewType(vk::ImageType imageType, uint32_t layers) {
     if (layers > 1) {
