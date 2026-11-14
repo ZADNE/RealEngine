@@ -10,7 +10,7 @@ module;
 
 #include <ImGui/imgui.h>
 
-module rticreator:MainMenuRoom_impl;
+module realengine.tools.rti_creator:MainMenuRoom_impl;
 import :MainMenuRoom;
 
 using namespace ImGui;

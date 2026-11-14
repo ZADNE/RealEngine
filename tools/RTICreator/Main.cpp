@@ -1,7 +1,7 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-module rticreator:Main;
+module realengine.tools.rti_creator:Main;
 import realengine;
 import :MainMenuRoom;
 
