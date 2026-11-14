@@ -1,6 +1,6 @@
 ﻿real_target_sources(ResourcePackager
     PRIVATE
-        Arguments.hpp               Arguments.cpp
+        Arguments.cppm              Arguments.cpp
                                     Main.cpp
-        Package.hpp                 Package.cpp
+        Package.cppm                Package.cpp
 )

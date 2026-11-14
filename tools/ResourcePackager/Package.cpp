@@ -1,14 +1,12 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <filesystem>
-#include <fstream>
-
+module;
 #include <bit7z/bitfilecompressor.hpp>
 
-#include <RealEngine/resources/PackageConstants.hpp>
-
-#include <ResourcePackager/Package.hpp>
+module realengine.tools.resource_packager:Package_impl;
+import realengine;
+import :Package;
 
 namespace fs = std::filesystem;
 

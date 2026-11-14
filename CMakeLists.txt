@@ -211,10 +211,9 @@ block(PROPAGATE RTICreator)
 
     # ResourcePackager
     add_real_executable(ResourcePackager)
-    target_include_directories(ResourcePackager
-        PRIVATE
-            "src"
-            "tools"
+    real_target_init_file_sets(ResourcePackager
+        BASE_DIR "tools"
+        SOURCES_AS_CXX_MODULE_IMPL_UNITS
     )
     set_target_properties(ResourcePackager PROPERTIES
         CXX_STANDARD 23
@@ -224,6 +223,7 @@ block(PROPAGATE RTICreator)
         PRIVATE
             argparse
             bit7z
+            RealEngine
     )
     real_copy_7z_dll_to_target(ResourcePackager)
 

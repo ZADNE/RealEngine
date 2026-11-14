@@ -1,11 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#pragma once
-#include <span>
-#include <string>
+export module realengine.tools.resource_packager:Package;
+import std;
 
-namespace re::rp {
+export namespace re::rp {
 
 void composePackage(
     std::span<const std::string> inputDirs, const std::string& outputDir,

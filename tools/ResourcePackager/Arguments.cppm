@@ -1,11 +1,10 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#pragma once
-#include <string>
-#include <vector>
+export module realengine.tools.resource_packager:Arguments;
+import std;
 
-namespace re::rp {
+export namespace re::rp {
 
 struct CLIArguments {
     std::vector<std::string> inputDirs;

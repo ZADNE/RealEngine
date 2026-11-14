@@ -1,12 +1,11 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <iostream>
+module realengine.tools.resource_packager:Main_impl;
+import :Arguments;
+import :Package;
 
-#include <ResourcePackager/Arguments.hpp>
-#include <ResourcePackager/Package.hpp>
-
-int main(int argc, char* argv[]) {
+extern "C++" int main(int argc, char* argv[]) {
     using namespace re::rp;
     try {
         CLIArguments args = parseArguments(argc, argv);

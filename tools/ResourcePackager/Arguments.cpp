@@ -1,14 +1,15 @@
 ﻿/**
  *  @author    Dubsky Tomas
  */
-#include <argparse/argparse.hpp>
-
-#include <ResourcePackager/Arguments.hpp>
+module realengine.tools.resource_packager:Arguments_impl;
+import std;
+import argparse;
+import :Arguments;
 
 namespace re::rp {
 
 CLIArguments parseArguments(int argc, char* argv[]) { // NOLINT(*-avoid-c-arrays)
-    argparse::ArgumentParser parser("ResourcePackager", "0.1.0");
+    argparse::ArgumentParser parser("ResourcePackager", "0.1.1");
 
     parser.add_argument("--in")
         .metavar("input_dir")
@@ -25,7 +26,7 @@ CLIArguments parseArguments(int argc, char* argv[]) { // NOLINT(*-avoid-c-arrays
         .help("filepath where C++ index file will be placed");
 
     try {
-        parser.parse_args(argc, argv);
+        parser.parse_args(std::vector<std::string>{&argv[0], &argv[argc]});
     } catch (const std::exception& err) {
         std::cerr << err.what() << std::endl;
         std::cerr << parser;
