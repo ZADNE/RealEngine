@@ -1,9 +1,9 @@
 ﻿real_target_sources(RealEngine_utility
     PRIVATE
-        geometry.frag               
-        geometry.vert               
-        sprite.frag                 
-        sprite.tesc                 
-        sprite.tese                 
-        sprite.vert                 
+        Geometry.frag               
+        Geometry.vert               
+        Sprite.frag                 
+        Sprite.tesc                 
+        Sprite.tese                 
+        Sprite.vert                 
 )
