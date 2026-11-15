@@ -16,11 +16,10 @@ constexpr const char* k_indexFileFormatString =
     "/**\n"
     " *  @file Automatically generated file by RealEngine's ResourcePackager\n"
     " */\n"
-    "#pragma once\n"
-    "#include <RealEngine/resources/ResourceID.hpp>\n"
-    "#include <RealEngine/utility/CompTimeString.hpp>\n"
+    "export module {};\n"
+    "import realengine;\n"
     "\n"
-    "namespace re {{\n"
+    "export namespace re {{\n"
     "\n"
     "template<CompTimeString k_lit>\n"
     "consteval ResourceID resourceID() {{\n"
@@ -54,7 +53,7 @@ std::string toForwardSlash(const std::string& in) {
 
 void composePackage(
     std::span<const std::string> inputDirs, const std::string& outputDir,
-    const std::string& indexFilepath
+    const std::string& indexFilepath, const std::string& moduleName
 ) {
     // Prepare 7z
     bit7z::Bit7zLibrary lib{default7ZipSharedLibLocation()};
@@ -92,7 +91,8 @@ void composePackage(
     for (uint32_t i = 0; i < static_cast<uint32_t>(index.size()); ++i) {
         idsString += std::format(k_textureIDFormatString, index[i], i);
     }
-    std::string indexContents = std::format(k_indexFileFormatString, idsString);
+    std::string indexContents =
+        std::format(k_indexFileFormatString, moduleName, idsString);
 
     // Write C++ index
     std::ofstream indexFile{indexFilepath};

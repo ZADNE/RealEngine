@@ -8,7 +8,7 @@ export namespace re::rp {
 
 void composePackage(
     std::span<const std::string> inputDirs, const std::string& outputDir,
-    const std::string& indexFilepath
+    const std::string& indexFilepath, const std::string& moduleName
 );
 
 } // namespace re::rp

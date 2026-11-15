@@ -9,7 +9,7 @@ import :Arguments;
 namespace re::rp {
 
 CLIArguments parseArguments(int argc, char* argv[]) { // NOLINT(*-avoid-c-arrays)
-    argparse::ArgumentParser parser("ResourcePackager", "0.1.1");
+    argparse::ArgumentParser parser("ResourcePackager", "0.2.0");
 
     parser.add_argument("--in")
         .metavar("input_dir")
@@ -24,6 +24,10 @@ CLIArguments parseArguments(int argc, char* argv[]) { // NOLINT(*-avoid-c-arrays
         .metavar("output_index_file")
         .required()
         .help("filepath where C++ index file will be placed");
+    parser.add_argument("--module_name")
+        .metavar("cpp_module_file")
+        .required()
+        .help("name of the C++ module");
 
     try {
         parser.parse_args(std::vector<std::string>{&argv[0], &argv[argc]});
@@ -36,7 +40,8 @@ CLIArguments parseArguments(int argc, char* argv[]) { // NOLINT(*-avoid-c-arrays
     return CLIArguments{
         .inputDirs     = parser.get<std::vector<std::string>>("--in"),
         .outputDir     = parser.get<>("-o"),
-        .indexFilepath = parser.get<>("--index")
+        .indexFilepath = parser.get<>("--index"),
+        .moduleName    = parser.get<>("--module_name")
     };
 }
 

@@ -10,6 +10,7 @@ struct CLIArguments {
     std::vector<std::string> inputDirs;
     std::string outputDir;
     std::string indexFilepath;
+    std::string moduleName;
 };
 
 CLIArguments parseArguments(int argc, char* argv[]); // NOLINT(*-avoid-c-arrays)

@@ -1,6 +1,6 @@
 /**
- *  @author    Dubsky Tomas
- *  @file      ResourceIndex.hpp
+ *  @author    Automatically generated file by RealProject
+ *  @file      ResourceIndex.cppm
  *  @brief     Is an empty placeholder that will be overriden by a real index.
  *  @details   This file is special. After running ResourcePackager at least
  *             once, a proper resource index will be generated in the build
@@ -9,11 +9,10 @@
  *             without running the ResourcePackager. That is useful for debug
  *             builds because those actually use unpackaged data.
  */
-#pragma once
-#include <RealEngine/resources/ResourceID.hpp>
-#include <RealEngine/utility/CompTimeString.hpp>
+export module @module_name@;
+import realengine;
 
-namespace re {
+export namespace re {
 
 /**
  * @brief   Resolves a resource identified by string path into ID.
