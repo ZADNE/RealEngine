@@ -132,6 +132,7 @@ block(PROPAGATE RealEngine_sublibs)
         add_real_library(${target_name} STATIC)
         real_target_init_file_sets(${target_name}
             BASE_DIR "src"
+            GENERATE_CXX_MODULE_INTERFACE "realengine"
             SOURCES_AS_CXX_MODULE_IMPL_UNITS
         )
         set_target_properties(${target_name} PROPERTIES
