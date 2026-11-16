@@ -8,6 +8,7 @@ Real naming convention follows [C++ Canonical Project Structure](https://www.ope
 
 * `.hpp` for C++ headers (e.g. `TileDrawer.hpp`)
 * `.cpp` for C++ source files (e.g. `TileDrawer.cpp`)
+* `.cppm` for C++ module (partition) interface units (e.g. `TileDrawer.cppm`)
 * `.glsl` for GLSL headers (e.g. `WorldDrawingPC.glsl`)
 * `.vert`, `.tesc`, `.tese`, `.geom`, `.frag`, `.comp` for GLSL vertex, tessellation control, tessellation evaluation, geometry, fragment and compute shaders respectively (e.g. `drawFullscreen.vert`, `drawTiles.frag`)
 * All generated files have `.gen` infixed before the final extension (e.g. `WorldDrawingPC.glsl.gen.hpp` for C++ header generated from above GLSL header).
@@ -19,7 +20,7 @@ Related C++ and GLSL source codes may be mixed inside a folder or the shaders ma
 Indentation and alignment should be enforced by the **usage of ClangFormat** so this section describes only identifier naming conventions:
 
 ### Types
-Types (structs, classes, unions) and concepts use **PascalCase**. A class is expected to be placed in a file of the same name so, e.g., `TileDrawer` in `TileDrawer.hpp`.
+Types (structs, classes, unions) and concepts use **PascalCase**. A class is expected to be placed in a file of the same name so, e.g., `TileDrawer` in `TileDrawer.hpp` or `TileDrawer.cppm`.
 
 A notable exception from this rule are namespaces which use (usually very short) underscore_case identifiers.
 
@@ -38,11 +39,17 @@ Both free-standing and member functions use **camelCase**.
 
 Getters and setters (where necessary) use implicit get and explicit set. So, e.g., property `m_color` is gotten via `color()` and set via `setColor(...)`.
 
+### Modules
+
+Module names are expected to be named the same as the folders and files they are implemented in. That is underscore_case for top level module, underscore_case for module partitions that denote subfolders and PascalCase for the last partition identifier that denotes the name of the file it is implemented in.
+
 ### Example
 
 A code sample demonstrating some of the rules follows:
 ```
-class TileDrawer {
+export module my_super_game:tiles.TileDrawer;
+
+export class TileDrawer {
 public:
     void drawTiles(float deltaTime);
     int tileCount() const { return m_tileCount; }
@@ -77,7 +84,7 @@ Scope identifiers include:
 * `u_` for uniform buffers
 * `b_` for storage buffers
 * `s_` for shared variables
-* Other variables (such as locals) do not use any prefix.
+* Other variables (such as function local variables) do not use any prefix.
 
 ### Example
 
