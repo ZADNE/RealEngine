@@ -10,7 +10,7 @@ function(_generate_cpp_interface_module target)
 
     # Configure the file
     get_property(module_part_paths
-        FILE_SET realproject_module_interfaces
+        FILE_SET realproject_public_module_interfaces
         TARGET ${target}
         PROPERTY SOURCES
     )
@@ -41,7 +41,7 @@ function(_generate_cpp_interface_module target)
     # Make the file part of target
     target_sources(${target}
         PUBLIC
-            FILE_SET realproject_module_interfaces
+            FILE_SET realproject_public_module_interfaces
             FILES ${interface_module}
     )
 endfunction()

@@ -64,12 +64,15 @@ function(real_target_init_file_sets target)
     # Module file sets
     get_target_property(target_type ${target} TYPE)
     if(NOT (${target_type} STREQUAL "INTERFACE_LIBRARY"))
-        target_sources(${target} PUBLIC FILE_SET realproject_module_interfaces
-            TYPE CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/${ARG_BASE_DIR}"
-        )
         target_sources(${target}
             PUBLIC
-                FILE_SET realproject_module_interfaces
+                FILE_SET realproject_public_module_interfaces
+                TYPE CXX_MODULES
+                BASE_DIRS
+                    "${CMAKE_CURRENT_SOURCE_DIR}/${ARG_BASE_DIR}"
+                    "${CMAKE_CURRENT_BINARY_DIR}/${ARG_BASE_DIR}"
+            PRIVATE
+                FILE_SET realproject_private_module_interfaces
                 TYPE CXX_MODULES
                 BASE_DIRS
                     "${CMAKE_CURRENT_SOURCE_DIR}/${ARG_BASE_DIR}"
@@ -88,16 +91,24 @@ function(real_target_init_file_sets target)
 endfunction()
 
 # Based on file extensions, add source files into the target
-function(_incorporate_scoped_sources target path_rel header_scope)
+function(_incorporate_scoped_sources target path_rel file_scope)
     get_target_property(sources_as_cxx_impl_units ${target} realproject_sources_as_cxx_impl_units)
     foreach(source IN LISTS ARGN)
         get_filename_component(source_ext ${source} LAST_EXT)
         if(${source_ext} IN_LIST REALPROJECT_MODULE_INTERFACE_EXTENSIONS)
-            target_sources(${target}
-                PUBLIC
-                    FILE_SET realproject_module_interfaces
-                    FILES ${source}
-            )
+            if(${file_scope} STREQUAL "PUBLIC")
+                target_sources(${target}
+                    PUBLIC
+                        FILE_SET realproject_public_module_interfaces
+                        FILES ${source}
+                )
+            elseif(${file_scope} STREQUAL "PRIVATE")
+                target_sources(${target}
+                    PRIVATE
+                        FILE_SET realproject_private_module_interfaces
+                        FILES ${source}
+                )
+            endif()
         elseif(${source_ext} IN_LIST REALPROJECT_HEADER_EXTENSIONS)
             if(${header_scope} STREQUAL "PUBLIC")
                 target_sources(${target}

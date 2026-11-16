@@ -273,7 +273,7 @@ block()
         FILE_SET HEADERS
             DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
-        FILE_SET realproject_module_interfaces
+        FILE_SET realproject_public_module_interfaces
             DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
         FILE_SET CXX_MODULES

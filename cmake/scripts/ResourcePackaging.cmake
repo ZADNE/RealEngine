@@ -50,7 +50,7 @@ function(real_target_package_resources)
     # Make the index file part of target
     target_sources(${ARG_TARGET}
         PUBLIC
-            FILE_SET realproject_module_interfaces
+            FILE_SET realproject_public_module_interfaces
             FILES ${ARG_INDEX_FILE}
     )
 

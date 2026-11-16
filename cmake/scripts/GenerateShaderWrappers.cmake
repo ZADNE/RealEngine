@@ -42,8 +42,8 @@ function(_generate_cpp_wrapper_for_stage target shader_rel)
 
     # Make the files part of the project
     target_sources(${target}
-        PUBLIC
-            FILE_SET realproject_module_interfaces
+        PRIVATE
+            FILE_SET realproject_private_module_interfaces
             FILES ${cppm_abs}
         PRIVATE
             FILE_SET realproject_module_impl_units
