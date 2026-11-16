@@ -2,6 +2,25 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
+function(_shader_filename_to_identifier filename out_shader_identifier)
+    string(REPLACE "." "_" filename ${filename})
+    string(SUBSTRING ${filename} 0 1 first_char)
+    string(SUBSTRING ${filename} 1 -1 remainder)
+    string(TOLOWER ${first_char} first_char)
+    set(${out_shader_identifier} "${first_char}${remainder}" PARENT_SCOPE)
+endfunction()
+
+function(_shader_path_to_module_names path_rel out_module_name out_module_partition)
+    string(FIND ${path_rel} "/" first_sep)
+    string(SUBSTRING ${path_rel} 0 ${first_sep} module_name)
+    math(INCREMENT first_sep)
+    string(SUBSTRING ${path_rel} ${first_sep} -1 module_partition)
+    string(REPLACE "." "_" module_partition ${module_partition})
+    string(REPLACE "/" "." module_partition ${module_partition})
+    set(${out_module_name} ${module_name} PARENT_SCOPE)
+    set(${out_module_partition} ${module_partition} PARENT_SCOPE)
+endfunction()
+
 function(_generate_cpp_wrapper_for_stage target shader_rel)
     # Compose variables
     get_filename_component(shader ${shader_rel} NAME)
@@ -14,14 +33,8 @@ function(_generate_cpp_wrapper_for_stage target shader_rel)
     file(TO_NATIVE_PATH "${target_base_dir_rel}/${shader_rel}" debug_shader_rel)
     string(REPLACE "\\" "\\\\" debug_shader_rel "${debug_shader_rel}")
     set(debug_shader_rel "$<$<CONFIG:Debug>:${debug_shader_rel}>")
-    string(REPLACE "." "_" shader_ ${shader})
-    string(TOLOWER ${shader_rel} shader_partition)
-    string(FIND ${shader_partition} "/" first_sep)
-    string(SUBSTRING ${shader_partition} 0 ${first_sep} module_name)
-    math(INCREMENT first_sep)
-    string(SUBSTRING ${shader_partition} ${first_sep} -1 module_partition)
-    string(REPLACE "." "_" module_partition ${module_partition})
-    string(REPLACE "/" "." module_partition ${module_partition})
+    _shader_filename_to_identifier(${shader} shader_identifier)
+    _shader_path_to_module_names(${shader_rel} module_name module_partition)
 
     # Generate the files
     _generate_configured_file("${template_dir}/Shader.cppm.in" ${cppm_abs})
@@ -42,14 +55,15 @@ function(_generate_cpp_wrapper_to_expose_header target header_rel)
     # Compose paths
     get_filename_component(header ${header_rel} NAME)
     get_filename_component(header_rel_dir ${header_rel} DIRECTORY)
-    set(hpp_rel "${header_rel_dir}/${header}.gen.hpp")
-    set(hpp_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${hpp_rel}")
+    set(cppm_rel "${header_rel_dir}/${header}.gen.cppm")
+    set(cppm_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${cppm_rel}")
+    _shader_path_to_module_names(${header_rel} module_name module_partition)
 
     # Generate the file
-    configure_file("${template_dir}/HeaderWrapper.hpp.in" ${hpp_abs} @ONLY)
+    configure_file("${template_dir}/HeaderWrapper.cppm.in" ${cppm_abs} @ONLY)
 endfunction()
 
-function(_generate_cpp_wrappers_for_shaders target)
+function(_generate_shaders_wrappers target)
     # Check if this target has shaders
     _does_target_have_shaders(${target})
     if(NOT ${target_has_shaders})

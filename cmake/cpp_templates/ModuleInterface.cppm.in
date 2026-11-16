@@ -1,0 +1,6 @@
+/**
+ *  @author    Automatically generated file by RealProject
+ */
+export module @module_name@;
+
+@exports_imports@

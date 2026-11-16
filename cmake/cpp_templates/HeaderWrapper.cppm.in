@@ -1,7 +1,7 @@
 /**
  *  @author    Automatically generated file by RealProject
  */
-#pragma once
+export module @module_name@:@module_partition@;
 
 @cpp_namespace_start@
 #include <RealShaders/details/GlslIntegrationBegin.hpp>

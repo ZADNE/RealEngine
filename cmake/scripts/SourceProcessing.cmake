@@ -27,15 +27,23 @@ set(REALPROJECT_GLSL_STAGE_EXTENSIONS
 #     real_target_init_file_sets(
 #        <target>
 #        BASE_DIR <directory_name>
+#        [ GENERATE_CXX_MODULE_INTERFACE <module_name> ]
 #        [ SOURCES_AS_CXX_MODULE_IMPL_UNITS ]
 #     )
-# BASE_DIR: Header includes will be relative to this
-# SOURCES_AS_CXX_MODULE_IMPL_UNITS: C++ sources (identified by file extension)
-#                                   will be treated as module implementation units.
-#                                   Ignored for INTERFACE libraries.
+# BASE_DIR <directory_name>
+#     Header includes will be relative to this directory.
+# GENERATE_CXX_MODULE_INTERFACE <module_name>
+#     A C++ module interface will be generated.
+#     All target's module partition interfaces must declare partition as:
+#         export module <module_name>:folder.subfolder.FileName;
+#     The module interface will not be valid if this condition is not satisfied.
+# SOURCES_AS_CXX_MODULE_IMPL_UNITS
+#     C++ sources (identified by file extension) will be treated as
+#     module implementation units.
+#     Ignored for INTERFACE libraries.
 function(real_target_init_file_sets target)
     set(option_keywords SOURCES_AS_CXX_MODULE_IMPL_UNITS)
-    set(one_value_keywords BASE_DIR)
+    set(one_value_keywords BASE_DIR GENERATE_CXX_MODULE_INTERFACE)
     cmake_parse_arguments(ARG "${option_keywords}" "${one_value_keywords}" "" ${ARGN})
 
     get_target_property(source_dir ${target} SOURCE_DIR)
@@ -46,6 +54,12 @@ function(real_target_init_file_sets target)
     target_sources(${target} PUBLIC FILE_SET realproject_public_headers
         TYPE HEADERS BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/${ARG_BASE_DIR}"
     )
+
+    if(DEFINED ARG_GENERATE_CXX_MODULE_INTERFACE)
+        set_target_properties(${target} PROPERTIES
+            realproject_cxx_interface_module "${ARG_GENERATE_CXX_MODULE_INTERFACE}"
+        )
+    endif()
 
     # Module file sets
     get_target_property(target_type ${target} TYPE)

@@ -1,9 +1,7 @@
 # author     Dubsky Tomas
 
-include("${CMAKE_CURRENT_LIST_DIR}/RealProjectSourceProcessing.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/RealProjectGenerateSetupFile.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/RealShadersAddCompilationTarget.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/RealShadersGenerateCppFiles.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/SourceProcessing.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/FinalizeTarget.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ResourcePackaging.cmake")
 
 # Do not use directly, use add_real_library or add_real_executable
@@ -12,6 +10,7 @@ macro(_add_real_target target)
     set_target_properties(${target} PROPERTIES
         CXX_STANDARD                            23
         CXX_MODULE_STD                          ON
+        realproject_cxx_interface_module        ""
         realproject_sources_as_cxx_impl_units   OFF
         realproject_base_dir_rel                "."
         realproject_base_dir_abs                "${source_dir}"
@@ -20,9 +19,7 @@ macro(_add_real_target target)
         realproject_glsl_headers_rel            ""
         realproject_glsl_sources_rel            ""
     )
-    cmake_language(DEFER CALL _generate_cpp_setup_file ${target})
-    cmake_language(DEFER CALL _generate_cpp_wrappers_for_shaders ${target})
-    cmake_language(DEFER CALL _add_shader_compilation_target ${target})
+    cmake_language(DEFER CALL _finalize_real_target ${target})
 endmacro()
 
 # Adds a Real library
