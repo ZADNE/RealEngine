@@ -60,7 +60,12 @@ function(_generate_cpp_wrapper_to_expose_header target header_rel)
     _shader_path_to_module_names(${header_rel} module_name module_partition)
 
     # Generate the file
-    configure_file("${template_dir}/HeaderWrapper.cppm.in" ${cppm_abs} @ONLY)
+    configure_file("${template_dir}/ShaderModuleHeader.cppm.in" ${cppm_abs} @ONLY)
+    target_sources(${target}
+        PRIVATE
+            FILE_SET realproject_module_impl_units
+            FILES ${cppm_abs}
+    )
 endfunction()
 
 function(_generate_shaders_wrappers target)
@@ -79,7 +84,7 @@ function(_generate_shaders_wrappers target)
     # Load target properties and prepare variables
     get_target_property(base_dir ${target} realproject_base_dir_rel)
     get_target_property(shader_sources_rel ${target} realproject_glsl_sources_rel)
-    get_target_property(shader_headers_rel ${target} realproject_glsl_headers_rel)
+    get_target_property(shader_module_headers_rel ${target} realproject_glsl_module_headers_rel)
     get_target_property(cpp_namespace ${target} realproject_shader_cxx_namespace)
     get_target_property(shaders_cxx_module ${target} realproject_shaders_cxx_module)
     _load_shader_naming_constants()
@@ -110,10 +115,10 @@ function(_generate_shaders_wrappers target)
     endforeach()
 
     # Expose shader headers
-    foreach(header_rel IN LISTS shader_headers_rel)
+    foreach(header_rel IN LISTS shader_module_headers_rel)
         _generate_cpp_wrapper_to_expose_header(${target} ${header_rel})
     endforeach()
-    list(LENGTH shader_headers_rel exposed_header_count)
+    list(LENGTH shader_module_headers_rel exposed_header_count)
     if(${exposed_header_count} GREATER 0)
         # Add include path for RealShaders folder that header wrappers use
         get_realengine_base_dir_abs()

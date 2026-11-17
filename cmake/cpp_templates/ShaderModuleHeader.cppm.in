@@ -1,0 +1,29 @@
+/**
+ *  @author    Automatically generated file by RealProject
+ */
+export module @module_name@:@module_partition@;
+
+#if defined(__clang__)
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Winclude-angled-in-module-purview"
+#elif defined(_MSC_VER)
+#    pragma warning(push)
+#    pragma warning(disable : 5244)
+#endif
+
+#define GLM_FORCE_SWIZZLE
+#include <glm/glm.hpp>
+
+@cpp_namespace_start@
+#include <RealShaders/details/GlslIntegrationBegin.hpp>
+
+#include <@header_rel@>
+
+#include <RealShaders/details/GlslIntegrationEnd.hpp>
+@cpp_namespace_end@
+
+#if defined(__clang__)
+#    pragma clang diagnostic pop
+#elif defined(_MSC_VER)
+#    pragma warning(pop)
+#endif
