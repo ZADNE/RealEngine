@@ -6,7 +6,7 @@ import std;
 import argparse;
 import :Arguments;
 
-namespace re::rp {
+namespace re::resp {
 
 CLIArguments parseArguments(int argc, char* argv[]) { // NOLINT(*-avoid-c-arrays)
     argparse::ArgumentParser parser("ResourcePackager", "0.2.0");
@@ -45,4 +45,4 @@ CLIArguments parseArguments(int argc, char* argv[]) { // NOLINT(*-avoid-c-arrays
     };
 }
 
-} // namespace re::rp
+} // namespace re::resp

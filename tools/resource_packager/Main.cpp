@@ -6,7 +6,7 @@ import :Arguments;
 import :Package;
 
 extern "C++" int main(int argc, char* argv[]) {
-    using namespace re::rp;
+    using namespace re::resp;
     try {
         CLIArguments args = parseArguments(argc, argv);
         composePackage(

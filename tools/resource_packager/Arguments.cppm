@@ -4,7 +4,7 @@
 export module realengine.tools.resource_packager:Arguments;
 import std;
 
-export namespace re::rp {
+export namespace re::resp {
 
 struct CLIArguments {
     std::vector<std::string> inputDirs;
@@ -15,4 +15,4 @@ struct CLIArguments {
 
 CLIArguments parseArguments(int argc, char* argv[]); // NOLINT(*-avoid-c-arrays)
 
-} // namespace re::rp
+} // namespace re::resp

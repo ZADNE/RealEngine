@@ -10,7 +10,7 @@ import :Package;
 
 namespace fs = std::filesystem;
 
-namespace re::rp {
+namespace re::resp {
 
 constexpr const char* k_indexFileFormatString =
     "/**\n"
@@ -101,4 +101,4 @@ void composePackage(
     );
 }
 
-} // namespace re::rp
+} // namespace re::resp
