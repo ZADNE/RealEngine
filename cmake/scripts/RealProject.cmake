@@ -16,7 +16,7 @@ macro(_add_real_target target)
         realproject_base_dir_abs                "${source_dir}"
         realproject_setup_filepath_rel          "${target}Setup.gen.hpp"
         realproject_glsl_standard               "460"
-        realproject_glsl_module_headers_rel     ""
+        realproject_glsl_headers_rel            ""
         realproject_glsl_sources_rel            ""
     )
     cmake_language(DEFER CALL _finalize_real_target ${target})

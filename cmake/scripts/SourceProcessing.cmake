@@ -17,10 +17,6 @@ set(REALPROJECT_GLSL_HEADER_EXTENSIONS
     ".glsl"
     CACHE STRING "List of file extensions interpreted as GLSL header files"
 )
-set(REALPROJECT_GLSL_MODULE_HEADER_EXTENSIONS
-    ".glslm"
-    CACHE STRING "List of file extensions interpreted as GLSL header files that should be exposed to C++"
-)
 set(REALPROJECT_GLSL_STAGE_EXTENSIONS
     ".vert;.tesc;.tese;.geom;.frag;.comp"
     CACHE STRING "List of file extensions interpreted as GLSL stage files"
@@ -134,10 +130,8 @@ function(_incorporate_scoped_sources target path_rel file_scope)
                 target_sources(${target} PRIVATE ${source})
             endif()
         elseif(${source_ext} IN_LIST REALPROJECT_GLSL_HEADER_EXTENSIONS)
-            # Nothing to do currently
-        elseif(${source_ext} IN_LIST REALPROJECT_GLSL_MODULE_HEADER_EXTENSIONS)
             set_property(TARGET ${target}
-                APPEND PROPERTY realproject_glsl_module_headers_rel
+                APPEND PROPERTY shader_headers_rel
                 "${path_rel}/${source}"
             )
         elseif(${source_ext} IN_LIST REALPROJECT_GLSL_STAGE_EXTENSIONS)
