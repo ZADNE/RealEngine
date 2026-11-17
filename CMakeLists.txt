@@ -285,7 +285,7 @@ block()
             COMPONENT           RealEngine_Development
     )
     install( # Manually install RealShaders because it contains GLSL that normally is not installed
-        DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/src/RealShaders"
+        DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/src/realshaders"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         COMPONENT   RealEngine_Development
     )
