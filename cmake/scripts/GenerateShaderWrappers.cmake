@@ -18,7 +18,7 @@ function(_shader_path_to_module_names path_rel out_module_name out_module_partit
     string(REPLACE "." "_" module_partition ${module_partition})
     string(REPLACE "/" "." module_partition ${module_partition})
     set(${out_module_name} ${module_name} PARENT_SCOPE)
-    set(${out_module_partition} ${module_partition} PARENT_SCOPE)
+    set(${out_module_partition} "${module_partition}_gen" PARENT_SCOPE)
 endfunction()
 
 function(_generate_cpp_wrapper_for_stage target shader_rel)
@@ -66,6 +66,7 @@ function(_generate_cpp_wrapper_to_expose_header target header_rel)
     
     # Compose variables and paths
     get_filename_component(header ${header_rel} NAME)
+    get_filename_component(header_rel_dir ${header_rel} DIRECTORY)
     set(cppm_rel "${header_rel_dir}/${header}.gen.cppm")
     set(cppm_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${cppm_rel}")
     _shader_path_to_module_names(${header_rel} module_name module_partition)
