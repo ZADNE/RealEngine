@@ -8,7 +8,7 @@ module;
 #define NOMINMAX 1
 #include <Windows.h>
 
-#include <ImGui/imgui.h>
+#include <imgui/imgui.h>
 
 module realengine.tools.rti_creator:MainMenuRoom_impl;
 import :MainMenuRoom;

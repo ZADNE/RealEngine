@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  */
 module;
-#include <ImGui/imgui_impl_sdl3.h>
+#include <imgui/imgui_impl_sdl3.h>
 #include <SDL3/SDL_events.h>
 
 module realengine:window.Window_impl;

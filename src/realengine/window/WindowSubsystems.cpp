@@ -2,7 +2,7 @@
  *  @author    Dubsky Tomas
  */
 module;
-#include <ImGui/imgui.h>
+#include <imgui/imgui.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3_ttf/SDL_ttf.h>
 

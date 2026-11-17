@@ -22,7 +22,7 @@ target_link_libraries(ImGui
         SDL3::SDL3
         glm::glm-header-only
 )
-add_subdirectory(ImGui)
+add_subdirectory(imgui)
 
 # lodepng
 add_real_library(lodepng STATIC)
