@@ -2,6 +2,7 @@
  *  @author    Automatically generated file by RealProject
  */
 export module @module_name@:@module_partition@;
+import glm;
 
 #if defined(__clang__)
 #    pragma clang diagnostic push
@@ -11,16 +12,13 @@ export module @module_name@:@module_partition@;
 #    pragma warning(disable : 5244)
 #endif
 
-#define GLM_FORCE_SWIZZLE
-#include <glm/glm.hpp>
-
-@cpp_namespace_start@
+@cpp_export_namespace_start@
 #include <realshaders/details/GlslIntegrationBegin.hpp>
 
 #include <@header_rel@>
 
 #include <realshaders/details/GlslIntegrationEnd.hpp>
-@cpp_namespace_end@
+@cpp_export_namespace_end@
 
 #if defined(__clang__)
 #    pragma clang diagnostic pop

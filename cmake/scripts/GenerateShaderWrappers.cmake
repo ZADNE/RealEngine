@@ -52,15 +52,26 @@ function(_generate_cpp_wrapper_for_stage target shader_rel)
 endfunction()
 
 function(_generate_cpp_wrapper_to_expose_header target header_rel)
-    # Compose paths
+    # Check if this header should be exposed
+    set(header_abs "${CMAKE_CURRENT_SOURCE_DIR}/${base_dir}/${header_rel}")
+    file(READ ${header_abs} header_content LIMIT 2047)
+    string(FIND
+        "${header_content}"
+        "#include <realshaders/CppIntegration.glsl>"
+        found_index
+    )
+    if(found_index EQUAL -1)
+        return() # This header should not be exposed
+    endif()
+    
+    # Compose variables and paths
     get_filename_component(header ${header_rel} NAME)
-    get_filename_component(header_rel_dir ${header_rel} DIRECTORY)
     set(cppm_rel "${header_rel_dir}/${header}.gen.cppm")
     set(cppm_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${cppm_rel}")
     _shader_path_to_module_names(${header_rel} module_name module_partition)
 
     # Generate the file
-    configure_file("${template_dir}/ShaderModuleHeader.cppm.in" ${cppm_abs} @ONLY)
+    configure_file("${template_dir}/ShaderHeader.cppm.in" ${cppm_abs} @ONLY)
     target_sources(${target}
         PUBLIC
             FILE_SET realproject_public_module_interfaces
