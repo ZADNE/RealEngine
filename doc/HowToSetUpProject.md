@@ -48,7 +48,7 @@ To serve these use cases, wrappers for GLSL headers are generated too. Wrapper f
 * `scalar` layout should be used for interface blocks to ensure that the memory layout is the same in both languages.
 * `out` and `inout` keywords cannot be used.
 
-You can also include a special GLSL header via `#include <RealShaders/CppIntegration.glsl>` to:
+You can also include a special GLSL header via `#include <realshaders/CppIntegration.glsl>` to:
 
 * Introduce macro `RE_GLSL_ONLY(...)` that preserves the contents only for GLSL compiler.
 * Introduce macro `RE_CPP_ONLY(...)` that preserves the contents only for C++ compiler.
