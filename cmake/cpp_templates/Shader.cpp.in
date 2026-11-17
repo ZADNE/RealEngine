@@ -4,6 +4,14 @@
 module @module_name@:@module_partition@_impl;
 import :@module_partition@;
 
+#if defined(__clang__)
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Winclude-angled-in-module-purview"
+#elif defined(_MSC_VER)
+#    pragma warning(push)
+#    pragma warning(disable : 5244)
+#endif
+
 @cpp_namespace_start@
 #if 0
 // Navigation section - use #includes to jump to files:
@@ -22,3 +30,9 @@ const re::ShaderSource @shader_identifier@{
     "@debug_shader_rel@"
 };
 @cpp_namespace_end@
+
+#if defined(__clang__)
+#    pragma clang diagnostic pop
+#elif defined(_MSC_VER)
+#    pragma warning(pop)
+#endif

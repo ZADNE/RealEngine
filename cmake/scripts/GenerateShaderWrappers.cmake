@@ -62,8 +62,8 @@ function(_generate_cpp_wrapper_to_expose_header target header_rel)
     # Generate the file
     configure_file("${template_dir}/ShaderModuleHeader.cppm.in" ${cppm_abs} @ONLY)
     target_sources(${target}
-        PRIVATE
-            FILE_SET realproject_module_impl_units
+        PUBLIC
+            FILE_SET realproject_public_module_interfaces
             FILES ${cppm_abs}
     )
 endfunction()

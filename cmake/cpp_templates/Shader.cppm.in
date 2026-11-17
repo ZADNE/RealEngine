@@ -2,7 +2,7 @@
  *  @author    Automatically generated file by RealProject
  */
 export module @module_name@:@module_partition@;
-import :graphics.pipelines.PipelineSources;
+import $<IF:$<STREQUAL:@module_name@,realengine>,:graphics.pipelines.PipelineSources,realengine>;
 
 @cpp_export_namespace_start@
 extern const re::ShaderSource @shader_identifier@;
