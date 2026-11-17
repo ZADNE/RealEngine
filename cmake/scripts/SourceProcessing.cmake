@@ -131,7 +131,7 @@ function(_incorporate_scoped_sources target path_rel file_scope)
             endif()
         elseif(${source_ext} IN_LIST REALPROJECT_GLSL_HEADER_EXTENSIONS)
             set_property(TARGET ${target}
-                APPEND PROPERTY shader_headers_rel
+                APPEND PROPERTY realproject_glsl_headers_rel
                 "${path_rel}/${source}"
             )
         elseif(${source_ext} IN_LIST REALPROJECT_GLSL_STAGE_EXTENSIONS)
