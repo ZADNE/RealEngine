@@ -93,6 +93,7 @@ block(PROPAGATE bit7z_aliased_target runtime_bundled_artifacts)
         )
         set_target_properties(glm-glm-cpp-module PROPERTIES CXX_STANDARD 23)
         target_include_directories(glm-glm-cpp-module PUBLIC ${glm_include_dir})
+        target_compile_definitions(glm-glm-cpp-module PUBLIC "GLM_FORCE_SWIZZLE")
         add_library(glm::glm-cpp-module ALIAS glm-glm-cpp-module)
     endif()
 
