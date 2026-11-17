@@ -4,6 +4,8 @@
 export module realengine.tools.rti_creator:MainMenuRoom;
 import realengine;
 
+export namespace re::rtic {
+
 /**
  * @brief Room with the UI
  */
@@ -58,3 +60,5 @@ private:
 
     float m_drawScale = 1.0f;
 };
+
+} // namespace re::rtic

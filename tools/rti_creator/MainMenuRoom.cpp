@@ -15,6 +15,8 @@ import :MainMenuRoom;
 
 using namespace ImGui;
 
+namespace re::rtic {
+
 MainMenuRoom::MainMenuRoom(re::CommandLineArguments args)
     : Room(0, re::RoomDisplaySettings{.framesPerSecondLimit = 144, .imGuiSubpassIndex = 0})
     , m_texView(engine().windowDims()) {
@@ -262,3 +264,5 @@ void MainMenuRoom::resetView() {
     m_texView.setPosition(glm::vec2{0.0f, 0.0f});
     m_drawScale = 1.0f;
 }
+
+} // namespace re::rtic
