@@ -1,10 +1,10 @@
 /**
  *  @author    Automatically generated file by RealProject
  */
-#pragma once
-#include <RealEngine/resources/hot_reload/HotReloadInitInfo.hpp>
+export module @module_name@;
+import realengine;
 
-namespace re::setup {
+export namespace re::setup {
 
 constexpr HotReloadInitInfo k_hotReloadInitInfo{
     .cmakePath              = "$<$<CONFIG:Debug>:${cmake_command}>",
