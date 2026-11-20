@@ -35,7 +35,7 @@ glm::mat4 FlyingCamera3D::calculateRelativeViewMat(
 }
 
 glm::mat4 FlyingCamera3D::calculateViewMat(glm::quat dirQuat, glm::vec3 pos) const {
-    return glm::gtc::translate(glm::gtc::mat4_cast(dirQuat), -pos);
+    return glm::translate(glm::mat4_cast(dirQuat), -pos);
 }
 
 } // namespace re

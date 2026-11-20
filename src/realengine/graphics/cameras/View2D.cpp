@@ -11,8 +11,7 @@ namespace re {
 
 View2D::View2D(glm::vec2 viewDimensions)
     : m_viewDimensions(viewDimensions) {
-    m_orthoMatrix =
-        glm::ext::ortho(0.0f, m_viewDimensions.x, 0.0f, m_viewDimensions.y);
+    m_orthoMatrix = glm::ortho(0.0f, m_viewDimensions.x, 0.0f, m_viewDimensions.y);
     update();
 }
 
@@ -46,10 +45,10 @@ void View2D::update() {
         -m_position.x + m_viewDimensions.x * 0.5f,
         -m_position.y + m_viewDimensions.y * 0.5f, 0.0f
     );
-    m_viewMatrix = glm::gtc::translate(m_orthoMatrix, translate);
+    m_viewMatrix = glm::translate(m_orthoMatrix, translate);
     // Scale
     glm::vec3 scale(m_scale.x, m_scale.y, 0.0f);
-    m_viewMatrix = glm::ext::scale(glm::mat4(1.0f), scale) * m_viewMatrix;
+    m_viewMatrix = glm::scale(glm::mat4(1.0f), scale) * m_viewMatrix;
     // Update relative cursor position
     m_cursorRel = convertAbsToRel(m_cursorAbs);
 }
