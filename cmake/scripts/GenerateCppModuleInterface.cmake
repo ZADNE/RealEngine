@@ -37,7 +37,7 @@ function(_generate_cpp_interface_module target)
         cmake_path(REMOVE_EXTENSION module_part_path LAST_ONLY)
         string(REPLACE "." "_" module_part_path ${module_part_path})
         string(REPLACE "/" "." module_part_path ${module_part_path})
-        string(APPEND exports_imports "export import :${module_part_path};\n")
+        list(APPEND exports_imports ":${module_part_path}")
     endforeach()
 
     # Configure the file

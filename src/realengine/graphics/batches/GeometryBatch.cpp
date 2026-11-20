@@ -7,8 +7,7 @@ module;
 
 module realengine:graphics.batches.GeometryBatch_impl;
 import :graphics.batches.GeometryBatch;
-import :graphics.batches.shaders.Geometry_frag;
-import :graphics.batches.shaders.Geometry_vert;
+import :graphics.batches.shaders.AllShaders_gen;
 import :graphics.commands.CommandBuffer;
 import :graphics.synchronization.DoubleBuffered;
 

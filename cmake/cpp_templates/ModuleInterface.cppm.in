@@ -1,6 +1,7 @@
 /**
  *  @author    Automatically generated file by RealProject
  */
-export module @module_name@;
+export module @module_name@@module_partition@;
 
-@exports_imports@
+$<LIST:JOIN,$<LIST:TRANSFORM,@exports_imports@,APPLY,export import $<_0>\;>,@newline@>
+$<LIST:JOIN,$<LIST:TRANSFORM,@import_only@,APPLY,import $<_0>\;>,@newline@>

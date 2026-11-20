@@ -7,12 +7,7 @@ module;
 
 module realengine:graphics.batches.SpriteBatch_impl;
 import :graphics.batches.SpriteBatch;
-import std;
-import glm;
-import :graphics.batches.shaders.Sprite_frag;
-import :graphics.batches.shaders.Sprite_tesc;
-import :graphics.batches.shaders.Sprite_tese;
-import :graphics.batches.shaders.Sprite_vert;
+import :graphics.batches.shaders.AllShaders_gen;
 import :graphics.synchronization.DoubleBuffered;
 
 using enum vk::DescriptorBindingFlagBits;

@@ -1,7 +1,7 @@
 /**
  *  @author    Automatically generated file by RealProject
  */
-export module @module_name@:@module_partition@;
+export module @module_name@@module_partition@;
 import $<IF:$<STREQUAL:@module_name@,realengine>,:graphics.pipelines.PipelineSources,realengine>;
 
 @cpp_export_namespace_start@

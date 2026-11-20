@@ -10,15 +10,13 @@ function(_shader_filename_to_identifier filename out_shader_identifier)
     set(${out_shader_identifier} "${first_char}${remainder}" PARENT_SCOPE)
 endfunction()
 
-function(_shader_path_to_module_names path_rel out_module_name out_module_partition)
+function(_shader_path_to_module_partition path_rel  out_module_partition)
     string(FIND ${path_rel} "/" first_sep)
-    string(SUBSTRING ${path_rel} 0 ${first_sep} module_name)
     math(INCREMENT first_sep)
     string(SUBSTRING ${path_rel} ${first_sep} -1 module_partition)
     string(REPLACE "." "_" module_partition ${module_partition})
     string(REPLACE "/" "." module_partition ${module_partition})
-    set(${out_module_name} ${module_name} PARENT_SCOPE)
-    set(${out_module_partition} "${module_partition}_gen" PARENT_SCOPE)
+    set(${out_module_partition} ":${module_partition}_gen" PARENT_SCOPE)
 endfunction()
 
 function(_generate_cpp_wrapper_for_stage target shader_rel)
@@ -34,7 +32,7 @@ function(_generate_cpp_wrapper_for_stage target shader_rel)
     string(REPLACE "\\" "\\\\" debug_shader_rel "${debug_shader_rel}")
     set(debug_shader_rel "$<$<CONFIG:Debug>:${debug_shader_rel}>")
     _shader_filename_to_identifier(${shader} shader_identifier)
-    _shader_path_to_module_names(${shader_rel} module_name module_partition)
+    _shader_path_to_module_partition(${shader_rel} module_partition)
 
     # Generate the files
     _generate_configured_file("${template_dir}/Shader.cppm.in" ${cppm_abs})
@@ -42,8 +40,8 @@ function(_generate_cpp_wrapper_for_stage target shader_rel)
 
     # Make the files part of the project
     target_sources(${target}
-        PRIVATE
-            FILE_SET realproject_private_module_interfaces
+        PUBLIC
+            FILE_SET realproject_public_module_interfaces
             FILES ${cppm_abs}
         PRIVATE
             FILE_SET realproject_module_impl_units
@@ -63,13 +61,13 @@ function(_generate_cpp_wrapper_to_expose_header target header_rel)
     if(found_index EQUAL -1)
         return() # This header should not be exposed
     endif()
-    
+
     # Compose variables and paths
     get_filename_component(header ${header_rel} NAME)
     get_filename_component(header_rel_dir ${header_rel} DIRECTORY)
     set(cppm_rel "${header_rel_dir}/${header}.gen.cppm")
     set(cppm_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${cppm_rel}")
-    _shader_path_to_module_names(${header_rel} module_name module_partition)
+    _shader_path_to_module_partition(${header_rel} module_partition)
 
     # Generate the file
     configure_file("${template_dir}/ShaderHeader.cppm.in" ${cppm_abs} @ONLY)
@@ -98,10 +96,10 @@ function(_generate_shaders_wrappers target)
     get_target_property(shader_sources_rel ${target} realproject_glsl_sources_rel)
     get_target_property(shader_headers_rel ${target} realproject_glsl_headers_rel)
     get_target_property(cpp_namespace ${target} realproject_shader_cxx_namespace)
-    get_target_property(shaders_cxx_module ${target} realproject_shaders_cxx_module)
+    get_target_property(module_name ${target} realproject_cxx_interface_module)
     _load_shader_naming_constants()
 
-    # Prepare reusable variables
+    # Prepare reused variables
     if("${cpp_namespace}" STREQUAL "")
         set(cpp_export_namespace_start  "export {\n")
         set(cpp_export_namespace_end    "\n}")
@@ -124,6 +122,33 @@ function(_generate_shaders_wrappers target)
             get_filename_component(shader_dir ${shader_rel} DIRECTORY)
             list(APPEND shader_dirs ${shader_dir}) # Collect directories
         endif()
+    endforeach()
+
+    # Generate directory stage wrappers
+    list(REMOVE_DUPLICATES shader_dirs)
+    foreach(dir IN LISTS shader_dirs) # For each dir
+        _shader_path_to_module_partition("${dir}/AllShaders" module_partition)
+        # Find all shaders in it
+        set(exports_imports)
+        foreach(shader_rel IN LISTS shader_sources_rel)
+            get_filename_component(shader_dir ${shader_rel} DIRECTORY)
+            if(${shader_dir} STREQUAL ${dir})
+                _shader_path_to_module_partition(${shader_rel} shader_module_partition)
+                list(APPEND exports_imports ${shader_module_partition})
+            endif()
+        endforeach()
+
+        # Generate the file
+        set(cppm_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${dir}/AllShaders.gen.cppm")
+        _generate_configured_file(
+            "${template_dir}/ModuleInterface.cppm.in"
+            ${cppm_abs}
+        )
+        target_sources(${target}
+            PUBLIC
+                FILE_SET realproject_public_module_interfaces
+                FILES ${cppm_abs}
+        )
     endforeach()
 
     # Expose shader headers

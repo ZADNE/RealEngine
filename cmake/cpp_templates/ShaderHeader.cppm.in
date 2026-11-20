@@ -1,7 +1,7 @@
 /**
  *  @author    Automatically generated file by RealProject
  */
-export module @module_name@:@module_partition@;
+export module @module_name@@module_partition@;
 import glm;
 
 #if defined(__clang__)

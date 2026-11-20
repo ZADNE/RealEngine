@@ -1,8 +1,8 @@
 /**
  *  @author    Automatically generated file by RealProject
  */
-module @module_name@:@module_partition@_impl;
-import :@module_partition@;
+module @module_name@@module_partition@_impl;
+import @module_partition@;
 
 #if defined(__clang__)
 #    pragma clang diagnostic push

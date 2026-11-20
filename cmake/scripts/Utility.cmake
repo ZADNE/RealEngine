@@ -26,6 +26,8 @@ function(real_copy_7z_dll_to_target target)
 endfunction()
 
 function(_generate_configured_file in_file out_file)
+    set(newline "
+")
     file(READ ${in_file} contents)
     string(CONFIGURE "${contents}" contents)
     file(GENERATE
