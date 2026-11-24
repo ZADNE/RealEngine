@@ -34,7 +34,7 @@ int MainProgram::run(size_t roomName, const RoomTransitionArguments& args) {
     } catch (...) { fatalError("Unknown exception!"); }
 }
 
-void MainProgram::scheduleExit(int exitcode /* = 1*/) {
+void MainProgram::scheduleExit(int exitcode /* = 0*/) {
     m_programShouldRun = false;
     m_programExitCode  = exitcode;
 }

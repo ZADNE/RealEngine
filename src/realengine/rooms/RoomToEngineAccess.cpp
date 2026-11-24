@@ -10,7 +10,7 @@ namespace re {
 
 #pragma region MainProgram
 
-void RoomToEngineAccess::scheduleExit(int exitcode) {
+void RoomToEngineAccess::scheduleExit(int exitcode/* = 0*/) {
     m_mainProgram.scheduleExit(exitcode);
 }
 

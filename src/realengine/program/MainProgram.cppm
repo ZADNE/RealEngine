@@ -107,7 +107,7 @@ public:
      *
      * @param exitcode The exit code that should be returned from run()
      */
-    void scheduleExit(int exitcode = 1);
+    void scheduleExit(int exitcode = 0);
 
     /**
      * @brief Schedules transition to another ('next') room.
@@ -169,7 +169,7 @@ private:
     RoomToEngineAccess m_roomToEngineAccess;
 
     bool m_programShouldRun = false;
-    int m_programExitCode   = 1;
+    int m_programExitCode   = 0;
     int m_stepN             = 0;
 
     bool m_pollEventsInMainThread = true;

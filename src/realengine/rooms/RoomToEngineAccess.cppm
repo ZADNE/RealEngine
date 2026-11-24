@@ -41,7 +41,7 @@ public:
     /**
      * @copydoc MainProgram::scheduleExit
      */
-    void scheduleExit(int exitcode = 1);
+    void scheduleExit(int exitcode = 0);
 
     /**
      * @copydoc MainProgram::scheduleRoomTransition
