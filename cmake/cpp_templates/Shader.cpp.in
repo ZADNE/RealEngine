@@ -1,5 +1,5 @@
 /**
- *  @author    Automatically generated file by RealProject
+ *  @author    Automatically generated file by RealEngine
  */
 module @module_name@@module_partition@_impl;
 import @module_partition@;

@@ -17,15 +17,15 @@ Real/
 ├─ CMakeLists.txt
 ```
 
-The top level `CMakeLists.txt` should stay intact. Real also contains RealEngine-default configuration files for various tools (clangformat etc.) but these are not strictly necessary. There can be multiple RealProjects next to each other.
+The top level `CMakeLists.txt` should stay intact. Real also contains RealEngine-default configuration files for various tools (clangformat etc.) but these are not strictly necessary. There can be multiple RealEngine-based proejcts next to each other.
 
 ### CMake setup
 
-RealProjects shall be created with `add_real_executable` and `add_real_library` functions which take the same arguments as their standard versions. It is also advised to set up the main source directory - eg. `real_target_init_file_sets(MyProject BASE_DIR "src")` allows to `#include` files relative to `src` directory.
+Projects using RealEngine shall be created with `add_real_executable` and `add_real_library` functions which take the same arguments as their standard versions. It is also advised to set up the main source directory - eg. `real_target_init_file_sets(MyProject BASE_DIR "src")` allows to `#include` files relative to `src` directory.
 
 Individual files can be added to project using `real_target_sources`. This function works similar to `target_sources`. The important difference is that automatically incorporates shaders based on file extensions. By default it expects the same file extensions as Real Naming Convention recommends, though it can be changed via CMake cache variables.
 
-See `cmake/RealProject/RealProject.cmake` for full list and documentation of public functions and configuration options.
+See `cmake/script/RealEngine.cmake` (and `cmake/script/Setup.cmake`) for full list and documentation of public functions and configuration options.
 
 ### Incorporation of GLSL shaders
 

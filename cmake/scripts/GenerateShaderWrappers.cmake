@@ -41,10 +41,10 @@ function(_generate_cpp_wrapper_for_stage target shader_rel)
     # Make the files part of the project
     target_sources(${target}
         PUBLIC
-            FILE_SET realproject_public_module_interfaces
+            FILE_SET re_public_module_interfaces
             FILES ${cppm_abs}
         PRIVATE
-            FILE_SET realproject_module_impl_units
+            FILE_SET re_module_impl_units
             FILES ${cpp_abs}
     )
 endfunction()
@@ -73,7 +73,7 @@ function(_generate_cpp_wrapper_to_expose_header target header_rel)
     configure_file("${template_dir}/ShaderHeader.cppm.in" ${cppm_abs} @ONLY)
     target_sources(${target}
         PUBLIC
-            FILE_SET realproject_public_module_interfaces
+            FILE_SET re_public_module_interfaces
             FILES ${cppm_abs}
     )
 endfunction()
@@ -84,7 +84,7 @@ function(_generate_shaders_wrappers target)
     if(NOT ${target_has_shaders})
         return()
     endif()
-    get_target_property(sources_as_cxx_impl_units ${target} realproject_sources_as_cxx_impl_units)
+    get_target_property(sources_as_cxx_impl_units ${target} RE_SOURCES_AS_CXX_IMPL_UNITS)
     if(NOT ${sources_as_cxx_impl_units})
         message(WARNING "Target ${target} does not use C++ module implementation unit "
                         "which are required by RealShaders. The target will not have shaders.")
@@ -92,11 +92,11 @@ function(_generate_shaders_wrappers target)
     endif()
 
     # Load target properties and prepare variables
-    get_target_property(base_dir ${target} realproject_base_dir_rel)
-    get_target_property(shader_sources_rel ${target} realproject_glsl_sources_rel)
-    get_target_property(shader_headers_rel ${target} realproject_glsl_headers_rel)
-    get_target_property(cpp_namespace ${target} realproject_shader_cxx_namespace)
-    get_target_property(module_name ${target} realproject_cxx_interface_module)
+    get_target_property(base_dir ${target} RE_BASE_DIR_REL)
+    get_target_property(shader_sources_rel ${target} RE_GLSL_SOURCES_REL)
+    get_target_property(shader_headers_rel ${target} RE_GLSL_HEADERS_REL)
+    get_target_property(cpp_namespace ${target} RE_SHADER_NAMESPACE)
+    get_target_property(module_name ${target} RE_CXX_INTERFACE_MODULE)
     _load_shader_naming_constants()
 
     # Prepare reused variables
@@ -117,7 +117,7 @@ function(_generate_shaders_wrappers target)
     set(shader_dirs)
     foreach(shader_rel IN LISTS shader_sources_rel)
         get_filename_component(shader_ext ${shader_rel} LAST_EXT)
-        if (${shader_ext} IN_LIST REALPROJECT_GLSL_STAGE_EXTENSIONS)
+        if (${shader_ext} IN_LIST RE_GLSL_STAGE_EXTENSIONS)
             _generate_cpp_wrapper_for_stage(${target} ${shader_rel})
             get_filename_component(shader_dir ${shader_rel} DIRECTORY)
             list(APPEND shader_dirs ${shader_dir}) # Collect directories
@@ -146,7 +146,7 @@ function(_generate_shaders_wrappers target)
         )
         target_sources(${target}
             PUBLIC
-                FILE_SET realproject_public_module_interfaces
+                FILE_SET re_public_module_interfaces
                 FILES ${cppm_abs}
         )
     endforeach()

@@ -1,5 +1,6 @@
 # author     Dubsky Tomas
 
+include("${CMAKE_CURRENT_LIST_DIR}/Setup.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/SourceProcessing.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/FinalizeTarget.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ResourcePackaging.cmake")
@@ -8,17 +9,15 @@ include("${CMAKE_CURRENT_LIST_DIR}/ResourcePackaging.cmake")
 macro(_add_real_target target)
     get_target_property(source_dir ${target} SOURCE_DIR)
     set_target_properties(${target} PROPERTIES
-        CXX_STANDARD                            23
-        CXX_MODULE_STD                          ON
-        realproject_cxx_interface_module        ""
-        realproject_sources_as_cxx_impl_units   OFF
-        realproject_base_dir_rel                "."
-        realproject_base_dir_abs                "${source_dir}"
-        realproject_setup_filepath_rel          ""
-        realproject_setup_module                ""
-        realproject_glsl_standard               "460"
-        realproject_glsl_headers_rel            ""
-        realproject_glsl_sources_rel            ""
+        RE_CXX_INTERFACE_MODULE     ""
+        RE_BASE_DIR_REL             "."
+        RE_BASE_DIR_ABS             "${source_dir}"
+        RE_SETUP_FILEPATH_REL       ""
+        RE_SETUP_MODULE             ""
+        RE_GLSL_HEADERS_REL         ""
+        RE_GLSL_SOURCES_REL         ""
+        RE_IS_REAL_TARGET           ON
+        ${RE_REAL_TARGET_DEFAULT_PROPERTY_OVERRIDES}
     )
     cmake_language(DEFER CALL _finalize_real_target ${target})
 endmacro()

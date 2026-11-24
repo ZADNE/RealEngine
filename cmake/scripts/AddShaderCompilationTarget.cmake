@@ -10,8 +10,8 @@ function(_add_shader_compilation_target target)
     endif()
 
     # Load target properties and prepare variables
-    get_target_property(base_dir ${target} realproject_base_dir_rel)
-    get_target_property(shader_sources_rel ${target} realproject_glsl_sources_rel)
+    get_target_property(base_dir ${target} RE_BASE_DIR_REL)
+    get_target_property(shader_sources_rel ${target} RE_GLSL_SOURCES_REL)
     get_target_property(target_includes ${target} INCLUDE_DIRECTORIES)
     if (NOT shader_sources_rel)
         return()
@@ -33,7 +33,7 @@ function(_add_shader_compilation_target target)
                             "GLSL will be compiled as Debug.")
         endif()
     endif()
-    get_target_property(glsl_standard ${target} realproject_glsl_standard)
+    get_target_property(glsl_standard ${target} RE_GLSL_STANDARD)
     list(APPEND glslc_flags "-std=${glsl_standard}")
     set(glslc_include_paths
         "$<LIST:REMOVE_ITEM,$<LIST:TRANSFORM,$<LIST:REMOVE_DUPLICATES,${target_includes}>,PREPEND,-I>,-I>"
@@ -42,7 +42,7 @@ function(_add_shader_compilation_target target)
     # Create commands to compile the shaders
     foreach(shader_source_rel IN LISTS shader_sources_rel)
         get_filename_component(shader_ext ${shader_source_rel} LAST_EXT)
-        if (${shader_ext} IN_LIST REALPROJECT_GLSL_STAGE_EXTENSIONS)
+        if (${shader_ext} IN_LIST RE_GLSL_STAGE_EXTENSIONS)
             set(shader_source_abs "${CMAKE_CURRENT_SOURCE_DIR}/${base_dir}/${shader_source_rel}")
             set(shader_out_base_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${shader_source_rel}")
             set(shader_c_abs    "${shader_out_base_abs}.${shader_c_ext}")   # C representation

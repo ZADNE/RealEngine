@@ -3,7 +3,7 @@
 function(get_realengine_base_dir_abs)
     if(TARGET RealEngine)
         get_target_property(base_dir RealEngine
-            HEADER_DIRS_realproject_public_headers
+            HEADER_DIRS_re_public_headers
         )
     else()
         # Assume building from source
@@ -38,8 +38,8 @@ endfunction()
 
 function(_does_target_have_shaders target)
     get_target_property(target_type ${target} TYPE)
-    get_target_property(shader_sources_rel ${target} realproject_glsl_sources_rel)
-    get_target_property(shader_headers_rel ${target} realproject_glsl_headers_rel)
+    get_target_property(shader_sources_rel ${target} RE_GLSL_SOURCES_REL)
+    get_target_property(shader_headers_rel ${target} RE_GLSL_HEADERS_REL)
     list(APPEND all_sources ${shader_sources_rel})
     list(APPEND all_sources ${shader_headers_rel})
     list(LENGTH all_sources shader_count)

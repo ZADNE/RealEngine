@@ -1,5 +1,5 @@
 /**
- *  @author    Automatically generated file by RealProject
+ *  @author    Automatically generated file by RealEngine
  */
 export module @module_name@@module_partition@;
 import $<IF:$<STREQUAL:@module_name@,realengine>,:graphics.pipelines.PipelineSources,realengine>;

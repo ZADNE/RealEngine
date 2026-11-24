@@ -38,4 +38,4 @@ set(REALENGINE_BUILDING_FROM_SOURCE FALSE
 include("${CMAKE_CURRENT_LIST_DIR}/RealEngineTargets.cmake")
 
 # CMake functions needed by projects using RealEngine (e.g. add_real_executable)
-include("${CMAKE_CURRENT_LIST_DIR}/scripts/RealProject.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/scripts/RealEngine.cmake")

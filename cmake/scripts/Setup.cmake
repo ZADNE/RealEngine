@@ -10,12 +10,12 @@ function(_re_define_target_property_and_cache_var NAME)
     )
     set(CACHE{${NAME}}
         TYPE ${ARG_TYPE}
-        HELP "${ARG_HELP}"
-        VALUE "${ARG_VALUE}"
+        HELP ${ARG_HELP}
+        VALUE ${ARG_VALUE}
     )
     define_property(TARGET
         PROPERTY ${NAME}
-        BRIEF_DOCS "${ARG_HELP}"
+        BRIEF_DOCS ${ARG_HELP}
         INITIALIZE_FROM_VARIABLE ${NAME}
     )
 endfunction()
@@ -31,13 +31,13 @@ _re_define_target_property_and_cache_var(
     RE_HEADER_EXTENSIONS
     TYPE  STRING
     HELP  "Extensions interpreted as C++ header files"
-    VALUE ".hpp"
+    VALUE ".hpp;.h"
 )
 _re_define_target_property_and_cache_var(
     RE_SOURCE_EXTENSIONS
     TYPE  STRING
     HELP  "Extensions interpreted as C++ source files"
-    VALUE ".cpp"
+    VALUE ".cpp;.c"
 )
 _re_define_target_property_and_cache_var(
     RE_GLSL_HEADER_EXTENSIONS
@@ -57,7 +57,7 @@ _re_define_target_property_and_cache_var(
     RE_SOURCES_AS_CXX_IMPL_UNITS
     TYPE  BOOL
     HELP  "Tells whether all source files are interpreted as module implementation units"
-    VALUE OFF
+    VALUE ON
 )
 _re_define_target_property_and_cache_var(
     RE_GLSL_STANDARD
@@ -72,7 +72,7 @@ _re_define_target_property_and_cache_var(
     VALUE ""
 )
 
-set(CACHE RE_REAL_TARGET_DEFAULT_PROPERTY_OVERRIDES
+set(CACHE{RE_REAL_TARGET_DEFAULT_PROPERTY_OVERRIDES}
     TYPE STRING
     HELP "Property name-value pairs that are set for all real targets."
     VALUE 

@@ -9,7 +9,7 @@ set(REALENGINE_BUILDING_FROM_SOURCE TRUE
     CACHE INTERNAL "Whether building RealEngine from source (as opposed to using installed)"
 )
 
-include("cmake/scripts/RealProject.cmake")
+include("cmake/scripts/RealEngine.cmake")
 include("cmake/scripts/GetRealEngineVersion.cmake")
 
 function(_real_FetchContent_MakeAvailable)
@@ -145,12 +145,9 @@ block(PROPAGATE RealEngine_sublibs)
         real_target_init_file_sets(${target_name}
             BASE_DIR "src"
             GENERATE_CXX_MODULE_INTERFACE "realengine"
-            SOURCES_AS_CXX_MODULE_IMPL_UNITS
         )
         set_target_properties(${target_name} PROPERTIES
-            CXX_STANDARD 23
-            realproject_shader_cxx_namespace "re::glsl"
-            INTERPROCEDURAL_OPTIMIZATION TRUE
+            RE_SHADER_NAMESPACE "re::glsl"
         )
         target_include_directories(${target_name}
             PUBLIC
@@ -228,10 +225,6 @@ block(PROPAGATE RTICreator)
         BASE_DIR "tools"
         SOURCES_AS_CXX_MODULE_IMPL_UNITS
     )
-    set_target_properties(ResourcePackager PROPERTIES
-        CXX_STANDARD 23
-        INTERPROCEDURAL_OPTIMIZATION TRUE
-    )
     target_link_libraries(ResourcePackager
         PRIVATE
             argparse
@@ -246,10 +239,6 @@ block(PROPAGATE RTICreator)
         real_target_init_file_sets(RTICreator
             BASE_DIR "tools"
             SOURCES_AS_CXX_MODULE_IMPL_UNITS
-        )
-        set_target_properties(RTICreator PROPERTIES
-            CXX_STANDARD 23
-            INTERPROCEDURAL_OPTIMIZATION TRUE
         )
         target_link_libraries(RTICreator PRIVATE RealEngine)
         set(RTICreator "RTICreator")
@@ -279,13 +268,13 @@ block()
         ARCHIVE
             DESTINATION         "${CMAKE_INSTALL_LIBDIR}"
             COMPONENT           RealEngine_Development
-        FILE_SET realproject_public_headers
+        FILE_SET re_public_headers
             DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
         FILE_SET HEADERS
             DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
-        FILE_SET realproject_public_module_interfaces
+        FILE_SET re_public_module_interfaces
             DESTINATION         "${CMAKE_INSTALL_INCLUDEDIR}"
             COMPONENT           RealEngine_Development
         FILE_SET CXX_MODULES
@@ -362,7 +351,7 @@ block()
             "${CMAKE_INSTALL_DATAROOTDIR}/RealEngine/cmake"
         COMPONENT RealEngine_Development
     )
-    install( # RealProject scripts and C++ template files
+    install( # RealEngine CMake scripts and condegen template files
         DIRECTORY
             "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cpp_templates"
             "${CMAKE_CURRENT_SOURCE_DIR}/cmake/scripts"

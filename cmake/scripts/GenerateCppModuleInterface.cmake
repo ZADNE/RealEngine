@@ -3,21 +3,21 @@
 include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
 function(_generate_cpp_interface_module target)
-    get_target_property(module_name ${target} realproject_cxx_interface_module)
+    get_target_property(module_name ${target} RE_CXX_INTERFACE_MODULE)
     if("${module_name}" STREQUAL "")
         return() # Target does not use generated module interface
     endif()
 
     # Get path to module base in source and binary directories
-    get_target_property(source_dir_abs ${target} realproject_base_dir_abs)
+    get_target_property(source_dir_abs ${target} RE_BASE_DIR_ABS)
     set(source_module_base_dir "${source_dir_abs}/${module_name}")
     get_target_property(binary_dir ${target} BINARY_DIR)
-    get_target_property(base_dir_rel ${target} realproject_base_dir_rel)
+    get_target_property(base_dir_rel ${target} RE_BASE_DIR_REL)
     set(binary_module_base_dir "${binary_dir}/${base_dir_rel}/${module_name}")
 
     # Process all files that belong to the public file set
     get_property(module_part_paths
-        FILE_SET realproject_public_module_interfaces
+        FILE_SET re_public_module_interfaces
         TARGET ${target}
         PROPERTY SOURCES
     )
@@ -42,7 +42,7 @@ function(_generate_cpp_interface_module target)
 
     # Configure the file
     get_target_property(target_binary_dir ${target} BINARY_DIR)
-    get_target_property(base_dir_rel ${target} realproject_base_dir_rel)
+    get_target_property(base_dir_rel ${target} RE_BASE_DIR_REL)
     set(interface_module "${target_binary_dir}/${base_dir_rel}/${target}.cppm")
     _generate_configured_file(
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../cpp_templates/ModuleInterface.cppm.in"
@@ -52,7 +52,7 @@ function(_generate_cpp_interface_module target)
     # Make the file part of target
     target_sources(${target}
         PUBLIC
-            FILE_SET realproject_public_module_interfaces
+            FILE_SET re_public_module_interfaces
             FILES ${interface_module}
     )
 endfunction()

@@ -25,7 +25,7 @@ function(real_target_package_resources)
         message(FATAL_ERROR "Name of target to package resources for not provided.")
     endif()
     if(NOT DEFINED ARG_INDEX_FILE)
-        get_target_property(base_dir ${ARG_TARGET} realproject_base_dir_rel)
+        get_target_property(base_dir ${ARG_TARGET} RE_BASE_DIR_REL)
         set(ARG_INDEX_FILE
             "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${ARG_TARGET}/ResourceIndex.gen.cppm"
         )
@@ -50,7 +50,7 @@ function(real_target_package_resources)
     # Make the index file part of target
     target_sources(${ARG_TARGET}
         PUBLIC
-            FILE_SET realproject_public_module_interfaces
+            FILE_SET re_public_module_interfaces
             FILES ${ARG_INDEX_FILE}
     )
 
