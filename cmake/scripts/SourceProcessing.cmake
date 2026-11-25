@@ -62,10 +62,15 @@ endfunction()
 
 # Based on file extensions, add source files into the target
 function(_incorporate_scoped_sources target path_rel file_scope)
-    get_target_property(sources_as_cxx_impl_units ${target} RE_SOURCES_AS_CXX_IMPL_UNITS)
+    get_target_property(module_interface_extensions ${target} RE_MODULE_INTERFACE_EXTENSIONS)
+    get_target_property(header_extensions           ${target} RE_HEADER_EXTENSIONS)
+    get_target_property(source_extensions           ${target} RE_SOURCE_EXTENSIONS)
+    get_target_property(glsl_header_extensions      ${target} RE_GLSL_HEADER_EXTENSIONS)
+    get_target_property(glsl_stage_extensions       ${target} RE_GLSL_STAGE_EXTENSIONS)
+    get_target_property(sources_as_cxx_impl_units   ${target} RE_SOURCES_AS_CXX_IMPL_UNITS)
     foreach(source IN LISTS ARGN)
         get_filename_component(source_ext ${source} LAST_EXT)
-        if(${source_ext} IN_LIST RE_MODULE_INTERFACE_EXTENSIONS)
+        if(${source_ext} IN_LIST module_interface_extensions)
             if(${file_scope} STREQUAL "PUBLIC")
                 target_sources(${target}
                     PUBLIC
@@ -79,7 +84,7 @@ function(_incorporate_scoped_sources target path_rel file_scope)
                         FILES ${source}
                 )
             endif()
-        elseif(${source_ext} IN_LIST RE_HEADER_EXTENSIONS)
+        elseif(${source_ext} IN_LIST header_extensions)
             if(${file_scope} STREQUAL "PUBLIC")
                 target_sources(${target}
                     PUBLIC
@@ -89,7 +94,7 @@ function(_incorporate_scoped_sources target path_rel file_scope)
             elseif(${file_scope} STREQUAL "PRIVATE")
                 target_sources(${target} PRIVATE ${source})
             endif()
-        elseif(${source_ext} IN_LIST RE_SOURCE_EXTENSIONS)
+        elseif(${source_ext} IN_LIST source_extensions)
             if(${sources_as_cxx_impl_units})
                 target_sources(${target}
                     PRIVATE
@@ -99,12 +104,12 @@ function(_incorporate_scoped_sources target path_rel file_scope)
             else()
                 target_sources(${target} PRIVATE ${source})
             endif()
-        elseif(${source_ext} IN_LIST RE_GLSL_HEADER_EXTENSIONS)
+        elseif(${source_ext} IN_LIST glsl_header_extensions)
             set_property(TARGET ${target}
                 APPEND PROPERTY RE_GLSL_HEADERS_REL
                 "${path_rel}/${source}"
             )
-        elseif(${source_ext} IN_LIST RE_GLSL_STAGE_EXTENSIONS)
+        elseif(${source_ext} IN_LIST glsl_stage_extensions)
             set_property(TARGET ${target}
                 APPEND PROPERTY RE_GLSL_SOURCES_REL
                 "${path_rel}/${source}"

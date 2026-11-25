@@ -18,11 +18,13 @@ function(_generate_cpp_setup_file target)
 
     # Prepare variables
     get_target_property(base_dir ${target} RE_BASE_DIR_REL)
+    get_target_property(glsl_header_extensions ${target} RE_GLSL_HEADER_EXTENSIONS)
+    get_target_property(glsl_stage_extensions ${target} RE_GLSL_STAGE_EXTENSIONS)
     set(template_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../cpp_templates")
     set(cmake_command ${CMAKE_COMMAND})
     set(source_dir ${CMAKE_SOURCE_DIR})
     set(binary_dir ${CMAKE_BINARY_DIR})
-    set(shader_file_extensions "${RE_GLSL_HEADER_EXTENSIONS};${RE_GLSL_STAGE_EXTENSIONS}")
+    set(shader_file_extensions "${glsl_header_extensions};${glsl_stage_extensions}")
     file(RELATIVE_PATH target_base_dir_rel ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/${base_dir}")
     set(cppm_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${setup_rel}")
 
