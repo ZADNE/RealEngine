@@ -19,18 +19,18 @@ macro(_re_add_real_target target)
         RE_IS_REAL_TARGET           ON
         ${RE_REAL_TARGET_DEFAULT_PROPERTY_OVERRIDES}
     )
-    cmake_language(DEFER CALL _finalize_real_target ${target})
+    cmake_language(DEFER CALL _re_finalize_real_target ${target})
 endmacro()
 
 # Adds a Real library
-# Add both C++ and GLSL sources via real_target_sources
+# Add both C++ and GLSL sources via re_target_sources
 macro(re_add_library)
     add_library(${ARGV})
     _re_add_real_target(${ARGV0})
 endmacro()
 
 # Adds a Real library
-# Add both C++ and GLSL sources via real_target_sources
+# Add both C++ and GLSL sources via re_target_sources
 macro(re_add_executable)
     add_executable(${ARGV})
     _re_add_real_target(${ARGV0})

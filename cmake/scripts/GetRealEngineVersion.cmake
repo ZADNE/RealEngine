@@ -2,7 +2,7 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
-function(get_realengine_version)
+function(re_get_engine_version out_var)
     re_get_engine_base_dir_abs(engine_base_dir_abs)
     file(READ
         "${engine_base_dir_abs}/RealEngine/utility/Version.cppm"
@@ -15,11 +15,11 @@ function(get_realengine_version)
     string(REGEX MATCH "constexpr int k_versionPatch = ([0-9]+)" _ ${version_file})
     set(version_patch "${CMAKE_MATCH_1}")
 
-    set(realengine_version "${version_major}.${version_minor}.${version_patch}" PARENT_SCOPE)
+    set(${out_var} "${version_major}.${version_minor}.${version_patch}" PARENT_SCOPE)
 endfunction()
 
 # Print the version to stdout if running in script mode
 if(DEFINED CMAKE_ARGV0)
-    get_realengine_version()
-    execute_process(COMMAND ${CMAKE_COMMAND} -E echo "${realengine_version}")
+    re_get_engine_version(engine_version)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E echo "${engine_version}")
 endif()

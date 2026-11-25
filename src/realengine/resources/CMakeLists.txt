@@ -1,6 +1,6 @@
 add_subdirectory(hot_reload)
 
-real_target_sources(RealEngine_utility
+re_target_sources(RealEngine_utility
     PUBLIC
         FileIO.cppm                 FileIO.cpp
         PackageConstants.cppm       

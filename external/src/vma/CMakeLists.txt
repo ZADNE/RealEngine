@@ -1,4 +1,4 @@
-real_target_sources(vma
+re_target_sources(vma
     PUBLIC
         vk_mem_alloc.cppm
         vk_mem_alloc.h

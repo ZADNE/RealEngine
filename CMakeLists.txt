@@ -142,7 +142,7 @@ block(PROPAGATE RealEngine_sublibs)
     # This function sets common properties
     function(_real_add_realengine_sublib target_name)
         re_add_library(${target_name} STATIC)
-        real_target_init_file_sets(${target_name}
+        re_target_init_file_sets(${target_name}
             BASE_DIR "src"
             GENERATE_CXX_MODULE_INTERFACE "realengine"
         )
@@ -190,7 +190,7 @@ block(PROPAGATE RealEngine_sublibs)
 
     # RealEngine main target
     re_add_library(RealEngine INTERFACE)
-    real_target_init_file_sets(RealEngine BASE_DIR "src")
+    re_target_init_file_sets(RealEngine BASE_DIR "src")
     target_link_libraries(RealEngine
         INTERFACE
             ${RealEngine_sublibs}
@@ -203,7 +203,7 @@ block(PROPAGATE RTICreator)
     # Doxygen documentation
     find_package(Doxygen)
     if (Doxygen_FOUND)
-        get_realengine_version()
+        re_get_engine_version(realengine_version)
         set(doxyfile_template "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile")
         set(doxyfile "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
         configure_file(
@@ -221,9 +221,8 @@ block(PROPAGATE RTICreator)
 
     # ResourcePackager
     re_add_executable(ResourcePackager)
-    real_target_init_file_sets(ResourcePackager
+    re_target_init_file_sets(ResourcePackager
         BASE_DIR "tools"
-        SOURCES_AS_CXX_MODULE_IMPL_UNITS
     )
     target_link_libraries(ResourcePackager
         PRIVATE
@@ -236,9 +235,8 @@ block(PROPAGATE RTICreator)
     # RTICreator (Windows only)
     if (WIN32)
         re_add_executable(RTICreator)
-        real_target_init_file_sets(RTICreator
+        re_target_init_file_sets(RTICreator
             BASE_DIR "tools"
-            SOURCES_AS_CXX_MODULE_IMPL_UNITS
         )
         target_link_libraries(RTICreator PRIVATE RealEngine)
         set(RTICreator "RTICreator")
@@ -326,7 +324,7 @@ block()
     )
 
     # Configure/generate and install CMake scripts
-    get_realengine_version()
+    re_get_engine_version(realengine_version)
     write_basic_package_version_file(
         "${CMAKE_CURRENT_BINARY_DIR}/RealEngineConfigVersion.cmake"
         VERSION ${realengine_version}

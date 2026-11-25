@@ -2,7 +2,7 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
-function(_generate_cpp_setup_file target)
+function(_re_generate_cpp_setup_file target)
     # Check whether it should be generated
     get_target_property(setup_rel ${target} RE_SETUP_FILEPATH_REL)
     get_target_property(module_name ${target} RE_SETUP_MODULE)

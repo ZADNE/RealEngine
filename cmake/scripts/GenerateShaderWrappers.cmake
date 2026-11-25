@@ -2,7 +2,7 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
-function(_shader_filename_to_identifier filename out_shader_identifier)
+function(_re_shader_filename_to_identifier filename out_shader_identifier)
     string(REPLACE "." "_" filename ${filename})
     string(SUBSTRING ${filename} 0 1 first_char)
     string(SUBSTRING ${filename} 1 -1 remainder)
@@ -10,7 +10,7 @@ function(_shader_filename_to_identifier filename out_shader_identifier)
     set(${out_shader_identifier} "${first_char}${remainder}" PARENT_SCOPE)
 endfunction()
 
-function(_shader_path_to_module_partition path_rel  out_module_partition)
+function(_re_shader_path_to_module_partition path_rel  out_module_partition)
     string(FIND ${path_rel} "/" first_sep)
     math(INCREMENT first_sep)
     string(SUBSTRING ${path_rel} ${first_sep} -1 module_partition)
@@ -19,7 +19,7 @@ function(_shader_path_to_module_partition path_rel  out_module_partition)
     set(${out_module_partition} ":${module_partition}_gen" PARENT_SCOPE)
 endfunction()
 
-function(_generate_cpp_wrapper_for_stage target shader_rel)
+function(_re_generate_cpp_wrapper_for_stage target shader_rel)
     # Compose variables
     get_filename_component(shader ${shader_rel} NAME)
     get_filename_component(shader_rel_dir ${shader_rel} DIRECTORY)
@@ -31,8 +31,8 @@ function(_generate_cpp_wrapper_for_stage target shader_rel)
     file(TO_NATIVE_PATH "${target_base_dir_rel}/${shader_rel}" debug_shader_rel)
     string(REPLACE "\\" "\\\\" debug_shader_rel "${debug_shader_rel}")
     set(debug_shader_rel "$<$<CONFIG:Debug>:${debug_shader_rel}>")
-    _shader_filename_to_identifier(${shader} shader_identifier)
-    _shader_path_to_module_partition(${shader_rel} module_partition)
+    _re_shader_filename_to_identifier(${shader} shader_identifier)
+    _re_shader_path_to_module_partition(${shader_rel} module_partition)
 
     # Generate the files
     _re_generate_configured_file("${template_dir}/Shader.cppm.in" ${cppm_abs})
@@ -49,7 +49,7 @@ function(_generate_cpp_wrapper_for_stage target shader_rel)
     )
 endfunction()
 
-function(_generate_cpp_wrapper_to_expose_header target header_rel)
+function(_re_generate_cpp_wrapper_to_expose_header target header_rel)
     # Check if this header should be exposed
     set(header_abs "${CMAKE_CURRENT_SOURCE_DIR}/${base_dir}/${header_rel}")
     file(READ ${header_abs} header_content LIMIT 2047)
@@ -67,7 +67,7 @@ function(_generate_cpp_wrapper_to_expose_header target header_rel)
     get_filename_component(header_rel_dir ${header_rel} DIRECTORY)
     set(cppm_rel "${header_rel_dir}/${header}.gen.cppm")
     set(cppm_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${cppm_rel}")
-    _shader_path_to_module_partition(${header_rel} module_partition)
+    _re_shader_path_to_module_partition(${header_rel} module_partition)
 
     # Generate the file
     configure_file("${template_dir}/ShaderHeader.cppm.in" ${cppm_abs} @ONLY)
@@ -78,7 +78,7 @@ function(_generate_cpp_wrapper_to_expose_header target header_rel)
     )
 endfunction()
 
-function(_generate_shaders_wrappers target)
+function(_re_generate_shaders_wrappers target)
     # Check if this target has shaders
     re_does_target_have_shaders(${target} target_has_shaders)
     if(NOT ${target_has_shaders})
@@ -119,7 +119,7 @@ function(_generate_shaders_wrappers target)
     foreach(shader_rel IN LISTS shader_sources_rel)
         get_filename_component(shader_ext ${shader_rel} LAST_EXT)
         if (${shader_ext} IN_LIST glsl_stage_extensions)
-            _generate_cpp_wrapper_for_stage(${target} ${shader_rel})
+            _re_generate_cpp_wrapper_for_stage(${target} ${shader_rel})
             get_filename_component(shader_dir ${shader_rel} DIRECTORY)
             list(APPEND shader_dirs ${shader_dir}) # Collect directories
         endif()
@@ -128,13 +128,13 @@ function(_generate_shaders_wrappers target)
     # Generate directory stage wrappers
     list(REMOVE_DUPLICATES shader_dirs)
     foreach(dir IN LISTS shader_dirs) # For each dir
-        _shader_path_to_module_partition("${dir}/AllShaders" module_partition)
+        _re_shader_path_to_module_partition("${dir}/AllShaders" module_partition)
         # Find all shaders in it
         set(exports_imports)
         foreach(shader_rel IN LISTS shader_sources_rel)
             get_filename_component(shader_dir ${shader_rel} DIRECTORY)
             if(${shader_dir} STREQUAL ${dir})
-                _shader_path_to_module_partition(${shader_rel} shader_module_partition)
+                _re_shader_path_to_module_partition(${shader_rel} shader_module_partition)
                 list(APPEND exports_imports ${shader_module_partition})
             endif()
         endforeach()
@@ -154,7 +154,7 @@ function(_generate_shaders_wrappers target)
 
     # Expose shader headers
     foreach(header_rel IN LISTS shader_headers_rel)
-        _generate_cpp_wrapper_to_expose_header(${target} ${header_rel})
+        _re_generate_cpp_wrapper_to_expose_header(${target} ${header_rel})
     endforeach()
     list(LENGTH shader_headers_rel exposed_header_count)
     if(${exposed_header_count} GREATER 0)

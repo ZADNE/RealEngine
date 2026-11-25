@@ -2,7 +2,7 @@
 
 # Initializes file sets of a real target
 # Syntax:
-#     real_target_init_file_sets(
+#     re_target_init_file_sets(
 #        <target>
 #        BASE_DIR <directory_name>
 #        [ GENERATE_CXX_MODULE_INTERFACE <module_name> ]
@@ -14,7 +14,7 @@
 #     All target's module partition interfaces must declare partition as:
 #         export module <module_name>:folder.subfolder.FileName;
 #     The module interface will not be valid if this condition is not satisfied.
-function(real_target_init_file_sets target)
+function(re_target_init_file_sets target)
     set(option_keywords "")
     set(one_value_keywords BASE_DIR GENERATE_CXX_MODULE_INTERFACE)
     cmake_parse_arguments(ARG "${option_keywords}" "${one_value_keywords}" "" ${ARGN})
@@ -61,7 +61,7 @@ function(real_target_init_file_sets target)
 endfunction()
 
 # Based on file extensions, add source files into the target
-function(_incorporate_scoped_sources target path_rel file_scope)
+function(_re_incorporate_scoped_sources target path_rel file_scope)
     get_target_property(module_interface_extensions ${target} RE_MODULE_INTERFACE_EXTENSIONS)
     get_target_property(header_extensions           ${target} RE_HEADER_EXTENSIONS)
     get_target_property(source_extensions           ${target} RE_SOURCE_EXTENSIONS)
@@ -125,13 +125,13 @@ endfunction()
 # Adds C++ source files (headers, source, shaders) files to a target
 # C++ headers maintain the scope (PUBLIC, PRIVATE)
 # C++ sources and GLSL headers/stages are always private
-function(real_target_sources target)
+function(re_target_sources target)
     # Sanity check
     get_target_property(is_real_target ${target} RE_IS_REAL_TARGET)
     if(NOT ${is_real_target})
         message(FATAL_ERROR
             "Target ${target} is not a Real target, "
-            "and thus real_target_sources cannot be used on it."
+            "and thus re_target_sources cannot be used on it."
         )
         return()
     endif()
@@ -147,6 +147,6 @@ function(real_target_sources target)
     )
 
     # Incorporate the sources
-    _incorporate_scoped_sources(${target} ${path_rel} PUBLIC ${ARG_PUBLIC})
-    _incorporate_scoped_sources(${target} ${path_rel} PRIVATE ${ARG_PRIVATE})
+    _re_incorporate_scoped_sources(${target} ${path_rel} PUBLIC ${ARG_PUBLIC})
+    _re_incorporate_scoped_sources(${target} ${path_rel} PRIVATE ${ARG_PRIVATE})
 endfunction()

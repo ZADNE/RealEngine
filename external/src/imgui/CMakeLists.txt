@@ -1,4 +1,4 @@
-﻿real_target_sources(ImGui
+﻿re_target_sources(ImGui
     PUBLIC
         imconfig.h                  
         imgui.h                     imgui.cpp

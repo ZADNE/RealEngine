@@ -1,4 +1,4 @@
-real_target_sources(RTICreator
+re_target_sources(RTICreator
     PRIVATE 
                                     Main.cpp
         MainMenuRoom.cppm           MainMenuRoom.cpp

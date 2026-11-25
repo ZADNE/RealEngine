@@ -1,4 +1,4 @@
-﻿real_target_sources(lodepng
+﻿re_target_sources(lodepng
     PUBLIC
         lodepng.hpp                 lodepng.cpp
 )

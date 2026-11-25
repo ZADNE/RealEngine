@@ -2,7 +2,7 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
-function(_add_shader_compilation_target target)
+function(_re_add_shader_compilation_target target)
     # Check if this target has shaders
     re_does_target_have_shaders(${target} target_has_shaders)
     if(NOT ${target_has_shaders})

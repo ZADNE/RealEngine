@@ -2,7 +2,7 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
-function(_generate_cpp_interface_module target)
+function(_re_generate_cpp_interface_module target)
     get_target_property(module_name ${target} RE_CXX_INTERFACE_MODULE)
     if("${module_name}" STREQUAL "")
         return() # Target does not use generated module interface

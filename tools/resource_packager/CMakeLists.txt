@@ -1,4 +1,4 @@
-﻿real_target_sources(ResourcePackager
+﻿re_target_sources(ResourcePackager
     PRIVATE
         Arguments.cppm              Arguments.cpp
                                     Main.cpp

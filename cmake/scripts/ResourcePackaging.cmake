@@ -4,7 +4,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
 # Create a custom target that will index and package files:
 # Syntax:
-#     real_target_package_resources(
+#     re_target_package_resources(
 #        TARGET <target>
 #        PACKAGE_DIR <directory_name>
 #        [ INDEX_FILE <file_path> ]
@@ -15,7 +15,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 # The target will be named <target>_PackageResources.
 # The packaging will be done in non-debug builds only as debug build of RealEngine
 # reads the unpackaged data.
-function(real_target_package_resources)
+function(re_target_package_resources)
     set(one_value_args TARGET PACKAGE_DIR INDEX_FILE MODULE_NAME)
     set(multi_value_args INPUT_DIRS)
     cmake_parse_arguments(ARG "" "${one_value_args}" "${multi_value_args}" ${ARGN})
