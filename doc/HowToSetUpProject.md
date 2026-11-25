@@ -21,11 +21,11 @@ The top level `CMakeLists.txt` should stay intact. Real also contains RealEngine
 
 ### CMake setup
 
-Projects using RealEngine shall be created with `add_real_executable` and `add_real_library` functions which take the same arguments as their standard versions. It is also advised to set up the main source directory - eg. `real_target_init_file_sets(MyProject BASE_DIR "src")` allows to `#include` files relative to `src` directory.
+Projects using RealEngine shall be created with `re_add_executable` and `re_add_library` functions which take the same arguments as their standard versions. It is also advised to set up the main source directory - eg. `real_target_init_file_sets(MyProject BASE_DIR "src")` allows to `#include` files relative to `src` directory.
 
 Individual files can be added to project using `real_target_sources`. This function works similar to `target_sources`. The important difference is that automatically incorporates shaders based on file extensions. By default it expects the same file extensions as Real Naming Convention recommends, though it can be changed via CMake cache variables.
 
-See `cmake/script/RealEngine.cmake` (and `cmake/script/Setup.cmake`) for full list and documentation of public functions and configuration options.
+As a rule, all public CMake functions start with `re_`, properties start with `RE_`, and internal functions that should not be used directly start with `_re_`. See `cmake/script/RealEngine.cmake` (and `cmake/script/Setup.cmake`) for full list and documentation of public functions and configuration options.
 
 ### Incorporation of GLSL shaders
 

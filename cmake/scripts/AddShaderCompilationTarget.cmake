@@ -4,7 +4,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
 function(_add_shader_compilation_target target)
     # Check if this target has shaders
-    _does_target_have_shaders(${target})
+    re_does_target_have_shaders(${target} target_has_shaders)
     if(NOT ${target_has_shaders})
         return()
     endif()
@@ -17,7 +17,7 @@ function(_add_shader_compilation_target target)
     if (NOT shader_sources_rel)
         return()
     endif()
-    _load_shader_naming_constants()
+    _re_load_shader_naming_constants()
 
     # Determine shader compilation flags
     if(${CMAKE_BUILD_TYPE} STREQUAL "Release")

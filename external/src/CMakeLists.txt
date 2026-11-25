@@ -5,17 +5,17 @@ set(CMAKE_CXX_CLANG_TIDY "")
 set(RE_SOURCES_AS_CXX_IMPL_UNITS OFF)
 
 # argparse
-add_real_library(argparse OBJECT)
+re_add_library(argparse OBJECT)
 real_target_init_file_sets(argparse BASE_DIR ".")
 add_subdirectory(argparse)
 
 # Filewatch
-add_real_library(filewatch OBJECT)
+re_add_library(filewatch OBJECT)
 real_target_init_file_sets(filewatch BASE_DIR ".")
 add_subdirectory(filewatch)
 
 # Dear ImGui
-add_real_library(ImGui STATIC)
+re_add_library(ImGui STATIC)
 real_target_init_file_sets(ImGui BASE_DIR ".")
 target_link_libraries(ImGui
     PRIVATE
@@ -26,12 +26,12 @@ target_link_libraries(ImGui
 add_subdirectory(imgui)
 
 # lodepng
-add_real_library(lodepng STATIC)
+re_add_library(lodepng STATIC)
 real_target_init_file_sets(lodepng BASE_DIR ".")
 add_subdirectory(lodepng)
 
 # Vulkan Memory Allocator
-add_real_library(vma OBJECT)
+re_add_library(vma OBJECT)
 real_target_init_file_sets(vma BASE_DIR ".")
 target_link_libraries(vma
     PRIVATE

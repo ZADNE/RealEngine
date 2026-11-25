@@ -44,7 +44,7 @@ function(_generate_cpp_interface_module target)
     get_target_property(target_binary_dir ${target} BINARY_DIR)
     get_target_property(base_dir_rel ${target} RE_BASE_DIR_REL)
     set(interface_module "${target_binary_dir}/${base_dir_rel}/${target}.cppm")
-    _generate_configured_file(
+    _re_generate_configured_file(
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../cpp_templates/ModuleInterface.cppm.in"
         ${interface_module}
     )

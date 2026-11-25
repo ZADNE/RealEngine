@@ -141,7 +141,7 @@ block(PROPAGATE RealEngine_sublibs)
     # RealEngine is composed of a number of static sub-libraries
     # This function sets common properties
     function(_real_add_realengine_sublib target_name)
-        add_real_library(${target_name} STATIC)
+        re_add_library(${target_name} STATIC)
         real_target_init_file_sets(${target_name}
             BASE_DIR "src"
             GENERATE_CXX_MODULE_INTERFACE "realengine"
@@ -189,7 +189,7 @@ block(PROPAGATE RealEngine_sublibs)
     # _real_add_realengine_sublib(RealEngine_systems)
 
     # RealEngine main target
-    add_real_library(RealEngine INTERFACE)
+    re_add_library(RealEngine INTERFACE)
     real_target_init_file_sets(RealEngine BASE_DIR "src")
     target_link_libraries(RealEngine
         INTERFACE
@@ -220,7 +220,7 @@ block(PROPAGATE RTICreator)
     endif()
 
     # ResourcePackager
-    add_real_executable(ResourcePackager)
+    re_add_executable(ResourcePackager)
     real_target_init_file_sets(ResourcePackager
         BASE_DIR "tools"
         SOURCES_AS_CXX_MODULE_IMPL_UNITS
@@ -231,11 +231,11 @@ block(PROPAGATE RTICreator)
             bit7z
             RealEngine
     )
-    real_copy_7z_dll_to_target(ResourcePackager)
+    re_copy_7z_dll_to_target(ResourcePackager)
 
     # RTICreator (Windows only)
     if (WIN32)
-        add_real_executable(RTICreator)
+        re_add_executable(RTICreator)
         real_target_init_file_sets(RTICreator
             BASE_DIR "tools"
             SOURCES_AS_CXX_MODULE_IMPL_UNITS

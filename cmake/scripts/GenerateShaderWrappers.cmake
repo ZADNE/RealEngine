@@ -35,8 +35,8 @@ function(_generate_cpp_wrapper_for_stage target shader_rel)
     _shader_path_to_module_partition(${shader_rel} module_partition)
 
     # Generate the files
-    _generate_configured_file("${template_dir}/Shader.cppm.in" ${cppm_abs})
-    _generate_configured_file("${template_dir}/Shader.cpp.in" ${cpp_abs})
+    _re_generate_configured_file("${template_dir}/Shader.cppm.in" ${cppm_abs})
+    _re_generate_configured_file("${template_dir}/Shader.cpp.in" ${cpp_abs})
 
     # Make the files part of the project
     target_sources(${target}
@@ -80,7 +80,7 @@ endfunction()
 
 function(_generate_shaders_wrappers target)
     # Check if this target has shaders
-    _does_target_have_shaders(${target})
+    re_does_target_have_shaders(${target} target_has_shaders)
     if(NOT ${target_has_shaders})
         return()
     endif()
@@ -98,7 +98,7 @@ function(_generate_shaders_wrappers target)
     get_target_property(glsl_stage_extensions ${target} RE_GLSL_STAGE_EXTENSIONS)
     get_target_property(cpp_namespace ${target} RE_SHADER_NAMESPACE)
     get_target_property(module_name ${target} RE_CXX_INTERFACE_MODULE)
-    _load_shader_naming_constants()
+    _re_load_shader_naming_constants()
 
     # Prepare reused variables
     if("${cpp_namespace}" STREQUAL "")
@@ -141,7 +141,7 @@ function(_generate_shaders_wrappers target)
 
         # Generate the file
         set(cppm_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${dir}/AllShaders.gen.cppm")
-        _generate_configured_file(
+        _re_generate_configured_file(
             "${template_dir}/ModuleInterface.cppm.in"
             ${cppm_abs}
         )
@@ -159,9 +159,9 @@ function(_generate_shaders_wrappers target)
     list(LENGTH shader_headers_rel exposed_header_count)
     if(${exposed_header_count} GREATER 0)
         # Add include path for RealShaders folder that header wrappers use
-        get_realengine_base_dir_abs()
+        re_get_engine_base_dir_abs(engine_base_dir_abs)
         target_include_directories(${target}
-            PUBLIC "${realengine_base_dir_abs}"
+            PUBLIC "${engine_base_dir_abs}"
         )
     endif()
 

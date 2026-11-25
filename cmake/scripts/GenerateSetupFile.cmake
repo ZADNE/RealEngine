@@ -29,7 +29,7 @@ function(_generate_cpp_setup_file target)
     set(cppm_abs "${CMAKE_CURRENT_BINARY_DIR}/${base_dir}/${setup_rel}")
 
     # Generate the file
-    _generate_configured_file(
+    _re_generate_configured_file(
         "${template_dir}/TargetSetup.cppm.in"
         ${cppm_abs}
     )

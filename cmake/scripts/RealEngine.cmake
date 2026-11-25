@@ -5,8 +5,8 @@ include("${CMAKE_CURRENT_LIST_DIR}/SourceProcessing.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/FinalizeTarget.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ResourcePackaging.cmake")
 
-# Do not use directly, use add_real_library or add_real_executable
-macro(_add_real_target target)
+# Do not use directly, use re_add_library or re_add_executable
+macro(_re_add_real_target target)
     get_target_property(source_dir ${target} SOURCE_DIR)
     set_target_properties(${target} PROPERTIES
         RE_CXX_INTERFACE_MODULE     ""
@@ -24,16 +24,16 @@ endmacro()
 
 # Adds a Real library
 # Add both C++ and GLSL sources via real_target_sources
-macro(add_real_library)
+macro(re_add_library)
     add_library(${ARGV})
-    _add_real_target(${ARGV0})
+    _re_add_real_target(${ARGV0})
 endmacro()
 
 # Adds a Real library
 # Add both C++ and GLSL sources via real_target_sources
-macro(add_real_executable)
+macro(re_add_executable)
     add_executable(${ARGV})
-    _add_real_target(${ARGV0})
+    _re_add_real_target(${ARGV0})
     # Copy DLLs in post build step
     add_custom_command(TARGET ${ARGV0} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E

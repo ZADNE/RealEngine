@@ -3,9 +3,9 @@
 include("${CMAKE_CURRENT_LIST_DIR}/Utility.cmake")
 
 function(get_realengine_version)
-    get_realengine_base_dir_abs()
+    re_get_engine_base_dir_abs(engine_base_dir_abs)
     file(READ
-        "${realengine_base_dir_abs}/RealEngine/utility/Version.cppm"
+        "${engine_base_dir_abs}/RealEngine/utility/Version.cppm"
         version_file
     )
     string(REGEX MATCH "constexpr int k_versionMajor = ([0-9]+)" _ ${version_file})
